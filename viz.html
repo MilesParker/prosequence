@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Prasanga — Argument Graph</title>
+<script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: #0f1117;
+  color: #e0e0e0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  overflow: hidden;
+}
+
+#graph { display: block; }
+
+/* ── Tooltip ── */
+#tooltip {
+  position: fixed;
+  background: rgba(12, 14, 22, 0.97);
+  border: 1px solid #2a2d3e;
+  border-radius: 8px;
+  padding: 12px 16px;
+  max-width: 340px;
+  font-size: 12px;
+  line-height: 1.5;
+  pointer-events: none;
+  z-index: 100;
+  display: none;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.6);
+}
+#tooltip .tt-tag {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #666;
+  margin-bottom: 5px;
+}
+#tooltip .tt-text {
+  color: #ddd;
+  margin-bottom: 8px;
+  font-size: 12.5px;
+}
+#tooltip .tt-grounds {
+  color: #aaa;
+  font-size: 11px;
+  margin-bottom: 4px;
+  border-left: 2px solid #333;
+  padding-left: 8px;
+}
+#tooltip .tt-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 8px;
+}
+#tooltip .tt-chip {
+  font-size: 10px;
+  padding: 2px 7px;
+  border-radius: 10px;
+  background: #1e2030;
+  color: #888;
+}
+#tooltip .tt-chip.pro   { background: #1b3520; color: #66bb6a; }
+#tooltip .tt-chip.anti  { background: #3b1a1a; color: #ef9a9a; }
+#tooltip .tt-chip.emp   { background: #1e2738; color: #78909c; }
+#tooltip .tt-chip.med   { background: #2a2040; color: #ce93d8; }
+#tooltip .tt-chip.prop  { background: #0d2b5e; color: #90caf9; }
+#tooltip .tt-chip.term  { background: #3b2e00; color: #ffcc02; }
+
+/* ── Detail panel ── */
+#panel {
+  position: fixed;
+  top: 0; right: 0;
+  width: 380px;
+  height: 100vh;
+  background: rgba(10, 12, 20, 0.98);
+  border-left: 1px solid #1e2030;
+  padding: 0;
+  overflow-y: auto;
+  z-index: 200;
+  display: none;
+  font-size: 13px;
+}
+#panel-header {
+  position: sticky;
+  top: 0;
+  background: rgba(10, 12, 20, 0.98);
+  border-bottom: 1px solid #1e2030;
+  padding: 16px 20px 14px;
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  z-index: 1;
+}
+#panel-header h2 {
+  flex: 1;
+  font-size: 14px;
+  font-weight: 600;
+  color: #e0e0e0;
+  line-height: 1.4;
+}
+#close-panel {
+  flex-shrink: 0;
+  background: none;
+  border: none;
+  color: #555;
+  font-size: 20px;
+  cursor: pointer;
+  line-height: 1;
+  padding: 0 2px;
+}
+#close-panel:hover { color: #fff; }
+#panel-body { padding: 16px 20px 24px; }
+.p-section { margin-top: 18px; }
+.p-label {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: #555;
+  margin-bottom: 6px;
+}
+.p-value {
+  color: #bbb;
+  line-height: 1.6;
+  font-size: 13px;
+}
+.p-value.grounds {
+  border-left: 2px solid #1e2030;
+  padding-left: 10px;
+  color: #999;
+  font-size: 12px;
+}
+.p-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
+.p-chip {
+  font-size: 11px;
+  padding: 3px 9px;
+  border-radius: 10px;
+  background: #1a1c28;
+  color: #777;
+}
+.edge-list { list-style: none; margin-top: 4px; }
+.edge-list li {
+  padding: 6px 0;
+  border-bottom: 1px solid #141620;
+  font-size: 12px;
+  color: #999;
+  display: flex;
+  gap: 8px;
+  align-items: baseline;
+}
+.rel { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 3px; flex-shrink: 0; }
+.rel-support  { background: #143320; color: #4caf50; }
+.rel-attack   { background: #321414; color: #e53935; }
+.rel-warrants { background: #2a1540; color: #ab47bc; }
+.empty { color: #333; font-style: italic; font-size: 12px; padding: 4px 0; }
+
+/* ── Legend ── */
+#legend {
+  position: fixed;
+  bottom: 20px;
+  left: 20px;
+  background: rgba(10, 12, 20, 0.95);
+  border: 1px solid #1e2030;
+  border-radius: 8px;
+  padding: 12px 16px;
+  font-size: 11px;
+  z-index: 50;
+  user-select: none;
+}
+.leg-section { margin-top: 0; }
+.leg-section + .leg-section { margin-top: 10px; border-top: 1px solid #1e2030; padding-top: 10px; }
+.leg-title { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #444; margin-bottom: 7px; }
+.leg-row { display: flex; align-items: center; gap: 9px; margin: 4px 0; color: #888; }
+.leg-circle { border-radius: 50%; flex-shrink: 0; }
+.leg-diamond { flex-shrink: 0; transform: rotate(45deg); }
+.leg-line { height: 0; flex-shrink: 0; }
+.leg-line.dashed { border-style: dashed; }
+
+/* ── Title bar ── */
+#titlebar {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  height: 44px;
+  background: rgba(10, 12, 20, 0.92);
+  border-bottom: 1px solid #1a1c28;
+  display: flex;
+  align-items: center;
+  padding: 0 18px;
+  z-index: 40;
+  gap: 14px;
+  backdrop-filter: blur(4px);
+}
+#titlebar h1 { font-size: 13px; font-weight: 600; color: #bbb; }
+#titlebar .subtitle { font-size: 11px; color: #444; }
+
+#loading {
+  position: fixed; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  background: #0f1117;
+  z-index: 999;
+  font-size: 14px;
+  color: #555;
+}
+</style>
+</head>
+<body>
+
+<div id="loading">Loading graph…</div>
+<div id="titlebar">
+  <h1 id="ds-title">Prasanga</h1>
+  <span class="subtitle" id="ds-subtitle"></span>
+</div>
+<svg id="graph"></svg>
+<div id="tooltip"></div>
+<div id="panel">
+  <div id="panel-header">
+    <h2 id="panel-tag"></h2>
+    <button id="close-panel" title="Close">×</button>
+  </div>
+  <div id="panel-body" id="panel-content"></div>
+</div>
+<div id="legend">
+  <div class="leg-section">
+    <div class="leg-title">Nodes</div>
+    <div class="leg-row"><div style="width:28px;height:14px;background:#1565c0;border:2px solid #5c9de8;border-radius:3px;flex-shrink:0"></div> Proposition</div>
+    <div class="leg-row"><div style="width:22px;height:12px;background:#2e7d32;border:1.5px solid #66bb6a;border-radius:3px;flex-shrink:0"></div> Pro argument</div>
+    <div class="leg-row"><div style="width:22px;height:12px;background:#c62828;border:1.5px solid #ef9a9a;border-radius:3px;flex-shrink:0"></div> Anti argument</div>
+    <div class="leg-row"><div style="width:22px;height:12px;background:#546e7a;border:1.5px solid #78909c;border-radius:3px;flex-shrink:0"></div> Empirical / Analogy</div>
+    <div class="leg-row"><div style="width:22px;height:12px;background:#2e7d32;border:1.5px dashed #66bb6a;border-radius:3px;flex-shrink:0"></div> Mediating (dashed)</div>
+    <div class="leg-row"><div style="width:22px;height:12px;background:#f57f17;border:1.5px solid #ffe082;border-radius:3px;flex-shrink:0"></div> Terminal value</div>
+  </div>
+  <div class="leg-section">
+    <div class="leg-title">Edges</div>
+    <div class="leg-row"><div class="leg-line" style="width:26px;border-top:2.5px solid #4caf50"></div> Support</div>
+    <div class="leg-row"><div class="leg-line dashed" style="width:26px;border-top:2.5px dashed #e53935"></div> Attack</div>
+    <div class="leg-row"><div class="leg-line dashed" style="width:26px;border-top:2px dashed #9c27b0"></div> Warrants</div>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ─────────────── helpers ─────────────── */
+
+// Node dimensions (half-width, half-height) — squarish
+const NODE_W = 42, NODE_H = 36;
+const PROP_W = 48, PROP_H = 40;
+const LINE_H = 12;   // px between text lines
+const WORDS_PER_LINE = 2;
+
+function nodeHW(n) { return n._type === 'proposition' ? PROP_W : NODE_W; }
+function nodeHH(n) { return n._type === 'proposition' ? PROP_H : NODE_H; }
+
+// Split tag into lines of up to WORDS_PER_LINE words
+function wrapTag(tag) {
+  const words = (tag || '').split(/\s+/).filter(Boolean);
+  const lines = [];
+  for (let i = 0; i < words.length; i += WORDS_PER_LINE) {
+    lines.push(words.slice(i, i + WORDS_PER_LINE).join(' '));
+  }
+  return lines.length ? lines : [''];
+}
+
+// Returns point on the rect boundary of node n (centered at nx,ny)
+// in the direction toward (tx,ty), plus arrowPad extra outset
+function rectEdgePt(nx, ny, tx, ty, n, arrowPad) {
+  const hw = nodeHW(n) + (arrowPad || 0);
+  const hh = nodeHH(n) + (arrowPad || 0);
+  const dx = tx - nx, dy = ty - ny;
+  if (dx === 0 && dy === 0) return { x: nx, y: ny };
+  const adx = Math.abs(dx), ady = Math.abs(dy);
+  const scale = adx * hh > ady * hw ? hw / adx : hh / ady;
+  return { x: nx + dx * scale, y: ny + dy * scale };
+}
+
+function nodeFill(n) {
+  if (n._type === 'proposition') return '#1565c0';
+  if (n._type === 'terminal')    return '#f9a825';
+  const c = n.cluster;
+  if (c === 'Pro')     return '#2e7d32';
+  if (c === 'Anti')    return '#c62828';
+  return '#546e7a'; // Empirical, Analogy, other
+}
+
+function nodeStroke(n) {
+  if (n._type === 'proposition') return '#5c9de8';
+  if (n._type === 'terminal')    return '#ffe082';
+  const c = n.cluster;
+  if (c === 'Pro')     return '#66bb6a';
+  if (c === 'Anti')    return '#ef9a9a';
+  return '#78909c';
+}
+
+function edgeColor(rel) {
+  if (rel === 'Support')  return '#4caf50';
+  if (rel === 'Attack')   return '#e53935';
+  return '#7b1fa2';
+}
+
+function relHtml(rel) {
+  const cls = rel === 'Support' ? 'rel-support' : rel === 'Attack' ? 'rel-attack' : 'rel-warrants';
+  return `<span class="rel ${cls}">${rel}</span>`;
+}
+
+function chipClass(n) {
+  if (n._type === 'proposition') return 'prop';
+  if (n._type === 'terminal')    return 'term';
+  if (n.isMediating)             return 'med';
+  const c = n.cluster;
+  if (c === 'Pro')  return 'pro';
+  if (c === 'Anti') return 'anti';
+  return 'emp';
+}
+
+function sourceLabel(src) {
+  if (!src) return 'unknown';
+  const t = src.type || 'unknown';
+  if (src.reference) return `${t} — ${src.reference}`;
+  return t;
+}
+
+/* ─────────────── main ─────────────── */
+
+async function main() {
+  let raw;
+  try {
+    const resp = await fetch('discourse-spaces/free-transit.yaml');
+    if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
+    raw = await resp.text();
+  } catch (err) {
+    document.getElementById('loading').textContent = `Failed to load YAML: ${err.message}`;
+    return;
+  }
+
+  const data = jsyaml.load(raw);
+
+  document.getElementById('ds-title').textContent = data.title || 'Argument Graph';
+  document.getElementById('ds-subtitle').textContent = data.id || '';
+
+  const prop  = data.proposition       || {};
+  const args  = data.arguments         || [];
+  const tvns  = data.terminalValueNodes || [];
+  const edges = data.edges             || [];
+
+  const maxArgDepth = args.reduce((m, a) => Math.max(m, a.depth ?? 0), 0);
+  const termDepth   = maxArgDepth + 1;
+
+  // Build unified node array
+  const nodes = [
+    { ...prop, _type: 'proposition', _depth: 0 },
+    ...args.map(a => ({ ...a, _type: 'argument', _depth: a.depth ?? 0 })),
+    ...tvns.map(t => ({ ...t, _type: 'terminal', _depth: termDepth })),
+  ];
+
+  const nodeById = new Map(nodes.map(n => [n.id, n]));
+
+  // Links — D3 forceLink will replace string ids with node references
+  const links = edges.map(e => ({ ...e }));
+
+  // Adjacency for panel
+  const incoming = new Map(nodes.map(n => [n.id, []]));
+  const outgoing  = new Map(nodes.map(n => [n.id, []]));
+  edges.forEach(e => {
+    outgoing.get(e.source)?.push(e);
+    incoming.get(e.target)?.push(e);
+  });
+
+  /* ─── SVG / zoom setup ─── */
+
+  const W = window.innerWidth;
+  const H = window.innerHeight;
+  const TOP_OFFSET = 44; // title bar height
+  const totalDepths = termDepth + 1;
+  const depthSpacing = (H - TOP_OFFSET - 40) / totalDepths;
+
+  const svg = d3.select('#graph')
+    .attr('width', W)
+    .attr('height', H);
+
+  const defs = svg.append('defs');
+
+  // Arrowhead markers — one per relationship type
+  [
+    { id: 'arr-support',  color: '#4caf50' },
+    { id: 'arr-attack',   color: '#e53935' },
+    { id: 'arr-warrants', color: '#7b1fa2' },
+  ].forEach(({ id, color }) => {
+    defs.append('marker')
+      .attr('id', id)
+      .attr('viewBox', '0 -5 10 10')
+      .attr('refX', 8)   // tip of arrow
+      .attr('refY', 0)
+      .attr('markerWidth', 6)
+      .attr('markerHeight', 6)
+      .attr('orient', 'auto')
+      .append('path')
+      .attr('d', 'M0,-5L10,0L0,5')
+      .attr('fill', color)
+      .attr('opacity', 0.85);
+  });
+
+  const g = svg.append('g').attr('transform', `translate(0,${TOP_OFFSET})`);
+
+  svg.call(
+    d3.zoom()
+      .scaleExtent([0.08, 5])
+      .on('zoom', e => g.attr('transform', `translate(${e.transform.x},${e.transform.y + TOP_OFFSET}) scale(${e.transform.k})`))
+  );
+
+  /* ─── Draw edges ─── */
+
+  const linkSel = g.append('g').attr('class', 'links')
+    .selectAll('line')
+    .data(links)
+    .enter().append('line')
+    .attr('stroke', d => edgeColor(d.relationship))
+    .attr('stroke-width', d => d.relationship === 'Warrants' ? 1.2 : 1.6)
+    .attr('stroke-dasharray', d => {
+      if (d.relationship === 'Warrants') return '6,4';
+      if (d.relationship === 'Attack')   return '5,3';
+      return null;
+    })
+    .attr('stroke-opacity', 0.65)
+    .attr('marker-end', d => {
+      if (d.relationship === 'Support')  return 'url(#arr-support)';
+      if (d.relationship === 'Attack')   return 'url(#arr-attack)';
+      return 'url(#arr-warrants)';
+    });
+
+  /* ─── Draw nodes ─── */
+
+  const nodeSel = g.append('g').attr('class', 'nodes')
+    .selectAll('g')
+    .data(nodes)
+    .enter().append('g')
+    .attr('class', 'node')
+    .attr('cursor', 'pointer')
+    .attr('opacity', d => d.uncertain ? 0.55 : 1);
+
+  // Rect background for all nodes
+  nodeSel.append('rect')
+    .attr('x', d => -nodeHW(d))
+    .attr('y', d => -nodeHH(d))
+    .attr('width',  d => nodeHW(d) * 2)
+    .attr('height', d => nodeHH(d) * 2)
+    .attr('rx', 4)
+    .attr('fill', d => nodeFill(d))
+    .attr('stroke', d => nodeStroke(d))
+    .attr('stroke-width', d => d._type === 'proposition' ? 2 : 1.5)
+    .attr('stroke-dasharray', d => d.isMediating ? '5,3' : null);
+
+  // Multi-line label text, vertically centered
+  nodeSel.append('text')
+    .attr('text-anchor', 'middle')
+    .attr('fill', '#e8e8e8')
+    .attr('font-size', d => d._type === 'proposition' ? '10px' : '9.5px')
+    .attr('font-family', 'system-ui, sans-serif')
+    .attr('pointer-events', 'none')
+    .attr('font-weight', d => d._type === 'proposition' ? '600' : '400')
+    .each(function(d) {
+      const lines = wrapTag(d.tag || d.id);
+      const totalH = (lines.length - 1) * LINE_H;
+      d3.select(this).selectAll('tspan')
+        .data(lines)
+        .enter().append('tspan')
+        .attr('x', 0)
+        .attr('dy', (_, i) => i === 0 ? -totalH / 2 + 'px' : LINE_H + 'px')
+        .attr('dominant-baseline', 'middle')
+        .text(t => t);
+    });
+
+  /* ─── Tooltip ─── */
+
+  const tooltip = document.getElementById('tooltip');
+
+  function showTooltip(event, d) {
+    const mainText = d.claim || d.text || '';
+    const cc = chipClass(d);
+    let html = `<div class="tt-tag">${d.tag || d.id}</div>`;
+    html += `<div class="tt-text">${mainText}</div>`;
+    if (d._type === 'argument' && d.grounds && d.grounds.text && d.grounds.text.trim() !== 'N/A') {
+      html += `<div class="tt-grounds">${d.grounds.text.trim()}</div>`;
+    }
+    html += '<div class="tt-meta">';
+    if (d._type === 'argument') {
+      html += `<span class="tt-chip ${cc}">${d.cluster}</span>`;
+      html += `<span class="tt-chip">depth ${d._depth}</span>`;
+      if (d.isMediating) html += `<span class="tt-chip med">mediating</span>`;
+      if (d.grounds?.source) html += `<span class="tt-chip">${d.grounds.source.type}</span>`;
+    } else if (d._type === 'proposition') {
+      html += `<span class="tt-chip prop">proposition</span>`;
+    } else {
+      html += `<span class="tt-chip term">terminal value</span>`;
+    }
+    html += '</div>';
+    tooltip.innerHTML = html;
+    tooltip.style.display = 'block';
+    moveTooltip(event);
+  }
+
+  function moveTooltip(event) {
+    const x = event.clientX, y = event.clientY;
+    const tw = 340, th = 140;
+    const left = x + 16 + tw > window.innerWidth  ? x - tw - 10 : x + 16;
+    const top  = y + 10 + th > window.innerHeight  ? y - th - 10 : y + 10;
+    tooltip.style.left = left + 'px';
+    tooltip.style.top  = top  + 'px';
+  }
+
+  nodeSel
+    .on('mouseover', showTooltip)
+    .on('mousemove', (event) => moveTooltip(event))
+    .on('mouseout',  () => { tooltip.style.display = 'none'; });
+
+  /* ─── Click / panel ─── */
+
+  const panel    = document.getElementById('panel');
+  const panelTag = document.getElementById('panel-tag');
+  const panelBody = document.getElementById('panel-body');
+
+  function showPanel(d) {
+    tooltip.style.display = 'none';
+    panelTag.textContent = d.tag || d.id;
+
+    const mainText = d.claim || d.text || '';
+    let html = '';
+
+    // ID
+    html += `<div class="p-section">
+      <div class="p-label">ID</div>
+      <div class="p-value" style="font-family:monospace;font-size:12px;color:#666">${d.id}</div>
+    </div>`;
+
+    // Main text
+    html += `<div class="p-section">
+      <div class="p-label">Statement</div>
+      <div class="p-value">${mainText}</div>
+    </div>`;
+
+    if (d._type === 'argument') {
+      if (d.grounds) {
+        if (d.grounds.text && d.grounds.text.trim() !== 'N/A') {
+          html += `<div class="p-section">
+            <div class="p-label">Grounds</div>
+            <div class="p-value grounds">${d.grounds.text.trim()}</div>
+          </div>`;
+        }
+        html += `<div class="p-section">
+          <div class="p-label">Source</div>
+          <div class="p-value">${sourceLabel(d.grounds.source)}</div>
+        </div>`;
+      }
+      html += `<div class="p-section">
+        <div class="p-label">Properties</div>
+        <div class="p-chips">
+          <span class="p-chip">${d.cluster}</span>
+          <span class="p-chip">depth ${d._depth}</span>
+          <span class="p-chip">${d.scheme || ''}</span>
+          ${d.isMediating ? '<span class="p-chip" style="color:#ce93d8">mediating</span>' : ''}
+          ${d.uncertain   ? '<span class="p-chip" style="color:#ff8a65">uncertain</span>' : ''}
+          <span class="p-chip">${d.submissionStatus || ''}</span>
+        </div>
+      </div>`;
+    } else if (d._type === 'terminal') {
+      html += `<div class="p-section"><div class="p-chips"><span class="p-chip" style="color:#ffcc02">terminal value</span></div></div>`;
+    } else {
+      html += `<div class="p-section"><div class="p-chips"><span class="p-chip" style="color:#90caf9">root proposition</span></div></div>`;
+    }
+
+    // Incoming edges
+    const inc = incoming.get(d.id) || [];
+    html += `<div class="p-section">
+      <div class="p-label">Incoming (${inc.length})</div>
+      <ul class="edge-list">`;
+    if (inc.length === 0) {
+      html += '<li><span class="empty">none</span></li>';
+    } else {
+      inc.forEach(e => {
+        const src = nodeById.get(e.source);
+        const lbl = src ? (src.tag || src.id) : e.source;
+        html += `<li>${relHtml(e.relationship)} <span>${lbl}</span></li>`;
+      });
+    }
+    html += '</ul></div>';
+
+    // Outgoing edges
+    const out = outgoing.get(d.id) || [];
+    html += `<div class="p-section">
+      <div class="p-label">Outgoing (${out.length})</div>
+      <ul class="edge-list">`;
+    if (out.length === 0) {
+      html += '<li><span class="empty">none</span></li>';
+    } else {
+      out.forEach(e => {
+        const tgt = nodeById.get(e.target);
+        const lbl = tgt ? (tgt.tag || tgt.id) : e.target;
+        html += `<li>${relHtml(e.relationship)} <span>${lbl}</span></li>`;
+      });
+    }
+    html += '</ul></div>';
+
+    panelBody.innerHTML = html;
+    panel.style.display = 'block';
+  }
+
+  nodeSel.on('click', (event, d) => {
+    event.stopPropagation();
+    showPanel(d);
+  });
+
+  svg.on('click', () => { panel.style.display = 'none'; });
+  document.getElementById('close-panel').addEventListener('click', () => { panel.style.display = 'none'; });
+
+  /* ─── Force simulation ─── */
+
+  const simulation = d3.forceSimulation(nodes)
+    .force('link', d3.forceLink(links)
+      .id(d => d.id)
+      .distance(70)
+      .strength(0.25))
+    .force('charge', d3.forceManyBody().strength(-280).distanceMax(400))
+    .force('x', d3.forceX(W / 2).strength(0.04))
+    .force('y', d3.forceY(d => (d._depth + 0.5) * depthSpacing).strength(0.85))
+    .force('collision', d3.forceCollide(d => Math.sqrt(nodeHW(d)**2 + nodeHH(d)**2) + 10))
+    .alphaDecay(0.02)
+    .on('tick', ticked);
+
+  function ticked() {
+    linkSel.each(function(d) {
+      const s = d.source, t = d.target;
+      const sp = rectEdgePt(s.x, s.y, t.x, t.y, s, 2);
+      const ep = rectEdgePt(t.x, t.y, s.x, s.y, t, 9); // 9px clearance for arrowhead
+      d3.select(this)
+        .attr('x1', sp.x).attr('y1', sp.y)
+        .attr('x2', ep.x).attr('y2', ep.y);
+    });
+
+    nodeSel.attr('transform', d => `translate(${d.x ?? 0},${d.y ?? 0})`);
+  }
+
+  // Drag
+  nodeSel.call(
+    d3.drag()
+      .on('start', (event, d) => {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x; d.fy = d.y;
+      })
+      .on('drag', (event, d) => { d.fx = event.x; d.fy = event.y; })
+      .on('end',  (event, d) => {
+        if (!event.active) simulation.alphaTarget(0);
+        d.fx = null; d.fy = null;
+      })
+  );
+
+  document.getElementById('loading').style.display = 'none';
+}
+
+main().catch(err => {
+  document.getElementById('loading').textContent = `Error: ${err.message}`;
+  console.error(err);
+});
+</script>
+</body>
+</html>
