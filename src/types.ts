@@ -73,6 +73,7 @@ export type GroundsSource =
 
 export interface Grounds {
   text: string
+  quote: string | null
   source: GroundsSource
 }
 
