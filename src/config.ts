@@ -2,6 +2,15 @@
 // v2 corpus (claim/inference model). Swap to another *.v2.yaml to view it.
 export const DATA_FILE = 'discourse-spaces/gaza.v2.yaml'
 
+// ── Inference rendering mode ──────────────────────────────────────────────────
+// 'diamond' — inferences are free-floating junction nodes (original).
+// 'port'    — an inference has exactly one target (invariant 1), so it collapses
+//             to a coloured port (nub) on that target claim's border; grounds and
+//             warrants attach to the port and the concludes/contests edge is
+//             implicit. Layout is claims-only (no inference ranks). Undercuts
+//             (contests an inference) hang a nub off the contested port.
+export const INFERENCE_RENDER: 'diamond' | 'port' = 'port'
+
 // ── Layout ──────────────────────────────────────────────────────────────────
 export const TITLE_BAR_HEIGHT = 44
 export const PANEL_WIDTH = 380
@@ -34,6 +43,8 @@ export const NODE = {
   // Inference junction marks are small and visually subordinate — wiring,
   // not peers. Rendered as a small diamond of this half-diagonal.
   infRadius: 7,
+  // Port mode: radius of the nub drawn on a claim's border.
+  portRadius: 6,
 } as const
 
 // ── Color palette (all values in HSL) ────────────────────────────────────────
@@ -112,6 +123,10 @@ export const LAYOUT = {
   ranksep: 90,              // px gap between ranks (routing room)
   edgesep: 28,              // px gap between edges (routing room)
   ranker: 'network-simplex' as const,
+  // Port mode: spacing between adjacent nubs along a claim's border, and how far
+  // an undercut nub hangs off the port it contests.
+  portGap: 20,
+  undercutOffset: 26,
   // Initial zoom-to-fit leaves this much of the viewport as margin.
   fitPadding: 0.92,
 } as const

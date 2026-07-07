@@ -1,8 +1,8 @@
 import { useEffect, useRef } from 'react'
 import * as d3 from 'd3'
 import type { DiscourseSpace } from '../../types'
-import { EDGE, NODE, TITLE_BAR_HEIGHT, VIEW } from '../../config'
-import { layoutSugiyama, fitTransform } from '../layout'
+import { COLORS, EDGE, NODE, TITLE_BAR_HEIGHT, VIEW, INFERENCE_RENDER } from '../../config'
+import { layoutSugiyama, layoutPorts, fitTransform } from '../layout'
 import {
   buildGraphData,
   edgeColor, edgeMarkerId,
@@ -41,10 +41,10 @@ export function Graph({ data, onHover, onClick }: Props) {
 
     const gd = buildGraphData(data)
     const { nodes, links } = gd
+    const ports = INFERENCE_RENDER === 'port'
 
-    // ── Sugiyama layered layout (dagre) ──────────────────────────────────────
-    // Positions are fixed; no force simulation. Assigns node.x / node.y.
-    const bounds = layoutSugiyama(gd)
+    // ── Layered layout (dagre). Positions are fixed; no force simulation. ─────
+    const bounds = ports ? layoutPorts(gd) : layoutSugiyama(gd)
 
     // Incident-link index, so a drag only re-clips the affected edges.
     // Built from the raw string endpoints before we resolve them below.
@@ -91,10 +91,15 @@ export function Graph({ data, onHover, onClick }: Props) {
 
     // ── Edges ────────────────────────────────────────────────────────────────
     // Rendered as paths through the layout's routed waypoints so they steer
-    // around nodes rather than cutting straight through them.
+    // around nodes rather than cutting straight through them. In port mode the
+    // concludes/contests-a-claim edges collapse into the port itself, so they
+    // are not drawn; undercuts (contests an inference) still need a connector.
+    const drawnLinks = ports
+      ? links.filter(l => l.role !== 'Concludes' && !(l.role === 'Contests' && !l.toInference))
+      : links
     const linkSel = g.append('g').attr('class', 'links')
       .selectAll<SVGPathElement, GraphLink>('path')
-      .data(links)
+      .data(drawnLinks)
       .join('path')
       .attr('fill', 'none')
       .attr('stroke', d => edgeColor(d.role))
@@ -115,6 +120,16 @@ export function Graph({ data, onHover, onClick }: Props) {
     nodeSel.each(function (d) {
       const sel = d3.select(this)
       if (d._kind === 'inference') {
+        if (ports) {
+          // Port nub on the target claim's border — green concludes, red contests.
+          const role: EdgeRole = (d as { concludes?: unknown }).concludes != null ? 'Concludes' : 'Contests'
+          sel.append('circle')
+            .attr('r', NODE.portRadius)
+            .attr('fill', edgeColor(role))
+            .attr('stroke', COLORS.background)
+            .attr('stroke-width', 1.5)
+          return
+        }
         // Small diamond — a subordinate junction, not a peer node.
         sel.append('path')
           .attr('d', diamondPath(NODE.infRadius))
