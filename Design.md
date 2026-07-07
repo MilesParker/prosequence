@@ -1,26 +1,86 @@
 # Argument Framework: Core Design Principles
 
+> **Schema v2 (2026-07-02).** The framework was migrated from the
+> Argument/Proposition/TerminalValueNode model to a **claim / inference**
+> model. The principles below are unchanged in spirit; the structural
+> vocabulary has changed. Read "The v2 data model" first — it is the
+> canonical mapping between the principles and what is actually stored.
+> The canonical TypeScript schema lives in [`src/types.ts`](src/types.ts).
+
+## 0. The v2 data model (claim / inference)
+
+**Two node types.**
+
+- **Claim** — the only content-bearing node (`id`, `tag`, `text`,
+  `terminal`, optional `attribution`, `cluster`, `uncertain`,
+  `submissionStatus`). One node per distinct claim; several people asserting
+  it on different evidence share the node and contribute separate inferences.
+- **Inference** — content-free. It binds specific grounds-claims and
+  warrant-claims to exactly one output. Rendered as a small junction, not a
+  peer node.
+
+**Four edge roles** (positions, not stored edge records — they fall out of an
+inference's fields):
+
+- **Grounds** (claim → inference): the evidence an inference runs on.
+- **Warrants** (claim → inference): the bridging assumptions. Multiple
+  warrants on one inference are **conjoint (AND)**. Alternative
+  justifications are **separate inferences (OR)**. `warrants: []` means
+  "implicit, not yet surfaced" — a legal state.
+- **Concludes** (inference → claim): the inference derives the claim. *A
+  support is an inference that concludes.*
+- **Contests** (inference → claim | inference): the inference attacks the
+  target. *An attack is an inference that contests.*
+  - contest a **claim** = **rebut**;
+  - contest an **inference** = **undercut**;
+  - rebut an **attributive** claim = **undermine**.
+
+  No separate attack taxonomy is stored — rebut/undercut/undermine are read
+  off the target's type.
+
+**Enums.** `ArgumentScheme` (FromExample, FromGeneralization, FromAnalogy,
+FromAuthority, FromConsequence, FromSign, FromCause, FromDefinition),
+`Cluster` (Pro, Anti, Empirical, Analogy, Terminal), `SubmissionStatus`
+(Pending, Interrogating, Rejected, Accepted), `GroundsSource` (Citation,
+SelfEvident, CommonKnowledge, LogicalNecessity, None).
+
+**Positions, not types.** "Proposition", "terminal", "warrant", "grounds",
+"attack" are no longer node/edge types — they are positions a claim or
+inference occupies, with two exceptions encoded as data:
+
+- `Claim.terminal: boolean` marks a bedrock commitment (may never be
+  concluded), distinct from "not yet supported" (a GAP-6 gap).
+- `DiscourseSpace.roots: ClaimId[]` designates the claims currently treated
+  as contested questions.
+
+**Retired constructs.** `Argument` (with embedded grounds), `Proposition` and
+`TerminalValueNode` as node types, `Support`/`Attack`/`Warrants` as edge
+types, `Grounds` as a struct, and the `depth`/`isMediating` fields are all
+gone. Depth is computed from topology; a mediating claim is one with no
+inference from it concluding a root. `cluster` survives on `Claim` as viz
+metadata; `hint` survives on `Inference` as a margin note.
+
 ## 1. The goal is completeness, not adjudication
 
 The framework does not determine whether arguments are correct or which side wins. It ensures that all reasonable arguments have been made, all implicit assumptions have been surfaced, and all warranted challenges have been lodged. The graph is successful when it is dialectically saturated — every argument that could reasonably be made has been made, and every warrant that could reasonably be challenged has been challenged.
 
-## 2. The atomic unit is the argument
+## 2. The atomic unit is the claim, joined by inferences
 
-An argument consists of: a claim (the assertable conclusion) and grounds (the attributed factual basis). The bridging assumptions that make the grounds count as evidence for the claim — warrants — are themselves argument nodes connected via Warrants edges. All elements must be explicit before an argument enters the graph.
+An assertion decomposes into: a **claim** (the assertable conclusion), its **grounds** (the attributed factual basis, itself a claim carrying `attribution`), and an **inference** that binds the grounds to the claim (`concludes`). The bridging assumptions that make the grounds count as evidence — **warrants** — are themselves claim nodes, listed in the inference's `warrants`. All elements must be explicit before the inference enters the graph.
 
-When making an argument, a participant must state: (a) what they believe — the claim; (b) why they believe it — the grounds; and (c) the assumptions that make b imply a — warrant argument nodes. Warrants are not sub-fields of an argument; they are first-class argument nodes in the graph, distinguishable from support and attack relationships by the Warrants edge type.
+When making an argument, a participant must state: (a) what they believe — the claim; (b) why they believe it — the grounds-claim; and (c) the assumptions that make b imply a — warrant claims on the inference. Warrants are not sub-fields; they are first-class claims, bound to a specific inference via its `warrants` list. A support and an attack are not different kinds of thing from an inference — a support *is* an inference that `concludes`, an attack *is* an inference that `contests`.
 
 ## 3. Warrants are the primary site of logical vulnerability
 
 All meaningful logical challenge ultimately targets a warrant — either an explicit one or an implied one that must be made explicit before it can be attacked. Grounds are factual claims attributed to a source. Claims are conclusions that follow or don't follow from their grounds via their warrants.
 
-Warrant argument nodes are connected to the arguments they bridge via Warrants edges. This is a distinct edge type from Support and Attack — it expresses that the warrant is constitutive of the inference, not merely additional evidence for it. Without the warrant the inference collapses; without a support edge the claim is merely less well supported.
+Warrant claims are attached to the inference they bridge via its `warrants` list. This is a distinct position from grounds — a warrant is constitutive of the inference, not merely additional evidence for it. Without the warrant the inference collapses; without an additional concluding inference the claim is merely less well supported. To challenge whether a warrant licenses the step, you **undercut** the inference (a `contests` edge targeting the inference itself), rather than rebutting a claim.
 
 What appears to be a grounds attack is always an attack on an implied warrant — either a source-credibility warrant ("this source is reliable") or an attribution-accuracy warrant ("this source actually reported this"). These implied warrants must be surfaced as explicit argument nodes before they can be attacked.
 
 ## 4. Grounds must be attributive
 
-Grounds are always attributed to a source. They take the form "source X reports/shows/found Y" rather than asserting facts directly. The source type determines the form of the implicit source-credibility warrant:
+Grounds are attributive **claims**: a claim carrying an `attribution: { source, quote }`, its text of the form "source X reports/shows/found Y" rather than asserting facts directly. Attributive claims are the empirical leaves of the graph — they bottom out by checkability against the cited source, not by a `terminal` flag, and should not be concluded by any inference (soft invariant 5). The source type determines the form of the implicit source-credibility warrant:
 
 - **Citation** — a specific paper, report, study, or document
 - **Self-evident** — true by inspection of the world; no citation needed but the self-evidence claim is itself attackable
@@ -50,15 +110,15 @@ Challenging a definition is a meta-move that redirects to a different discourse 
 
 ## 9. Terminal value nodes are bedrock
 
-Every inferential chain eventually bottoms out in a terminal value node — a bedrock commitment that cannot be further justified empirically within this discourse space. Terminal nodes are stated as plain value assertions (e.g. "highest utility is highest justice") without reference to named philosophical frameworks, preserving cultural neutrality.
+Every inferential chain eventually bottoms out in a terminal claim — a `Claim` with `terminal: true` (`cluster: Terminal`) — a bedrock commitment that cannot be further justified empirically within this discourse space. Terminal claims are stated as plain value assertions (e.g. "highest utility is highest justice") without reference to named philosophical frameworks, preserving cultural neutrality.
 
-Terminal nodes cannot be supported by further argument within the discourse space. They can be made explicit, compared, and acknowledged as the source of genuine value disagreement. Two participants who follow their inferential chains all the way down and find incompatible terminal nodes have located the actual source of their disagreement.
+Terminal claims cannot be concluded by any inference within the discourse space (invariant 2); the gatekeeper rejects any inference that concludes one. They can be made explicit, compared, and acknowledged as the source of genuine value disagreement. Two participants who follow their inferential chains all the way down and find incompatible terminal nodes have located the actual source of their disagreement.
 
 ## 10. The framework represents both inferential and dialectical structure in a unified graph
 
-The inferential structure captures how individual arguments are constructed — how grounds connect to claims via warrant argument nodes (Warrants edges). The dialectical structure captures how arguments relate to each other — Attack and Support edges. These are logically distinct concerns but are represented in a unified graph rather than separate layers, using three edge types: Warrants, Support, and Attack.
+The inferential structure captures how individual arguments are constructed — how grounds connect to claims via warrant claims on an inference. The dialectical structure captures how arguments relate — inferences that `conclude` (support) or `contest` (attack) other claims and inferences. These are logically distinct concerns but are represented in a unified graph rather than separate layers, using the four edge roles (Grounds, Warrants, Concludes, Contests) that fall out of inference structure.
 
-Dialectical attacks are arguments in their own right — they have claims, grounds, and their own warrant nodes. The framework does not assume or require synthesis. Genuine value disagreements are represented as incompatible terminal nodes, not as problems to be resolved. Most real arguments do not produce synthesis — they clarify where disagreement actually lives.
+Dialectical attacks are inferences in their own right — they run on grounds-claims and carry their own warrant claims. Because an attack is a node (an inference), it can itself be the *target* of an undercut — this is exactly why attacks had to become nodes rather than edges. The framework does not assume or require synthesis. Genuine value disagreements are represented as incompatible terminal claims, not as problems to be resolved. Most real arguments do not produce synthesis — they clarify where disagreement actually lives.
 
 ## 11. Depth is inferential distance, not importance
 
@@ -73,3 +133,66 @@ A node's depth in the graph measures how many inferential steps it is from the r
 **It is not:** A debate judge, a fact-checker, a political position, or a guarantee of resolution.
 
 **The core question it asks of every participant:** What would you have to believe in order to believe this? Following that question all the way down is the work the framework is designed to support.
+
+---
+
+## YAML generation rules (v2)
+
+A discourse-space corpus is a single YAML document with `id`, `title`,
+`definitions`, `roots`, `claims`, and `inferences`. The discipline rules are
+unchanged in spirit; only the shapes changed.
+
+- **Claims list.** Every assertion — conclusions, grounds, warrants,
+  terminals, and the contested questions themselves — is a `Claim`. Keep
+  claims **atomic**: one proposition per claim.
+- **Roots.** List the contested question(s) in `roots`. They are ordinary
+  claims; nothing "owns" them.
+- **Attribution on claims.** A claim that reports what a source says carries
+  `attribution: { source: <GroundsSource>, quote: <verbatim | null> }`. Its
+  text is attributive ("Source X reports Y"). These are the checkable leaves;
+  do not conclude them with an inference.
+- **Warrant claims as bridging assumptions.** Surface the assumption that
+  licenses each step as its own claim and list it in the inference's
+  `warrants`. Conjoint warrants (all required for one step) go on **one**
+  inference; genuinely **alternative** justifications are **separate**
+  inferences concluding the same claim.
+- **Contests for attacks.** An attack is an inference with `contests`.
+  Contest a **claim** to rebut it; contest an **inference** to undercut the
+  step; rebut an attributive claim to undermine it.
+- **Examples through generalisations.** An example claim feeds a
+  generalisation via an inference that `concludes` the generalisation; the
+  representativeness warrant attaches to *that* inference (the generalising
+  step), not to the example's internal attribution inference.
+- **Terminals as plain-language value assertions.** `terminal: true`,
+  `cluster: Terminal`, no attribution, never concluded.
+
+Validate every corpus with `npm run validate -- <corpus.v2.yaml>`. Errors are
+invariants 1–4 and 6; warnings are the soft invariant 5 and unsupported
+non-terminal claims (surfaced but not yet supported warrant claims, or claims
+that should be roots).
+
+## Corpus extraction (Step 4 shape change)
+
+The extraction procedure is unchanged for Steps 1–3 and 5 (identify the
+contested question, harvest positions, attribute grounds, interrogate for
+implicit warrants). **Step 4 — emit YAML — changes shape only:** instead of
+`arguments` (claim + embedded grounds), `terminalValueNodes`, and typed
+`edges`, emit a flat `claims` list (with `attribution` on the attributive
+ones and `terminal` on the bedrock ones), a `roots` list, and an
+`inferences` list whose `grounds`/`warrants`/`concludes`/`contests` fields
+encode all the connective tissue. `scripts/convert.ts` performs exactly this
+mechanical remapping from an old-model corpus.
+
+## GAP 1 — resolved (undercut = contests targeting an inference)
+
+GAP 1 was: a warrant-applicability attack (e.g. free-transit's *user-pays
+applied inconsistently*) had no clean representation, because it logically
+attacks *the applicability of a warranted connection* rather than a claim,
+and terminal nodes could not be targeted. In v2 this is a first-class
+**undercut**: an inference whose `contests` points at **another inference**.
+The user-pays-inconsistency argument now contests the inference that links
+*user-pays-as-policy* to the root (warranted by the user-pays terminal),
+saying "that path does not hold," without touching the policy claim or the
+terminal. Likewise, in the Gaza corpus the *confinement* claim undercuts the
+inference from the *Mosul-analogy* claim to the *Hamas-tactics* claim. This
+is the forced discovery that made attacks into nodes.

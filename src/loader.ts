@@ -3,62 +3,46 @@ import * as yaml from 'js-yaml'
 import {
   DiscourseSpace,
   DiscourseSpaceId,
-  NodeId,
-  EdgeId,
-  Argument,
-  TerminalValueNode,
-  Edge,
-  Grounds,
-  Definition,
-  Proposition
+  ClaimId,
+  InferenceId,
+  Claim,
+  Inference,
+  Attribution,
+  Definition
 } from './types'
 
-function castGrounds(g: any): Grounds {
+function castAttribution(a: any): Attribution | undefined {
+  if (!a) return undefined
   return {
-    text: g.text,
-    source: g.source
+    source: a.source,
+    quote: a.quote ?? null
   }
 }
 
-function castArgument(a: any): Argument {
+function castClaim(c: any): Claim {
   return {
-    id: a.id as NodeId,
-    tag: a.tag,
-    claim: a.claim,
-    grounds: castGrounds(a.grounds),
-    scheme: a.scheme,
-    cluster: a.cluster,
-    depth: a.depth,
-    isMediating: a.isMediating,
-    uncertain: a.uncertain,
-    submissionStatus: a.submissionStatus
+    id: c.id as ClaimId,
+    tag: c.tag,
+    text: c.text,
+    terminal: c.terminal ?? false,
+    attribution: castAttribution(c.attribution),
+    cluster: c.cluster,
+    uncertain: c.uncertain ?? false,
+    submissionStatus: c.submissionStatus ?? 'Accepted'
   }
 }
 
-function castTerminalValueNode(n: any): TerminalValueNode {
+function castInference(i: any): Inference {
   return {
-    id: n.id as NodeId,
-    tag: n.tag,
-    text: n.text
-  }
-}
-
-function castEdge(e: any): Edge {
-  return {
-    id: e.id as EdgeId,
-    source: e.source as NodeId,
-    target: e.target as NodeId,
-    relationship: e.relationship,
-    hint: e.hint ?? null,
-    uncertain: e.uncertain
-  }
-}
-
-function castProposition(p: any): Proposition {
-  return {
-    id: p.id as NodeId,
-    tag: p.tag,
-    text: p.text
+    id: i.id as InferenceId,
+    scheme: i.scheme ?? null,
+    uncertain: i.uncertain ?? false,
+    submissionStatus: i.submissionStatus ?? 'Accepted',
+    grounds: (i.grounds ?? []) as ClaimId[],
+    warrants: (i.warrants ?? []) as ClaimId[],
+    hint: i.hint ?? null,
+    concludes: i.concludes ? (i.concludes as ClaimId) : undefined,
+    contests: i.contests ? (i.contests as ClaimId | InferenceId) : undefined
   }
 }
 
@@ -77,9 +61,8 @@ export function loadDiscourseSpace(path: string): DiscourseSpace {
     id: data.id as DiscourseSpaceId,
     title: data.title,
     definitions: (data.definitions ?? []).map(castDefinition),
-    proposition: castProposition(data.proposition),
-    arguments: (data.arguments ?? []).map(castArgument),
-    terminalValueNodes: (data.terminalValueNodes ?? []).map(castTerminalValueNode),
-    edges: (data.edges ?? []).map(castEdge)
+    roots: (data.roots ?? []) as ClaimId[],
+    claims: (data.claims ?? []).map(castClaim),
+    inferences: (data.inferences ?? []).map(castInference)
   }
 }

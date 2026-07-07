@@ -1,10 +1,16 @@
-import { DiscourseSpace, NodeId } from './types'
+import { DiscourseSpace, ClaimId, Claim } from './types'
 
 export function printDiscourseSpace(ds: DiscourseSpace): void {
   console.log(`=== ${ds.title} [${ds.id}] ===\n`)
 
-  console.log(`PROPOSITION`)
-  console.log(`  [${ds.proposition.tag}] ${ds.proposition.text}\n`)
+  const claimById = new Map<string, Claim>(ds.claims.map(c => [c.id, c]))
+  const tagOf = (id: string) => claimById.get(id)?.tag ?? id
+
+  console.log(`ROOTS (${ds.roots.length})`)
+  for (const r of ds.roots) {
+    console.log(`  [${tagOf(r)}] ${claimById.get(r)?.text ?? r}`)
+  }
+  console.log()
 
   console.log(`DEFINITIONS (${ds.definitions.length})`)
   for (const def of ds.definitions) {
@@ -13,39 +19,45 @@ export function printDiscourseSpace(ds: DiscourseSpace): void {
   }
   console.log()
 
-  const tagByNodeId = buildTagIndex(ds)
-
-  console.log(`ARGUMENTS (${ds.arguments.length})`)
-  for (const arg of ds.arguments) {
-    console.log(`  [${arg.tag}]`)
-    console.log(`    claim:    ${arg.claim}`)
-    console.log(`    scheme:   ${arg.scheme}`)
-    console.log(`    cluster:  ${arg.cluster}`)
-    console.log(`    depth:    ${arg.depth}`)
-    console.log(`    mediating: ${arg.isMediating}`)
+  console.log(`CLAIMS (${ds.claims.length})`)
+  for (const c of ds.claims) {
+    const flags = [
+      c.terminal ? 'terminal' : null,
+      c.attribution ? 'attributive' : null,
+      c.uncertain ? 'uncertain' : null
+    ].filter(Boolean).join(', ')
+    console.log(`  [${c.tag}] (${c.cluster}${flags ? '; ' + flags : ''})`)
+    console.log(`    ${c.text}`)
+    if (c.attribution) {
+      console.log(`    source: ${sourceLabel(c.attribution.source)}`)
+    }
   }
   console.log()
 
-  console.log(`TERMINAL VALUE NODES (${ds.terminalValueNodes.length})`)
-  for (const tvn of ds.terminalValueNodes) {
-    console.log(`  [${tvn.tag}] ${tvn.text}`)
-  }
-  console.log()
-
-  console.log(`EDGES (${ds.edges.length})`)
-  for (const edge of ds.edges) {
-    const srcTag = tagByNodeId.get(edge.source) ?? edge.source
-    const tgtTag = tagByNodeId.get(edge.target) ?? edge.target
-    const uncertain = edge.uncertain ? ' [uncertain]' : ''
-    const hint = edge.hint ? ` (${edge.hint})` : ''
-    console.log(`  ${srcTag} → ${tgtTag} [${edge.relationship}]${hint}${uncertain}`)
+  console.log(`INFERENCES (${ds.inferences.length})`)
+  for (const inf of ds.inferences) {
+    const output = inf.concludes
+      ? `concludes → ${tagOf(inf.concludes)}`
+      : inf.contests
+        ? `contests → ${tagOf(inf.contests)}`
+        : '(no output!)'
+    const grounds = inf.grounds.map(g => tagOf(g)).join(', ')
+    const warrants = inf.warrants.length ? inf.warrants.map(w => tagOf(w)).join(', ') : '(implicit)'
+    const scheme = inf.scheme ? ` [${inf.scheme}]` : ''
+    console.log(`  ${inf.id}${scheme}`)
+    console.log(`    grounds:  ${grounds}`)
+    console.log(`    warrants: ${warrants}`)
+    console.log(`    ${output}`)
+    if (inf.hint) console.log(`    hint: ${inf.hint}`)
   }
 }
 
-function buildTagIndex(ds: DiscourseSpace): Map<NodeId, string> {
-  const map = new Map<NodeId, string>()
-  map.set(ds.proposition.id, ds.proposition.tag)
-  for (const arg of ds.arguments) map.set(arg.id, arg.tag)
-  for (const tvn of ds.terminalValueNodes) map.set(tvn.id, tvn.tag)
-  return map
+function sourceLabel(src: { type: string; reference?: string }): string {
+  if (src.reference) return `${src.type} — ${src.reference}`
+  return src.type
+}
+
+// Helper kept for potential external use; resolves a claim id to its tag.
+export function tagForClaim(ds: DiscourseSpace, id: ClaimId): string {
+  return ds.claims.find(c => c.id === id)?.tag ?? id
 }

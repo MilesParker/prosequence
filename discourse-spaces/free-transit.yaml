@@ -1605,8 +1605,12 @@ edges:
   # === USER PAYS INCONSISTENCY ATTACKS TERMINAL ===
   # NOTE: node-29 (user pays applied inconsistently) would logically attack
   # t-user-pays-principle but terminal nodes cannot be targeted.
-  # This is GAP 1 — warrant applicability attacks have no clean representation.
-  # The inconsistency argument instead attacks user-pays-as-policy directly.
+  # This was GAP 1 — warrant applicability attacks had no clean representation.
+  # RESOLVED in the v2 (claim/inference) model: scripts/convert.ts remaps this
+  # edge to an UNDERCUT — an inference contesting the inference that links
+  # user-pays-as-policy to the root. See discourse-spaces/free-transit.v2.yaml
+  # (i-e-inconsistency-attacks-user-pays-policy) and Design.md "GAP 1 — resolved".
+  # (This legacy old-model file is retained only as the converter's input.)
 
   - id: e-inconsistency-attacks-user-pays-policy
     source: user-pays-applied-inconsistently

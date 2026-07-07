@@ -1,0 +1,91 @@
+import { COLORS } from '../../config'
+import type { GraphNode, ClaimNode, InfNode, ChipKind } from '../graphData'
+import { claimChipKind, sourceLabel } from '../graphData'
+
+interface Props {
+  node: GraphNode
+  x: number
+  y: number
+  nodeById: Map<string, GraphNode>
+}
+
+const TOOLTIP_W = 340
+const TOOLTIP_H = 160
+
+function chipStyle(kind: ChipKind) {
+  const c = COLORS.chip[kind] ?? COLORS.chip.default
+  return { fontSize: 10, padding: '2px 7px', borderRadius: 10, background: c.bg, color: c.color }
+}
+
+function tagOf(id: string, nodeById: Map<string, GraphNode>): string {
+  const n = nodeById.get(id)
+  return n && n._kind === 'claim' ? (n.tag || id) : id
+}
+
+export function Tooltip({ node, x, y, nodeById }: Props) {
+  const left = x + 16 + TOOLTIP_W > window.innerWidth  ? x - TOOLTIP_W - 10 : x + 16
+  const top  = y + 10 + TOOLTIP_H > window.innerHeight ? y - TOOLTIP_H - 10 : y + 10
+
+  const shell = {
+    position: 'fixed' as const, left, top,
+    background: 'rgba(12, 14, 22, 0.97)',
+    border: `1px solid ${COLORS.border}`, borderRadius: 8, padding: '12px 16px',
+    maxWidth: TOOLTIP_W, fontSize: 12, lineHeight: 1.5,
+    pointerEvents: 'none' as const, zIndex: 100, boxShadow: '0 4px 20px rgba(0,0,0,0.6)',
+  }
+  const tagStyle = { fontSize: 10, fontWeight: 600 as const, textTransform: 'uppercase' as const, letterSpacing: '0.08em', color: '#666', marginBottom: 5 }
+  const chips = { display: 'flex', flexWrap: 'wrap' as const, gap: 6, marginTop: 8 }
+
+  if (node._kind === 'inference') {
+    const inf = node as InfNode
+    const warrantList = (inf.warrants ?? []).map(w => tagOf(String(w), nodeById))
+    return (
+      <div style={shell}>
+        <div style={tagStyle}>Inference</div>
+        <div style={{ color: '#ddd', marginBottom: 8, fontSize: 12.5 }}>
+          {inf.concludes ? 'Concludes a claim' : 'Contests a claim or inference'}
+        </div>
+        {inf.hint && (
+          <div style={{ color: '#aaa', fontSize: 11, marginBottom: 6, borderLeft: `2px solid ${COLORS.border}`, paddingLeft: 8 }}>
+            {inf.hint}
+          </div>
+        )}
+        {warrantList.length > 0 && (
+          <div style={{ color: '#999', fontSize: 11, marginBottom: 4 }}>
+            <span style={{ color: '#777' }}>warrants: </span>
+            {warrantList.join('; ')}
+          </div>
+        )}
+        <div style={chips}>
+          <span style={chipStyle('inference')}>{inf.scheme || 'no scheme'}</span>
+          {warrantList.length === 0 && <span style={chipStyle('default')}>implicit warrant</span>}
+        </div>
+      </div>
+    )
+  }
+
+  const claim = node as ClaimNode
+  const kind = claimChipKind(claim)
+  return (
+    <div style={shell}>
+      <div style={tagStyle}>{claim.tag || (claim.id as unknown as string)}</div>
+      <div style={{ color: '#ddd', marginBottom: 8, fontSize: 12.5 }}>{claim.text}</div>
+      {claim.attribution && (
+        <>
+          {claim.attribution.quote && (
+            <div style={{ color: '#aaa', fontSize: 11, marginBottom: 4, borderLeft: `2px solid ${COLORS.border}`, paddingLeft: 8, fontStyle: 'italic' }}>
+              “{claim.attribution.quote}”
+            </div>
+          )}
+          <div style={{ color: '#888', fontSize: 11, marginBottom: 4 }}>
+            {sourceLabel(claim.attribution.source as { type: string; reference?: string })}
+          </div>
+        </>
+      )}
+      <div style={chips}>
+        <span style={chipStyle(kind)}>{claim._isRoot ? 'root' : claim.terminal ? 'terminal' : claim.attribution ? 'attributive' : claim.cluster}</span>
+        {claim.uncertain && <span style={chipStyle('default')}>uncertain</span>}
+      </div>
+    </div>
+  )
+}

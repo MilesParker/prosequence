@@ -1,0 +1,828 @@
+# Converted to the claim/inference model (v2) by scripts/convert.ts.
+# Source: discourse-spaces/freedman.yaml. Do not hand-edit claim texts; this migration is structural.
+id: us-iran-ceasefire-2026
+title: US-Iran Ceasefire Agreement 2026
+definitions:
+  - term: strategic interests
+    text: >
+      US strategic interests include: security of regional allies, freedom of navigation through
+      international waterways, non-proliferation of nuclear weapons and long-range missiles, and
+      credibility of US security commitments.
+    importedFrom: null
+  - term: ceasefire agreement
+    text: >
+      The preliminary memorandum of understanding of June 2026 between the US and Iran, covering
+      cessation of hostilities, 60-day toll-free Hormuz passage, and a framework for subsequent
+      nuclear negotiations contingent on Israel halting operations in Lebanon.
+    importedFrom: null
+  - term: military leverage
+    text: >
+      The capacity to credibly threaten or apply military force to extract concessions. Leverage is
+      expended when a campaign has ended without achieving its objective and renewed escalation is
+      not credible.
+    importedFrom: null
+roots:
+  - prop-us-iran-ceasefire
+claims:
+  - id: prop-us-iran-ceasefire
+    tag: Deal serves US strategic interests
+    text: The US-Iran ceasefire agreement of June 2026 serves US strategic interests.
+    terminal: false
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: t-alliance-system-value
+    tag: Alliance system value (terminal)
+    text: States are more secure inside a reliable alliance system than they can ever be acting alone.
+    terminal: true
+    cluster: Terminal
+    uncertain: false
+    submissionStatus: Accepted
+  - id: t-leader-self-interest-legitimate
+    tag: Leader self-interest legitimate (terminal)
+    text: A leader's personal political survival is a legitimate criterion in state decisions.
+    terminal: true
+    cluster: Terminal
+    uncertain: false
+    submissionStatus: Accepted
+  - id: t-suffering-constrains-strategy
+    tag: Suffering constrains strategy (terminal)
+    text: >-
+      Minimising human suffering is a supreme obligation that constrains permissible strategic
+      action.
+    terminal: true
+    cluster: Terminal
+    uncertain: false
+    submissionStatus: Accepted
+  - id: t-reason-over-instinct
+    tag: Reason over instinct (terminal)
+    text: >-
+      Human reason carefully applied and subject to correction is a more reliable guide to action
+      than instinct or intuition.
+    terminal: true
+    cluster: Terminal
+    uncertain: false
+    submissionStatus: Accepted
+  - id: t-order-depends-on-democracy
+    tag: Order depends on democracy (terminal)
+    text: >-
+      A state's long-run security depends on the survival of democratic governance in the
+      international order it inhabits.
+    terminal: true
+    cluster: Terminal
+    uncertain: false
+    submissionStatus: Accepted
+  - id: t-realist-state-primacy
+    tag: Realist state primacy (terminal)
+    text: >-
+      A state owes obligations only to its own citizens; the political character of other states is
+      not a legitimate basis for foreign policy.
+    terminal: true
+    cluster: Terminal
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-electoral-not-strategic
+    tag: Electoral not strategic
+    text: The deal was shaped by Trump's electoral interests, not US strategic interests.
+    terminal: false
+    cluster: Anti
+    uncertain: false
+    submissionStatus: Accepted
+  - id: g-electoral-not-strategic
+    tag: Electoral not strategic — grounds
+    text: >-
+      Friedman reports Trump assessed the war's inflation and gasoline price effects as a
+      prescription for Republican midterm losses, and publicly pre-assigned credit and blame to
+      Vance along personal political lines.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Thomas L. Friedman, New York Times, June 19 2026
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-allies-abandoned
+    tag: Allies abandoned
+    text: The deal leaves US allies more exposed than before the war began.
+    terminal: false
+    cluster: Anti
+    uncertain: false
+    submissionStatus: Accepted
+  - id: g-allies-abandoned
+    tag: Allies abandoned — grounds
+    text: >-
+      Friedman reports the deal is silent on Iran's missiles and proxy networks, makes nuclear talks
+      contingent on Israeli concessions in Lebanon, and signals to Gulf Arab states that the US is
+      withdrawing its security guarantee.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Thomas L. Friedman, New York Times, June 19 2026
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-hormuz-concession
+    tag: Hormuz toll concession
+    text: >-
+      The deal concedes Iran a potential future right to toll commercial shipping through the Strait
+      of Hormuz.
+    terminal: false
+    cluster: Anti
+    uncertain: false
+    submissionStatus: Accepted
+  - id: g-hormuz-concession
+    tag: Hormuz toll concession — grounds
+    text: >-
+      The memorandum of understanding states Iran will ensure toll-free Hormuz passage "for 60 days
+      only," as quoted by Friedman.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: US-Iran MOU June 2026, as quoted by Friedman, New York Times, June 19 2026
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-nuclear-leverage-gone
+    tag: Nuclear leverage expended
+    text: >-
+      The deal defers the nuclear question into a negotiation where the US has already expended its
+      military leverage.
+    terminal: false
+    cluster: Anti
+    uncertain: false
+    submissionStatus: Accepted
+  - id: g-nuclear-leverage-gone
+    tag: Nuclear leverage expended — grounds
+    text: >-
+      Friedman reports the deal leaves Iran's near-bomb-grade uranium for future negotiations after
+      the military campaign ended without achieving that objective.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Thomas L. Friedman, New York Times, June 19 2026
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-deal-ended-economic-harm
+    tag: Deal ended economic harm
+    text: >-
+      The deal serves US interests by ending a war that was driving inflation and energy price
+      increases.
+    terminal: false
+    cluster: Pro
+    uncertain: false
+    submissionStatus: Accepted
+  - id: g-deal-ended-economic-harm
+    tag: Deal ended economic harm — grounds
+    text: >-
+      Friedman acknowledges Trump assessed the war as causing food inflation and high gasoline
+      prices harmful to American households.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Thomas L. Friedman, New York Times, June 19 2026
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-w-electoral-calendar
+    tag: Warrant — electoral calendar proximate cause
+    text: >-
+      When a negotiating outcome tracks the leader's electoral calendar rather than strategic logic,
+      electoral pressure is the proximate cause.
+    terminal: false
+    cluster: Anti
+    uncertain: false
+    submissionStatus: Accepted
+  - id: g-w-electoral-calendar
+    tag: Warrant — electoral calendar proximate cause — grounds
+    text: >-
+      An outcome explicable by electoral timing without remainder requires no additional strategic
+      explanation.
+    terminal: false
+    attribution:
+      source:
+        type: SelfEvident
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-w-capability-retention
+    tag: Warrant — capability retention increases exposure
+    text: >-
+      Removing US military pressure while leaving Iran's threatening capabilities intact increases
+      allies' net threat exposure.
+    terminal: false
+    cluster: Anti
+    uncertain: false
+    submissionStatus: Accepted
+  - id: g-w-capability-retention
+    tag: Warrant — capability retention increases exposure — grounds
+    text: >-
+      If the constraining force is removed and the constrained capability remains, the net threat to
+      those the force was protecting increases.
+    terminal: false
+    attribution:
+      source:
+        type: LogicalNecessity
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-w-withdrawal-signal
+    tag: Warrant — withdrawal signal forces accommodation
+    text: >-
+      Allies who receive credible signals of US withdrawal must independently accommodate the rising
+      regional power, shifting the balance against the US.
+    terminal: false
+    cluster: Anti
+    uncertain: false
+    submissionStatus: Accepted
+  - id: g-w-withdrawal-signal
+    tag: Warrant — withdrawal signal forces accommodation — grounds
+    text: States balance against threats when patron protection is withdrawn.
+    terminal: false
+    attribution:
+      source:
+        type: CommonKnowledge
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-w-hormuz-precedent
+    tag: Warrant — 60-day carve-out establishes precedent
+    text: >-
+      A time-limited toll-free commitment without a permanent successor establishes the precedent
+      that Iran holds authority to charge for Hormuz passage.
+    terminal: false
+    cluster: Anti
+    uncertain: false
+    submissionStatus: Accepted
+  - id: g-w-hormuz-precedent
+    tag: Warrant — 60-day carve-out establishes precedent — grounds
+    text: >-
+      A 60-day carve-out implies a default state to which passage reverts — a default in which Iran
+      determines the terms.
+    terminal: false
+    attribution:
+      source:
+        type: LogicalNecessity
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-w-leverage-expended
+    tag: Warrant — ended campaign signals escalation ceiling
+    text: >-
+      Once a military campaign ends without achieving its core objective, the threat of renewed
+      force becomes less credible, weakening the position for deferred objectives.
+    terminal: false
+    cluster: Anti
+    uncertain: false
+    submissionStatus: Accepted
+  - id: g-w-leverage-expended
+    tag: Warrant — ended campaign signals escalation ceiling — grounds
+    text: >-
+      A state that has struck and accepted a deal short of its objective signals a ceiling on its
+      willingness to escalate.
+    terminal: false
+    attribution:
+      source:
+        type: CommonKnowledge
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-w-economic-harm
+    tag: Warrant — citizen welfare is national interest
+    text: >-
+      Ending a war causing domestic inflation serves the material interests of US citizens, which
+      are a component of US national interests.
+    terminal: false
+    cluster: Pro
+    uncertain: false
+    submissionStatus: Accepted
+  - id: g-w-economic-harm
+    tag: Warrant — citizen welfare is national interest — grounds
+    text: >-
+      If citizen material welfare is a component of national interests, and the war was harming that
+      welfare, ending it advances national interests on that dimension.
+    terminal: false
+    attribution:
+      source:
+        type: LogicalNecessity
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-sycophancy-caused-miscalculation
+    tag: Sycophancy caused miscalculation
+    text: >-
+      Trump and Netanyahu's purge of internal dissent caused the strategic miscalculation about
+      Iran's likely response.
+    terminal: false
+    cluster: Anti
+    uncertain: false
+    submissionStatus: Accepted
+  - id: g-sycophancy-caused-miscalculation
+    tag: Sycophancy caused miscalculation — grounds
+    text: >-
+      Mukunda told Friedman that America and Israel "failed at both" mechanisms for good executive
+      decisions, and that "experts had predicted everything that went wrong in the war."
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Gautam Mukunda, as quoted by Friedman, New York Times, June 19 2026
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-obama-double-standard
+    tag: Obama double standard
+    text: >-
+      The deal's terms are worse than what the same actors condemned as unacceptable under Obama, so
+      partisan praise carries no evidentiary weight.
+    terminal: false
+    cluster: Analogy
+    uncertain: false
+    submissionStatus: Accepted
+  - id: g-obama-double-standard
+    tag: Obama double standard — grounds
+    text: >-
+      Friedman notes the deal makes nuclear talks contingent on Israeli military concessions in
+      Lebanon, and states Obama would have been denounced for agreeing to such terms.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Thomas L. Friedman, New York Times, June 19 2026
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-iranian-politics-unlocked
+    tag: Iranian domestic politics unlocked
+    text: A diminished external threat may create space for internal Iranian pressure for regime reform.
+    terminal: false
+    cluster: Pro
+    uncertain: true
+    submissionStatus: Accepted
+  - id: g-iranian-politics-unlocked
+    tag: Iranian domestic politics unlocked — grounds
+    text: >-
+      Friedman speculates that without an external threat to justify repression, Iranians may ask
+      what 47 years of theocratic rule has produced besides nuclear spending and proxy funding.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Thomas L. Friedman, New York Times, June 19 2026
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-w-expert-exclusion
+    tag: Warrant — expert exclusion causes predictive failure
+    text: >-
+      When decision-makers exclude expert challenge, predictive failures that experts would have
+      flagged are structurally caused by that exclusion.
+    terminal: false
+    cluster: Anti
+    uncertain: false
+    submissionStatus: Accepted
+  - id: g-w-expert-exclusion
+    tag: Warrant — expert exclusion causes predictive failure — grounds
+    text: >-
+      Removing the input that would have corrected an error makes that error attributable to the
+      removal.
+    terminal: false
+    attribution:
+      source:
+        type: LogicalNecessity
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-w-identity-evaluation
+    tag: Warrant — identity-driven evaluation lacks evidentiary weight
+    text: >-
+      When the same outcome is condemned under one administration and praised under another with no
+      change in strategic logic, the evaluation is partisan and carries no independent evidentiary
+      weight.
+    terminal: false
+    cluster: Analogy
+    uncertain: false
+    submissionStatus: Accepted
+  - id: g-w-identity-evaluation
+    tag: Warrant — identity-driven evaluation lacks evidentiary weight — grounds
+    text: >-
+      An evaluation criterion applied selectively by identity rather than consistently by logic
+      cannot serve as independent evidence of merit.
+    terminal: false
+    attribution:
+      source:
+        type: SelfEvident
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-w-threat-removal-unlocks-politics
+    tag: Warrant — external threat removal unlocks internal politics
+    text: >-
+      Regimes that use external threat narratives to suppress dissent lose that justification when
+      the threat recedes, potentially enabling domestic opposition to organise.
+    terminal: false
+    cluster: Pro
+    uncertain: true
+    submissionStatus: Accepted
+  - id: g-w-threat-removal-unlocks-politics
+    tag: Warrant — external threat removal unlocks internal politics — grounds
+    text: >-
+      It is common knowledge that authoritarian regimes instrumentalise external threats to justify
+      internal repression.
+    terminal: false
+    attribution:
+      source:
+        type: CommonKnowledge
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-dealmaking-skills-dont-transfer
+    tag: Dealmaking skills don't transfer
+    text: >-
+      Transactional deal-making skills do not transfer to geopolitical negotiations involving
+      military leverage and alliance management.
+    terminal: false
+    cluster: Anti
+    uncertain: false
+    submissionStatus: Accepted
+  - id: g-dealmaking-skills-dont-transfer
+    tag: Dealmaking skills don't transfer — grounds
+    text: >-
+      Friedman observes that real-estate negotiators Witkoff and Kushner, after billions spent in
+      military action, secured only 60 days of toll-free Hormuz passage with no commitments on
+      missiles, proxies, or nuclear material.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Thomas L. Friedman, New York Times, June 19 2026
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-w-dealmaking-transfer
+    tag: Warrant — dealmaking skills are not geopolitical skills
+    text: >-
+      Real-estate negotiation optimises for closing a transaction; geopolitical negotiation requires
+      preserving leverage and foreclosing future coercion options — these are not extensions of the
+      same skill.
+    terminal: false
+    cluster: Anti
+    uncertain: false
+    submissionStatus: Accepted
+  - id: g-w-dealmaking-transfer
+    tag: Warrant — dealmaking skills are not geopolitical skills — grounds
+    text: >-
+      Closing a deal and foreclosing an adversary's future coercion options are structurally
+      distinct objectives requiring distinct competencies.
+    terminal: false
+    attribution:
+      source:
+        type: SelfEvident
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-witkoff-kushner-example
+    tag: Witkoff-Kushner Hormuz outcome
+    text: >-
+      The Witkoff-Kushner Hormuz negotiation is a concrete instance of transactional logic producing
+      a strategically deficient outcome.
+    terminal: false
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: g-witkoff-kushner-example
+    tag: Witkoff-Kushner Hormuz outcome — grounds
+    text: >-
+      Friedman reports the specific terms: billions in military expenditure yielded 60 days of
+      toll-free passage, no missile constraints, no proxy constraints, and no resolution of Iran's
+      nuclear material.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Thomas L. Friedman, New York Times, June 19 2026
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+inferences:
+  - id: i-electoral-not-strategic
+    scheme: FromCause
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - g-electoral-not-strategic
+    warrants:
+      - t-leader-self-interest-legitimate
+      - c-w-electoral-calendar
+    hint: null
+    concludes: c-electoral-not-strategic
+  - id: i-allies-abandoned
+    scheme: FromConsequence
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - g-allies-abandoned
+    warrants:
+      - t-alliance-system-value
+      - c-w-capability-retention
+      - c-w-withdrawal-signal
+    hint: null
+    concludes: c-allies-abandoned
+  - id: i-hormuz-concession
+    scheme: FromConsequence
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - g-hormuz-concession
+    warrants:
+      - c-w-hormuz-precedent
+    hint: null
+    concludes: c-hormuz-concession
+  - id: i-nuclear-leverage-gone
+    scheme: FromConsequence
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - g-nuclear-leverage-gone
+    warrants:
+      - c-w-leverage-expended
+    hint: null
+    concludes: c-nuclear-leverage-gone
+  - id: i-deal-ended-economic-harm
+    scheme: FromConsequence
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - g-deal-ended-economic-harm
+    warrants:
+      - t-suffering-constrains-strategy
+      - c-w-economic-harm
+    hint: null
+    concludes: c-deal-ended-economic-harm
+  - id: i-w-electoral-calendar
+    scheme: FromCause
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - g-w-electoral-calendar
+    warrants: []
+    hint: null
+    concludes: c-w-electoral-calendar
+  - id: i-w-capability-retention
+    scheme: FromConsequence
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - g-w-capability-retention
+    warrants: []
+    hint: null
+    concludes: c-w-capability-retention
+  - id: i-w-withdrawal-signal
+    scheme: FromConsequence
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - g-w-withdrawal-signal
+    warrants: []
+    hint: null
+    concludes: c-w-withdrawal-signal
+  - id: i-w-hormuz-precedent
+    scheme: FromConsequence
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - g-w-hormuz-precedent
+    warrants: []
+    hint: null
+    concludes: c-w-hormuz-precedent
+  - id: i-w-leverage-expended
+    scheme: FromCause
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - g-w-leverage-expended
+    warrants: []
+    hint: null
+    concludes: c-w-leverage-expended
+  - id: i-w-economic-harm
+    scheme: FromConsequence
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - g-w-economic-harm
+    warrants: []
+    hint: null
+    concludes: c-w-economic-harm
+  - id: i-sycophancy-caused-miscalculation
+    scheme: FromCause
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - g-sycophancy-caused-miscalculation
+    warrants:
+      - t-reason-over-instinct
+      - c-w-expert-exclusion
+    hint: null
+    concludes: c-sycophancy-caused-miscalculation
+  - id: i-obama-double-standard
+    scheme: FromAnalogy
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - g-obama-double-standard
+    warrants:
+      - t-order-depends-on-democracy
+      - c-w-identity-evaluation
+    hint: null
+    concludes: c-obama-double-standard
+  - id: i-iranian-politics-unlocked
+    scheme: FromConsequence
+    uncertain: true
+    submissionStatus: Accepted
+    grounds:
+      - g-iranian-politics-unlocked
+    warrants:
+      - c-w-threat-removal-unlocks-politics
+    hint: null
+    concludes: c-iranian-politics-unlocked
+  - id: i-w-expert-exclusion
+    scheme: FromCause
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - g-w-expert-exclusion
+    warrants: []
+    hint: null
+    concludes: c-w-expert-exclusion
+  - id: i-w-identity-evaluation
+    scheme: FromAnalogy
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - g-w-identity-evaluation
+    warrants: []
+    hint: null
+    concludes: c-w-identity-evaluation
+  - id: i-w-threat-removal-unlocks-politics
+    scheme: FromConsequence
+    uncertain: true
+    submissionStatus: Accepted
+    grounds:
+      - g-w-threat-removal-unlocks-politics
+    warrants: []
+    hint: null
+    concludes: c-w-threat-removal-unlocks-politics
+  - id: i-dealmaking-skills-dont-transfer
+    scheme: FromGeneralization
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - g-dealmaking-skills-dont-transfer
+    warrants:
+      - c-w-dealmaking-transfer
+    hint: null
+    concludes: c-dealmaking-skills-dont-transfer
+  - id: i-w-dealmaking-transfer
+    scheme: FromGeneralization
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - g-w-dealmaking-transfer
+    warrants: []
+    hint: null
+    concludes: c-w-dealmaking-transfer
+  - id: i-witkoff-kushner-example
+    scheme: FromExample
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - g-witkoff-kushner-example
+    warrants: []
+    hint: null
+    concludes: c-witkoff-kushner-example
+  - id: i-e-realism-attacks-identity-evaluation
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - t-realist-state-primacy
+    warrants: []
+    hint: Realist state primacy denies that democratic consistency is a valid evaluative criterion.
+    contests: c-w-identity-evaluation
+  - id: i-e-electoral-attacks-root
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-electoral-not-strategic
+    warrants: []
+    hint: null
+    contests: prop-us-iran-ceasefire
+  - id: i-e-allies-attacks-root
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-allies-abandoned
+    warrants: []
+    hint: null
+    contests: prop-us-iran-ceasefire
+  - id: i-e-hormuz-attacks-root
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-hormuz-concession
+    warrants: []
+    hint: null
+    contests: prop-us-iran-ceasefire
+  - id: i-e-nuclear-attacks-root
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-nuclear-leverage-gone
+    warrants: []
+    hint: null
+    contests: prop-us-iran-ceasefire
+  - id: i-e-deal-supports-root
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-deal-ended-economic-harm
+    warrants: []
+    hint: null
+    concludes: prop-us-iran-ceasefire
+  - id: i-e-sycophancy-supports-electoral
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-sycophancy-caused-miscalculation
+    warrants: []
+    hint: Sycophancy explains structurally how electoral interests came to dominate strategic ones.
+    concludes: c-electoral-not-strategic
+  - id: i-e-obama-attacks-deal
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-obama-double-standard
+    warrants: []
+    hint: >-
+      The double-standard attack undermines the pro warrant by showing the evaluation is not
+      principled.
+    contests: c-deal-ended-economic-harm
+  - id: i-e-iranian-politics-supports-deal
+    scheme: null
+    uncertain: true
+    submissionStatus: Accepted
+    grounds:
+      - c-iranian-politics-unlocked
+    warrants: []
+    hint: Uncertain secondary benefit that may partially redeem the pro case.
+    concludes: c-deal-ended-economic-harm
+  - id: i-e-dealmaking-supports-sycophancy
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-dealmaking-skills-dont-transfer
+    warrants: []
+    hint: The generalisation about dealmaking skills supports the sycophancy/miscalculation argument.
+    concludes: c-sycophancy-caused-miscalculation
+  - id: i-e-witkoff-supports-dealmaking
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-witkoff-kushner-example
+    warrants: []
+    hint: Witkoff-Kushner is the concrete instance supporting the generalisation.
+    concludes: c-dealmaking-skills-dont-transfer

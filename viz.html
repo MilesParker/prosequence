@@ -2,211 +2,71 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Prasanga — Argument Graph</title>
+<title>Prasanga — Claim / Inference Graph</title>
 <script src="https://cdn.jsdelivr.net/npm/d3@7/dist/d3.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/js-yaml@4/dist/js-yaml.min.js"></script>
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
-body {
-  background: #0f1117;
-  color: #e0e0e0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
-  overflow: hidden;
-}
-
+body { background: #0f1117; color: #e0e0e0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif; overflow: hidden; }
 #graph { display: block; }
 
-/* ── Tooltip ── */
 #tooltip {
-  position: fixed;
-  background: rgba(12, 14, 22, 0.97);
-  border: 1px solid #2a2d3e;
-  border-radius: 8px;
-  padding: 12px 16px;
-  max-width: 340px;
-  font-size: 12px;
-  line-height: 1.5;
-  pointer-events: none;
-  z-index: 100;
-  display: none;
+  position: fixed; background: rgba(12, 14, 22, 0.97); border: 1px solid #2a2d3e;
+  border-radius: 8px; padding: 12px 16px; max-width: 340px; font-size: 12px;
+  line-height: 1.5; pointer-events: none; z-index: 100; display: none;
   box-shadow: 0 4px 20px rgba(0,0,0,0.6);
 }
-#tooltip .tt-tag {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #666;
-  margin-bottom: 5px;
-}
-#tooltip .tt-text {
-  color: #ddd;
-  margin-bottom: 8px;
-  font-size: 12.5px;
-}
-#tooltip .tt-grounds {
-  color: #aaa;
-  font-size: 11px;
-  margin-bottom: 4px;
-  border-left: 2px solid #333;
-  padding-left: 8px;
-}
-#tooltip .tt-meta {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 8px;
-}
-#tooltip .tt-chip {
-  font-size: 10px;
-  padding: 2px 7px;
-  border-radius: 10px;
-  background: #1e2030;
-  color: #888;
-}
+#tooltip .tt-tag { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #666; margin-bottom: 5px; }
+#tooltip .tt-text { color: #ddd; margin-bottom: 8px; font-size: 12.5px; }
+#tooltip .tt-quote { color: #aaa; font-size: 11px; margin-bottom: 4px; border-left: 2px solid #333; padding-left: 8px; font-style: italic; }
+#tooltip .tt-sub { color: #999; font-size: 11px; margin-bottom: 4px; }
+#tooltip .tt-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+#tooltip .tt-chip { font-size: 10px; padding: 2px 7px; border-radius: 10px; background: #1e2030; color: #888; }
 #tooltip .tt-chip.pro   { background: #1b3520; color: #66bb6a; }
 #tooltip .tt-chip.anti  { background: #3b1a1a; color: #ef9a9a; }
-#tooltip .tt-chip.emp   { background: #1e2738; color: #78909c; }
-#tooltip .tt-chip.med   { background: #2a2040; color: #ce93d8; }
-#tooltip .tt-chip.prop  { background: #0d2b5e; color: #90caf9; }
-#tooltip .tt-chip.term  { background: #3b2e00; color: #ffcc02; }
+#tooltip .tt-chip.empirical { background: #1e2738; color: #78909c; }
+#tooltip .tt-chip.analogy   { background: #2a2040; color: #ce93d8; }
+#tooltip .tt-chip.root  { background: #0d2b5e; color: #90caf9; }
+#tooltip .tt-chip.terminal { background: #3b2e00; color: #ffcc02; }
+#tooltip .tt-chip.attributive { background: #262a30; color: #9fb0bf; }
+#tooltip .tt-chip.inference   { background: #22263a; color: #9aa4d0; }
 
-/* ── Detail panel ── */
 #panel {
-  position: fixed;
-  top: 0; right: 0;
-  width: 380px;
-  height: 100vh;
-  background: rgba(10, 12, 20, 0.98);
-  border-left: 1px solid #1e2030;
-  padding: 0;
-  overflow-y: auto;
-  z-index: 200;
-  display: none;
-  font-size: 13px;
+  position: fixed; top: 0; right: 0; width: 380px; height: 100vh;
+  background: rgba(10, 12, 20, 0.98); border-left: 1px solid #1e2030; padding: 0;
+  overflow-y: auto; z-index: 200; display: none; font-size: 13px;
 }
-#panel-header {
-  position: sticky;
-  top: 0;
-  background: rgba(10, 12, 20, 0.98);
-  border-bottom: 1px solid #1e2030;
-  padding: 16px 20px 14px;
-  display: flex;
-  align-items: flex-start;
-  gap: 10px;
-  z-index: 1;
-}
-#panel-header h2 {
-  flex: 1;
-  font-size: 14px;
-  font-weight: 600;
-  color: #e0e0e0;
-  line-height: 1.4;
-}
-#close-panel {
-  flex-shrink: 0;
-  background: none;
-  border: none;
-  color: #555;
-  font-size: 20px;
-  cursor: pointer;
-  line-height: 1;
-  padding: 0 2px;
-}
+#panel-header { position: sticky; top: 0; background: rgba(10, 12, 20, 0.98); border-bottom: 1px solid #1e2030; padding: 16px 20px 14px; display: flex; align-items: flex-start; gap: 10px; z-index: 1; }
+#panel-header h2 { flex: 1; font-size: 14px; font-weight: 600; color: #e0e0e0; line-height: 1.4; }
+#close-panel { flex-shrink: 0; background: none; border: none; color: #555; font-size: 20px; cursor: pointer; line-height: 1; padding: 0 2px; }
 #close-panel:hover { color: #fff; }
 #panel-body { padding: 16px 20px 24px; }
 .p-section { margin-top: 18px; }
-.p-label {
-  font-size: 10px;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #555;
-  margin-bottom: 6px;
-}
-.p-value {
-  color: #bbb;
-  line-height: 1.6;
-  font-size: 13px;
-}
-.p-value.grounds {
-  border-left: 2px solid #1e2030;
-  padding-left: 10px;
-  color: #999;
-  font-size: 12px;
-}
+.p-label { font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; color: #555; margin-bottom: 6px; }
+.p-value { color: #bbb; line-height: 1.6; font-size: 13px; }
+.p-value.quote { border-left: 2px solid #1e2030; padding-left: 10px; color: #999; font-size: 12px; font-style: italic; }
 .p-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 2px; }
-.p-chip {
-  font-size: 11px;
-  padding: 3px 9px;
-  border-radius: 10px;
-  background: #1a1c28;
-  color: #777;
-}
+.p-chip { font-size: 11px; padding: 3px 9px; border-radius: 10px; background: #1a1c28; color: #777; }
 .edge-list { list-style: none; margin-top: 4px; }
-.edge-list li {
-  padding: 6px 0;
-  border-bottom: 1px solid #141620;
-  font-size: 12px;
-  color: #999;
-  display: flex;
-  gap: 8px;
-  align-items: baseline;
-}
+.edge-list li { padding: 6px 0; border-bottom: 1px solid #141620; font-size: 12px; color: #999; display: flex; gap: 8px; align-items: baseline; }
 .rel { font-size: 10px; font-weight: 700; padding: 2px 6px; border-radius: 3px; flex-shrink: 0; }
-.rel-support  { background: #143320; color: #4caf50; }
-.rel-attack   { background: #321414; color: #e53935; }
-.rel-warrants { background: #2a1540; color: #ab47bc; }
+.rel-Grounds   { background: #14242f; color: #6ba8c9; }
+.rel-Warrants  { background: #14281c; color: #6fbf82; }
+.rel-Concludes { background: #143320; color: #58c169; }
+.rel-Contests  { background: #321414; color: #ef5f5c; }
 .empty { color: #333; font-style: italic; font-size: 12px; padding: 4px 0; }
 
-/* ── Legend ── */
-#legend {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  background: rgba(10, 12, 20, 0.95);
-  border: 1px solid #1e2030;
-  border-radius: 8px;
-  padding: 12px 16px;
-  font-size: 11px;
-  z-index: 50;
-  user-select: none;
-}
-.leg-section { margin-top: 0; }
+#legend { position: fixed; bottom: 20px; left: 20px; background: rgba(10, 12, 20, 0.95); border: 1px solid #1e2030; border-radius: 8px; padding: 12px 16px; font-size: 11px; z-index: 50; user-select: none; }
 .leg-section + .leg-section { margin-top: 10px; border-top: 1px solid #1e2030; padding-top: 10px; }
 .leg-title { font-size: 9.5px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; color: #444; margin-bottom: 7px; }
 .leg-row { display: flex; align-items: center; gap: 9px; margin: 4px 0; color: #888; }
-.leg-circle { border-radius: 50%; flex-shrink: 0; }
-.leg-diamond { flex-shrink: 0; transform: rotate(45deg); }
 .leg-line { height: 0; flex-shrink: 0; }
-.leg-line.dashed { border-style: dashed; }
+.leg-diamond { width: 12px; height: 12px; flex-shrink: 0; transform: rotate(45deg); }
 
-/* ── Title bar ── */
-#titlebar {
-  position: fixed;
-  top: 0; left: 0; right: 0;
-  height: 44px;
-  background: rgba(10, 12, 20, 0.92);
-  border-bottom: 1px solid #1a1c28;
-  display: flex;
-  align-items: center;
-  padding: 0 18px;
-  z-index: 40;
-  gap: 14px;
-  backdrop-filter: blur(4px);
-}
+#titlebar { position: fixed; top: 0; left: 0; right: 0; height: 44px; background: rgba(10, 12, 20, 0.92); border-bottom: 1px solid #1a1c28; display: flex; align-items: center; padding: 0 18px; z-index: 40; gap: 14px; backdrop-filter: blur(4px); }
 #titlebar h1 { font-size: 13px; font-weight: 600; color: #bbb; }
 #titlebar .subtitle { font-size: 11px; color: #444; }
-
-#loading {
-  position: fixed; inset: 0;
-  display: flex; align-items: center; justify-content: center;
-  background: #0f1117;
-  z-index: 999;
-  font-size: 14px;
-  color: #555;
-}
+#loading { position: fixed; inset: 0; display: flex; align-items: center; justify-content: center; background: #0f1117; z-index: 999; font-size: 14px; color: #555; }
 </style>
 </head>
 <body>
@@ -223,55 +83,87 @@ body {
     <h2 id="panel-tag"></h2>
     <button id="close-panel" title="Close">×</button>
   </div>
-  <div id="panel-body" id="panel-content"></div>
+  <div id="panel-body"></div>
 </div>
 <div id="legend">
   <div class="leg-section">
-    <div class="leg-title">Nodes</div>
-    <div class="leg-row"><div style="width:28px;height:14px;background:#1565c0;border:2px solid #5c9de8;border-radius:3px;flex-shrink:0"></div> Proposition</div>
-    <div class="leg-row"><div style="width:22px;height:12px;background:#2e7d32;border:1.5px solid #66bb6a;border-radius:3px;flex-shrink:0"></div> Pro argument</div>
-    <div class="leg-row"><div style="width:22px;height:12px;background:#c62828;border:1.5px solid #ef9a9a;border-radius:3px;flex-shrink:0"></div> Anti argument</div>
-    <div class="leg-row"><div style="width:22px;height:12px;background:#546e7a;border:1.5px solid #78909c;border-radius:3px;flex-shrink:0"></div> Empirical / Analogy</div>
-    <div class="leg-row"><div style="width:22px;height:12px;background:#2e7d32;border:1.5px dashed #66bb6a;border-radius:3px;flex-shrink:0"></div> Mediating (dashed)</div>
-    <div class="leg-row"><div style="width:22px;height:12px;background:#f57f17;border:1.5px solid #ffe082;border-radius:3px;flex-shrink:0"></div> Terminal value</div>
+    <div class="leg-title">Claims</div>
+    <div class="leg-row"><div style="width:24px;height:12px;background:hsla(212,80%,42%,0.18);border:2px solid hsl(212,75%,64%);border-radius:3px;flex-shrink:0"></div> Root</div>
+    <div class="leg-row"><div style="width:22px;height:12px;background:hsla(131,40%,34%,0.20);border:1.5px solid hsl(123,38%,57%);border-radius:3px;flex-shrink:0"></div> Pro</div>
+    <div class="leg-row"><div style="width:22px;height:12px;background:hsla(0,45%,40%,0.18);border:1.5px solid hsl(0,60%,70%);border-radius:3px;flex-shrink:0"></div> Anti</div>
+    <div class="leg-row"><div style="width:22px;height:12px;background:hsla(199,18%,40%,0.18);border:1.5px solid hsl(200,16%,62%);border-radius:3px;flex-shrink:0"></div> Empirical</div>
+    <div class="leg-row"><div style="width:22px;height:12px;background:hsla(280,30%,45%,0.18);border:1.5px solid hsl(285,40%,70%);border-radius:3px;flex-shrink:0"></div> Analogy</div>
+    <div class="leg-row"><div style="width:22px;height:12px;background:hsla(210,12%,30%,0.16);border:1.5px solid hsl(210,12%,50%);border-radius:3px;flex-shrink:0"></div> Attributive</div>
+    <div class="leg-row"><div style="width:22px;height:12px;background:hsla(37,95%,56%,0.15);border:1.5px solid hsl(45,100%,76%);border-radius:3px;flex-shrink:0"></div> Terminal</div>
+  </div>
+  <div class="leg-section">
+    <div class="leg-title">Inference</div>
+    <div class="leg-row"><div class="leg-diamond" style="background:hsl(232,20%,20%);border:1.25px solid hsl(232,18%,46%)"></div> Junction</div>
   </div>
   <div class="leg-section">
     <div class="leg-title">Edges</div>
-    <div class="leg-row"><div class="leg-line" style="width:26px;border-top:2.5px solid #4caf50"></div> Support</div>
-    <div class="leg-row"><div class="leg-line dashed" style="width:26px;border-top:2.5px dashed #e53935"></div> Attack</div>
-    <div class="leg-row"><div class="leg-line dashed" style="width:26px;border-top:2px dashed #9c27b0"></div> Warrants</div>
+    <div class="leg-row"><div class="leg-line" style="width:26px;border-top:2.5px solid hsl(205,30%,55%)"></div> Grounds</div>
+    <div class="leg-row"><div class="leg-line" style="width:26px;border-top:2.5px dashed hsl(122,30%,40%)"></div> Warrants</div>
+    <div class="leg-row"><div class="leg-line" style="width:26px;border-top:2.5px solid hsl(122,39%,49%)"></div> Concludes</div>
+    <div class="leg-row"><div class="leg-line" style="width:26px;border-top:2.5px solid hsl(1,77%,55%)"></div> Contests</div>
   </div>
 </div>
 
 <script>
 'use strict';
 
+/* ─────────────── constants ─────────────── */
+
+const NODE_HW = 60, NODE_HH = 30;      // claim half-dims
+const ROOT_HW = 66, ROOT_HH = 38;      // root claim half-dims
+const INF_R = 7;                       // inference diamond half-diagonal
+const LINE_H = 12, WORDS_PER_LINE = 2;
+
+const NODE_COLORS = {
+  root:        { fill: 'hsla(212,80%,42%,0.18)', stroke: 'hsl(212,75%,64%)' },
+  terminal:    { fill: 'hsla(37,95%,56%,0.15)',  stroke: 'hsl(45,100%,76%)' },
+  pro:         { fill: 'hsla(131,40%,34%,0.20)', stroke: 'hsl(123,38%,57%)' },
+  anti:        { fill: 'hsla(0,45%,40%,0.18)',   stroke: 'hsl(0,60%,70%)'   },
+  empirical:   { fill: 'hsla(199,18%,40%,0.18)', stroke: 'hsl(200,16%,62%)' },
+  analogy:     { fill: 'hsla(280,30%,45%,0.18)', stroke: 'hsl(285,40%,70%)' },
+  attributive: { fill: 'hsla(210,12%,30%,0.16)', stroke: 'hsl(210,12%,50%)' },
+};
+const INF_COLOR = { fill: 'hsl(232,20%,20%)', stroke: 'hsl(232,18%,46%)' };
+const EDGE_COLORS = {
+  Grounds:   'hsl(205,30%,55%)',
+  Warrants:  'hsl(122,30%,40%)',
+  Concludes: 'hsl(122,39%,49%)',
+  Contests:  'hsl(1,77%,55%)',
+};
+
 /* ─────────────── helpers ─────────────── */
 
-// Node dimensions (half-width, half-height) — squarish
-const NODE_W = 42, NODE_H = 36;
-const PROP_W = 48, PROP_H = 40;
-const LINE_H = 12;   // px between text lines
-const WORDS_PER_LINE = 2;
+function isInf(n) { return n._kind === 'inference'; }
+function nodeHW(n) { return isInf(n) ? INF_R : (n._isRoot ? ROOT_HW : NODE_HW); }
+function nodeHH(n) { return isInf(n) ? INF_R : (n._isRoot ? ROOT_HH : NODE_HH); }
 
-function nodeHW(n) { return n._type === 'proposition' ? PROP_W : NODE_W; }
-function nodeHH(n) { return n._type === 'proposition' ? PROP_H : NODE_H; }
+function claimColorKey(n) {
+  if (n._isRoot) return 'root';
+  if (n.terminal) return 'terminal';
+  if (n.attribution) return 'attributive';
+  const c = n.cluster;
+  if (c === 'Pro') return 'pro';
+  if (c === 'Anti') return 'anti';
+  if (c === 'Analogy') return 'analogy';
+  return 'empirical';
+}
+function nodeFill(n) { return isInf(n) ? INF_COLOR.fill : NODE_COLORS[claimColorKey(n)].fill; }
+function nodeStroke(n) { return isInf(n) ? INF_COLOR.stroke : NODE_COLORS[claimColorKey(n)].stroke; }
 
-// Split tag into lines of up to WORDS_PER_LINE words
 function wrapTag(tag) {
   const words = (tag || '').split(/\s+/).filter(Boolean);
   const lines = [];
-  for (let i = 0; i < words.length; i += WORDS_PER_LINE) {
-    lines.push(words.slice(i, i + WORDS_PER_LINE).join(' '));
-  }
+  for (let i = 0; i < words.length; i += WORDS_PER_LINE) lines.push(words.slice(i, i + WORDS_PER_LINE).join(' '));
   return lines.length ? lines : [''];
 }
 
-// Returns point on the rect boundary of node n (centered at nx,ny)
-// in the direction toward (tx,ty), plus arrowPad extra outset
-function rectEdgePt(nx, ny, tx, ty, n, arrowPad) {
-  const hw = nodeHW(n) + (arrowPad || 0);
-  const hh = nodeHH(n) + (arrowPad || 0);
+function rectEdgePt(nx, ny, tx, ty, n, pad) {
+  const hw = nodeHW(n) + (pad || 0), hh = nodeHH(n) + (pad || 0);
   const dx = tx - nx, dy = ty - ny;
   if (dx === 0 && dy === 0) return { x: nx, y: ny };
   const adx = Math.abs(dx), ady = Math.abs(dy);
@@ -279,392 +171,264 @@ function rectEdgePt(nx, ny, tx, ty, n, arrowPad) {
   return { x: nx + dx * scale, y: ny + dy * scale };
 }
 
-function nodeFill(n) {
-  if (n._type === 'proposition') return '#1565c0';
-  if (n._type === 'terminal')    return '#f9a825';
-  const c = n.cluster;
-  if (c === 'Pro')     return '#2e7d32';
-  if (c === 'Anti')    return '#c62828';
-  return '#546e7a'; // Empirical, Analogy, other
-}
-
-function nodeStroke(n) {
-  if (n._type === 'proposition') return '#5c9de8';
-  if (n._type === 'terminal')    return '#ffe082';
-  const c = n.cluster;
-  if (c === 'Pro')     return '#66bb6a';
-  if (c === 'Anti')    return '#ef9a9a';
-  return '#78909c';
-}
-
-function edgeColor(rel) {
-  if (rel === 'Support')  return '#4caf50';
-  if (rel === 'Attack')   return '#e53935';
-  return '#7b1fa2';
-}
-
-function relHtml(rel) {
-  const cls = rel === 'Support' ? 'rel-support' : rel === 'Attack' ? 'rel-attack' : 'rel-warrants';
-  return `<span class="rel ${cls}">${rel}</span>`;
-}
-
-function chipClass(n) {
-  if (n._type === 'proposition') return 'prop';
-  if (n._type === 'terminal')    return 'term';
-  if (n.isMediating)             return 'med';
-  const c = n.cluster;
-  if (c === 'Pro')  return 'pro';
-  if (c === 'Anti') return 'anti';
-  return 'emp';
-}
+function diamondPath(r) { return `M0,${-r}L${r},0L0,${r}L${-r},0Z`; }
 
 function sourceLabel(src) {
   if (!src) return 'unknown';
-  const t = src.type || 'unknown';
-  if (src.reference) return `${t} — ${src.reference}`;
-  return t;
+  return src.reference ? `${src.type} — ${src.reference}` : src.type;
+}
+
+/* ─────────────── build ─────────────── */
+
+function buildGraph(data) {
+  const claims = data.claims || [];
+  const inferences = data.inferences || [];
+  const roots = new Set((data.roots || []).map(String));
+  const infIds = new Set(inferences.map(i => i.id));
+
+  const links = [];
+  for (const inf of inferences) {
+    (inf.grounds || []).forEach(g => links.push({ id: `${inf.id}:g:${g}`, source: g, target: inf.id, role: 'Grounds', uncertain: !!inf.uncertain }));
+    (inf.warrants || []).forEach(w => links.push({ id: `${inf.id}:w:${w}`, source: w, target: inf.id, role: 'Warrants', uncertain: !!inf.uncertain }));
+    if (inf.concludes) links.push({ id: `${inf.id}:concludes`, source: inf.id, target: inf.concludes, role: 'Concludes', uncertain: !!inf.uncertain });
+    if (inf.contests) links.push({ id: `${inf.id}:contests`, source: inf.id, target: inf.contests, role: 'Contests', toInf: infIds.has(inf.contests), uncertain: !!inf.uncertain });
+  }
+
+  const depth = computeDepth(claims, inferences, roots, infIds);
+  const computedMax = Math.max(0, ...Object.values(depth));
+  const terminalDepth = computedMax + 1;
+
+  const nodes = [];
+  for (const c of claims) nodes.push(Object.assign({}, c, { _kind: 'claim', _isRoot: roots.has(String(c.id)), _depth: c.terminal ? terminalDepth : (depth[c.id] ?? computedMax) }));
+  for (const i of inferences) nodes.push(Object.assign({}, i, { _kind: 'inference', _depth: depth[i.id] ?? computedMax }));
+
+  const nodeById = new Map(nodes.map(n => [n.id, n]));
+  const incoming = new Map(nodes.map(n => [n.id, []]));
+  const outgoing = new Map(nodes.map(n => [n.id, []]));
+  const clean = links.filter(l => nodeById.has(l.source) && nodeById.has(l.target));
+  clean.forEach(l => { outgoing.get(l.source).push(l); incoming.get(l.target).push(l); });
+
+  return { nodes, links: clean, nodeById, incoming, outgoing, maxDepth: terminalDepth };
+}
+
+function computeDepth(claims, inferences, roots, infIds) {
+  const outputsToClaim = {}, contestersOf = {}, inputsOf = {};
+  const push = (m, k, v) => { (m[k] = m[k] || []).push(v); };
+  for (const inf of inferences) {
+    inputsOf[inf.id] = [...(inf.grounds || []), ...(inf.warrants || [])].map(String);
+    if (inf.concludes) push(outputsToClaim, String(inf.concludes), inf.id);
+    if (inf.contests) {
+      const t = String(inf.contests);
+      if (infIds.has(t)) push(contestersOf, t, inf.id); else push(outputsToClaim, t, inf.id);
+    }
+  }
+  const depth = {}, queue = [];
+  roots.forEach(r => { depth[r] = 0; queue.push(r); });
+  const visit = (id, d) => { if (!(id in depth) || d < depth[id]) { depth[id] = d; queue.push(id); } };
+  while (queue.length) {
+    const n = queue.shift(), d = depth[n];
+    if (infIds.has(n)) {
+      (inputsOf[n] || []).forEach(c => visit(c, d + 1));
+      (contestersOf[n] || []).forEach(j => visit(j, d + 1));
+    } else {
+      (outputsToClaim[n] || []).forEach(inf => visit(inf, d + 1));
+    }
+  }
+  const fallback = Math.max(0, ...Object.values(depth)) + 1;
+  claims.forEach(c => { if (!(c.id in depth)) depth[c.id] = fallback; });
+  inferences.forEach(i => { if (!(i.id in depth)) depth[i.id] = fallback; });
+  return depth;
 }
 
 /* ─────────────── main ─────────────── */
 
 async function main() {
+  const params = new URLSearchParams(location.search);
+  const file = params.get('data') || 'discourse-spaces/gaza.v2.yaml';
+
   let raw;
   try {
-    const resp = await fetch('discourse-spaces/free-transit.yaml');
+    const resp = await fetch(file);
     if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
     raw = await resp.text();
   } catch (err) {
-    document.getElementById('loading').textContent = `Failed to load YAML: ${err.message}`;
+    document.getElementById('loading').textContent = `Failed to load ${file}: ${err.message}`;
     return;
   }
 
   const data = jsyaml.load(raw);
-
   document.getElementById('ds-title').textContent = data.title || 'Argument Graph';
   document.getElementById('ds-subtitle').textContent = data.id || '';
 
-  const prop  = data.proposition       || {};
-  const args  = data.arguments         || [];
-  const tvns  = data.terminalValueNodes || [];
-  const edges = data.edges             || [];
+  const { nodes, links, nodeById, incoming, outgoing, maxDepth } = buildGraph(data);
 
-  const maxArgDepth = args.reduce((m, a) => Math.max(m, a.depth ?? 0), 0);
-  const termDepth   = maxArgDepth + 1;
+  const W = window.innerWidth, H = window.innerHeight, TOP = 44;
+  const depthSpacing = (H - TOP - 40) / (maxDepth + 1);
 
-  // Build unified node array
-  const nodes = [
-    { ...prop, _type: 'proposition', _depth: 0 },
-    ...args.map(a => ({ ...a, _type: 'argument', _depth: a.depth ?? 0 })),
-    ...tvns.map(t => ({ ...t, _type: 'terminal', _depth: termDepth })),
-  ];
-
-  const nodeById = new Map(nodes.map(n => [n.id, n]));
-
-  // Links — D3 forceLink will replace string ids with node references
-  const links = edges.map(e => ({ ...e }));
-
-  // Adjacency for panel
-  const incoming = new Map(nodes.map(n => [n.id, []]));
-  const outgoing  = new Map(nodes.map(n => [n.id, []]));
-  edges.forEach(e => {
-    outgoing.get(e.source)?.push(e);
-    incoming.get(e.target)?.push(e);
-  });
-
-  /* ─── SVG / zoom setup ─── */
-
-  const W = window.innerWidth;
-  const H = window.innerHeight;
-  const TOP_OFFSET = 44; // title bar height
-  const totalDepths = termDepth + 1;
-  const depthSpacing = (H - TOP_OFFSET - 40) / totalDepths;
-
-  const svg = d3.select('#graph')
-    .attr('width', W)
-    .attr('height', H);
-
+  const svg = d3.select('#graph').attr('width', W).attr('height', H);
   const defs = svg.append('defs');
-
-  // Arrowhead markers — one per relationship type
-  [
-    { id: 'arr-support',  color: '#4caf50' },
-    { id: 'arr-attack',   color: '#e53935' },
-    { id: 'arr-warrants', color: '#7b1fa2' },
-  ].forEach(({ id, color }) => {
-    defs.append('marker')
-      .attr('id', id)
-      .attr('viewBox', '0 -5 10 10')
-      .attr('refX', 8)   // tip of arrow
-      .attr('refY', 0)
-      .attr('markerWidth', 6)
-      .attr('markerHeight', 6)
-      .attr('orient', 'auto')
-      .append('path')
-      .attr('d', 'M0,-5L10,0L0,5')
-      .attr('fill', color)
-      .attr('opacity', 0.85);
+  ['Grounds', 'Warrants', 'Concludes', 'Contests'].forEach(role => {
+    defs.append('marker').attr('id', `arr-${role.toLowerCase()}`)
+      .attr('viewBox', '0 -5 10 10').attr('refX', 8).attr('refY', 0)
+      .attr('markerWidth', 6).attr('markerHeight', 6).attr('orient', 'auto')
+      .append('path').attr('d', 'M0,-5L10,0L0,5').attr('fill', EDGE_COLORS[role]).attr('opacity', 0.9);
   });
 
-  const g = svg.append('g').attr('transform', `translate(0,${TOP_OFFSET})`);
+  const g = svg.append('g').attr('transform', `translate(0,${TOP})`);
+  svg.call(d3.zoom().scaleExtent([0.08, 5]).on('zoom', e =>
+    g.attr('transform', `translate(${e.transform.x},${e.transform.y + TOP}) scale(${e.transform.k})`)));
 
-  svg.call(
-    d3.zoom()
-      .scaleExtent([0.08, 5])
-      .on('zoom', e => g.attr('transform', `translate(${e.transform.x},${e.transform.y + TOP_OFFSET}) scale(${e.transform.k})`))
-  );
+  const linkSel = g.append('g').selectAll('line').data(links).enter().append('line')
+    .attr('stroke', d => EDGE_COLORS[d.role])
+    .attr('stroke-width', d => d.role === 'Warrants' ? 1.4 : 1.6)
+    .attr('stroke-dasharray', d => d.role === 'Warrants' ? '5,3' : null)
+    .attr('stroke-opacity', d => d.uncertain ? 0.42 : 0.72)
+    .attr('marker-end', d => `url(#arr-${d.role.toLowerCase()})`);
 
-  /* ─── Draw edges ─── */
+  const nodeSel = g.append('g').selectAll('g.node').data(nodes).enter().append('g')
+    .attr('class', 'node').attr('cursor', 'pointer').attr('opacity', d => d.uncertain ? 0.6 : 1);
 
-  const linkSel = g.append('g').attr('class', 'links')
-    .selectAll('line')
-    .data(links)
-    .enter().append('line')
-    .attr('stroke', d => edgeColor(d.relationship))
-    .attr('stroke-width', d => d.relationship === 'Warrants' ? 1.2 : 1.6)
-    .attr('stroke-dasharray', d => {
-      if (d.relationship === 'Warrants') return '6,4';
-      if (d.relationship === 'Attack')   return '5,3';
-      return null;
-    })
-    .attr('stroke-opacity', 0.65)
-    .attr('marker-end', d => {
-      if (d.relationship === 'Support')  return 'url(#arr-support)';
-      if (d.relationship === 'Attack')   return 'url(#arr-attack)';
-      return 'url(#arr-warrants)';
-    });
+  nodeSel.each(function (d) {
+    const sel = d3.select(this);
+    if (isInf(d)) {
+      sel.append('path').attr('d', diamondPath(INF_R)).attr('fill', nodeFill(d)).attr('stroke', nodeStroke(d)).attr('stroke-width', 1.25);
+      return;
+    }
+    sel.append('rect')
+      .attr('x', -nodeHW(d)).attr('y', -nodeHH(d))
+      .attr('width', nodeHW(d) * 2).attr('height', nodeHH(d) * 2).attr('rx', 4)
+      .attr('fill', nodeFill(d)).attr('stroke', nodeStroke(d))
+      .attr('stroke-width', d._isRoot ? 2.5 : 1.5);
+    const lines = wrapTag(d.tag || d.id);
+    const totalH = (lines.length - 1) * LINE_H;
+    sel.append('text').attr('text-anchor', 'middle').attr('fill', '#e8e8e8')
+      .attr('font-size', d._isRoot ? '10px' : '9.5px').attr('font-family', 'system-ui, sans-serif')
+      .attr('pointer-events', 'none').attr('font-weight', d._isRoot ? '600' : '400')
+      .selectAll('tspan').data(lines).enter().append('tspan')
+      .attr('x', 0).attr('dy', (_, i) => i === 0 ? (-totalH / 2 + 'px') : (LINE_H + 'px'))
+      .attr('dominant-baseline', 'middle').text(t => t);
+  });
 
-  /* ─── Draw nodes ─── */
-
-  const nodeSel = g.append('g').attr('class', 'nodes')
-    .selectAll('g')
-    .data(nodes)
-    .enter().append('g')
-    .attr('class', 'node')
-    .attr('cursor', 'pointer')
-    .attr('opacity', d => d.uncertain ? 0.55 : 1);
-
-  // Rect background for all nodes
-  nodeSel.append('rect')
-    .attr('x', d => -nodeHW(d))
-    .attr('y', d => -nodeHH(d))
-    .attr('width',  d => nodeHW(d) * 2)
-    .attr('height', d => nodeHH(d) * 2)
-    .attr('rx', 4)
-    .attr('fill', d => nodeFill(d))
-    .attr('stroke', d => nodeStroke(d))
-    .attr('stroke-width', d => d._type === 'proposition' ? 2 : 1.5)
-    .attr('stroke-dasharray', d => d.isMediating ? '5,3' : null);
-
-  // Multi-line label text, vertically centered
-  nodeSel.append('text')
-    .attr('text-anchor', 'middle')
-    .attr('fill', '#e8e8e8')
-    .attr('font-size', d => d._type === 'proposition' ? '10px' : '9.5px')
-    .attr('font-family', 'system-ui, sans-serif')
-    .attr('pointer-events', 'none')
-    .attr('font-weight', d => d._type === 'proposition' ? '600' : '400')
-    .each(function(d) {
-      const lines = wrapTag(d.tag || d.id);
-      const totalH = (lines.length - 1) * LINE_H;
-      d3.select(this).selectAll('tspan')
-        .data(lines)
-        .enter().append('tspan')
-        .attr('x', 0)
-        .attr('dy', (_, i) => i === 0 ? -totalH / 2 + 'px' : LINE_H + 'px')
-        .attr('dominant-baseline', 'middle')
-        .text(t => t);
-    });
-
-  /* ─── Tooltip ─── */
-
+  /* ─── tooltip ─── */
   const tooltip = document.getElementById('tooltip');
-
   function showTooltip(event, d) {
-    const mainText = d.claim || d.text || '';
-    const cc = chipClass(d);
-    let html = `<div class="tt-tag">${d.tag || d.id}</div>`;
-    html += `<div class="tt-text">${mainText}</div>`;
-    if (d._type === 'argument' && d.grounds && d.grounds.text && d.grounds.text.trim() !== 'N/A') {
-      html += `<div class="tt-grounds">${d.grounds.text.trim()}</div>`;
-    }
-    html += '<div class="tt-meta">';
-    if (d._type === 'argument') {
-      html += `<span class="tt-chip ${cc}">${d.cluster}</span>`;
-      html += `<span class="tt-chip">depth ${d._depth}</span>`;
-      if (d.isMediating) html += `<span class="tt-chip med">mediating</span>`;
-      if (d.grounds?.source) html += `<span class="tt-chip">${d.grounds.source.type}</span>`;
-    } else if (d._type === 'proposition') {
-      html += `<span class="tt-chip prop">proposition</span>`;
+    let html = '';
+    if (isInf(d)) {
+      html += `<div class="tt-tag">Inference</div>`;
+      html += `<div class="tt-text">${d.concludes ? 'Concludes a claim' : 'Contests a claim or inference'}</div>`;
+      if (d.hint) html += `<div class="tt-quote">${d.hint}</div>`;
+      const ws = (d.warrants || []).map(w => (nodeById.get(w) || {}).tag || w);
+      if (ws.length) html += `<div class="tt-sub"><span style="color:#777">warrants: </span>${ws.join('; ')}</div>`;
+      html += `<div class="tt-meta"><span class="tt-chip inference">${d.scheme || 'no scheme'}</span>`;
+      if (!ws.length) html += `<span class="tt-chip">implicit warrant</span>`;
+      html += `</div>`;
     } else {
-      html += `<span class="tt-chip term">terminal value</span>`;
+      const key = claimColorKey(d);
+      html += `<div class="tt-tag">${d.tag || d.id}</div>`;
+      html += `<div class="tt-text">${d.text || ''}</div>`;
+      if (d.attribution) {
+        if (d.attribution.quote) html += `<div class="tt-quote">“${d.attribution.quote}”</div>`;
+        html += `<div class="tt-sub">${sourceLabel(d.attribution.source)}</div>`;
+      }
+      const label = d._isRoot ? 'root' : d.terminal ? 'terminal' : d.attribution ? 'attributive' : d.cluster;
+      html += `<div class="tt-meta"><span class="tt-chip ${key}">${label}</span>`;
+      if (d.uncertain) html += `<span class="tt-chip">uncertain</span>`;
+      html += `</div>`;
     }
-    html += '</div>';
     tooltip.innerHTML = html;
     tooltip.style.display = 'block';
     moveTooltip(event);
   }
-
   function moveTooltip(event) {
-    const x = event.clientX, y = event.clientY;
-    const tw = 340, th = 140;
-    const left = x + 16 + tw > window.innerWidth  ? x - tw - 10 : x + 16;
-    const top  = y + 10 + th > window.innerHeight  ? y - th - 10 : y + 10;
-    tooltip.style.left = left + 'px';
-    tooltip.style.top  = top  + 'px';
+    const x = event.clientX, y = event.clientY, tw = 340, th = 160;
+    tooltip.style.left = (x + 16 + tw > window.innerWidth ? x - tw - 10 : x + 16) + 'px';
+    tooltip.style.top = (y + 10 + th > window.innerHeight ? y - th - 10 : y + 10) + 'px';
   }
+  nodeSel.on('mouseover', showTooltip).on('mousemove', moveTooltip).on('mouseout', () => tooltip.style.display = 'none');
 
-  nodeSel
-    .on('mouseover', showTooltip)
-    .on('mousemove', (event) => moveTooltip(event))
-    .on('mouseout',  () => { tooltip.style.display = 'none'; });
-
-  /* ─── Click / panel ─── */
-
-  const panel    = document.getElementById('panel');
+  /* ─── panel ─── */
+  const panel = document.getElementById('panel');
   const panelTag = document.getElementById('panel-tag');
   const panelBody = document.getElementById('panel-body');
+  const tagOf = id => { const n = nodeById.get(id); return n && n._kind === 'claim' ? (n.tag || id) : id; };
+
+  function relRow(l, endpoint) {
+    const id = l[endpoint];
+    const n = nodeById.get(id);
+    const label = n ? (n._kind === 'claim' ? (n.tag || id) : 'inference') : id;
+    return `<li><span class="rel rel-${l.role}">${l.role}</span> <span>${label}</span></li>`;
+  }
 
   function showPanel(d) {
     tooltip.style.display = 'none';
-    panelTag.textContent = d.tag || d.id;
+    panelTag.textContent = isInf(d) ? 'Inference' : (d.tag || d.id);
+    let html = `<div class="p-section"><div class="p-label">ID</div><div class="p-value" style="font-family:monospace;font-size:12px;color:#666">${d.id}</div></div>`;
 
-    const mainText = d.claim || d.text || '';
-    let html = '';
-
-    // ID
-    html += `<div class="p-section">
-      <div class="p-label">ID</div>
-      <div class="p-value" style="font-family:monospace;font-size:12px;color:#666">${d.id}</div>
-    </div>`;
-
-    // Main text
-    html += `<div class="p-section">
-      <div class="p-label">Statement</div>
-      <div class="p-value">${mainText}</div>
-    </div>`;
-
-    if (d._type === 'argument') {
-      if (d.grounds) {
-        if (d.grounds.text && d.grounds.text.trim() !== 'N/A') {
-          html += `<div class="p-section">
-            <div class="p-label">Grounds</div>
-            <div class="p-value grounds">${d.grounds.text.trim()}</div>
-          </div>`;
-        }
-        html += `<div class="p-section">
-          <div class="p-label">Source</div>
-          <div class="p-value">${sourceLabel(d.grounds.source)}</div>
-        </div>`;
+    if (isInf(d)) {
+      const out = d.concludes ? `concludes → <strong>${tagOf(d.concludes)}</strong>` : d.contests ? `contests → <strong>${tagOf(d.contests)}</strong>` : '—';
+      html += `<div class="p-section"><div class="p-label">Output</div><div class="p-value">${out}</div></div>`;
+      if (d.hint) html += `<div class="p-section"><div class="p-label">Hint</div><div class="p-value" style="font-size:12px">${d.hint}</div></div>`;
+      html += `<div class="p-section"><div class="p-label">Grounds (${(d.grounds || []).length})</div><div class="p-value" style="font-size:12px">${(d.grounds || []).map(tagOf).join('; ') || '—'}</div></div>`;
+      html += `<div class="p-section"><div class="p-label">Warrants (${(d.warrants || []).length})</div><div class="p-value" style="font-size:12px">${(d.warrants || []).length ? d.warrants.map(tagOf).join('; ') : 'implicit (not yet surfaced)'}</div></div>`;
+      html += `<div class="p-section"><div class="p-label">Properties</div><div class="p-chips"><span class="p-chip">${d.scheme || 'no scheme'}</span><span class="p-chip">depth ${d._depth}</span>${d.uncertain ? '<span class="p-chip" style="color:#ff8a65">uncertain</span>' : ''}</div></div>`;
+    } else {
+      html += `<div class="p-section"><div class="p-label">Statement</div><div class="p-value">${d.text || ''}</div></div>`;
+      if (d.attribution) {
+        if (d.attribution.quote) html += `<div class="p-section"><div class="p-label">Quote</div><div class="p-value quote">“${d.attribution.quote}”</div></div>`;
+        html += `<div class="p-section"><div class="p-label">Source</div><div class="p-value">${sourceLabel(d.attribution.source)}</div></div>`;
       }
-      html += `<div class="p-section">
-        <div class="p-label">Properties</div>
-        <div class="p-chips">
-          <span class="p-chip">${d.cluster}</span>
-          <span class="p-chip">depth ${d._depth}</span>
-          <span class="p-chip">${d.scheme || ''}</span>
-          ${d.isMediating ? '<span class="p-chip" style="color:#ce93d8">mediating</span>' : ''}
-          ${d.uncertain   ? '<span class="p-chip" style="color:#ff8a65">uncertain</span>' : ''}
-          <span class="p-chip">${d.submissionStatus || ''}</span>
-        </div>
-      </div>`;
-    } else if (d._type === 'terminal') {
-      html += `<div class="p-section"><div class="p-chips"><span class="p-chip" style="color:#ffcc02">terminal value</span></div></div>`;
-    } else {
-      html += `<div class="p-section"><div class="p-chips"><span class="p-chip" style="color:#90caf9">root proposition</span></div></div>`;
+      html += `<div class="p-section"><div class="p-label">Properties</div><div class="p-chips">
+        ${d._isRoot ? '<span class="p-chip" style="color:#90caf9">root</span>' : ''}
+        ${d.terminal ? '<span class="p-chip" style="color:#ffcc02">terminal</span>' : ''}
+        ${d.attribution ? '<span class="p-chip">attributive</span>' : ''}
+        <span class="p-chip">${d.cluster}</span>
+        <span class="p-chip">depth ${d._depth}</span>
+        ${d.uncertain ? '<span class="p-chip" style="color:#ff8a65">uncertain</span>' : ''}
+        ${d.submissionStatus ? `<span class="p-chip">${d.submissionStatus}</span>` : ''}
+      </div></div>`;
     }
 
-    // Incoming edges
-    const inc = incoming.get(d.id) || [];
-    html += `<div class="p-section">
-      <div class="p-label">Incoming (${inc.length})</div>
-      <ul class="edge-list">`;
-    if (inc.length === 0) {
-      html += '<li><span class="empty">none</span></li>';
-    } else {
-      inc.forEach(e => {
-        const src = nodeById.get(e.source);
-        const lbl = src ? (src.tag || src.id) : e.source;
-        html += `<li>${relHtml(e.relationship)} <span>${lbl}</span></li>`;
-      });
-    }
-    html += '</ul></div>';
-
-    // Outgoing edges
-    const out = outgoing.get(d.id) || [];
-    html += `<div class="p-section">
-      <div class="p-label">Outgoing (${out.length})</div>
-      <ul class="edge-list">`;
-    if (out.length === 0) {
-      html += '<li><span class="empty">none</span></li>';
-    } else {
-      out.forEach(e => {
-        const tgt = nodeById.get(e.target);
-        const lbl = tgt ? (tgt.tag || tgt.id) : e.target;
-        html += `<li>${relHtml(e.relationship)} <span>${lbl}</span></li>`;
-      });
-    }
-    html += '</ul></div>';
+    const inc = incoming.get(d.id) || [], out = outgoing.get(d.id) || [];
+    html += `<div class="p-section"><div class="p-label">Incoming (${inc.length})</div><ul class="edge-list">${inc.length ? inc.map(l => relRow(l, 'source')).join('') : '<li><span class="empty">none</span></li>'}</ul></div>`;
+    html += `<div class="p-section"><div class="p-label">Outgoing (${out.length})</div><ul class="edge-list">${out.length ? out.map(l => relRow(l, 'target')).join('') : '<li><span class="empty">none</span></li>'}</ul></div>`;
 
     panelBody.innerHTML = html;
     panel.style.display = 'block';
   }
 
-  nodeSel.on('click', (event, d) => {
-    event.stopPropagation();
-    showPanel(d);
-  });
+  nodeSel.on('click', (event, d) => { event.stopPropagation(); showPanel(d); });
+  svg.on('click', () => panel.style.display = 'none');
+  document.getElementById('close-panel').addEventListener('click', () => panel.style.display = 'none');
 
-  svg.on('click', () => { panel.style.display = 'none'; });
-  document.getElementById('close-panel').addEventListener('click', () => { panel.style.display = 'none'; });
-
-  /* ─── Force simulation ─── */
-
+  /* ─── simulation ─── */
   const simulation = d3.forceSimulation(nodes)
-    .force('link', d3.forceLink(links)
-      .id(d => d.id)
-      .distance(70)
-      .strength(0.25))
-    .force('charge', d3.forceManyBody().strength(-280).distanceMax(400))
+    .force('link', d3.forceLink(links).id(d => d.id).distance(55).strength(0.3))
+    .force('charge', d3.forceManyBody().strength(-240).distanceMax(400))
     .force('x', d3.forceX(W / 2).strength(0.04))
-    .force('y', d3.forceY(d => (d._depth + 0.5) * depthSpacing).strength(0.85))
-    .force('collision', d3.forceCollide(d => Math.sqrt(nodeHW(d)**2 + nodeHH(d)**2) + 10))
+    .force('y', d3.forceY(d => (d._depth + 0.5) * depthSpacing).strength(0.9))
+    .force('collision', d3.forceCollide(d => Math.sqrt(nodeHW(d) ** 2 + nodeHH(d) ** 2) + 8))
     .alphaDecay(0.02)
     .on('tick', ticked);
 
   function ticked() {
-    linkSel.each(function(d) {
+    linkSel.each(function (d) {
       const s = d.source, t = d.target;
       const sp = rectEdgePt(s.x, s.y, t.x, t.y, s, 2);
-      const ep = rectEdgePt(t.x, t.y, s.x, s.y, t, 9); // 9px clearance for arrowhead
-      d3.select(this)
-        .attr('x1', sp.x).attr('y1', sp.y)
-        .attr('x2', ep.x).attr('y2', ep.y);
+      const ep = rectEdgePt(t.x, t.y, s.x, s.y, t, 9);
+      d3.select(this).attr('x1', sp.x).attr('y1', sp.y).attr('x2', ep.x).attr('y2', ep.y);
     });
-
     nodeSel.attr('transform', d => `translate(${d.x ?? 0},${d.y ?? 0})`);
   }
 
-  // Drag
-  nodeSel.call(
-    d3.drag()
-      .on('start', (event, d) => {
-        if (!event.active) simulation.alphaTarget(0.3).restart();
-        d.fx = d.x; d.fy = d.y;
-      })
-      .on('drag', (event, d) => { d.fx = event.x; d.fy = event.y; })
-      .on('end',  (event, d) => {
-        if (!event.active) simulation.alphaTarget(0);
-        d.fx = null; d.fy = null;
-      })
-  );
+  nodeSel.call(d3.drag()
+    .on('start', (event, d) => { if (!event.active) simulation.alphaTarget(0.3).restart(); d.fx = d.x; d.fy = d.y; })
+    .on('drag', (event, d) => { d.fx = event.x; d.fy = event.y; })
+    .on('end', (event, d) => { if (!event.active) simulation.alphaTarget(0); d.fx = null; d.fy = null; }));
 
   document.getElementById('loading').style.display = 'none';
 }
 
-main().catch(err => {
-  document.getElementById('loading').textContent = `Error: ${err.message}`;
-  console.error(err);
-});
+main().catch(err => { document.getElementById('loading').textContent = `Error: ${err.message}`; console.error(err); });
 </script>
 </body>
 </html>
