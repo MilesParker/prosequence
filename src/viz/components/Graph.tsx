@@ -7,7 +7,7 @@ import {
   buildGraphData,
   edgeColor, edgeMarkerId,
   nodeFill, nodeStroke,
-  nodeHW, nodeHH, isRootClaim,
+  nodeHW, nodeHH, isRootClaim, isWarrantClaim,
   rectEdgePt, wrapTag,
   type GraphNode, type GraphLink, type EdgeRole,
 } from '../graphData'
@@ -22,6 +22,13 @@ const ROLES: EdgeRole[] = ['Grounds', 'Warrants', 'Concludes', 'Contests']
 
 function diamondPath(r: number): string {
   return `M0,${-r}L${r},0L0,${r}L${-r},0Z`
+}
+
+// Port nub: a half-disc whose flat diameter sits flush on the claim's bottom
+// border (local y = 0) and whose curve bulges `height` below it — fused to the
+// claim rather than floating beside it.
+function portPath(halfWidth: number, height: number): string {
+  return `M${-halfWidth},0 A${halfWidth},${height} 0 0 0 ${halfWidth},0 Z`
 }
 
 export function Graph({ data, onHover, onClick }: Props) {
@@ -52,6 +59,25 @@ export function Graph({ data, onHover, onClick }: Props) {
     for (const l of links) {
       incident.get(l.source as unknown as string)?.push(l)
       incident.get(l.target as unknown as string)?.push(l)
+    }
+
+    // Host → attached nubs, so a claim drag carries its ports (and their
+    // undercut nubs) with it instead of orphaning them. Positions are anchored
+    // relative to the host by the layout, so we translate children by the same
+    // delta rather than re-deriving offsets.
+    const childrenOf = new Map<string, GraphNode[]>()
+    for (const n of nodes) {
+      const host = n._kind === 'inference' ? n._hostId : undefined
+      if (host == null) continue
+      ;(childrenOf.get(host) ?? childrenOf.set(host, []).get(host)!).push(n)
+    }
+    // All nubs anchored to `id`, transitively (port → its undercut nubs).
+    const descendants = (id: string, out: GraphNode[] = []): GraphNode[] => {
+      for (const c of childrenOf.get(id) ?? []) {
+        out.push(c)
+        descendants(c.id as unknown as string, out)
+      }
+      return out
     }
 
     // Resolve string endpoints → node objects for rendering. (dagre and the
@@ -121,13 +147,17 @@ export function Graph({ data, onHover, onClick }: Props) {
       const sel = d3.select(this)
       if (d._kind === 'inference') {
         if (ports) {
-          // Port nub on the target claim's border — green concludes, red contests.
-          const role: EdgeRole = (d as { concludes?: unknown }).concludes != null ? 'Concludes' : 'Contests'
-          sel.append('circle')
-            .attr('r', NODE.portRadius)
-            .attr('fill', edgeColor(role))
-            .attr('stroke', COLORS.background)
-            .attr('stroke-width', 1.5)
+          // Port nub on the target claim's border — a half-disc flush against
+          // the claim's bottom edge, filled+stroked like a claim node so it
+          // reads as part of the node. Green concludes / red contests reuse the
+          // pro/anti node palette.
+          const concludes = (d as { concludes?: unknown }).concludes != null
+          const style = concludes ? COLORS.node.pro : COLORS.node.anti
+          sel.append('path')
+            .attr('d', portPath(NODE.portHalfWidth, NODE.portHeight))
+            .attr('fill', style.fill)
+            .attr('stroke', style.stroke)
+            .attr('stroke-width', NODE.strokeWidth)
           return
         }
         // Small diamond — a subordinate junction, not a peer node.
@@ -146,6 +176,7 @@ export function Graph({ data, onHover, onClick }: Props) {
         .attr('fill', nodeFill(d))
         .attr('stroke', nodeStroke(d))
         .attr('stroke-width', isRootClaim(d) ? NODE.rootStrokeWidth : NODE.strokeWidth)
+        .attr('stroke-dasharray', isWarrantClaim(d) ? EDGE.dashWarrants : null)
 
       const lines = wrapTag(d.tag || (d.id as unknown as string))
       const totalH = (lines.length - 1) * NODE.lineHeight
@@ -213,13 +244,31 @@ export function Graph({ data, onHover, onClick }: Props) {
       d3.drag<SVGGElement, GraphNode>()
         .on('start', () => onHoverRef.current(null))
         .on('drag', function (event, d) {
-          d.x = event.x; d.y = event.y
-          d3.select(this).attr('transform', placeNode.call(this, d))
-          const affected = incident.get(d.id as unknown as string) ?? []
+          const dx = event.x - (d.x ?? 0)
+          const dy = event.y - (d.y ?? 0)
+
+          // A port drags its whole node: resolve the cluster root (the host
+          // claim when dragging a port, else the node itself), then translate
+          // the root and every nub attached to it — ports and their undercut
+          // nubs — by the same delta so the cluster moves rigidly.
+          const host = d._kind === 'inference' && d._hostId
+            ? gd.nodeById.get(d._hostId) : undefined
+          const root = host && host._kind === 'claim' ? host : d
+          const moved = [root, ...descendants(root.id as unknown as string)]
+          for (const n of moved) { n.x = (n.x ?? 0) + dx; n.y = (n.y ?? 0) + dy }
+          const movedSet = new Set(moved)
+          nodeSel.filter(n => movedSet.has(n)).attr('transform', placeNode)
+
           // Dragging invalidates the routed waypoints — fall back to a straight
-          // line between the (moved) endpoints for the affected edges.
-          for (const l of affected) l.points = undefined
-          linkSel.filter(l => affected.includes(l)).each(placeLink)
+          // line between the (moved) endpoints for every affected edge.
+          const affected = new Set<GraphLink>()
+          for (const n of moved) {
+            for (const l of incident.get(n.id as unknown as string) ?? []) {
+              l.points = undefined
+              affected.add(l)
+            }
+          }
+          linkSel.filter(l => affected.has(l)).each(placeLink)
         })
     )
 

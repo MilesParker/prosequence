@@ -11,10 +11,23 @@ export type ClaimNode = Claim & {
   _kind: 'claim'
   _isRoot: boolean
   _depth: number
+  /** True when this claim serves as a warrant for some inference. */
+  _isWarrant: boolean
+  /**
+   * Half-width override (set by `layoutPorts`) when a claim carries more ports
+   * than its default width can hold, so its nubs never spill past its border.
+   */
+  _halfWidth?: number
 }
 export type InfNode = Inference & {
   _kind: 'inference'
   _depth: number
+  /**
+   * Node this inference's port/nub is anchored to (set by `layoutPorts`): the
+   * host claim for a port, or the contested port for an undercut nub. Dragging
+   * the host carries its attached nubs along so they never orphan.
+   */
+  _hostId?: string
 }
 export type GraphNode = (ClaimNode | InfNode) & SimulationNodeDatum
 
@@ -79,10 +92,13 @@ export function buildGraphData(ds: DiscourseSpace): GraphData {
   const maxDepth = terminalDepth
 
   // ── Nodes ────────────────────────────────────────────────────────────────────
+  const warrantIds = new Set<string>()
+  for (const inf of inferences) for (const w of inf.warrants ?? []) warrantIds.add(String(w))
+
   const claimNodes: GraphNode[] = claims.map(c => {
     const id = c.id as unknown as string
     const d = c.terminal ? terminalDepth : (depth.get(id) ?? computedMax)
-    return { ...c, _kind: 'claim' as const, _isRoot: roots.has(id), _depth: d } as ClaimNode & SimulationNodeDatum
+    return { ...c, _kind: 'claim' as const, _isRoot: roots.has(id), _isWarrant: warrantIds.has(id), _depth: d } as ClaimNode & SimulationNodeDatum
   })
   const infNodes: GraphNode[] = inferences.map(i => {
     const id = i.id as unknown as string
@@ -163,8 +179,14 @@ export function isRootClaim(n: GraphNode): boolean {
   return n._kind === 'claim' && (n as ClaimNode)._isRoot
 }
 
+export function isWarrantClaim(n: GraphNode): boolean {
+  return n._kind === 'claim' && (n as ClaimNode)._isWarrant
+}
+
 export function nodeHW(n: GraphNode): number {
   if (n._kind === 'inference') return NODE.infRadius
+  const override = (n as ClaimNode)._halfWidth
+  if (override != null) return override
   return isRootClaim(n) ? NODE.rootHalfWidth : NODE.halfWidth
 }
 
@@ -215,6 +237,8 @@ export function nodeFill(n: GraphNode): string {
 
 export function nodeStroke(n: GraphNode): string {
   if (n._kind === 'inference') return COLORS.inference.stroke
+  // Warrant claims are outlined to match their (dashed green) warrant edges.
+  if (isWarrantClaim(n)) return COLORS.edge.warrants
   return COLORS.node[claimColorKey(n as ClaimNode)].stroke
 }
 

@@ -1,7 +1,7 @@
 import dagre from '@dagrejs/dagre'
 import { LAYOUT, NODE } from '../config'
 import { nodeHW, nodeHH, type GraphData, type GraphNode } from './graphData'
-import type { InfNode } from './graphData'
+import type { InfNode, ClaimNode } from './graphData'
 
 export interface LayoutBounds {
   minX: number
@@ -108,6 +108,25 @@ export function layoutPorts(gd: GraphData): LayoutBounds {
     return null
   }
 
+  // Widen any claim that hosts more ports than its default width can hold, so
+  // its nubs stay flush along the border instead of spilling past it. Done
+  // before dagre so the layout reserves the extra width.
+  const portCount = new Map<string, number>()
+  for (const n of gd.nodes) {
+    if (n._kind !== 'inference') continue
+    const inf = n as InfNode
+    let host: string | null = null
+    if (inf.concludes != null && claimIds.has(String(inf.concludes))) host = String(inf.concludes)
+    else if (inf.contests != null && claimIds.has(String(inf.contests))) host = String(inf.contests)
+    if (host) portCount.set(host, (portCount.get(host) ?? 0) + 1)
+  }
+  for (const c of claims) {
+    const k = portCount.get(idOf(c)) ?? 0
+    if (k <= 1) continue
+    const need = (k - 1) / 2 * LAYOUT.portGap + NODE.portHalfWidth + LAYOUT.portMargin
+    if (need > nodeHW(c)) (c as ClaimNode)._halfWidth = need
+  }
+
   const g = new dagre.graphlib.Graph({ multigraph: true, directed: true })
   g.setGraph({
     rankdir: LAYOUT.rankdir,
@@ -172,9 +191,10 @@ export function layoutPorts(gd: GraphData): LayoutBounds {
     const n = infIds.length
     const y = (c.y ?? 0) + nodeHH(c)
     infIds.forEach((id, i) => {
-      const inf = gd.nodeById.get(id)!
+      const inf = gd.nodeById.get(id)! as InfNode
       inf.x = (c.x ?? 0) + (i - (n - 1) / 2) * LAYOUT.portGap
       inf.y = y
+      inf._hostId = claimId
     })
   }
 
@@ -185,6 +205,7 @@ export function layoutPorts(gd: GraphData): LayoutBounds {
     if (tgt && tgt.x != null && tgt.y != null) {
       node.x = tgt.x
       node.y = tgt.y + LAYOUT.undercutOffset
+      inf._hostId = String(inf.contests)
     } else {
       node.x = meanGroundX(node)
       node.y = 0

@@ -147,7 +147,7 @@ claims:
       source:
         type: Citation
         reference: Omer Bartov, New York Times, 2025
-      quote: I don't know them
+      quote: null
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
@@ -641,16 +641,6 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: c-infrastructure-destruction-beyond-military-necessity
-    tag: Infrastructure destruction beyond military necessity
-    text: >-
-      The scope of civilian infrastructure destruction — hospitals, schools, universities, water
-      treatment, cultural sites — exceeds any plausible military necessity and indicates an
-      objective of making Gaza uninhabitable as a Palestinian territory.
-    terminal: false
-    cluster: Pro
-    uncertain: false
-    submissionStatus: Accepted
   - id: g-infrastructure-destruction-beyond-military-necessity
     tag: Infrastructure destruction beyond military necessity — grounds
     text: >-
@@ -894,7 +884,6 @@ inferences:
     warrants:
       - c-intl-law-obliges-designation
       - c-incorrect-application-damages-convention
-      - c-holocaust-memory-universalism
     hint: null
     concludes: c-denial-damages-intl-law
   - id: i-ethnic-cleansing-morphs-genocide
@@ -1069,15 +1058,29 @@ inferences:
     warrants: []
     hint: null
     concludes: c-few-statements-vs-systematic-policy
-  - id: i-infrastructure-destruction-beyond-military-necessity
+  - id: i-pattern-of-ops-genocidal-from-infrastructure
     scheme: FromSign
     uncertain: false
     submissionStatus: Accepted
     grounds:
       - g-infrastructure-destruction-beyond-military-necessity
+    warrants:
+      - c-pattern-establishes-intent
+    hint: >-
+      Independent route to the same claim: destruction of the institutions of group reconstitution,
+      distinct from the building-count evidence.
+    concludes: c-pattern-of-ops-genocidal
+  - id: i-holocaust-memory-to-denial-damages
+    scheme: FromConsequence
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-holocaust-memory-universalism
     warrants: []
-    hint: null
-    concludes: c-infrastructure-destruction-beyond-military-necessity
+    hint: >-
+      Independent moral route to the same claim; does not depend on the Convention's designation
+      mechanics.
+    concludes: c-denial-damages-intl-law
   - id: i-mosul-analogy
     scheme: FromAnalogy
     uncertain: false
@@ -1254,15 +1257,6 @@ inferences:
       Stephens concedes the statements were made; what he contests is the warrant that rhetorical
       statements in the heat of conflict constitute evidence of state policy intent.
     contests: c-statements-evidence-intent
-  - id: i-e-infra-destruction-supports-pattern
-    scheme: null
-    uncertain: false
-    submissionStatus: Accepted
-    grounds:
-      - c-infrastructure-destruction-beyond-military-necessity
-    warrants: []
-    hint: null
-    concludes: c-pattern-of-ops-genocidal
   - id: i-e-mosul-attacks-hamas-tactics
     scheme: null
     uncertain: false
@@ -1285,7 +1279,7 @@ inferences:
       Both arguments read intent from scale; Stephens's counter is that the relevant scale is
       killing rate (too low for genocide), not infrastructure destruction rate.
     contests: c-pattern-of-ops-genocidal
-  - id: i-e-genocide-label-antisemitism-attacks-scholarly
+  - id: i-e-antisemitism-undercuts-scholarly-authority
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1293,9 +1287,9 @@ inferences:
       - c-genocide-label-antisemitism-charge
     warrants: []
     hint: >-
-      Attacks the argument from authority by contesting the scholarly consensus's motivations and
-      framing.
-    contests: c-scholarly-consensus-genocide
+      Concedes that the scholars have reached this conclusion; contests that their conclusion
+      supports the proposition, on grounds that the designation serves a delegitimising function.
+    contests: i-e-scholarly-consensus-to-prop
   - id: i-e-silences-critics-attacks-antisemitism-charge
     scheme: null
     uncertain: false

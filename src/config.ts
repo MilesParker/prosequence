@@ -1,6 +1,21 @@
 // ── File locations ──────────────────────────────────────────────────────────
 // v2 corpus (claim/inference model). Swap to another *.v2.yaml to view it.
-export const DATA_FILE = 'discourse-spaces/gaza.v2.yaml'
+export const DEFAULT_MODEL = 'gaza'
+
+// Resolve the corpus file, honouring a `?model=<name>` query param
+// (e.g. ?model=gaza → discourse-spaces/gaza.v2.yaml). The name is sanitised to
+// a safe slug so it can only reference files within discourse-spaces/.
+export function resolveDataFile(): string {
+  let model = DEFAULT_MODEL
+  if (typeof window !== 'undefined') {
+    const param = new URLSearchParams(window.location.search).get('model')
+    if (param) model = param
+  }
+  const slug = model.replace(/[^a-zA-Z0-9_-]/g, '')
+  return `discourse-spaces/${slug || DEFAULT_MODEL}.v2.yaml`
+}
+
+export const DATA_FILE = resolveDataFile()
 
 // ── Inference rendering mode ──────────────────────────────────────────────────
 // 'diamond' — inferences are free-floating junction nodes (original).
@@ -43,8 +58,13 @@ export const NODE = {
   // Inference junction marks are small and visually subordinate — wiring,
   // not peers. Rendered as a small diamond of this half-diagonal.
   infRadius: 7,
-  // Port mode: radius of the nub drawn on a claim's border.
-  portRadius: 6,
+  // Port mode: the nub drawn on a claim's border. A half-disc whose flat
+  // diameter sits flush on the claim's bottom edge and whose curve bulges
+  // below — so it reads as fused to its host claim, not a dot floating beside
+  // it. Grounds/warrants converge on the nub.
+  portRadius: 10,     // half-extent used for layout bounds and edge clipping
+  portHalfWidth: 10,  // half-width of the diameter (along the border)
+  portHeight: 15,     // how far the curve bulges below the border
 } as const
 
 // ── Color palette (all values in HSL) ────────────────────────────────────────
@@ -79,7 +99,9 @@ export const COLORS = {
   // Four edge roles, each distinct.
   edge: {
     grounds:   'hsl(205, 30%, 55%)',   // steel — evidence into an inference
-    warrants:  'hsl(122, 30%, 40%)',   // dim green (dashed) — bridging assumption
+    warrants:  'hsl(205, 30%, 55%)',   // steel (dashed) — an inference input like
+                                       // grounds; the dash marks it a bridging
+                                       // assumption. Green is reserved for Concludes.
     concludes: 'hsl(122, 39%, 49%)',   // green — was Support
     contests:  'hsl(1, 77%, 55%)',     // red — was Attack
   },
@@ -87,7 +109,7 @@ export const COLORS = {
   // Role badges in the detail panel.
   rel: {
     grounds:   { bg: 'hsl(205, 30%, 16%)', color: 'hsl(205, 40%, 62%)' },
-    warrants:  { bg: 'hsl(143, 34%, 13%)', color: 'hsl(122, 34%, 52%)' },
+    warrants:  { bg: 'hsl(205, 30%, 16%)', color: 'hsl(205, 40%, 62%)' },
     concludes: { bg: 'hsl(143, 44%, 14%)', color: 'hsl(122, 39%, 55%)' },
     contests:  { bg: 'hsl(0, 43%, 14%)',   color: 'hsl(1, 77%, 62%)'   },
   },
@@ -124,9 +146,12 @@ export const LAYOUT = {
   edgesep: 28,              // px gap between edges (routing room)
   ranker: 'network-simplex' as const,
   // Port mode: spacing between adjacent nubs along a claim's border, and how far
-  // an undercut nub hangs off the port it contests.
-  portGap: 20,
-  undercutOffset: 26,
+  // an undercut nub hangs off the port it contests. When a claim has more ports
+  // than fit within its default width, it is widened to hold them (+ portMargin
+  // of clearance on each side).
+  portGap: 26,
+  portMargin: 8,
+  undercutOffset: 30,
   // Initial zoom-to-fit leaves this much of the viewport as margin.
   fitPadding: 0.92,
 } as const

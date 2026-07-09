@@ -356,6 +356,19 @@ claims:
     cluster: Analogy
     uncertain: false
     submissionStatus: Accepted
+  - id: g-democracy-criterion-invoked
+    tag: Double-standard critique invokes a democratic-governance criterion — grounds
+    text: >-
+      The double-standard critique evaluates the deal against the survival of democratic
+      governance in other states rather than against the interests of US citizens.
+    terminal: false
+    attribution:
+      source:
+        type: LogicalNecessity
+      quote: null
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
   - id: g-obama-double-standard
     tag: Obama double standard — grounds
     text: >-
@@ -725,15 +738,16 @@ inferences:
     warrants: []
     hint: null
     concludes: c-witkoff-kushner-example
-  - id: i-e-realism-attacks-identity-evaluation
+  - id: i-e-realism-undercuts-obama-double-standard
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
+      - g-democracy-criterion-invoked
+    warrants:
       - t-realist-state-primacy
-    warrants: []
-    hint: Realist state primacy denies that democratic consistency is a valid evaluative criterion.
-    contests: c-w-identity-evaluation
+    hint: Contests the applicability of the democratic-order criterion to this link, not its general validity.
+    contests: i-obama-double-standard
   - id: i-e-electoral-attacks-root
     scheme: null
     uncertain: false
