@@ -17,14 +17,22 @@ export function resolveDataFile(): string {
 
 export const DATA_FILE = resolveDataFile()
 
-// ── Inference rendering mode ──────────────────────────────────────────────────
-// 'diamond' — inferences are free-floating junction nodes (original).
-// 'port'    — an inference has exactly one target (invariant 1), so it collapses
-//             to a coloured port (nub) on that target claim's border; grounds and
-//             warrants attach to the port and the concludes/contests edge is
-//             implicit. Layout is claims-only (no inference ranks). Undercuts
-//             (contests an inference) hang a nub off the contested port.
-export const INFERENCE_RENDER: 'diamond' | 'port' = 'port'
+// ── Progressive disclosure ────────────────────────────────────────────────────
+// Inferences render in one of three states (P/J/X). The master layout is frozen
+// (the fully-expanded, all-X geometry); disclosure toggles visibility only. See
+// src/viz/disclosure.ts.
+export const DISCLOSURE = {
+  fadeMs: 200,          // enter/exit fade for revealed/hidden marks
+  chipMaxChars: 14,     // truncation for folded-warrant chips
+  chipHeight: 16,
+  chipGap: 4,
+  chipFontSize: 9,
+  badgeFontSize: 9,
+  fanGap: 18,           // vertical drop from a J junction to its chip/badge fan
+  hiddenFontSize: 9,    // persistent "something is hidden" count on a claim
+  highlightStroke: 'hsl(45, 100%, 70%)',
+  highlightWidth: 3,
+} as const
 
 // ── Layout ──────────────────────────────────────────────────────────────────
 export const TITLE_BAR_HEIGHT = 44

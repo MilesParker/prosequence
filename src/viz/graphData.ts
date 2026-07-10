@@ -28,6 +28,13 @@ export type InfNode = Inference & {
    * the host carries its attached nubs along so they never orphan.
    */
   _hostId?: string
+  /**
+   * Rim-slot position on the host claim's border (set by `masterLayout`), used
+   * to draw this inference as a P stub or J junction. Its `x`/`y` (from the full
+   * Sugiyama pass) remain the expanded-junction position used in the X state.
+   */
+  _portX?: number
+  _portY?: number
 }
 export type GraphNode = (ClaimNode | InfNode) & SimulationNodeDatum
 
@@ -215,6 +222,35 @@ export function wrapTag(tag: string): string[] {
     lines.push(words.slice(i, i + NODE.wordsPerLine).join(' '))
   }
   return lines.length ? lines : ['']
+}
+
+/**
+ * Wrap `tag` to fit a `hw × hh` (half-width/height) box at `fontSize`, greedily
+ * by estimated character width. If it doesn't fit in the available lines, the
+ * last line is trimmed at a word boundary and given a trailing ellipsis.
+ */
+export function fitTag(tag: string, hw: number, hh: number, fontSize: number): string[] {
+  const words = (tag || '').split(/\s+/).filter(Boolean)
+  if (!words.length) return ['']
+  const maxChars = Math.max(3, Math.floor((hw * 2 - 8) / (fontSize * 0.58)))
+  const maxLines = Math.max(1, Math.floor((hh * 2 - 6) / NODE.lineHeight))
+
+  const lines: string[] = []
+  let cur = ''
+  for (const raw of words) {
+    const w = raw.length > maxChars ? raw.slice(0, maxChars - 1) + '…' : raw
+    if (!cur) cur = w
+    else if ((cur + ' ' + w).length <= maxChars) cur += ' ' + w
+    else { lines.push(cur); cur = w }
+  }
+  if (cur) lines.push(cur)
+  if (lines.length <= maxLines) return lines
+
+  const kept = lines.slice(0, maxLines)
+  let last = kept[maxLines - 1]
+  while (last.length + 1 > maxChars && last.includes(' ')) last = last.replace(/\s+\S*$/, '')
+  kept[maxLines - 1] = last.replace(/[…\s]*$/, '') + '…'
+  return kept
 }
 
 // ── Colour helpers ─────────────────────────────────────────────────────────────

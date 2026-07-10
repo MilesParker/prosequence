@@ -3,9 +3,11 @@ import { COLORS, TITLE_BAR_HEIGHT } from '../../config'
 interface Props {
   title: string
   subtitle?: string
+  search?: string
+  onSearch?: (value: string) => void
 }
 
-export function TitleBar({ title, subtitle }: Props) {
+export function TitleBar({ title, subtitle, search, onSearch }: Props) {
   return (
     <div style={{
       position: 'fixed',
@@ -25,6 +27,26 @@ export function TitleBar({ title, subtitle }: Props) {
       </h1>
       {subtitle && (
         <span style={{ fontSize: 11, color: COLORS.textDimmer }}>{subtitle}</span>
+      )}
+      {onSearch && (
+        <input
+          value={search ?? ''}
+          onChange={e => onSearch(e.target.value)}
+          placeholder="Search claims…  (Esc to reset)"
+          spellCheck={false}
+          style={{
+            marginLeft: 'auto',
+            width: 260,
+            height: 26,
+            padding: '0 10px',
+            fontSize: 12,
+            color: COLORS.text,
+            background: COLORS.surface,
+            border: `1px solid ${COLORS.border}`,
+            borderRadius: 6,
+            outline: 'none',
+          }}
+        />
       )}
     </div>
   )

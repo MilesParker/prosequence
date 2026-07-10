@@ -38,27 +38,26 @@ export function Tooltip({ node, x, y, nodeById }: Props) {
 
   if (node._kind === 'inference') {
     const inf = node as InfNode
-    const warrantList = (inf.warrants ?? []).map(w => tagOf(String(w), nodeById))
+    const grounds = (inf.grounds ?? []).map(g => tagOf(String(g), nodeById))
+    const warrants = (inf.warrants ?? []).map(w => tagOf(String(w), nodeById))
+    // §3 P: "Because {grounds[0]}{, +N more}, given {warrants[0]}{, +N more}."
+    const more = (n: number) => (n > 1 ? `, +${n - 1} more` : '')
+    const because = grounds.length ? `Because ${grounds[0]}${more(grounds.length)}` : 'Because (grounds)'
+    const given = warrants.length ? `, given ${warrants[0]}${more(warrants.length)}` : ''
     return (
       <div style={shell}>
         <div style={tagStyle}>Inference</div>
         <div style={{ color: '#ddd', marginBottom: 8, fontSize: 12.5 }}>
-          {inf.concludes ? 'Concludes a claim' : 'Contests a claim or inference'}
+          {because}{given}.
         </div>
         {inf.hint && (
           <div style={{ color: '#aaa', fontSize: 11, marginBottom: 6, borderLeft: `2px solid ${COLORS.border}`, paddingLeft: 8 }}>
             {inf.hint}
           </div>
         )}
-        {warrantList.length > 0 && (
-          <div style={{ color: '#999', fontSize: 11, marginBottom: 4 }}>
-            <span style={{ color: '#777' }}>warrants: </span>
-            {warrantList.join('; ')}
-          </div>
-        )}
         <div style={chips}>
           <span style={chipStyle('inference')}>{inf.scheme || 'no scheme'}</span>
-          {warrantList.length === 0 && <span style={chipStyle('default')}>implicit warrant</span>}
+          {warrants.length === 0 && <span style={chipStyle('default')}>implicit warrant</span>}
         </div>
       </div>
     )

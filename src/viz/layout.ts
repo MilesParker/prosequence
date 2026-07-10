@@ -1,7 +1,11 @@
 import dagre from '@dagrejs/dagre'
+import type { SimulationNodeDatum } from 'd3'
 import { LAYOUT, NODE } from '../config'
 import { nodeHW, nodeHH, type GraphData, type GraphNode } from './graphData'
 import type { InfNode, ClaimNode } from './graphData'
+
+/** Inference node with its live simulation coordinates present. */
+type PosInf = InfNode & SimulationNodeDatum
 
 export interface LayoutBounds {
   minX: number
@@ -191,7 +195,7 @@ export function layoutPorts(gd: GraphData): LayoutBounds {
     const n = infIds.length
     const y = (c.y ?? 0) + nodeHH(c)
     infIds.forEach((id, i) => {
-      const inf = gd.nodeById.get(id)! as InfNode
+      const inf = gd.nodeById.get(id)! as PosInf
       inf.x = (c.x ?? 0) + (i - (n - 1) / 2) * LAYOUT.portGap
       inf.y = y
       inf._hostId = claimId
@@ -200,7 +204,7 @@ export function layoutPorts(gd: GraphData): LayoutBounds {
 
   // Undercut nubs hang just below the port they contest.
   for (const node of undercuts) {
-    const inf = node as InfNode
+    const inf = node as PosInf
     const tgt = inf.contests != null ? gd.nodeById.get(String(inf.contests)) : undefined
     if (tgt && tgt.x != null && tgt.y != null) {
       node.x = tgt.x
@@ -224,6 +228,70 @@ export function layoutPorts(gd: GraphData): LayoutBounds {
   }
   if (!Number.isFinite(minX)) { minX = minY = 0; maxX = maxY = 0 }
   return { minX, minY, maxX, maxY, width: maxX - minX, height: maxY - minY }
+}
+
+/**
+ * Master layout for progressive disclosure. Runs the full Sugiyama pass once
+ * (fixing `x`/`y` on every claim and inference, and routing every edge) — this
+ * is the fully-expanded, all-X geometry. Positions are frozen: disclosure toggles
+ * visibility only, never coordinates. Additionally computes each inference's
+ * rim-slot (`_portX`/`_portY`) on its output claim's bottom border, used to draw
+ * it as a P stub or J junction; undercut nubs hang just below the port they
+ * contest. Returns the full-graph bounds (the renderer fits to visible nodes).
+ */
+export function masterLayout(gd: GraphData): LayoutBounds {
+  const bounds = layoutSugiyama(gd)
+
+  const claimHost = (inf: PosInf): string | null => {
+    if (inf.concludes != null && gd.nodeById.get(String(inf.concludes))?._kind === 'claim')
+      return String(inf.concludes)
+    if (inf.contests != null && gd.nodeById.get(String(inf.contests))?._kind === 'claim')
+      return String(inf.contests)
+    return null
+  }
+
+  const byClaim = new Map<string, PosInf[]>()
+  const undercuts: PosInf[] = []
+  for (const n of gd.nodes) {
+    if (n._kind !== 'inference') continue
+    const inf = n as PosInf
+    const host = claimHost(inf)
+    if (host) (byClaim.get(host) ?? byClaim.set(host, []).get(host)!).push(inf)
+    else undercuts.push(inf)
+  }
+
+  // Ports arc along the host claim's bottom rim, spaced by portGap but compressed
+  // to stay within the border when a claim carries many (fan-in) — so stubs never
+  // overlap and never spill past the node.
+  for (const [claimId, infs] of byClaim) {
+    const c = gd.nodeById.get(claimId)!
+    infs.sort((a, b) => ((a.x ?? 0) - (b.x ?? 0)) || (String(a.id) < String(b.id) ? -1 : 1))
+    const n = infs.length
+    const span = 2 * (nodeHW(c) - NODE.portHalfWidth)
+    const gap = n > 1 ? Math.min(LAYOUT.portGap, span / (n - 1)) : 0
+    const y = (c.y ?? 0) + nodeHH(c)
+    infs.forEach((inf, k) => {
+      inf._portX = (c.x ?? 0) + (k - (n - 1) / 2) * gap
+      inf._portY = y
+      inf._hostId = claimId
+    })
+  }
+
+  // Undercut nubs: below the port they contest, anchored to it.
+  for (const inf of undercuts) {
+    const tgtId = inf.contests != null ? String(inf.contests) : null
+    const tgt = tgtId ? gd.nodeById.get(tgtId) as PosInf | undefined : undefined
+    if (tgt && tgt._kind === 'inference') {
+      inf._portX = tgt._portX ?? tgt.x ?? 0
+      inf._portY = (tgt._portY ?? tgt.y ?? 0) + LAYOUT.undercutOffset
+      inf._hostId = tgtId!
+    } else {
+      inf._portX = inf.x ?? 0
+      inf._portY = inf.y ?? 0
+    }
+  }
+
+  return bounds
 }
 
 /**
