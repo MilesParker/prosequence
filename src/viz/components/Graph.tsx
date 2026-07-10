@@ -309,15 +309,18 @@ function drawNode(
         .attr('d', portPath(NODE.portHalfWidth, NODE.portHeight))
         .attr('transform', `translate(${ox},${oy})`)
         .attr('fill', style.fill).attr('stroke', style.stroke).attr('stroke-width', NODE.strokeWidth)
-      const circle = sel.append('circle')         // floated bundler
-        .attr('r', r).attr('fill', style.fill).attr('stroke', style.stroke).attr('stroke-width', NODE.strokeWidth)
+      const bundler = sel.append('g')             // floated bundler (opaque so edges
+      bundler.append('circle').attr('r', r).attr('fill', COLORS.background)  // don't show through)
+      bundler.append('circle').attr('r', r)
+        .attr('fill', style.fill).attr('stroke', style.stroke).attr('stroke-width', NODE.strokeWidth)
       if (prev !== 'X') {                          // slide out from the nub on expand
-        circle.attr('transform', `translate(${ox},${oy})`)
+        bundler.attr('transform', `translate(${ox},${oy})`)
           .transition().duration(320).attr('transform', 'translate(0,0)')
       }
     } else {
-      sel.append('circle')                        // J: bundler resting on the rim
-        .attr('r', r).attr('fill', style.fill).attr('stroke', style.stroke).attr('stroke-width', NODE.strokeWidth)
+      sel.append('circle').attr('r', r).attr('fill', COLORS.background)   // J: opaque backing
+      sel.append('circle').attr('r', r)           // bundler resting on the rim
+        .attr('fill', style.fill).attr('stroke', style.stroke).attr('stroke-width', NODE.strokeWidth)
     }
     sel.on('click', (e: MouseEvent) => { e.stopPropagation(); cb().onJunctionClick(d.id) })
       .on('mouseover', (e: MouseEvent) => hover(e, inf))
@@ -441,6 +444,7 @@ function drawFan(
         e.stopPropagation()
         if (isOpen) cb().onGroundsClose(infId); else cb().onBadgeClick(infId)
       })
+    ctrl.append('circle').attr('cx', 0).attr('cy', cy).attr('r', r).attr('fill', COLORS.background)  // opaque backing
     ctrl.append('circle').attr('cx', 0).attr('cy', cy).attr('r', r)
       .attr('fill', isOpen ? style.fill : style.stroke).attr('stroke', style.stroke).attr('stroke-width', NODE.strokeWidth)
     if (foldGrounds.length > 1) {

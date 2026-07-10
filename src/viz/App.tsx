@@ -55,11 +55,20 @@ export function App() {
   }, [data, derived])
 
   // ── Disclosure affordances (§6) ─────────────────────────────────────────────
-  // Clicking a port expands it fully (P→X) so grounds and warrants appear
-  // together in one step, rather than grounds at J then warrants at X.
+  // Clicking a port expands it (P→X) AND reveals its leaf grounds/warrants, so a
+  // leaf-only argument shows its content in one click instead of two (expand,
+  // then open the grounds control).
   const onPortClick = useCallback((inf: string) => {
-    setOver(o => ({ states: new Map(o.states).set(inf, 'X'), promoted: o.promoted }))
-  }, [])
+    const i = derived?.inf.get(inf)
+    const leaves = i
+      ? [...(i.grounds ?? []), ...(i.warrants ?? [])].map(String).filter(g => derived!.foldableSet.has(g))
+      : []
+    setOver(o => {
+      const promoted = new Set(o.promoted)
+      for (const g of leaves) promoted.add(g)
+      return { states: new Map(o.states).set(inf, 'X'), promoted }
+    })
+  }, [derived])
   const onJunctionClick = useCallback((inf: string) => {
     const cur = projection?.inferenceState.get(inf) ?? 'J'
     const next = cur === 'X' ? 'P' : 'X'   // J→X, X→P (floor re-applies in effectiveState)

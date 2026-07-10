@@ -231,65 +231,55 @@ export function layoutPorts(gd: GraphData): LayoutBounds {
 }
 
 /**
- * Master layout for progressive disclosure. Runs the full Sugiyama pass once
- * (fixing `x`/`y` on every claim and inference, and routing every edge) — this
- * is the fully-expanded, all-X geometry. Positions are frozen: disclosure toggles
- * visibility only, never coordinates. Additionally computes each inference's
- * rim-slot (`_portX`/`_portY`) on its output claim's bottom border, used to draw
- * it as a P stub or J junction; undercut nubs hang just below the port they
- * contest. Returns the full-graph bounds (the renderer fits to visible nodes).
+ * Master layout for progressive disclosure. Uses the **claims-only** layout:
+ * only claim boxes are ranked; inferences are not given their own depth. Each
+ * inference gets two frozen positions:
+ *   - `_portX`/`_portY`: its nub on the conclusion's rim (P state, and the
+ *     persistent anchor in X).
+ *   - `x`/`y`: a "bundler" point floated just below the conclusion, where its
+ *     grounds converge when expanded (X state).
+ * Positions are frozen; disclosure toggles visibility only. Edges are drawn
+ * straight (the bundler sits close to its conclusion). Returns the bounds; the
+ * renderer fits to the visible subset.
  */
 export function masterLayout(gd: GraphData): LayoutBounds {
-  const bounds = layoutSugiyama(gd)
+  const bounds = layoutPorts(gd)   // claims-only: claim x/y + inference rim slots on x/y
 
-  const claimHost = (inf: PosInf): string | null => {
-    if (inf.concludes != null && gd.nodeById.get(String(inf.concludes))?._kind === 'claim')
-      return String(inf.concludes)
-    if (inf.contests != null && gd.nodeById.get(String(inf.contests))?._kind === 'claim')
-      return String(inf.contests)
-    return null
-  }
-
-  const byClaim = new Map<string, PosInf[]>()
-  const undercuts: PosInf[] = []
+  // layoutPorts wrote each inference's rim slot into x/y — move it to the port
+  // fields so x/y can hold the bundler position instead.
   for (const n of gd.nodes) {
     if (n._kind !== 'inference') continue
     const inf = n as PosInf
-    const host = claimHost(inf)
-    if (host) (byClaim.get(host) ?? byClaim.set(host, []).get(host)!).push(inf)
-    else undercuts.push(inf)
+    inf._portX = inf.x ?? 0
+    inf._portY = inf.y ?? 0
   }
 
-  // Ports arc along the host claim's bottom rim, spaced by portGap but compressed
-  // to stay within the border when a claim carries many (fan-in) — so stubs never
-  // overlap and never spill past the node.
-  for (const [claimId, infs] of byClaim) {
-    const c = gd.nodeById.get(claimId)!
-    infs.sort((a, b) => ((a.x ?? 0) - (b.x ?? 0)) || (String(a.id) < String(b.id) ? -1 : 1))
-    const n = infs.length
-    const span = 2 * (nodeHW(c) - NODE.portHalfWidth)
-    const gap = n > 1 ? Math.min(LAYOUT.portGap, span / (n - 1)) : 0
-    const y = (c.y ?? 0) + nodeHH(c)
-    infs.forEach((inf, k) => {
-      inf._portX = (c.x ?? 0) + (k - (n - 1) / 2) * gap
-      inf._portY = y
-      inf._hostId = claimId
-    })
-  }
+  // Float each inference to a bundler point below its conclusion, centred on the
+  // mean x of its inputs so grounds converge cleanly.
+  for (const n of gd.nodes) {
+    if (n._kind !== 'inference') continue
+    const inf = n as PosInf
+    const ins = [...(inf.grounds ?? []), ...(inf.warrants ?? [])]
+      .map(id => gd.nodeById.get(String(id)))
+      .filter((m): m is GraphNode => !!m && m.x != null)
+    const cx = ins.length ? ins.reduce((s, m) => s + (m.x ?? 0), 0) / ins.length : (inf._portX ?? 0)
 
-  // Undercut nubs: below the port they contest, anchored to it.
-  for (const inf of undercuts) {
-    const tgtId = inf.contests != null ? String(inf.contests) : null
-    const tgt = tgtId ? gd.nodeById.get(tgtId) as PosInf | undefined : undefined
-    if (tgt && tgt._kind === 'inference') {
-      inf._portX = tgt._portX ?? tgt.x ?? 0
-      inf._portY = (tgt._portY ?? tgt.y ?? 0) + LAYOUT.undercutOffset
-      inf._hostId = tgtId!
+    const outId = inf.concludes != null ? String(inf.concludes)
+      : inf.contests != null ? String(inf.contests) : null
+    const out = outId ? gd.nodeById.get(outId) : undefined
+    if (out && out._kind === 'claim' && out.y != null) {
+      inf.x = cx
+      inf.y = out.y + nodeHH(out) + LAYOUT.bundlerDrop
     } else {
-      inf._portX = inf.x ?? 0
-      inf._portY = inf.y ?? 0
+      // Undercut (contests an inference): drop just below its rim anchor.
+      inf.x = inf._portX ?? 0
+      inf.y = (inf._portY ?? 0) + LAYOUT.bundlerDrop
     }
   }
+
+  // Routed waypoints from layoutPorts aimed at the conclusion; the bundler sits
+  // elsewhere, so draw these edges straight.
+  for (const l of gd.links) l.points = undefined
 
   return bounds
 }

@@ -160,6 +160,9 @@ export const LAYOUT = {
   portGap: 26,
   portMargin: 8,
   undercutOffset: 30,
+  // Claims-only master layout: how far below its conclusion an inference's
+  // bundler floats (where its grounds converge in the expanded X state).
+  bundlerDrop: 46,
   // Initial zoom-to-fit leaves this much of the viewport as margin.
   fitPadding: 0.92,
 } as const
