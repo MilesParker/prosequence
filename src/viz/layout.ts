@@ -1,11 +1,6 @@
-import dagre from '@dagrejs/dagre'
-import type { SimulationNodeDatum } from 'd3'
+import ELK, { type ElkNode } from 'elkjs/lib/elk.bundled.js'
 import { LAYOUT, NODE } from '../config'
 import { nodeHW, nodeHH, type GraphData, type GraphNode } from './graphData'
-import type { InfNode, ClaimNode } from './graphData'
-
-/** Inference node with its live simulation coordinates present. */
-type PosInf = InfNode & SimulationNodeDatum
 
 export interface LayoutBounds {
   minX: number
@@ -16,64 +11,61 @@ export interface LayoutBounds {
   height: number
 }
 
+const elk = new ELK()
+
 /**
- * Layered layout via dagre, prioritising legibility of relationships. Both
- * claims and inference junctions are ranked, so every edge spans adjacent ranks
- * and stays short. Assigns `x`/`y` (node centres) to every node in place and,
- * critically, stores each edge's routed waypoints on `link.points` so the
- * renderer can steer edges *around* nodes instead of drawing straight lines
- * through them.
+ * Layered layout via ELK (Eclipse Layout Kernel). ELK's layered algorithm both
+ * minimises edge crossings and *routes* edges orthogonally around nodes — which
+ * is what makes edges legible (a force/stress layout cannot). The cost is a wide
+ * aspect ratio: fan-out puts many nodes in one layer, and no static layout avoids
+ * that while keeping edges routed — so this is a wide, pannable map.
  *
- * Edge direction is reversed relative to the data model: grounds run
- * claim→inference→claim (evidence up to a conclusion), so feeding them raw would
- * rank evidence above conclusions. Reversing makes dagre rank a concluded claim
- * above its inference above its grounds — roots on top, evidence sinking down.
- * The captured waypoints are reversed back to data (source→target) order.
+ * Runs async (ELK returns a promise). Writes node centres to `x`/`y` and routed
+ * waypoints to each `link.points`, and returns the graph bounds.
  */
-export function layoutSugiyama(gd: GraphData): LayoutBounds {
-  const idOf = (n: GraphNode) => n.id as unknown as string
+export async function layoutGraph(gd: GraphData): Promise<LayoutBounds> {
+  const wOf = (n: GraphNode) => (n._kind === 'claim' ? nodeHW(n) : NODE.infRadius) * 2
+  const hOf = (n: GraphNode) => (n._kind === 'claim' ? nodeHH(n) : NODE.infRadius) * 2
 
-  const g = new dagre.graphlib.Graph({ multigraph: true, directed: true })
-  g.setGraph({
-    rankdir: LAYOUT.rankdir,
-    nodesep: LAYOUT.nodesep,
-    ranksep: LAYOUT.ranksep,
-    edgesep: LAYOUT.edgesep,
-    ranker: LAYOUT.ranker,
-  })
-  g.setDefaultEdgeLabel(() => ({}))
+  const graph: ElkNode = {
+    id: 'root',
+    layoutOptions: {
+      'elk.algorithm': 'layered',
+      'elk.direction': 'UP',                       // edge targets above sources → conclusions/roots on top
+      'elk.edgeRouting': 'ORTHOGONAL',
+      'elk.spacing.nodeNode': String(LAYOUT.nodeSpacing),
+      'elk.layered.spacing.nodeNodeBetweenLayers': String(LAYOUT.layerSpacing),
+      'elk.spacing.edgeNode': '16',
+      'elk.layered.spacing.edgeEdgeBetweenLayers': '10',
+    },
+    children: gd.nodes.map(n => ({ id: String(n.id), width: wOf(n), height: hOf(n) })),
+    edges: gd.links.map(l => ({
+      id: l.id,
+      sources: [l.source as unknown as string],
+      targets: [l.target as unknown as string],
+    })),
+  }
 
+  const res = await elk.layout(graph)
+
+  const byId = new Map((res.children ?? []).map(c => [c.id, c]))
   for (const n of gd.nodes) {
-    g.setNode(idOf(n), { width: nodeHW(n) * 2, height: nodeHH(n) * 2 })
+    const c = byId.get(String(n.id))
+    if (c) { n.x = (c.x ?? 0) + (c.width ?? 0) / 2; n.y = (c.y ?? 0) + (c.height ?? 0) / 2 }
   }
 
+  const edgeById = new Map((res.edges ?? []).map(e => [e.id, e]))
   for (const l of gd.links) {
-    const src = l.source as unknown as string
-    const tgt = l.target as unknown as string
-    // Reversed: data target becomes the (higher) dagre source.
-    g.setEdge(tgt, src, {}, l.id)
-  }
-
-  dagre.layout(g)
-
-  for (const n of gd.nodes) {
-    const p = g.node(idOf(n))
-    if (p) { n.x = p.x; n.y = p.y }
-  }
-
-  // Capture routed waypoints. dagre returns them in dagre-source→dagre-target
-  // order (reversed vs. the data edge), so flip back to source→target.
-  for (const l of gd.links) {
-    const src = l.source as unknown as string
-    const tgt = l.target as unknown as string
-    const e = g.edge(tgt, src, l.id)
-    l.points = e?.points ? e.points.map(p => ({ x: p.x, y: p.y })).reverse() : undefined
+    const sec = edgeById.get(l.id)?.sections?.[0]
+    l.points = sec
+      ? [sec.startPoint, ...(sec.bendPoints ?? []), sec.endPoint].map(p => ({ x: p.x, y: p.y }))
+      : undefined
   }
 
   let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
   for (const n of gd.nodes) {
     if (n.x == null || n.y == null) continue
-    const hw = nodeHW(n), hh = nodeHH(n)
+    const hw = wOf(n) / 2, hh = hOf(n) / 2
     if (n.x - hw < minX) minX = n.x - hw
     if (n.x + hw > maxX) maxX = n.x + hw
     if (n.y - hh < minY) minY = n.y - hh
@@ -81,188 +73,6 @@ export function layoutSugiyama(gd: GraphData): LayoutBounds {
   }
   if (!Number.isFinite(minX)) { minX = minY = 0; maxX = maxY = 0 }
   return { minX, minY, maxX, maxY, width: maxX - minX, height: maxY - minY }
-}
-
-/**
- * Port-mode layout. Inferences are not ranked; the graph is laid out over
- * claims only (which also halves depth vs. the diamond model). Each inference
- * then collapses onto a port on its single target claim's bottom border, and
- * grounds/warrants route up to that port. Undercuts (contests an inference) hang
- * a nub just below the port they attack.
- *
- * Assigns `x`/`y` to claims (dagre) and to inference nubs (port slots), stores
- * routed waypoints on grounds/warrant links, and returns the bounding box.
- */
-export function layoutPorts(gd: GraphData): LayoutBounds {
-  const idOf = (n: GraphNode) => n.id as unknown as string
-  const claims = gd.nodes.filter(n => n._kind === 'claim')
-  const claimIds = new Set(claims.map(idOf))
-
-  // Claim an inference ultimately outputs to, following undercuts to bedrock.
-  const outputClaim = (infId: string, seen = new Set<string>()): string | null => {
-    if (seen.has(infId)) return null
-    seen.add(infId)
-    const inf = gd.nodeById.get(infId) as InfNode | undefined
-    if (!inf || inf._kind !== 'inference') return null
-    if (inf.concludes != null) return String(inf.concludes)
-    if (inf.contests != null) {
-      const t = String(inf.contests)
-      return claimIds.has(t) ? t : outputClaim(t, seen)
-    }
-    return null
-  }
-
-  // Widen any claim that hosts more ports than its default width can hold, so
-  // its nubs stay flush along the border instead of spilling past it. Done
-  // before dagre so the layout reserves the extra width.
-  const portCount = new Map<string, number>()
-  for (const n of gd.nodes) {
-    if (n._kind !== 'inference') continue
-    const inf = n as InfNode
-    let host: string | null = null
-    if (inf.concludes != null && claimIds.has(String(inf.concludes))) host = String(inf.concludes)
-    else if (inf.contests != null && claimIds.has(String(inf.contests))) host = String(inf.contests)
-    if (host) portCount.set(host, (portCount.get(host) ?? 0) + 1)
-  }
-  for (const c of claims) {
-    const k = portCount.get(idOf(c)) ?? 0
-    if (k <= 1) continue
-    const need = (k - 1) / 2 * LAYOUT.portGap + NODE.portHalfWidth + LAYOUT.portMargin
-    if (need > nodeHW(c)) (c as ClaimNode)._halfWidth = need
-  }
-
-  const g = new dagre.graphlib.Graph({ multigraph: true, directed: true })
-  g.setGraph({
-    rankdir: LAYOUT.rankdir,
-    nodesep: LAYOUT.nodesep,
-    ranksep: LAYOUT.ranksep,
-    edgesep: LAYOUT.edgesep,
-    ranker: LAYOUT.ranker,
-  })
-  g.setDefaultEdgeLabel(() => ({}))
-  for (const n of claims) g.setNode(idOf(n), { width: nodeHW(n) * 2, height: nodeHH(n) * 2 })
-
-  // Contract each grounds/warrant link to a claim→claim edge (ground → the
-  // inference's output claim), reversed so the conclusion ranks above.
-  for (const l of gd.links) {
-    if (l.role !== 'Grounds' && l.role !== 'Warrants') continue
-    const gClaim = l.source as unknown as string
-    const out = outputClaim(l.target as unknown as string)
-    if (out == null || !claimIds.has(out) || !claimIds.has(gClaim) || gClaim === out) continue
-    g.setEdge(out, gClaim, {}, l.id)
-  }
-
-  dagre.layout(g)
-  for (const n of claims) { const p = g.node(idOf(n)); if (p) { n.x = p.x; n.y = p.y } }
-
-  // Routed waypoints for grounds/warrant links (ground → out-claim), flipped to
-  // source→target order. Endpoints get re-aimed at the port when rendering.
-  for (const l of gd.links) {
-    if (l.role !== 'Grounds' && l.role !== 'Warrants') continue
-    const gClaim = l.source as unknown as string
-    const out = outputClaim(l.target as unknown as string)
-    if (out == null) { l.points = undefined; continue }
-    const e = g.edge(out, gClaim, l.id)
-    l.points = e?.points ? e.points.map(p => ({ x: p.x, y: p.y })).reverse() : undefined
-  }
-
-  // ── Port slots ───────────────────────────────────────────────────────────────
-  const meanGroundX = (node: GraphNode): number => {
-    const inf = node as InfNode
-    const gs = [...(inf.grounds ?? []), ...(inf.warrants ?? [])]
-      .map(id => gd.nodeById.get(String(id)))
-      .filter((m): m is GraphNode => !!m && m.x != null)
-    return gs.length ? gs.reduce((s, m) => s + (m.x ?? 0), 0) / gs.length : (node.x ?? 0)
-  }
-
-  const portsByClaim = new Map<string, string[]>()
-  const undercuts: GraphNode[] = []
-  for (const n of gd.nodes) {
-    if (n._kind !== 'inference') continue
-    const inf = n as InfNode
-    let host: string | null = null
-    if (inf.concludes != null && claimIds.has(String(inf.concludes))) host = String(inf.concludes)
-    else if (inf.contests != null && claimIds.has(String(inf.contests))) host = String(inf.contests)
-    if (host) (portsByClaim.get(host) ?? portsByClaim.set(host, []).get(host)!).push(idOf(n))
-    else undercuts.push(n)
-  }
-
-  for (const [claimId, infIds] of portsByClaim) {
-    const c = gd.nodeById.get(claimId)!
-    infIds.sort((a, b) =>
-      (meanGroundX(gd.nodeById.get(a)!) - meanGroundX(gd.nodeById.get(b)!))
-      || (a < b ? -1 : 1))
-    const n = infIds.length
-    const y = (c.y ?? 0) + nodeHH(c)
-    infIds.forEach((id, i) => {
-      const inf = gd.nodeById.get(id)! as PosInf
-      inf.x = (c.x ?? 0) + (i - (n - 1) / 2) * LAYOUT.portGap
-      inf.y = y
-      inf._hostId = claimId
-    })
-  }
-
-  // Undercut nubs hang just below the port they contest.
-  for (const node of undercuts) {
-    const inf = node as PosInf
-    const tgt = inf.contests != null ? gd.nodeById.get(String(inf.contests)) : undefined
-    if (tgt && tgt.x != null && tgt.y != null) {
-      node.x = tgt.x
-      node.y = tgt.y + LAYOUT.undercutOffset
-      inf._hostId = String(inf.contests)
-    } else {
-      node.x = meanGroundX(node)
-      node.y = 0
-    }
-  }
-
-  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity
-  for (const n of gd.nodes) {
-    if (n.x == null || n.y == null) continue
-    const hw = n._kind === 'inference' ? NODE.portRadius : nodeHW(n)
-    const hh = n._kind === 'inference' ? NODE.portRadius : nodeHH(n)
-    if (n.x - hw < minX) minX = n.x - hw
-    if (n.x + hw > maxX) maxX = n.x + hw
-    if (n.y - hh < minY) minY = n.y - hh
-    if (n.y + hh > maxY) maxY = n.y + hh
-  }
-  if (!Number.isFinite(minX)) { minX = minY = 0; maxX = maxY = 0 }
-  return { minX, minY, maxX, maxY, width: maxX - minX, height: maxY - minY }
-}
-
-/**
- * Master layout for the static map. Uses the **claims-only** layout (only claim
- * boxes are ranked; inference depth is not encoded), then floats each inference
- * to a junction point just below its conclusion, centred on the mean x of its
- * inputs so grounds converge cleanly. Edges are drawn straight. Returns the
- * bounds. (This is the interim layout — to be replaced by a force layout.)
- */
-export function masterLayout(gd: GraphData): LayoutBounds {
-  const bounds = layoutPorts(gd)   // claims-only: claim x/y; inference x/y = rim slot
-
-  for (const n of gd.nodes) {
-    if (n._kind !== 'inference') continue
-    const inf = n as PosInf
-    const rimX = inf.x ?? 0, rimY = inf.y ?? 0
-    const ins = [...(inf.grounds ?? []), ...(inf.warrants ?? [])]
-      .map(id => gd.nodeById.get(String(id)))
-      .filter((m): m is GraphNode => !!m && m.x != null)
-    const cx = ins.length ? ins.reduce((s, m) => s + (m.x ?? 0), 0) / ins.length : rimX
-
-    const outId = inf.concludes != null ? String(inf.concludes)
-      : inf.contests != null ? String(inf.contests) : null
-    const out = outId ? gd.nodeById.get(outId) : undefined
-    if (out && out._kind === 'claim' && out.y != null) {
-      inf.x = cx
-      inf.y = out.y + nodeHH(out) + LAYOUT.bundlerDrop
-    } else {
-      inf.x = rimX
-      inf.y = rimY + LAYOUT.bundlerDrop   // undercut: just below its rim anchor
-    }
-  }
-
-  for (const l of gd.links) l.points = undefined   // straight edges (bundler ≠ routed target)
-  return bounds
 }
 
 /**

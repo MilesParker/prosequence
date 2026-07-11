@@ -63,16 +63,9 @@ export const NODE = {
   rx: 4,
   strokeWidth: 1.5,
   rootStrokeWidth: 2.5,
-  // Inference junction marks are small and visually subordinate — wiring,
-  // not peers. Rendered as a small diamond of this half-diagonal.
+  // Inference junction marks are small and visually subordinate — wiring, not
+  // peers. Rendered as a small circle of this radius.
   infRadius: 7,
-  // Port mode: the nub drawn on a claim's border. A half-disc whose flat
-  // diameter sits flush on the claim's bottom edge and whose curve bulges
-  // below — so it reads as fused to its host claim, not a dot floating beside
-  // it. Grounds/warrants converge on the nub.
-  portRadius: 10,     // half-extent used for layout bounds and edge clipping
-  portHalfWidth: 10,  // half-width of the diameter (along the border)
-  portHeight: 15,     // how far the curve bulges below the border
 } as const
 
 // ── Color palette (all values in HSL) ────────────────────────────────────────
@@ -148,21 +141,11 @@ export const COLORS = {
 // adjacent ranks and stays short. `ranksep` is generous to leave routing room.
 // The layout is wide; that is an accepted cost of legibility.
 export const LAYOUT = {
-  rankdir: 'TB' as const,   // roots at top, evidence flowing down
-  nodesep: 45,              // px gap between nodes within a rank
-  ranksep: 90,              // px gap between ranks (routing room)
-  edgesep: 28,              // px gap between edges (routing room)
-  ranker: 'network-simplex' as const,
-  // Port mode: spacing between adjacent nubs along a claim's border, and how far
-  // an undercut nub hangs off the port it contests. When a claim has more ports
-  // than fit within its default width, it is widened to hold them (+ portMargin
-  // of clearance on each side).
-  portGap: 26,
-  portMargin: 8,
-  undercutOffset: 30,
-  // Claims-only master layout: how far below its conclusion an inference's
-  // bundler floats (where its grounds converge in the expanded X state).
-  bundlerDrop: 46,
+  // ELK layered layout — crossing-minimised, orthogonally-routed edges. Wide by
+  // nature (fan-out fills a layer); a wide pannable map is the accepted cost of
+  // readable edges.
+  nodeSpacing: 28,      // gap between nodes in a layer
+  layerSpacing: 46,     // gap between layers (routing room)
   // Initial zoom-to-fit leaves this much of the viewport as margin.
   fitPadding: 0.92,
 } as const

@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import * as d3 from 'd3'
 import type { DiscourseSpace } from '../../types'
 import { COLORS, EDGE, NODE, DISCLOSURE, TITLE_BAR_HEIGHT, VIEW } from '../../config'
-import { masterLayout, fitTransform } from '../layout'
+import { fitTransform, type LayoutBounds } from '../layout'
 import {
   edgeColor, edgeMarkerId,
   nodeFill, nodeStroke,
@@ -14,6 +14,7 @@ import {
 interface Props {
   data: DiscourseSpace
   graphData: GraphData
+  bounds: LayoutBounds
   highlight: Set<string>
   onHover: (node: GraphNode | null, x?: number, y?: number) => void
   onSelect: (node: GraphNode | null) => void
@@ -40,7 +41,7 @@ type NodeSel = d3.Selection<SVGGElement, GraphNode, SVGGElement, unknown>
  * interactions are pan/zoom, hover, click-to-select, drag-to-nudge, and search
  * highlight — no disclosure.
  */
-export function Graph({ data, graphData, highlight, onHover, onSelect }: Props) {
+export function Graph({ data, graphData, bounds, highlight, onHover, onSelect }: Props) {
   const svgRef = useRef<SVGSVGElement>(null)
   const onHoverRef = useRef(onHover)
   const onSelectRef = useRef(onSelect)
@@ -54,7 +55,6 @@ export function Graph({ data, graphData, highlight, onHover, onSelect }: Props) 
     const W = window.innerWidth
     const H = window.innerHeight
     const gd = graphData
-    const bounds = masterLayout(gd)
     const { nodes, links } = gd
 
     const svg = d3.select(el).attr('width', W).attr('height', H)
@@ -155,6 +155,7 @@ export function Graph({ data, graphData, highlight, onHover, onSelect }: Props) 
         const id = d.id as unknown as string
         linkSel.each(function (l) {
           if ((l.source as unknown as string) === id || (l.target as unknown as string) === id) {
+            l.points = undefined   // drop ELK routing so the edge follows the node
             const p = linkPath(l); if (p) d3.select(this).attr('d', p)
           }
         })
@@ -164,7 +165,7 @@ export function Graph({ data, graphData, highlight, onHover, onSelect }: Props) 
     svg.call(zoom.transform, d3.zoomIdentity.translate(fit.x, fit.y).scale(fit.k))
 
     return () => { svg.on('.zoom', null) }
-  }, [data, graphData])
+  }, [data, graphData, bounds])
 
   // Update the search-highlight rings without rebuilding the scene.
   useEffect(() => {
