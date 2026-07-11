@@ -231,38 +231,23 @@ export function layoutPorts(gd: GraphData): LayoutBounds {
 }
 
 /**
- * Master layout for progressive disclosure. Uses the **claims-only** layout:
- * only claim boxes are ranked; inferences are not given their own depth. Each
- * inference gets two frozen positions:
- *   - `_portX`/`_portY`: its nub on the conclusion's rim (P state, and the
- *     persistent anchor in X).
- *   - `x`/`y`: a "bundler" point floated just below the conclusion, where its
- *     grounds converge when expanded (X state).
- * Positions are frozen; disclosure toggles visibility only. Edges are drawn
- * straight (the bundler sits close to its conclusion). Returns the bounds; the
- * renderer fits to the visible subset.
+ * Master layout for the static map. Uses the **claims-only** layout (only claim
+ * boxes are ranked; inference depth is not encoded), then floats each inference
+ * to a junction point just below its conclusion, centred on the mean x of its
+ * inputs so grounds converge cleanly. Edges are drawn straight. Returns the
+ * bounds. (This is the interim layout — to be replaced by a force layout.)
  */
 export function masterLayout(gd: GraphData): LayoutBounds {
-  const bounds = layoutPorts(gd)   // claims-only: claim x/y + inference rim slots on x/y
+  const bounds = layoutPorts(gd)   // claims-only: claim x/y; inference x/y = rim slot
 
-  // layoutPorts wrote each inference's rim slot into x/y — move it to the port
-  // fields so x/y can hold the bundler position instead.
   for (const n of gd.nodes) {
     if (n._kind !== 'inference') continue
     const inf = n as PosInf
-    inf._portX = inf.x ?? 0
-    inf._portY = inf.y ?? 0
-  }
-
-  // Float each inference to a bundler point below its conclusion, centred on the
-  // mean x of its inputs so grounds converge cleanly.
-  for (const n of gd.nodes) {
-    if (n._kind !== 'inference') continue
-    const inf = n as PosInf
+    const rimX = inf.x ?? 0, rimY = inf.y ?? 0
     const ins = [...(inf.grounds ?? []), ...(inf.warrants ?? [])]
       .map(id => gd.nodeById.get(String(id)))
       .filter((m): m is GraphNode => !!m && m.x != null)
-    const cx = ins.length ? ins.reduce((s, m) => s + (m.x ?? 0), 0) / ins.length : (inf._portX ?? 0)
+    const cx = ins.length ? ins.reduce((s, m) => s + (m.x ?? 0), 0) / ins.length : rimX
 
     const outId = inf.concludes != null ? String(inf.concludes)
       : inf.contests != null ? String(inf.contests) : null
@@ -271,16 +256,12 @@ export function masterLayout(gd: GraphData): LayoutBounds {
       inf.x = cx
       inf.y = out.y + nodeHH(out) + LAYOUT.bundlerDrop
     } else {
-      // Undercut (contests an inference): drop just below its rim anchor.
-      inf.x = inf._portX ?? 0
-      inf.y = (inf._portY ?? 0) + LAYOUT.bundlerDrop
+      inf.x = rimX
+      inf.y = rimY + LAYOUT.bundlerDrop   // undercut: just below its rim anchor
     }
   }
 
-  // Routed waypoints from layoutPorts aimed at the conclusion; the bundler sits
-  // elsewhere, so draw these edges straight.
-  for (const l of gd.links) l.points = undefined
-
+  for (const l of gd.links) l.points = undefined   // straight edges (bundler ≠ routed target)
   return bounds
 }
 

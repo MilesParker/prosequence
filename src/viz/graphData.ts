@@ -28,13 +28,6 @@ export type InfNode = Inference & {
    * the host carries its attached nubs along so they never orphan.
    */
   _hostId?: string
-  /**
-   * Rim-slot position on the host claim's border (set by `masterLayout`), used
-   * to draw this inference as a P stub or J junction. Its `x`/`y` (from the full
-   * Sugiyama pass) remain the expanded-junction position used in the X state.
-   */
-  _portX?: number
-  _portY?: number
 }
 export type GraphNode = (ClaimNode | InfNode) & SimulationNodeDatum
 
