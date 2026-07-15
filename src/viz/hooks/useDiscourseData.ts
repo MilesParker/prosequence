@@ -3,12 +3,13 @@ import * as jsyaml from 'js-yaml'
 import { DATA_FILE } from '../../config'
 import type { DiscourseSpace } from '../../types'
 import { buildGraphData, type GraphData } from '../graphData'
-import { layoutGraph, type LayoutBounds } from '../layout'
+import { layoutGraph, type LayoutBounds, type GroupBox } from '../layout'
 
 interface Result {
   data: DiscourseSpace | null
   graphData: GraphData | null
   bounds: LayoutBounds | null
+  groups: GroupBox[] | null
   loading: boolean
   error: string | null
 }
@@ -17,6 +18,7 @@ export function useDiscourseData(): Result {
   const [data, setData]           = useState<DiscourseSpace | null>(null)
   const [graphData, setGraphData] = useState<GraphData | null>(null)
   const [bounds, setBounds]       = useState<LayoutBounds | null>(null)
+  const [groups, setGroups]       = useState<GroupBox[] | null>(null)
   const [loading, setLoading]     = useState(true)
   const [error, setError]         = useState<string | null>(null)
 
@@ -29,11 +31,12 @@ export function useDiscourseData(): Result {
         const raw = await resp.text()
         const parsed = jsyaml.load(raw) as DiscourseSpace
         const gd = buildGraphData(parsed)
-        const b = await layoutGraph(gd)   // ELK is async; positions land on gd's nodes/links
+        const r = await layoutGraph(gd)   // ELK is async; positions land on gd's nodes/links
         if (!cancelled) {
           setData(parsed)
           setGraphData(gd)
-          setBounds(b)
+          setBounds(r.bounds)
+          setGroups(r.groups)
         }
       } catch (err) {
         if (!cancelled) setError((err as Error).message)
@@ -45,5 +48,5 @@ export function useDiscourseData(): Result {
     return () => { cancelled = true }
   }, [])
 
-  return { data, graphData, bounds, loading, error }
+  return { data, graphData, bounds, groups, loading, error }
 }

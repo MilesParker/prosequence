@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import * as d3 from 'd3'
 import type { DiscourseSpace } from '../../types'
 import { COLORS, EDGE, NODE, DISCLOSURE, TITLE_BAR_HEIGHT, VIEW } from '../../config'
-import { fitTransform, type LayoutBounds } from '../layout'
+import { fitTransform, type LayoutBounds, type GroupBox } from '../layout'
 import {
   edgeColor, edgeMarkerId,
   nodeFill, nodeStroke,
@@ -15,6 +15,7 @@ interface Props {
   data: DiscourseSpace
   graphData: GraphData
   bounds: LayoutBounds
+  groups: GroupBox[]
   highlight: Set<string>
   onHover: (node: GraphNode | null, x?: number, y?: number) => void
   onSelect: (node: GraphNode | null) => void
@@ -41,7 +42,7 @@ type NodeSel = d3.Selection<SVGGElement, GraphNode, SVGGElement, unknown>
  * interactions are pan/zoom, hover, click-to-select, drag-to-nudge, and search
  * highlight — no disclosure.
  */
-export function Graph({ data, graphData, bounds, highlight, onHover, onSelect }: Props) {
+export function Graph({ data, graphData, bounds, groups, highlight, onHover, onSelect }: Props) {
   const svgRef = useRef<SVGSVGElement>(null)
   const onHoverRef = useRef(onHover)
   const onSelectRef = useRef(onSelect)
@@ -75,6 +76,15 @@ export function Graph({ data, graphData, bounds, highlight, onHover, onSelect }:
         `translate(${e.transform.x},${e.transform.y + TITLE_BAR_HEIGHT}) scale(${e.transform.k})`))
     svg.call(zoom)
 
+    // ── Group boxes (behind everything) ───────────────────────────────────────
+    g.append('g').attr('class', 'groups')
+      .selectAll('rect').data(groups).join('rect')
+      .attr('x', b => b.x - 12).attr('y', b => b.y - 12)
+      .attr('width', b => b.width + 24).attr('height', b => b.height + 24)
+      .attr('rx', 10)
+      .attr('fill', COLORS.borderFaint).attr('fill-opacity', 0.35)
+      .attr('stroke', COLORS.border).attr('stroke-width', 1)
+
     // ── Edges ────────────────────────────────────────────────────────────────
     const lineGen = d3.line<{ x: number; y: number }>().x(p => p.x).y(p => p.y).curve(d3.curveLinear)
     const linkPath = (l: GraphLink): string | null => {
@@ -89,8 +99,17 @@ export function Graph({ data, graphData, bounds, highlight, onHover, onSelect }:
       return lineGen(pts)
     }
 
+    // Root-directed edges are not drawn individually — each group's are bundled
+    // into one line per role (drawn below).
+    const isRoot = (id: string) => {
+      const n = gd.nodeById.get(id)
+      return !!n && n._kind === 'claim' && (n as ClaimNode)._isRoot
+    }
+    const innerLinks = links.filter(l =>
+      !isRoot(l.source as unknown as string) && !isRoot(l.target as unknown as string))
+
     const linkSel = g.append('g').attr('class', 'links')
-      .selectAll<SVGPathElement, GraphLink>('path').data(links).join('path')
+      .selectAll<SVGPathElement, GraphLink>('path').data(innerLinks).join('path')
       .attr('fill', 'none')
       .attr('stroke', d => edgeColor(d.role))
       .attr('stroke-width', d => d.role === 'Warrants' ? EDGE.strokeWidthWarrants : EDGE.strokeWidthDefault)
@@ -98,6 +117,53 @@ export function Graph({ data, graphData, bounds, highlight, onHover, onSelect }:
       .attr('stroke-opacity', d => d.uncertain ? EDGE.opacity * 0.6 : EDGE.opacity)
       .attr('marker-end', d => `url(#${edgeMarkerId(d.role)})`)
       .attr('d', d => linkPath(d))
+
+    // ── Bundled root edges ─────────────────────────────────────────────────────
+    // Each group's root-directed edges merge into one trunk per role, but for
+    // continuity the trunk fans back out at the group border: a thin branch runs
+    // from every member inference up to the bundle's exit point, so each edge is
+    // individually traceable end-to-end.
+    interface Bundle { box: GroupBox; rootId: string; role: EdgeRole; count: number; members: string[]; idx: number; total: number }
+    const bundles: Bundle[] = groups.flatMap(box =>
+      box.bundles.map((b, idx) => ({ box, ...b, idx, total: box.bundles.length })))
+    const exitPt = (b: Bundle) => ({
+      // on the group's top border, fanned when a group has several bundles
+      x: b.box.x + b.box.width / 2 + (b.idx - (b.total - 1) / 2) * 26,
+      y: b.box.y - 12,
+    })
+    const trunkPath = (b: Bundle): string => {
+      const root = gd.nodeById.get(b.rootId)
+      const { x: bx, y: by } = exitPt(b)
+      const rx = root?.x ?? 0
+      const ry = (root?.y ?? 0) + (root ? nodeHH(root) : 0) + VIEW.arrowTargetPad
+      const my = Math.min(by, ry) - 40   // bow upward between the two
+      return `M${bx},${by} C${bx},${my} ${rx},${my} ${rx},${ry}`
+    }
+    interface Branch { bundle: Bundle; member: string }
+    const branches: Branch[] = bundles.flatMap(bundle => bundle.members.map(member => ({ bundle, member })))
+    const branchPath = (br: Branch): string | null => {
+      const n = gd.nodeById.get(br.member)
+      if (!n || n.x == null || n.y == null) return null
+      const { x: bx, y: by } = exitPt(br.bundle)
+      const s = clipToNode(n, n.x, n.y, bx, by, VIEW.arrowSourcePad)
+      const dy = Math.max(1, s.y - by)
+      return `M${s.x},${s.y} C${s.x},${s.y - dy * 0.6} ${bx},${by + dy * 0.4} ${bx},${by}`
+    }
+    const branchSel = g.append('g').attr('class', 'bundle-branches')
+      .selectAll<SVGPathElement, Branch>('path').data(branches).join('path')
+      .attr('fill', 'none')
+      .attr('stroke', br => edgeColor(br.bundle.role))
+      .attr('stroke-width', EDGE.strokeWidthDefault)
+      .attr('stroke-opacity', EDGE.opacity * 0.8)
+      .attr('d', br => branchPath(br))
+    const bundleSel = g.append('g').attr('class', 'bundles')
+      .selectAll<SVGPathElement, Bundle>('path').data(bundles).join('path')
+      .attr('fill', 'none')
+      .attr('stroke', b => edgeColor(b.role))
+      .attr('stroke-width', b => Math.min(6, 1.4 + b.count * 0.6))
+      .attr('stroke-opacity', EDGE.opacity)
+      .attr('marker-end', b => `url(#${edgeMarkerId(b.role)})`)
+      .attr('d', b => trunkPath(b))
 
     // ── Nodes ────────────────────────────────────────────────────────────────
     const nodeSel = g.append('g').attr('class', 'nodes')
@@ -159,6 +225,8 @@ export function Graph({ data, graphData, bounds, highlight, onHover, onSelect }:
             const p = linkPath(l); if (p) d3.select(this).attr('d', p)
           }
         })
+        if (isRoot(id)) bundleSel.attr('d', b => trunkPath(b))
+        branchSel.filter(br => br.member === id).attr('d', br => branchPath(br))
       }))
 
     const fit = fitTransform(bounds, W, H - TITLE_BAR_HEIGHT, VIEW.zoomMin, VIEW.zoomMax)

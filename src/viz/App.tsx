@@ -9,7 +9,7 @@ import { useDiscourseData } from './hooks/useDiscourseData'
 import type { GraphNode, GraphData } from './graphData'
 
 export function App() {
-  const { data, graphData, bounds, error, loading } = useDiscourseData()
+  const { data, graphData, bounds, groups, error, loading } = useDiscourseData()
 
   const [hovered, setHovered] = useState<{ node: GraphNode; x: number; y: number } | null>(null)
   const [selected, setSelected] = useState<GraphNode | null>(null)
@@ -42,7 +42,7 @@ export function App() {
 
   if (loading) return <Loading />
   if (error)   return <Loading message={`Failed to load YAML: ${error}`} error />
-  if (!data || !graphData || !bounds) return null
+  if (!data || !graphData || !bounds || !groups) return null
 
   return (
     <>
@@ -51,6 +51,7 @@ export function App() {
         data={data}
         graphData={graphData as GraphData}
         bounds={bounds}
+        groups={groups}
         highlight={highlight}
         onHover={handleHover}
         onSelect={handleSelect}

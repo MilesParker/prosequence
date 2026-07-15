@@ -1,5 +1,12 @@
 # Converted to the claim/inference model (v2) by scripts/convert.ts.
 # Source: discourse-spaces/gaza.yaml. Do not hand-edit claim texts; this migration is structural.
+#
+# 2026-07 enthymemification pass (contests-to-claims collapse):
+#   - i-e-confinement-attacks-mosul re-pointed from i-e-mosul-attacks-hamas-tactics
+#     to the claim c-mosul-representativeness (pure re-point; warrant already existed).
+#   - c-consensus-tracks-legal-facts added as an explicit good-faith warrant, surfaced on
+#     i-e-scholarly-consensus-to-prop; i-e-antisemitism-undercuts-scholarly-authority
+#     re-pointed onto it. No contest now targets an inference (I8).
 id: gaza-genocide
 title: Is Israel's military campaign in Gaza genocide?
 definitions:
@@ -406,6 +413,16 @@ claims:
         I have been teaching classes on genocide for a quarter of a century. I can recognize one
         when I see one.
     cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-consensus-tracks-legal-facts
+    tag: Scholarly consensus tracks the legal facts, not a political function
+    text: >-
+      The scholars' convergence on the genocide designation reflects disinterested legal and
+      scholarly judgment of the facts rather than a politically delegitimising function, so their
+      consensus is evidence that the designation is correct.
+    terminal: false
+    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-intl-law-obliges-designation
@@ -1173,6 +1190,7 @@ inferences:
       - c-scholarly-consensus-genocide
     warrants:
       - t-intl-law-universal
+      - c-consensus-tracks-legal-facts
     hint: null
     concludes: prop-gaza-genocide
   - id: i-e-denial-damages-to-prop
@@ -1286,10 +1304,8 @@ inferences:
     grounds:
       - c-genocide-label-antisemitism-charge
     warrants: []
-    hint: >-
-      Concedes that the scholars have reached this conclusion; contests that their conclusion
-      supports the proposition, on grounds that the designation serves a delegitimising function.
-    contests: i-e-scholarly-consensus-to-prop
+    hint: null
+    contests: c-consensus-tracks-legal-facts
   - id: i-e-silences-critics-attacks-antisemitism-charge
     scheme: null
     uncertain: false
@@ -1306,7 +1322,5 @@ inferences:
     grounds:
       - c-confinement-transforms-cleansing
     warrants: []
-    hint: >-
-      Confinement is the structural variable that makes Gaza disanalogous to Mosul; the analogy
-      holds only if the target population can actually flee.
-    contests: i-e-mosul-attacks-hamas-tactics
+    hint: null
+    contests: c-mosul-representativeness

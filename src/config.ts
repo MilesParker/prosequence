@@ -141,11 +141,14 @@ export const COLORS = {
 // adjacent ranks and stays short. `ranksep` is generous to leave routing room.
 // The layout is wide; that is an accepted cost of legibility.
 export const LAYOUT = {
-  // ELK layered layout — crossing-minimised, orthogonally-routed edges. Wide by
-  // nature (fan-out fills a layer); a wide pannable map is the accepted cost of
-  // readable edges.
-  nodeSpacing: 28,      // gap between nodes in a layer
-  layerSpacing: 46,     // gap between layers (routing room)
+  // Grouped layout: disjoint subtrees are laid out independently (ELK layered,
+  // routed edges), then their boxes are rect-packed toward `aspectRatio`, with
+  // the root above and one bundled edge per group/role.
+  nodeSpacing: 28,      // gap between nodes in a layer (within a group)
+  layerSpacing: 46,     // gap between layers (routing room, within a group)
+  aspectRatio: 1.6,     // target width/height for the packed group boxes
+  groupGap: 50,         // gap between packed group boxes
+  rootGap: 90,          // vertical gap between the root and the packed block
   // Initial zoom-to-fit leaves this much of the viewport as margin.
   fitPadding: 0.92,
 } as const

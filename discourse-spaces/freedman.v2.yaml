@@ -1,5 +1,11 @@
 # Converted to the claim/inference model (v2) by scripts/convert.ts.
 # Source: discourse-spaces/freedman.yaml. Do not hand-edit claim texts; this migration is structural.
+#
+# 2026-07 enthymemification pass (contests-to-claims collapse):
+#   - c-democratic-criterion-governs added as an explicit criterion-applicability warrant,
+#     surfaced on i-obama-double-standard.
+#   - i-e-realism-undercuts-obama-double-standard re-pointed from the inference
+#     i-obama-double-standard onto that claim. No contest now targets an inference (I8).
 id: us-iran-ceasefire-2026
 title: US-Iran Ceasefire Agreement 2026
 definitions:
@@ -383,6 +389,16 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
+  - id: c-democratic-criterion-governs
+    tag: The democratic-governance criterion is the right yardstick here
+    text: >-
+      Evaluating this deal by its effect on the survival of democratic governance in the
+      international order is a legitimate and applicable standard for judging US strategic
+      interest, not an illegitimate substitution for the interests of US citizens.
+    terminal: false
+    cluster: Analogy
+    uncertain: false
+    submissionStatus: Accepted
   - id: c-iranian-politics-unlocked
     tag: Iranian domestic politics unlocked
     text: A diminished external threat may create space for internal Iranian pressure for regime reform.
@@ -671,6 +687,7 @@ inferences:
     warrants:
       - t-order-depends-on-democracy
       - c-w-identity-evaluation
+      - c-democratic-criterion-governs
     hint: null
     concludes: c-obama-double-standard
   - id: i-iranian-politics-unlocked
@@ -746,8 +763,8 @@ inferences:
       - g-democracy-criterion-invoked
     warrants:
       - t-realist-state-primacy
-    hint: Contests the applicability of the democratic-order criterion to this link, not its general validity.
-    contests: i-obama-double-standard
+    hint: null
+    contests: c-democratic-criterion-governs
   - id: i-e-electoral-attacks-root
     scheme: null
     uncertain: false

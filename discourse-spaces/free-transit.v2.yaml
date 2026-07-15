@@ -1,5 +1,11 @@
 # Converted to the claim/inference model (v2) by scripts/convert.ts.
 # Source: discourse-spaces/free-transit.yaml. Do not hand-edit claim texts; this migration is structural.
+#
+# 2026-07 enthymemification pass (contests-to-claims collapse):
+#   - c-w-user-pays-applies-to-transit added as an explicit applicability warrant, surfaced on
+#     i-e-user-pays-attacks-root.
+#   - i-e-inconsistency-attacks-user-pays-policy re-pointed from the inference
+#     i-e-user-pays-attacks-root onto that claim. No contest now targets an inference (I8).
 id: free-transit
 title: Should fares be removed from public transit?
 definitions:
@@ -1000,6 +1006,15 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
+  - id: c-w-user-pays-applies-to-transit
+    tag: Warrant — user-pays legitimately applies to transit
+    text: >-
+      The user-pays principle is applied consistently across comparable public services, so it
+      legitimately governs transit funding rather than being invoked selectively.
+    terminal: false
+    cluster: Anti
+    uncertain: false
+    submissionStatus: Accepted
   - id: c-w-consistent-outcome-indicates-pattern
     tag: Warrant — consistent outcome indicates general pattern
     text: >-
@@ -1477,6 +1492,7 @@ inferences:
       - c-user-pays-as-policy
     warrants:
       - t-user-pays-principle
+      - c-w-user-pays-applies-to-transit
     hint: User pays as policy is a direct normative reason not to remove fares
     contests: proposition-free-transit
   - id: i-e-targeted-subsidies-attacks-root
@@ -1644,10 +1660,8 @@ inferences:
     grounds:
       - c-user-pays-applied-inconsistently
     warrants: []
-    hint: >-
-      Selective application of user-pays undermines its use as a policy justification for transit
-      specifically
-    contests: i-e-user-pays-attacks-root
+    hint: null
+    contests: c-w-user-pays-applies-to-transit
   - id: i-e-user-pays-policy-supports-targeted
     scheme: null
     uncertain: false
