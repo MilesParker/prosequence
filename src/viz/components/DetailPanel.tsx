@@ -119,9 +119,9 @@ export function DetailPanel({ node, graphData, onClose }: Props) {
                   : '—'}
               </div>
             </Section>
-            {inf.hint && (
-              <Section label="Hint">
-                <div style={{ color: '#999', fontSize: PANEL_FONT.meta, lineHeight: 1.5 }}>{inf.hint}</div>
+            {inf.note && (
+              <Section label="Note">
+                <div style={{ color: '#999', fontSize: PANEL_FONT.meta, lineHeight: 1.5 }}>{inf.note}</div>
               </Section>
             )}
             <Section label={`Grounds (${(inf.grounds ?? []).length})`}>

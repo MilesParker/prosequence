@@ -50,9 +50,9 @@ export function Tooltip({ node, x, y, nodeById }: Props) {
         <div style={{ color: '#ddd', marginBottom: 8, fontSize: 12.5 }}>
           {because}{given}.
         </div>
-        {inf.hint && (
+        {inf.note && (
           <div style={{ color: '#aaa', fontSize: 11, marginBottom: 6, borderLeft: `2px solid ${COLORS.border}`, paddingLeft: 8 }}>
-            {inf.hint}
+            {inf.note}
           </div>
         )}
         <div style={chips}>

@@ -29,14 +29,15 @@ inference's fields):
   "implicit, not yet surfaced" — a legal state.
 - **Concludes** (inference → claim): the inference derives the claim. *A
   support is an inference that concludes.*
-- **Contests** (inference → claim | inference): the inference attacks the
-  target. *An attack is an inference that contests.*
-  - contest a **claim** = **rebut**;
-  - contest an **inference** = **undercut**;
-  - rebut an **attributive** claim = **undermine**.
+- **Contests** (inference → claim): the inference attacks the target claim.
+  *An attack is an inference that contests.* Attacks may **only** target
+  claims; an attack on an inferential step is not representable and is
+  surfaced as a warrant claim instead (see GAP 1).
+  - contest a non-attributive **claim** = **rebut**;
+  - contest an **attributive** claim = **undermine**.
 
-  No separate attack taxonomy is stored — rebut/undercut/undermine are read
-  off the target's type.
+  No separate attack taxonomy is stored — rebut vs. undermine is read off
+  whether the target claim is attributive.
 
 **Enums.** `ArgumentScheme` (FromExample, FromGeneralization, FromAnalogy,
 FromAuthority, FromConsequence, FromSign, FromCause, FromDefinition),
@@ -58,7 +59,8 @@ inference occupies, with two exceptions encoded as data:
 types, `Grounds` as a struct, and the `depth`/`isMediating` fields are all
 gone. Depth is computed from topology; a mediating claim is one with no
 inference from it concluding a root. `cluster` survives on `Claim` as viz
-metadata; `hint` survives on `Inference` as a margin note.
+metadata; the inference's `note` field (formerly `hint`) is a non-semantic
+authoring margin note — never rendered as argument content and never attackable.
 
 ## 1. The goal is completeness, not adjudication
 
@@ -74,7 +76,7 @@ When making an argument, a participant must state: (a) what they believe — the
 
 All meaningful logical challenge ultimately targets a warrant — either an explicit one or an implied one that must be made explicit before it can be attacked. Grounds are factual claims attributed to a source. Claims are conclusions that follow or don't follow from their grounds via their warrants.
 
-Warrant claims are attached to the inference they bridge via its `warrants` list. This is a distinct position from grounds — a warrant is constitutive of the inference, not merely additional evidence for it. Without the warrant the inference collapses; without an additional concluding inference the claim is merely less well supported. To challenge whether a warrant licenses the step, you **undercut** the inference (a `contests` edge targeting the inference itself), rather than rebutting a claim.
+Warrant claims are attached to the inference they bridge via its `warrants` list. This is a distinct position from grounds — a warrant is constitutive of the inference, not merely additional evidence for it. Without the warrant the inference collapses; without an additional concluding inference the claim is merely less well supported. To challenge whether a warrant licenses the step, you surface the implicit warrant as an explicit claim on that inference and **rebut that claim** — attacks target claims, never inferences. If the warrant is already explicit, contest it directly; if it is still implicit (`warrants: []`), the gatekeeper surfaces it first (see GAP 1).
 
 What appears to be a grounds attack is always an attack on an implied warrant — either a source-credibility warrant ("this source is reliable") or an attribution-accuracy warrant ("this source actually reported this"). These implied warrants must be surfaced as explicit argument nodes before they can be attacked.
 
@@ -118,7 +120,7 @@ Terminal claims cannot be concluded by any inference within the discourse space 
 
 The inferential structure captures how individual arguments are constructed — how grounds connect to claims via warrant claims on an inference. The dialectical structure captures how arguments relate — inferences that `conclude` (support) or `contest` (attack) other claims and inferences. These are logically distinct concerns but are represented in a unified graph rather than separate layers, using the four edge roles (Grounds, Warrants, Concludes, Contests) that fall out of inference structure.
 
-Dialectical attacks are inferences in their own right — they run on grounds-claims and carry their own warrant claims. Because an attack is a node (an inference), it can itself be the *target* of an undercut — this is exactly why attacks had to become nodes rather than edges. The framework does not assume or require synthesis. Genuine value disagreements are represented as incompatible terminal claims, not as problems to be resolved. Most real arguments do not produce synthesis — they clarify where disagreement actually lives.
+Dialectical attacks are inferences in their own right — they run on grounds-claims and carry their own warrant claims. Because an attack is a node (an inference) rather than a bare edge, its grounds and warrants are themselves claims that can be rebutted — an attack is answered by contesting the claims it stands on, not by contesting the inference. The framework does not assume or require synthesis. Genuine value disagreements are represented as incompatible terminal claims, not as problems to be resolved. Most real arguments do not produce synthesis — they clarify where disagreement actually lives.
 
 ## 11. Depth is inferential distance, not importance
 
@@ -156,9 +158,12 @@ unchanged in spirit; only the shapes changed.
   `warrants`. Conjoint warrants (all required for one step) go on **one**
   inference; genuinely **alternative** justifications are **separate**
   inferences concluding the same claim.
-- **Contests for attacks.** An attack is an inference with `contests`.
-  Contest a **claim** to rebut it; contest an **inference** to undercut the
-  step; rebut an attributive claim to undermine it.
+- **Contests for attacks.** An attack is an inference with `contests`, and it
+  may only target a **claim**. Contest a non-attributive claim to **rebut** it;
+  contest an attributive claim to **undermine** it. There is no inference-
+  targeting attack: an applicability challenge ("that warrant does not license
+  this step") is handled by surfacing the implicit warrant as its own claim on
+  the target inference and then contesting *that* claim.
 - **Examples through generalisations.** An example claim feeds a
   generalisation via an inference that `concludes` the generalisation; the
   representativeness warrant attaches to *that* inference (the generalising
@@ -166,10 +171,11 @@ unchanged in spirit; only the shapes changed.
 - **Terminals as plain-language value assertions.** `terminal: true`,
   `cluster: Terminal`, no attribution, never concluded.
 
-Validate every corpus with `npm run validate -- <corpus.v2.yaml>`. Errors are
-invariants 1–4 and 6; warnings are the soft invariant 5 and unsupported
-non-terminal claims (surfaced but not yet supported warrant claims, or claims
-that should be roots).
+Validate every corpus with `python validate.py <corpus.v2.yaml> ...`, which
+enforces invariants I1–I8. I1–I4 and I6–I8 are hard errors (non-zero exit);
+I5 (attributive claims should not be concluded) is a soft warning. I7 keeps
+terminal claims in `warrants` only — never in grounds, never as a `contests`
+target — and I8 forbids an attack from targeting an inference.
 
 ## Corpus extraction (Step 4 shape change)
 
@@ -183,16 +189,19 @@ ones and `terminal` on the bedrock ones), a `roots` list, and an
 encode all the connective tissue. `scripts/convert.ts` performs exactly this
 mechanical remapping from an old-model corpus.
 
-## GAP 1 — resolved (undercut = contests targeting an inference)
+## GAP 1 — resolved (enthymemification: surfaced warrant, contested as a rebut)
 
 GAP 1 was: a warrant-applicability attack (e.g. free-transit's *user-pays
-applied inconsistently*) had no clean representation, because it logically
-attacks *the applicability of a warranted connection* rather than a claim,
-and terminal nodes could not be targeted. In v2 this is a first-class
-**undercut**: an inference whose `contests` points at **another inference**.
-The user-pays-inconsistency argument now contests the inference that links
-*user-pays-as-policy* to the root (warranted by the user-pays terminal),
-saying "that path does not hold," without touching the policy claim or the
-terminal. Likewise, in the Gaza corpus the *confinement* claim undercuts the
-inference from the *Mosul-analogy* claim to the *Hamas-tactics* claim. This
-is the forced discovery that made attacks into nodes.
+applied inconsistently*) had no clean representation, because it appears to
+attack *the applicability of a warranted connection* rather than a claim, and
+terminal nodes could not be targeted. In v2 this is resolved by
+**enthymemification**, not by inference-targeting. Attacks may only target
+claims; undercuts have left the model entirely. An attack on an inferential
+step is surfaced: the gatekeeper makes the suppressed warrant the step depends
+on explicit, adds it to the target inference's `warrants`, and the attack
+becomes an ordinary **rebut** of that warrant claim. The
+user-pays-inconsistency argument now contests an explicit applicability /
+consistency claim standing beside the user-pays warrant, leaving the policy
+claim and the terminal untouched. Likewise, in the Gaza corpus the
+*confinement* argument rebuts the surfaced warrant bridging the *Mosul-analogy*
+claim to the *Hamas-tactics* claim, rather than undercutting the inference.

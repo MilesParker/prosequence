@@ -1071,7 +1071,7 @@ inferences:
       - c-w-fare-cost-binding-constraint
       - c-w-marginal-mobility-improvement
       - c-w-trip-rationing-representative
-    hint: null
+    note: null
     concludes: c-low-income-mobility-gains
   - id: i-emissions-reduction
     scheme: FromCause
@@ -1083,7 +1083,7 @@ inferences:
       - c-w-modal-shift-emissions
       - c-w-ridership-increase-causes-modal-shift
       - c-ridership-increase
-    hint: null
+    note: null
     concludes: c-emissions-reduction
   - id: i-congestion-reduction
     scheme: FromCause
@@ -1094,7 +1094,7 @@ inferences:
     warrants:
       - c-w-modal-shift-congestion
       - c-ridership-increase
-    hint: null
+    note: null
     concludes: c-congestion-reduction
   - id: i-labour-market-access
     scheme: FromConsequence
@@ -1105,7 +1105,7 @@ inferences:
     warrants:
       - c-w-reduced-cost-expands-catchment
       - c-ridership-increase
-    hint: null
+    note: null
     concludes: c-labour-market-access
   - id: i-boarding-speed
     scheme: FromCause
@@ -1115,7 +1115,7 @@ inferences:
       - g-boarding-speed
     warrants:
       - c-w-fare-payment-dwell-time
-    hint: null
+    note: null
     concludes: c-boarding-speed
   - id: i-collection-cost-not-justified
     scheme: FromConsequence
@@ -1125,7 +1125,7 @@ inferences:
       - g-collection-cost-not-justified
     warrants:
       - c-w-low-recovery-overhead
-    hint: null
+    note: null
     concludes: c-collection-cost-not-justified
   - id: i-collective-benefit-justifies-funding
     scheme: FromConsequence
@@ -1135,7 +1135,7 @@ inferences:
       - g-collective-benefit-justifies-funding
     warrants:
       - c-w-non-user-benefits-justify-collective
-    hint: null
+    note: null
     concludes: c-collective-benefit-justifies-funding
   - id: i-service-degradation
     scheme: FromExample
@@ -1145,7 +1145,7 @@ inferences:
       - g-service-degradation
     warrants:
       - c-w-revenue-dependency-representative
-    hint: null
+    note: null
     concludes: c-service-degradation
   - id: i-user-pays-as-policy
     scheme: FromConsequence
@@ -1155,7 +1155,7 @@ inferences:
       - g-user-pays-as-policy
     warrants:
       - c-w-concentrated-benefits-bear-costs
-    hint: null
+    note: null
     concludes: c-user-pays-as-policy
   - id: i-targeted-subsidies-more-effective
     scheme: FromConsequence
@@ -1165,7 +1165,7 @@ inferences:
       - g-targeted-subsidies-more-effective
     warrants:
       - c-w-universal-wastes-targeting-concentrates
-    hint: null
+    note: null
     concludes: c-targeted-subsidies-more-effective
   - id: i-ridership-increase
     scheme: FromGeneralization
@@ -1175,7 +1175,7 @@ inferences:
       - g-ridership-increase
     warrants:
       - c-w-fare-elimination-causes-ridership
-    hint: null
+    note: null
     concludes: c-ridership-increase
   - id: i-racial-justice
     scheme: FromConsequence
@@ -1185,7 +1185,7 @@ inferences:
       - g-racial-justice
     warrants:
       - c-w-systematic-burden-removal-redistributive
-    hint: null
+    note: null
     concludes: c-racial-justice
   - id: i-transit-utility-analogy
     scheme: FromAnalogy
@@ -1195,7 +1195,7 @@ inferences:
       - g-transit-utility-analogy
     warrants:
       - c-w-essentiality-criteria-same
-    hint: null
+    note: null
     concludes: c-transit-utility-analogy
   - id: i-user-pays-applied-inconsistently
     scheme: FromAnalogy
@@ -1205,7 +1205,7 @@ inferences:
       - g-user-pays-applied-inconsistently
     warrants:
       - c-w-selective-application-requires-justification
-    hint: null
+    note: null
     concludes: c-user-pays-applied-inconsistently
   - id: i-fare-removal-wont-reach-needy
     scheme: FromAuthority
@@ -1215,7 +1215,7 @@ inferences:
       - g-fare-removal-wont-reach-needy
     warrants:
       - c-w-transitcenter-methodology-reliable
-    hint: null
+    note: null
     concludes: c-fare-removal-wont-reach-needy
   - id: i-null-employment-effect
     scheme: FromCause
@@ -1225,7 +1225,7 @@ inferences:
       - g-null-employment-effect
     warrants:
       - c-w-fare-not-employment-constraint
-    hint: null
+    note: null
     concludes: c-null-employment-effect
   - id: i-universal-free-transit-regressive
     scheme: FromConsequence
@@ -1236,7 +1236,7 @@ inferences:
     warrants:
       - c-w-middle-income-transfer-regressive
       - c-w-regressivity-quantitative-claim
-    hint: null
+    note: null
     concludes: c-universal-free-transit-regressive
   - id: i-antisocial-behaviour-generalised
     scheme: FromGeneralization
@@ -1246,7 +1246,7 @@ inferences:
       - g-antisocial-behaviour-generalised
     warrants:
       - c-w-consistent-outcome-indicates-pattern
-    hint: null
+    note: null
     concludes: c-antisocial-behaviour-generalised
   - id: i-high-farebox-recovery-viable
     scheme: FromExample
@@ -1256,7 +1256,7 @@ inferences:
       - g-high-farebox-recovery-viable
     warrants:
       - c-w-toronto-hongkong-not-exceptional
-    hint: null
+    note: null
     concludes: c-high-farebox-recovery-viable
   - id: i-ridership-gains-plateau
     scheme: FromGeneralization
@@ -1266,7 +1266,7 @@ inferences:
       - g-ridership-gains-plateau
     warrants:
       - c-w-unaddressed-barriers-reassert
-    hint: null
+    note: null
     concludes: c-ridership-gains-plateau
   - id: i-luxembourg-viability
     scheme: FromExample
@@ -1275,7 +1275,7 @@ inferences:
     grounds:
       - g-luxembourg-viability
     warrants: []
-    hint: null
+    note: null
     concludes: c-luxembourg-viability
   - id: i-kansas-city-ridership
     scheme: FromExample
@@ -1284,7 +1284,7 @@ inferences:
     grounds:
       - g-kansas-city-ridership
     warrants: []
-    hint: null
+    note: null
     concludes: c-kansas-city-ridership
   - id: i-boston-ridership-gains
     scheme: FromExample
@@ -1293,7 +1293,7 @@ inferences:
     grounds:
       - g-boston-ridership-gains
     warrants: []
-    hint: null
+    note: null
     concludes: c-boston-ridership-gains
   - id: i-many-examples-successful-implementation
     scheme: FromGeneralization
@@ -1303,7 +1303,7 @@ inferences:
       - g-many-examples-successful-implementation
     warrants:
       - c-w-diverse-success-establishes-viability
-    hint: null
+    note: null
     concludes: c-many-examples-successful-implementation
   - id: i-antisocial-behaviour-local
     scheme: FromExample
@@ -1313,7 +1313,7 @@ inferences:
       - g-antisocial-behaviour-local
     warrants:
       - c-w-local-reports-representative
-    hint: null
+    note: null
     concludes: c-antisocial-behaviour-local
   - id: i-user-composition-shift
     scheme: FromSign
@@ -1323,7 +1323,7 @@ inferences:
       - g-user-composition-shift
     warrants:
       - c-w-problem-character-signals-composition
-    hint: null
+    note: null
     concludes: c-user-composition-shift
   - id: i-service-quality-over-fare
     scheme: FromAuthority
@@ -1332,7 +1332,7 @@ inferences:
     grounds:
       - g-service-quality-over-fare
     warrants: []
-    hint: null
+    note: null
     concludes: c-service-quality-over-fare
   - id: i-rct-warrant-defence
     scheme: FromAuthority
@@ -1342,7 +1342,7 @@ inferences:
       - g-rct-warrant-defence
     warrants:
       - c-w-rct-methodological-superiority
-    hint: null
+    note: null
     concludes: c-rct-warrant-defence
   - id: i-driving-underpriced
     scheme: FromExample
@@ -1351,7 +1351,7 @@ inferences:
     grounds:
       - g-driving-underpriced
     warrants: []
-    hint: null
+    note: null
     concludes: c-driving-underpriced
   - id: i-utility-analogy-fails
     scheme: FromAnalogy
@@ -1361,7 +1361,7 @@ inferences:
       - g-utility-analogy-fails
     warrants:
       - c-w-private-substitutes-disanalogy
-    hint: null
+    note: null
     concludes: c-utility-analogy-fails
   - id: i-w-trip-rationing-representative
     scheme: FromGeneralization
@@ -1370,7 +1370,7 @@ inferences:
     grounds:
       - g-w-trip-rationing-representative
     warrants: []
-    hint: null
+    note: null
     concludes: c-w-trip-rationing-representative
   - id: i-w-boston-representativeness
     scheme: FromAnalogy
@@ -1379,7 +1379,7 @@ inferences:
     grounds:
       - g-w-boston-representativeness
     warrants: []
-    hint: null
+    note: null
     concludes: c-w-boston-representativeness
   - id: i-w-transitcenter-methodology-reliable
     scheme: FromAuthority
@@ -1388,7 +1388,7 @@ inferences:
     grounds:
       - g-w-transitcenter-methodology-reliable
     warrants: []
-    hint: null
+    note: null
     concludes: c-w-transitcenter-methodology-reliable
   - id: i-e-low-income-supports-root
     scheme: null
@@ -1397,7 +1397,7 @@ inferences:
     grounds:
       - c-low-income-mobility-gains
     warrants: []
-    hint: Improving low-income mobility is an intrinsic reason to remove fares
+    note: Improving low-income mobility is an intrinsic reason to remove fares
     concludes: proposition-free-transit
   - id: i-e-emissions-supports-root
     scheme: null
@@ -1406,7 +1406,7 @@ inferences:
     grounds:
       - c-emissions-reduction
     warrants: []
-    hint: Emissions reduction is an intrinsic environmental reason to remove fares
+    note: Emissions reduction is an intrinsic environmental reason to remove fares
     concludes: proposition-free-transit
   - id: i-e-congestion-supports-root
     scheme: null
@@ -1415,7 +1415,7 @@ inferences:
     grounds:
       - c-congestion-reduction
     warrants: []
-    hint: Congestion reduction benefits all road users and is an intrinsic reason to remove fares
+    note: Congestion reduction benefits all road users and is an intrinsic reason to remove fares
     concludes: proposition-free-transit
   - id: i-e-labour-supports-root
     scheme: null
@@ -1424,7 +1424,7 @@ inferences:
     grounds:
       - c-labour-market-access
     warrants: []
-    hint: Labour market access is an intrinsic economic reason to remove fares
+    note: Labour market access is an intrinsic economic reason to remove fares
     concludes: proposition-free-transit
   - id: i-e-boarding-supports-root
     scheme: null
@@ -1433,7 +1433,7 @@ inferences:
     grounds:
       - c-boarding-speed
     warrants: []
-    hint: Faster boarding is a direct operational benefit of fare removal
+    note: Faster boarding is a direct operational benefit of fare removal
     concludes: proposition-free-transit
   - id: i-e-collection-cost-supports-root
     scheme: null
@@ -1442,7 +1442,7 @@ inferences:
     grounds:
       - c-collection-cost-not-justified
     warrants: []
-    hint: Unjustified collection costs are an economic reason to remove fares
+    note: Unjustified collection costs are an economic reason to remove fares
     concludes: proposition-free-transit
   - id: i-e-collective-benefit-supports-root
     scheme: null
@@ -1451,7 +1451,7 @@ inferences:
     grounds:
       - c-collective-benefit-justifies-funding
     warrants: []
-    hint: Collective benefit justifies collective funding as an intrinsic reason
+    note: Collective benefit justifies collective funding as an intrinsic reason
     concludes: proposition-free-transit
   - id: i-e-access-supports-root
     scheme: null
@@ -1462,7 +1462,7 @@ inferences:
     warrants:
       - c-w-transit-prerequisite-participation
       - t-collective-obligation
-    hint: Access as right is an intrinsic normative reason to remove fares
+    note: Access as right is an intrinsic normative reason to remove fares
     concludes: proposition-free-transit
   - id: i-e-just-supports-root
     scheme: null
@@ -1472,7 +1472,7 @@ inferences:
       - c-fare-free-transit-is-just
     warrants:
       - c-w-fare-free-meets-justice-definition
-    hint: Justice is an intrinsic normative reason to remove fares
+    note: Justice is an intrinsic normative reason to remove fares
     concludes: proposition-free-transit
   - id: i-e-service-degradation-attacks-root
     scheme: null
@@ -1482,7 +1482,7 @@ inferences:
       - c-service-degradation
     warrants:
       - t-user-pays-principle
-    hint: Service degradation from revenue loss is a direct reason not to remove fares
+    note: Service degradation from revenue loss is a direct reason not to remove fares
     contests: proposition-free-transit
   - id: i-e-user-pays-attacks-root
     scheme: null
@@ -1493,7 +1493,7 @@ inferences:
     warrants:
       - t-user-pays-principle
       - c-w-user-pays-applies-to-transit
-    hint: User pays as policy is a direct normative reason not to remove fares
+    note: User pays as policy is a direct normative reason not to remove fares
     contests: proposition-free-transit
   - id: i-e-targeted-subsidies-attacks-root
     scheme: null
@@ -1502,7 +1502,7 @@ inferences:
     grounds:
       - c-targeted-subsidies-more-effective
     warrants: []
-    hint: Better alternatives exist — targeted subsidies are more effective than universal removal
+    note: Better alternatives exist — targeted subsidies are more effective than universal removal
     contests: proposition-free-transit
   - id: i-e-racial-justice-supports-low-income
     scheme: null
@@ -1511,7 +1511,7 @@ inferences:
     grounds:
       - c-racial-justice
     warrants: []
-    hint: Racial justice elaborates why low-income mobility gains matter
+    note: Racial justice elaborates why low-income mobility gains matter
     concludes: c-low-income-mobility-gains
   - id: i-e-racial-justice-supports-just
     scheme: null
@@ -1520,7 +1520,7 @@ inferences:
     grounds:
       - c-racial-justice
     warrants: []
-    hint: Racial justice provides a redistributive grounding for the justice claim
+    note: Racial justice provides a redistributive grounding for the justice claim
     concludes: c-fare-free-transit-is-just
   - id: i-e-utility-analogy-supports-collective
     scheme: null
@@ -1529,7 +1529,7 @@ inferences:
     grounds:
       - c-transit-utility-analogy
     warrants: []
-    hint: The utility analogy provides analogical support for collective funding
+    note: The utility analogy provides analogical support for collective funding
     concludes: c-collective-benefit-justifies-funding
   - id: i-e-driving-supports-inconsistency
     scheme: null
@@ -1538,7 +1538,7 @@ inferences:
     grounds:
       - c-driving-underpriced
     warrants: []
-    hint: Road cost socialisation is the concrete evidence for selective application
+    note: Road cost socialisation is the concrete evidence for selective application
     concludes: c-user-pays-applied-inconsistently
   - id: i-e-service-quality-supports-wont-reach
     scheme: null
@@ -1547,7 +1547,7 @@ inferences:
     grounds:
       - c-service-quality-over-fare
     warrants: []
-    hint: Survey evidence that service quality matters more than fare supports the won't reach claim
+    note: Survey evidence that service quality matters more than fare supports the won't reach claim
     concludes: c-fare-removal-wont-reach-needy
   - id: i-e-rct-defence-supports-null-employment
     scheme: null
@@ -1556,7 +1556,7 @@ inferences:
     grounds:
       - c-rct-warrant-defence
     warrants: []
-    hint: RCT methodology superiority supports treating the null finding as the best evidence
+    note: RCT methodology superiority supports treating the null finding as the best evidence
     concludes: c-null-employment-effect
   - id: i-e-regressivity-attacks-just
     scheme: null
@@ -1565,7 +1565,7 @@ inferences:
     grounds:
       - c-universal-free-transit-regressive
     warrants: []
-    hint: Regressivity directly contests the justice claim
+    note: Regressivity directly contests the justice claim
     contests: c-fare-free-transit-is-just
   - id: i-e-antisocial-local-supports-generalised
     scheme: null
@@ -1574,7 +1574,7 @@ inferences:
     grounds:
       - c-antisocial-behaviour-local
     warrants: []
-    hint: Local reports provide the evidential basis for the generalisation
+    note: Local reports provide the evidential basis for the generalisation
     concludes: c-antisocial-behaviour-generalised
   - id: i-e-user-composition-supports-generalised
     scheme: null
@@ -1583,7 +1583,7 @@ inferences:
     grounds:
       - c-user-composition-shift
     warrants: []
-    hint: User composition shift provides a mechanistic explanation for the antisocial pattern
+    note: User composition shift provides a mechanistic explanation for the antisocial pattern
     concludes: c-antisocial-behaviour-generalised
   - id: i-e-high-farebox-attacks-collection-cost
     scheme: null
@@ -1592,7 +1592,7 @@ inferences:
     grounds:
       - c-high-farebox-recovery-viable
     warrants: []
-    hint: Counterexample showing high recovery is possible undermines the collection cost argument
+    note: Counterexample showing high recovery is possible undermines the collection cost argument
     contests: c-collection-cost-not-justified
   - id: i-e-plateau-attacks-ridership
     scheme: null
@@ -1601,7 +1601,7 @@ inferences:
     grounds:
       - c-ridership-gains-plateau
     warrants: []
-    hint: >-
+    note: >-
       Ridership gains are unsustained without service improvements, qualifying the ridership
       increase claim
     contests: c-ridership-increase
@@ -1613,7 +1613,7 @@ inferences:
       - c-luxembourg-viability
     warrants:
       - c-w-luxembourg-representative
-    hint: Luxembourg is one of the many successful implementations
+    note: Luxembourg is one of the many successful implementations
     concludes: c-many-examples-successful-implementation
   - id: i-e-kansas-city-supports-many-examples
     scheme: null
@@ -1623,7 +1623,7 @@ inferences:
       - c-kansas-city-ridership
     warrants:
       - c-w-kansas-city-representative
-    hint: Kansas City is one of the many successful implementations
+    note: Kansas City is one of the many successful implementations
     concludes: c-many-examples-successful-implementation
   - id: i-e-boston-supports-many-examples
     scheme: null
@@ -1633,7 +1633,7 @@ inferences:
       - c-boston-ridership-gains
     warrants:
       - c-w-boston-representativeness
-    hint: Boston is one of the many successful implementations
+    note: Boston is one of the many successful implementations
     concludes: c-many-examples-successful-implementation
   - id: i-e-many-examples-supports-ridership
     scheme: null
@@ -1642,7 +1642,7 @@ inferences:
     grounds:
       - c-many-examples-successful-implementation
     warrants: []
-    hint: Many successful examples provide empirical support for the ridership increase claim
+    note: Many successful examples provide empirical support for the ridership increase claim
     concludes: c-ridership-increase
   - id: i-e-utility-fails-attacks-analogy
     scheme: null
@@ -1651,7 +1651,7 @@ inferences:
     grounds:
       - c-utility-analogy-fails
     warrants: []
-    hint: Private substitutes disanalogy directly undermines the utility comparison
+    note: Private substitutes disanalogy directly undermines the utility comparison
     contests: c-transit-utility-analogy
   - id: i-e-inconsistency-attacks-user-pays-policy
     scheme: null
@@ -1660,7 +1660,7 @@ inferences:
     grounds:
       - c-user-pays-applied-inconsistently
     warrants: []
-    hint: null
+    note: null
     contests: c-w-user-pays-applies-to-transit
   - id: i-e-user-pays-policy-supports-targeted
     scheme: null
@@ -1670,7 +1670,7 @@ inferences:
       - c-user-pays-as-policy
     warrants:
       - t-user-pays-principle
-    hint: >-
+    note: >-
       User pays as policy provides normative grounding for preferring targeted over universal
       provision
     concludes: c-targeted-subsidies-more-effective
@@ -1682,7 +1682,7 @@ inferences:
       - c-user-pays-as-policy
     warrants:
       - t-user-pays-principle
-    hint: User pays as policy provides the distributional framework for the regressivity argument
+    note: User pays as policy provides the distributional framework for the regressivity argument
     concludes: c-universal-free-transit-regressive
   - id: i-e-antisocial-generalised-attacks-root
     scheme: null
@@ -1691,7 +1691,7 @@ inferences:
     grounds:
       - c-antisocial-behaviour-generalised
     warrants: []
-    hint: Reliable antisocial behaviour increase is a direct reason not to remove fares
+    note: Reliable antisocial behaviour increase is a direct reason not to remove fares
     contests: proposition-free-transit
   - id: i-e-wont-reach-attacks-root
     scheme: null
@@ -1700,7 +1700,7 @@ inferences:
     grounds:
       - c-fare-removal-wont-reach-needy
     warrants: []
-    hint: If fare removal doesn't reach those who need it, the primary equity justification fails
+    note: If fare removal doesn't reach those who need it, the primary equity justification fails
     contests: proposition-free-transit
   - id: i-e-null-employment-attacks-root
     scheme: null
@@ -1709,5 +1709,5 @@ inferences:
     grounds:
       - c-null-employment-effect
     warrants: []
-    hint: Null employment effect undermines the labour market access and equity case for fare removal
+    note: Null employment effect undermines the labour market access and equity case for fare removal
     contests: proposition-free-transit

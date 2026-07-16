@@ -33,17 +33,19 @@ function castClaim(c: any): Claim {
 }
 
 function castInference(i: any): Inference {
-  return {
+  const base = {
     id: i.id as InferenceId,
     scheme: i.scheme ?? null,
     uncertain: i.uncertain ?? false,
     submissionStatus: i.submissionStatus ?? 'Accepted',
     grounds: (i.grounds ?? []) as ClaimId[],
     warrants: (i.warrants ?? []) as ClaimId[],
-    hint: i.hint ?? null,
-    concludes: i.concludes ? (i.concludes as ClaimId) : undefined,
-    contests: i.contests ? (i.contests as ClaimId | InferenceId) : undefined
+    note: i.note ?? null
   }
+  // Output arity is a discriminated union: exactly one of contests/concludes.
+  return i.contests
+    ? { ...base, contests: i.contests as ClaimId }
+    : { ...base, concludes: i.concludes as ClaimId }
 }
 
 function castDefinition(d: any): Definition {

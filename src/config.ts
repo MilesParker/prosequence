@@ -45,7 +45,7 @@ export const PANEL_FONT = {
   base:  15,   // panel default / Output / Source body
   title: 16,   // header h2
   body:  15,   // claim statement
-  meta:  14,   // ids, quotes, list rows, grounds/warrants, hints
+  meta:  14,   // ids, quotes, list rows, grounds/warrants, notes
   label: 12,   // uppercase section labels
   chip:  13,   // property chips
   badge: 12,   // relation badges
@@ -86,7 +86,7 @@ export const COLORS = {
   // Claim nodes — coloured by role/cluster.
   node: {
     root:        { fill: 'hsla(212, 80%, 42%, 0.18)', stroke: 'hsl(212, 75%, 64%)' },
-    terminal:    { fill: 'hsla(37, 95%, 56%, 0.15)',  stroke: 'hsl(45, 100%, 76%)' },
+    terminal:    { fill: 'hsla(37, 95%, 56%, 0.15)',  stroke: 'hsl(48, 100%, 58%)' },
     pro:         { fill: 'hsla(131, 40%, 34%, 0.20)', stroke: 'hsl(123, 38%, 57%)' },
     anti:        { fill: 'hsla(0, 45%, 40%, 0.18)',   stroke: 'hsl(0, 60%, 70%)'   },
     empirical:   { fill: 'hsla(199, 18%, 40%, 0.18)', stroke: 'hsl(200, 16%, 62%)' },

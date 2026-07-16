@@ -6,7 +6,7 @@ import { fitTransform, type LayoutBounds, type GroupBox } from '../layout'
 import {
   edgeColor, edgeMarkerId,
   nodeFill, nodeStroke,
-  nodeHW, nodeHH, isRootClaim, isWarrantClaim,
+  nodeHW, nodeHH, isRootClaim,
   rectEdgePt, fitTag,
   type GraphNode, type GraphData, type GraphLink, type ClaimNode, type EdgeRole,
 } from '../graphData'
@@ -191,7 +191,6 @@ export function Graph({ data, graphData, bounds, groups, highlight, onHover, onS
         .attr('x', -hw).attr('y', -hh).attr('width', hw * 2).attr('height', hh * 2).attr('rx', NODE.rx)
         .attr('fill', nodeFill(c)).attr('stroke', nodeStroke(c))
         .attr('stroke-width', isRootClaim(c) ? NODE.rootStrokeWidth : NODE.strokeWidth)
-        .attr('stroke-dasharray', isWarrantClaim(c) ? EDGE.dashWarrants : null)
       const lines = fitTag(c.tag || (c.id as unknown as string), hw, hh, isRootClaim(c) ? 10 : 9.5)
       const totalH = (lines.length - 1) * NODE.lineHeight
       sel.append('text')

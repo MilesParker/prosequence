@@ -1,84 +1,152 @@
-import yaml, sys
+#!/usr/bin/env python3
+"""Structural validator for v2 discourse-space corpora.
+
+Enforces invariants I1–I8 from src/types.ts against the YAML corpora. Node
+kind is resolved by membership in the `claims` / `inferences` arrays — never
+inferred from an id prefix. Detects only; enthymemification is authoring work,
+so there is no auto-fix.
+
+Exit status is non-zero if any hard invariant is violated. I5 is soft (a
+warning): it is reported but does not affect exit status.
+
+Usage: python validate.py <corpus.yaml> [<corpus.yaml> ...]
+"""
+import sys, glob
+import yaml
+
 
 def roots_of(d):
-    for k in ('roots',):
-        if k in d: return set(d[k])
-    for k in ('discourseSpace','discourse_space'):
-        if k in d: return set(d[k].get('roots',[]))
-    return set()
+    if 'roots' in d:
+        return list(d['roots'])
+    for k in ('discourseSpace', 'discourse_space'):
+        if k in d:
+            return list(d[k].get('roots', []))
+    return []
+
 
 def validate(path):
     d = yaml.safe_load(open(path))
-    claims = {c['id']:c for c in d['claims']}
-    infs   = {i['id']:i for i in d['inferences']}
+    claims = {c['id']: c for c in d.get('claims', [])}
+    infs   = {i['id']: i for i in d.get('inferences', [])}
     roots  = roots_of(d)
-    errs = []
 
-    # I1 referential integrity
-    for iid,i in infs.items():
-        for g in (i.get('grounds') or []):
-            if g not in claims: errs.append(f"I1 {iid}: grounds '{g}' not a Claim")
-        for w in (i.get('warrants') or []):
-            if w not in claims: errs.append(f"I1 {iid}: warrant '{w}' not a Claim")
-        if i.get('concludes') and i['concludes'] not in claims:
-            errs.append(f"I1 {iid}: concludes '{i['concludes']}' not a Claim")
-        if i.get('contests') and i['contests'] not in claims and i['contests'] not in infs:
-            errs.append(f"I1 {iid}: contests '{i['contests']}' unknown")
+    errs  = []   # hard violations -> non-zero exit
+    warns = []   # soft violations (I5) -> reported only
+
+    def fail(inv, iid, target, msg):
+        # file, invariant, inference id, target id — in that order.
+        errs.append(f"{path}: {inv} {iid} {target}  {msg}")
+
+    for iid, i in infs.items():
+        concludes = i.get('concludes')
+        contests  = i.get('contests')
+        grounds   = i.get('grounds') or []
+        warrants  = i.get('warrants') or []
+
+        # I1 — exactly one of {concludes, contests}. (Type-enforced in TS.)
+        n_out = (1 if concludes else 0) + (1 if contests else 0)
+        if n_out != 1:
+            fail("I1", iid, "-", f"has {n_out} outputs (need exactly one of concludes/contests)")
+
+        # I3 — every referenced id resolves within the space.
+        for g in grounds:
+            if g not in claims:
+                fail("I3", iid, g, "grounds id does not resolve to a claim")
+        for w in warrants:
+            if w not in claims:
+                fail("I3", iid, w, "warrant id does not resolve to a claim")
+        if concludes and concludes not in claims:
+            fail("I3", iid, concludes, "concludes id does not resolve to a claim")
+        if contests and contests not in claims and contests not in infs:
+            fail("I3", iid, contests, "contests id does not resolve to any node")
+
+        # I2 — no inference concludes a terminal claim.
+        if concludes in claims and claims[concludes].get('terminal'):
+            fail("I2", iid, concludes, "concludes a terminal claim")
+
+        # I4 — grounds is non-empty.
+        if not grounds:
+            fail("I4", iid, "-", "zero grounds (grounds must be non-empty)")
+
+        # I5 — attributive claims should not be concluded. (Soft.)
+        if concludes in claims and claims[concludes].get('attribution') is not None:
+            warns.append(f"{path}: I5 {iid} {concludes}  concludes an attributive (checkable-leaf) claim")
+
+        # I7 — terminal claims appear only in warrants: never in grounds,
+        #      never as a contests target.
+        for g in grounds:
+            if g in claims and claims[g].get('terminal'):
+                fail("I7", iid, g, "terminal claim used as grounds (terminals belong only in warrants)")
+        if contests in claims and claims[contests].get('terminal'):
+            fail("I7", iid, contests, "terminal claim used as a contests target")
+
+        # I8 — a contests target resolves to a member of `claims`, never an
+        #      inference. Undercuts (inference-targeting attacks) are not
+        #      representable; surface the suppressed warrant as a claim instead.
+        if contests and contests in infs and contests not in claims:
+            fail("I8", iid, contests, "contests targets an inference (attacks may only target claims)")
+
+    # I3 — roots resolve to claims.
     for r in roots:
-        if r not in claims: errs.append(f"I1 root '{r}' not a Claim")
+        if r not in claims:
+            fail("I3", "-", r, "root id does not resolve to a claim")
 
-    # I2 exactly one output
-    for iid,i in infs.items():
-        n = (1 if i.get('concludes') else 0) + (1 if i.get('contests') else 0)
-        if n != 1: errs.append(f"I2 {iid}: has {n} outputs (need exactly 1)")
-
-    # I3 grounds >= 1
-    for iid,i in infs.items():
-        if not (i.get('grounds') or []): errs.append(f"I3 {iid}: zero grounds")
-
-    # I4 no inference concludes a terminal
-    for iid,i in infs.items():
-        t = i.get('concludes')
-        if t in claims and claims[t].get('terminal'): errs.append(f"I4 {iid}: concludes terminal '{t}'")
-
-    # I5 concludes targets a Claim only (inferences may only be contested)
-    for iid,i in infs.items():
-        if i.get('concludes') in infs: errs.append(f"I5 {iid}: concludes an Inference")
-
-    # I6 acyclicity over claim<->inference bipartite graph
+    # I6 — the graph of Concludes edges is acyclic. Support chains
+    #      (grounds/warrants -> inference -> concludes) may not cycle; contests
+    #      edges are excluded (an attack is allowed to point "up").
     adj = {}
-    for iid,i in infs.items():
+    for iid, i in infs.items():
         adj.setdefault(iid, [])
-        for g in (i.get('grounds') or []) + (i.get('warrants') or []):
-            adj.setdefault(g, []).append(iid)     # claim -> inference
-        tgt = i.get('concludes') or i.get('contests')
-        if tgt: adj[iid].append(tgt)              # inference -> target
-    WHITE,GREY,BLACK = 0,1,2
-    color = {n:WHITE for n in adj}
-    def dfs(n, stack):
-        color[n]=GREY
-        for m in adj.get(n,[]):
-            if color.get(m,WHITE)==GREY:
-                errs.append(f"I6 cycle: {' -> '.join(stack[stack.index(m):]+[m])}" if m in stack else f"I6 cycle at {m}")
-            elif color.get(m,WHITE)==WHITE:
-                dfs(m, stack+[m])
-        color[n]=BLACK
-    for n in list(adj):
-        if color[n]==WHITE: dfs(n,[n])
+        for c in (i.get('grounds') or []) + (i.get('warrants') or []):
+            adj.setdefault(c, []).append(iid)     # claim -> inference
+        concludes = i.get('concludes')
+        if concludes:
+            adj[iid].append(concludes)            # inference -> concluded claim
+    WHITE, GREY, BLACK = 0, 1, 2
+    color = {n: WHITE for n in adj}
+    reported = set()
 
-    # I7 NEW: terminals appear only in warrants
-    for iid,i in infs.items():
-        for g in (i.get('grounds') or []):
-            if claims.get(g,{}).get('terminal'): errs.append(f"I7 {iid}: terminal '{g}' used as grounds")
-        tgt = i.get('contests')
-        if tgt in claims and claims[tgt].get('terminal'): errs.append(f"I7 {iid}: contests terminal '{tgt}'")
+    def dfs(n, stack):
+        color[n] = GREY
+        for m in adj.get(n, []):
+            c = color.get(m, WHITE)
+            if c == GREY and m not in reported:
+                reported.add(m)
+                cyc = stack[stack.index(m):] + [m] if m in stack else [m]
+                fail("I6", "-", m, "cycle in concludes graph: " + " -> ".join(cyc))
+            elif c == WHITE:
+                dfs(m, stack + [m])
+        color[n] = BLACK
+
+    for n in list(adj):
+        if color.get(n, WHITE) == WHITE:
+            dfs(n, [n])
 
     print(f"{path}: {len(claims)} claims, {len(infs)} inferences, {len(roots)} root(s)")
+    for w in warns:
+        print("   WARN", w)
     if errs:
-        for e in errs: print("   FAIL", e)
+        for e in errs:
+            print("   FAIL", e)
     else:
-        print("   PASS  I1 refint  I2 one-output  I3 grounds>=1  I4 no-concludes-terminal  I5 concludes-claim-only  I6 acyclic  I7 terminals-warrants-only")
+        print("   PASS  I1 one-output  I2 no-concludes-terminal  I3 refint  "
+              "I4 grounds>=1  I6 acyclic-concludes  I7 terminals-warrants-only  "
+              "I8 contests-claim-only" + ("  (I5 warnings above)" if warns else ""))
     return not errs
 
-ok = all([validate(p) for p in ['freedman_v2.yaml','gaza_v2.yaml','free-transit_v2.yaml']])
-sys.exit(0 if ok else 1)
+
+def main(argv):
+    paths = []
+    for a in argv:
+        paths.extend(sorted(glob.glob(a)) or [a])
+    if not paths:
+        paths = sorted(glob.glob('discourse-spaces/*.v2.yaml'))
+    if not paths:
+        print("usage: python validate.py <corpus.yaml> [<corpus.yaml> ...]", file=sys.stderr)
+        return 2
+    ok = all([validate(p) for p in paths])
+    return 0 if ok else 1
+
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv[1:]))

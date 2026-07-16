@@ -100,15 +100,22 @@ export interface Claim {
  *
  * Output is exactly one of:
  *   - concludes: this inference derives the target claim
- *   - contests: this inference attacks the target
- *       ClaimId target      = rebut (contest the content)
- *       InferenceId target  = undercut (contest that this path holds)
- *       (undermining = rebutting an attributive claim)
+ *   - contests: this inference attacks the target claim
+ *       attributive target = undermine; any other target = rebut
+ *
+ * Attacks always target a claim. An attack on an inferential step
+ * ("that doesn't follow") is not representable, and is not meant to be:
+ * the gatekeeper enthymemifies it — surfaces the suppressed warrant the
+ * attack denies, adds that warrant to the target inference's `warrants`,
+ * and the attack becomes an ordinary rebut of that claim. This is how
+ * applicability attacks against terminal warrants are handled (former
+ * GAP 1): the terminal stays bedrock, and the surfaced applicability or
+ * consistency claim beside it is what gets contested.
  *
  * Multiple warrants on one inference are conjoint (all required).
  * Alternative warrants are alternative inferences.
  */
-export interface Inference {
+interface InferenceBase {
     id: InferenceId;
     scheme: ArgumentScheme | null;
     uncertain: boolean;
@@ -117,13 +124,20 @@ export interface Inference {
     grounds: ClaimId[];   // 1..*
     warrants: ClaimId[];  // 0..* — empty means implicit, not yet surfaced
 
-    /** Applicability note. Margin comment, not formally attackable;
-     *  to contest applicability, contest the inference. */
-    hint: string | null;
-
-    concludes?: ClaimId;
-    contests?: ClaimId | InferenceId;
+    /**
+     * Free-text authoring note. Not semantic, not attackable, not rendered
+     * as argument content. If it states an assumption the inference needs
+     * in order to hold, it belongs in `warrants` instead.
+     */
+    note: string | null;
 }
+
+/** Output arity (exactly one of concludes/contests) is type-enforced. */
+export type Inference = InferenceBase &
+    (
+        | { concludes: ClaimId; contests?: never }
+        | { contests: ClaimId; concludes?: never }
+        );
 
 // ---------- Discourse space ----------
 
@@ -147,13 +161,19 @@ export interface DiscourseSpace {
     inferences: Inference[];
 }
 
-// ---------- Structural invariants (enforced by validation, not types) ----------
+// ---------- Structural invariants ----------
 //
-// 1. Inference has exactly one of {concludes, contests}.
-// 2. No inference concludes a claim with terminal: true.
-// 3. All ClaimId / InferenceId references resolve within the space.
-// 4. grounds is non-empty.
-// 5. Attributive claims (attribution present) should not be concluded by
-//    any inference — they are checkable leaves. (Soft invariant; a claim
-//    can migrate from contested to attributive as a debate settles.)
-// 6. The graph of Concludes edges is acyclic.
+// I1. Inference has exactly one of {concludes, contests}.  [type-enforced]
+// I2. No inference concludes a claim with terminal: true.
+// I3. All ClaimId / InferenceId references resolve within the space.
+// I4. grounds is non-empty.
+// I5. Attributive claims (attribution present) should not be concluded by
+//     any inference — they are checkable leaves. (Soft invariant; a claim
+//     can migrate from contested to attributive as a debate settles.)
+// I6. The graph of Concludes edges is acyclic.
+// I7. Terminal claims appear only in `warrants` — never in `grounds`,
+//     never as a `contests` target.
+// I8. No `contests` target is an InferenceId.  [type-enforced]
+//
+// I1 and I8 are compile errors in TypeScript. They still require runtime
+// assertions in validate.py, which reads YAML and has no compiler.
