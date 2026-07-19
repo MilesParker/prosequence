@@ -15,11 +15,11 @@ function EdgeSwatch({ color, dashed = false }: { color: string; dashed?: boolean
 }
 
 function Row({ children }: { children: React.ReactNode }) {
-  return <div style={{ display: 'flex', alignItems: 'center', gap: 9, margin: '4px 0', color: '#888' }}>{children}</div>
+  return <div style={{ display: 'flex', alignItems: 'center', gap: 9, margin: '4px 0', color: COLORS.textMuted }}>{children}</div>
 }
 
 function SectionTitle({ children }: { children: React.ReactNode }) {
-  return <div style={{ fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: '#444', marginBottom: 7 }}>{children}</div>
+  return <div style={{ fontSize: 9.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em', color: COLORS.textFaint, marginBottom: 7 }}>{children}</div>
 }
 
 function Divider() {
@@ -29,7 +29,7 @@ function Divider() {
 export function Legend() {
   const n = COLORS.node
   return (
-    <div style={{ position: 'fixed', bottom: 20, left: 20, background: 'rgba(10, 12, 20, 0.95)', border: `1px solid ${COLORS.border}`, borderRadius: 8, padding: '12px 16px', fontSize: 11, zIndex: 50, userSelect: 'none' }}>
+    <div style={{ position: 'fixed', bottom: 20, left: 20, background: COLORS.surfaceBlur, backdropFilter: 'blur(4px)', border: `1px solid ${COLORS.border}`, borderRadius: 8, boxShadow: '0 6px 24px rgba(0,0,0,0.10)', padding: '12px 16px', fontSize: 11, zIndex: 50, userSelect: 'none' }}>
       <SectionTitle>Claims</SectionTitle>
       <Row><NodeSwatch fill={n.root.fill} stroke={n.root.stroke} /> Root (contested question)</Row>
       <Row><NodeSwatch fill={n.pro.fill} stroke={n.pro.stroke} /> Pro</Row>

@@ -17,8 +17,17 @@ interface Props {
   bounds: LayoutBounds
   groups: GroupBox[]
   highlight: Set<string>
+  /** Claim to reveal on mount — the shared selection, centred when swapping in. */
+  centerOn?: string | null
+  /** How to frame `centerOn` on mount: 'reveal' pans it in at a moderate zoom;
+   *  'neighborhood' zooms tight on its immediate surroundings (return icon). */
+  centerMode?: 'reveal' | 'neighborhood'
+  /** Currently-selected claim id — draws a persistent ring (updates live). */
+  selectedId?: string | null
   onHover: (node: GraphNode | null, x?: number, y?: number) => void
   onSelect: (node: GraphNode | null) => void
+  /** Double-click a claim to open it in the focus view. */
+  onActivate?: (node: GraphNode) => void
 }
 
 const ROLES: EdgeRole[] = ['Grounds', 'Warrants', 'Concludes', 'Contests']
@@ -42,12 +51,22 @@ type NodeSel = d3.Selection<SVGGElement, GraphNode, SVGGElement, unknown>
  * interactions are pan/zoom, hover, click-to-select, drag-to-nudge, and search
  * highlight — no disclosure.
  */
-export function Graph({ data, graphData, bounds, groups, highlight, onHover, onSelect }: Props) {
+export function Graph({ data, graphData, bounds, groups, highlight, centerOn, centerMode, selectedId, onHover, onSelect, onActivate }: Props) {
   const svgRef = useRef<SVGSVGElement>(null)
   const onHoverRef = useRef(onHover)
   const onSelectRef = useRef(onSelect)
+  const onActivateRef = useRef(onActivate)
   useEffect(() => { onHoverRef.current = onHover }, [onHover])
   useEffect(() => { onSelectRef.current = onSelect }, [onSelect])
+  useEffect(() => { onActivateRef.current = onActivate }, [onActivate])
+  // Read only at mount (in the scene-build effect); a change mid-view must not
+  // yank the viewport / rebuild the scene, so these stay out of that effect's deps.
+  const centerOnRef = useRef(centerOn)
+  useEffect(() => { centerOnRef.current = centerOn }, [centerOn])
+  const centerModeRef = useRef(centerMode)
+  useEffect(() => { centerModeRef.current = centerMode }, [centerMode])
+  const selectedIdRef = useRef(selectedId)
+  useEffect(() => { selectedIdRef.current = selectedId }, [selectedId])
   const nodesRef = useRef<NodeSel | null>(null)
 
   useEffect(() => {
@@ -75,6 +94,7 @@ export function Graph({ data, graphData, bounds, groups, highlight, onHover, onS
       .on('zoom', e => g.attr('transform',
         `translate(${e.transform.x},${e.transform.y + TITLE_BAR_HEIGHT}) scale(${e.transform.k})`))
     svg.call(zoom)
+    svg.on('dblclick.zoom', null)   // double-click is reserved for open-in-focus
 
     // ── Group boxes (behind everything) ───────────────────────────────────────
     g.append('g').attr('class', 'groups')
@@ -187,6 +207,11 @@ export function Graph({ data, graphData, bounds, groups, highlight, onHover, onS
         .attr('rx', NODE.rx + 2).attr('fill', 'none')
         .attr('stroke', DISCLOSURE.highlightStroke).attr('stroke-width', DISCLOSURE.highlightWidth)
         .attr('opacity', highlight.has(d.id as unknown as string) ? 1 : 0)
+      sel.append('rect').attr('class', 'sel')         // persistent selection ring (hidden by default)
+        .attr('x', -hw - 4).attr('y', -hh - 4).attr('width', hw * 2 + 8).attr('height', hh * 2 + 8)
+        .attr('rx', NODE.rx + 3).attr('fill', 'none')
+        .attr('stroke', DISCLOSURE.selectionStroke).attr('stroke-width', DISCLOSURE.selectionWidth)
+        .attr('opacity', selectedIdRef.current === (d.id as unknown as string) ? 1 : 0)
       sel.append('rect')
         .attr('x', -hw).attr('y', -hh).attr('width', hw * 2).attr('height', hh * 2).attr('rx', NODE.rx)
         .attr('fill', nodeFill(c)).attr('stroke', nodeStroke(c))
@@ -194,7 +219,7 @@ export function Graph({ data, graphData, bounds, groups, highlight, onHover, onS
       const lines = fitTag(c.tag || (c.id as unknown as string), hw, hh, isRootClaim(c) ? 10 : 9.5)
       const totalH = (lines.length - 1) * NODE.lineHeight
       sel.append('text')
-        .attr('text-anchor', 'middle').attr('fill', '#e8e8e8')
+        .attr('text-anchor', 'middle').attr('fill', COLORS.text)
         .attr('font-size', isRootClaim(c) ? '10px' : '9.5px')
         .attr('font-family', 'system-ui, sans-serif').attr('pointer-events', 'none')
         .attr('font-weight', isRootClaim(c) ? '600' : '400')
@@ -209,6 +234,7 @@ export function Graph({ data, graphData, bounds, groups, highlight, onHover, onS
       .on('mousemove', (e: MouseEvent, d) => onHoverRef.current(d, e.clientX, e.clientY))
       .on('mouseout', () => onHoverRef.current(null))
       .on('click', (e: MouseEvent, d) => { e.stopPropagation(); onSelectRef.current(d) })
+      .on('dblclick', (e: MouseEvent, d) => { e.stopPropagation(); if (d._kind === 'claim') onActivateRef.current?.(d) })
     svg.on('click', () => onSelectRef.current(null))
 
     // Drag to nudge a node; re-clip only its incident edges.
@@ -228,8 +254,25 @@ export function Graph({ data, graphData, bounds, groups, highlight, onHover, onS
         branchSel.filter(br => br.member === id).attr('d', br => branchPath(br))
       }))
 
+    // On a fresh mount, honour a pending selection: swapping in from the focus
+    // view must reveal that claim's position (§9a-1), not just fit the whole map.
     const fit = fitTransform(bounds, W, H - TITLE_BAR_HEIGHT, VIEW.zoomMin, VIEW.zoomMax)
-    svg.call(zoom.transform, d3.zoomIdentity.translate(fit.x, fit.y).scale(fit.k))
+    const target = centerOnRef.current ? gd.nodeById.get(centerOnRef.current) : null
+    if (target && target.x != null && target.y != null) {
+      let k: number
+      if (centerModeRef.current === 'neighborhood') {
+        // Return-from-focus: centre the claim at a fixed tight zoom so only its
+        // one or two immediate neighbours frame it.
+        k = Math.min(VIEW.zoomMax, Math.max(VIEW.zoomMin, VIEW.neighborhoodZoom))
+      } else {
+        k = Math.max(fit.k, Math.min(VIEW.zoomMax, 0.55))
+      }
+      const tx = W / 2 - k * target.x
+      const ty = (H - TITLE_BAR_HEIGHT) / 2 - k * target.y
+      svg.call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(k))
+    } else {
+      svg.call(zoom.transform, d3.zoomIdentity.translate(fit.x, fit.y).scale(fit.k))
+    }
 
     return () => { svg.on('.zoom', null) }
   }, [data, graphData, bounds])
@@ -241,6 +284,14 @@ export function Graph({ data, graphData, bounds, groups, highlight, onHover, onS
       d3.select(this).select('.hl').attr('opacity', highlight.has(d.id as unknown as string) ? 1 : 0)
     })
   }, [highlight])
+
+  // Update the persistent selection ring without rebuilding the scene.
+  useEffect(() => {
+    nodesRef.current?.each(function (d) {
+      if (d._kind !== 'claim') return
+      d3.select(this).select('.sel').attr('opacity', selectedId === (d.id as unknown as string) ? 1 : 0)
+    })
+  }, [selectedId])
 
   return <svg ref={svgRef} style={{ display: 'block' }} />
 }

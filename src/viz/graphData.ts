@@ -50,6 +50,12 @@ export interface GraphData {
   /** Links whose source is this node. */
   outgoing: Map<string, GraphLink[]>
   maxDepth: number
+  /** Inferences that conclude a claim (its supports). Keyed by ClaimId. */
+  supports: Map<string, Inference[]>
+  /** Inferences that contest a claim (its attacks). Keyed by ClaimId. */
+  attacks: Map<string, Inference[]>
+  /** Inferences that consume a claim as grounds or warrant. Keyed by ClaimId. */
+  consumers: Map<string, Inference[]>
 }
 
 // ── Build ─────────────────────────────────────────────────────────────────────
@@ -113,7 +119,27 @@ export function buildGraphData(ds: DiscourseSpace): GraphData {
     incoming.get(l.target as unknown as string)?.push(l)
   }
 
-  return { nodes, links: cleanLinks, nodeById, incoming, outgoing, maxDepth }
+  // ── Focus-view indices (computed once; both views read these, never recompute)
+  const supports = new Map<string, Inference[]>()
+  const attacks = new Map<string, Inference[]>()
+  const consumers = new Map<string, Inference[]>()
+  const consumerSeen = new Map<string, Set<string>>()
+  for (const inf of inferences) {
+    const iid = inf.id as unknown as string
+    if (inf.concludes) push(supports, String(inf.concludes), inf)
+    // A contest always targets a claim (I8); guard defensively all the same.
+    if (inf.contests && claimIds.has(String(inf.contests))) push(attacks, String(inf.contests), inf)
+    // Grounds ∪ warrants — dedupe if a claim is both on the same inference.
+    for (const c of [...(inf.grounds ?? []), ...(inf.warrants ?? [])].map(String)) {
+      let seen = consumerSeen.get(c)
+      if (!seen) { seen = new Set(); consumerSeen.set(c, seen) }
+      if (seen.has(iid)) continue
+      seen.add(iid)
+      push(consumers, c, inf)
+    }
+  }
+
+  return { nodes, links: cleanLinks, nodeById, incoming, outgoing, maxDepth, supports, attacks, consumers }
 }
 
 /** BFS depth: roots at 0, then alternating inference/claim layers. */
@@ -164,7 +190,7 @@ function computeDepth(claims: Claim[], inferences: Inference[], roots: Set<strin
   }
 }
 
-function push(m: Map<string, string[]>, k: string, v: string) {
+function push<T>(m: Map<string, T[]>, k: string, v: T) {
   m.set(k, [...(m.get(k) ?? []), v])
 }
 

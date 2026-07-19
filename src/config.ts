@@ -30,8 +30,12 @@ export const DISCLOSURE = {
   badgeFontSize: 9,
   fanGap: 18,           // vertical drop from a J junction to its chip/badge fan
   hiddenFontSize: 9,    // persistent "something is hidden" count on a claim
-  highlightStroke: 'hsl(45, 100%, 70%)',
+  highlightStroke: 'hsl(35, 95%, 48%)',   // amber — reads on the paper ground
   highlightWidth: 3,
+  // Persistent selection ring on the graph (the retired sidebar used to be the
+  // "this is selected" signal; now the node itself carries it).
+  selectionStroke: 'hsl(215, 60%, 40%)',  // ink blue — high-contrast on white
+  selectionWidth: 2.5,
 } as const
 
 // ── Layout ──────────────────────────────────────────────────────────────────
@@ -52,6 +56,36 @@ export const PANEL_FONT = {
   close: 24,   // × close button
 } as const
 
+// ── Focus view (band-stack surface) ───────────────────────────────────────────
+// The focus view centres one claim and stacks parent band / focus band /
+// For+Against columns. Layout tokens live here alongside the graph's.
+export const FOCUS = {
+  columnMaxWidth: 860,   // max width of the centred stack
+  rowFont: 14.5,         // claim-row text
+  focusFont: 19,         // centred claim text
+  labelFont: 11,         // uppercase role labels, pager, bedrock badge
+  pipSize: 8,            // §4 pip diameter
+  pipGap: 5,
+  connector: 22,         // vertical rule between bands
+  cellRadius: 8,
+  bracketWidth: 2,       // warrant bracket rule
+
+  // Parent band: two fixed columns (Supports/Contests), role-bucketed, never
+  // pages — sizes to content (max 4 tiles in the corpora), so no reserved height.
+  parentColGap: 16,        // Supports/Contests gap (mirrors the For/Against gap)
+
+  // "Came from" trace: the claim you navigated from wears this ring/wash while
+  // the focus-band icon is engaged. Amber matches the graph's search highlight.
+  fromRing: 'hsl(35, 95%, 48%)',
+  fromTint: 'hsla(35, 95%, 48%, 0.13)',
+
+  // Reserved heights that keep the landscape from shifting as you refocus
+  // (best-guess maxima; tiles scroll internally on the rare overflow).
+  focusMinHeight: 120,     // focus band floor (~3 lines)
+  columnHeight: 360,       // For/Against: equal fixed height
+  pagerHeight: 26,         // always reserved so paging never shifts the cell
+} as const
+
 // ── Node dimensions (half-width / half-height) ───────────────────────────────
 export const NODE = {
   halfWidth: 60,
@@ -69,63 +103,81 @@ export const NODE = {
 } as const
 
 // ── Color palette (all values in HSL) ────────────────────────────────────────
+// Light "living document" theme: warm paper ground, ink text. The graph's
+// cluster hues are necessarily less punchy here than on the old dark ground —
+// an accepted trade for the document feel — so fills are pale tints and the
+// legibility is carried by the darker, saturated strokes and by ink text.
 export const COLORS = {
-  background:  'hsl(225, 21%, 7%)',
-  surface:     'hsla(228, 33%, 6%, 0.98)',
-  surfaceBlur: 'hsla(228, 33%, 6%, 0.92)',
-  border:      'hsl(234, 23%, 15%)',
-  borderFaint: 'hsl(230, 23%, 10%)',
-  text:        'hsl(0, 0%, 88%)',
-  textMuted:   'hsl(0, 0%, 73%)',
-  textFaint:   'hsl(0, 0%, 40%)',
-  textDim:     'hsl(0, 0%, 33%)',
-  textDimmer:  'hsl(0, 0%, 27%)',
-  textLabel:   'hsl(0, 0%, 67%)',
-  textCode:    'hsl(0, 0%, 40%)',
+  background:  'hsl(43, 30%, 97%)',        // warm paper
+  surface:     'hsl(0, 0%, 100%)',         // cards lift a shade off the paper
+  surfaceBlur: 'hsla(43, 40%, 98%, 0.85)',
+  border:      'hsl(40, 16%, 84%)',
+  borderFaint: 'hsl(40, 16%, 90%)',
+  text:        'hsl(220, 18%, 18%)',       // ink
+  textMuted:   'hsl(220, 12%, 34%)',
+  textFaint:   'hsl(220, 10%, 50%)',
+  textDim:     'hsl(220, 10%, 58%)',
+  textDimmer:  'hsl(220, 10%, 70%)',
+  textLabel:   'hsl(220, 12%, 40%)',
+  textCode:    'hsl(220, 12%, 45%)',
 
-  // Claim nodes — coloured by role/cluster.
+  // Claim nodes — coloured by role/cluster. Pale fills, saturated strokes.
   node: {
-    root:        { fill: 'hsla(212, 80%, 42%, 0.18)', stroke: 'hsl(212, 75%, 64%)' },
-    terminal:    { fill: 'hsla(37, 95%, 56%, 0.15)',  stroke: 'hsl(48, 100%, 58%)' },
-    pro:         { fill: 'hsla(131, 40%, 34%, 0.20)', stroke: 'hsl(123, 38%, 57%)' },
-    anti:        { fill: 'hsla(0, 45%, 40%, 0.18)',   stroke: 'hsl(0, 60%, 70%)'   },
-    empirical:   { fill: 'hsla(199, 18%, 40%, 0.18)', stroke: 'hsl(200, 16%, 62%)' },
-    analogy:     { fill: 'hsla(280, 30%, 45%, 0.18)', stroke: 'hsl(285, 40%, 70%)' },
-    attributive: { fill: 'hsla(210, 12%, 30%, 0.16)', stroke: 'hsl(210, 12%, 50%)' },
+    root:        { fill: 'hsl(212, 90%, 95%)', stroke: 'hsl(212, 68%, 48%)' },
+    terminal:    { fill: 'hsl(45, 92%, 90%)',  stroke: 'hsl(36, 76%, 44%)'  },
+    pro:         { fill: 'hsl(131, 48%, 93%)', stroke: 'hsl(140, 44%, 36%)' },
+    anti:        { fill: 'hsl(2, 72%, 95%)',   stroke: 'hsl(2, 58%, 50%)'   },
+    empirical:   { fill: 'hsl(205, 40%, 94%)', stroke: 'hsl(205, 30%, 42%)' },
+    analogy:     { fill: 'hsl(280, 45%, 95%)', stroke: 'hsl(282, 38%, 52%)' },
+    attributive: { fill: 'hsl(210, 18%, 94%)', stroke: 'hsl(210, 12%, 46%)' },
   },
 
   // Inference junction marks — subordinate wiring.
-  inference: { fill: 'hsl(232, 20%, 20%)', stroke: 'hsl(232, 18%, 46%)' },
+  inference: { fill: 'hsl(230, 16%, 90%)', stroke: 'hsl(230, 12%, 55%)' },
 
   // Four edge roles, each distinct.
   edge: {
-    grounds:   'hsl(205, 30%, 55%)',   // steel — evidence into an inference
-    warrants:  'hsl(205, 30%, 55%)',   // steel (dashed) — an inference input like
+    grounds:   'hsl(205, 38%, 46%)',   // steel — evidence into an inference
+    warrants:  'hsl(205, 38%, 46%)',   // steel (dashed) — an inference input like
                                        // grounds; the dash marks it a bridging
                                        // assumption. Green is reserved for Concludes.
-    concludes: 'hsl(122, 39%, 49%)',   // green — was Support
-    contests:  'hsl(1, 77%, 55%)',     // red — was Attack
+    concludes: 'hsl(140, 46%, 38%)',   // green — was Support
+    contests:  'hsl(2, 62%, 50%)',     // red — was Attack
   },
 
-  // Role badges in the detail panel.
+  // Role badges (kept for token parity; the detail panel is retired).
   rel: {
-    grounds:   { bg: 'hsl(205, 30%, 16%)', color: 'hsl(205, 40%, 62%)' },
-    warrants:  { bg: 'hsl(205, 30%, 16%)', color: 'hsl(205, 40%, 62%)' },
-    concludes: { bg: 'hsl(143, 44%, 14%)', color: 'hsl(122, 39%, 55%)' },
-    contests:  { bg: 'hsl(0, 43%, 14%)',   color: 'hsl(1, 77%, 62%)'   },
+    grounds:   { bg: 'hsl(205, 40%, 92%)', color: 'hsl(205, 45%, 34%)' },
+    warrants:  { bg: 'hsl(205, 40%, 92%)', color: 'hsl(205, 45%, 34%)' },
+    concludes: { bg: 'hsl(140, 45%, 91%)', color: 'hsl(140, 48%, 28%)' },
+    contests:  { bg: 'hsl(2, 60%, 93%)',   color: 'hsl(2, 58%, 42%)'   },
   },
 
-  // Cluster / kind chips in tooltips + panel.
+  // Cluster / kind chips in tooltips.
   chip: {
-    default:     { bg: 'hsl(234, 23%, 15%)', color: 'hsl(0, 0%, 53%)'    },
-    pro:         { bg: 'hsl(131, 33%, 16%)', color: 'hsl(123, 38%, 57%)' },
-    anti:        { bg: 'hsl(0, 39%, 17%)',   color: 'hsl(0, 73%, 77%)'   },
-    empirical:   { bg: 'hsl(219, 30%, 17%)', color: 'hsl(200, 15%, 54%)' },
-    analogy:     { bg: 'hsl(280, 30%, 20%)', color: 'hsl(285, 47%, 74%)' },
-    root:        { bg: 'hsl(218, 76%, 21%)', color: 'hsl(207, 90%, 77%)' },
-    terminal:    { bg: 'hsl(47, 100%, 12%)', color: 'hsl(48, 100%, 50%)' },
-    attributive: { bg: 'hsl(210, 14%, 18%)', color: 'hsl(210, 14%, 62%)' },
-    inference:   { bg: 'hsl(232, 20%, 18%)', color: 'hsl(232, 22%, 64%)' },
+    default:     { bg: 'hsl(40, 16%, 91%)',  color: 'hsl(220, 10%, 40%)' },
+    pro:         { bg: 'hsl(131, 44%, 90%)', color: 'hsl(140, 46%, 28%)' },
+    anti:        { bg: 'hsl(2, 62%, 93%)',   color: 'hsl(2, 56%, 42%)'   },
+    empirical:   { bg: 'hsl(205, 38%, 92%)', color: 'hsl(205, 32%, 36%)' },
+    analogy:     { bg: 'hsl(280, 40%, 93%)', color: 'hsl(282, 38%, 42%)' },
+    root:        { bg: 'hsl(212, 80%, 92%)', color: 'hsl(212, 64%, 38%)' },
+    terminal:    { bg: 'hsl(45, 88%, 86%)',  color: 'hsl(34, 72%, 34%)'  },
+    attributive: { bg: 'hsl(210, 18%, 92%)', color: 'hsl(210, 14%, 38%)' },
+    inference:   { bg: 'hsl(230, 16%, 90%)', color: 'hsl(230, 14%, 40%)' },
+  },
+
+  // Focus-view pip fills (§4). Presence markers only — teal = supported,
+  // coral = contested. Shared token so both views read one source.
+  pip: {
+    supported: '#1D9E75',
+    contested: '#D85A30',
+  },
+
+  // For / Against column tint families (focus view). Green = For (concludes
+  // family), coral = Against (contests family). Column-derived, not content-.
+  column: {
+    for:     { tint: 'hsl(140, 46%, 40%)', bg: 'hsl(131, 46%, 96%)', border: 'hsl(131, 34%, 82%)', label: 'hsl(140, 46%, 32%)' },
+    against: { tint: 'hsl(2, 62%, 52%)',   bg: 'hsl(2, 66%, 97%)',   border: 'hsl(2, 52%, 86%)',   label: 'hsl(2, 56%, 44%)' },
   },
 } as const
 
@@ -159,6 +211,10 @@ export const VIEW = {
   zoomMax: 5,
   arrowSourcePad: 2,
   arrowTargetPad: 9,
+  // Focus-view "show in graph" return: centre the claim at this fixed zoom so
+  // just its one or two immediate neighbours frame it (vs the generic back
+  // button's wider reveal). Clamped to the zoom extent.
+  neighborhoodZoom: 2.0,
 } as const
 
 // ── Edge rendering ────────────────────────────────────────────────────────────

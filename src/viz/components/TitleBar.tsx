@@ -1,3 +1,4 @@
+import type { ReactNode } from 'react'
 import { COLORS, TITLE_BAR_HEIGHT } from '../../config'
 
 interface Props {
@@ -5,9 +6,11 @@ interface Props {
   subtitle?: string
   search?: string
   onSearch?: (value: string) => void
+  /** Right-aligned control (the graph⇄focus view toggle). */
+  viewToggle?: ReactNode
 }
 
-export function TitleBar({ title, subtitle, search, onSearch }: Props) {
+export function TitleBar({ title, subtitle, search, onSearch, viewToggle }: Props) {
   return (
     <div style={{
       position: 'fixed',
@@ -28,26 +31,28 @@ export function TitleBar({ title, subtitle, search, onSearch }: Props) {
       {subtitle && (
         <span style={{ fontSize: 11, color: COLORS.textDimmer }}>{subtitle}</span>
       )}
-      {onSearch && (
-        <input
-          value={search ?? ''}
-          onChange={e => onSearch(e.target.value)}
-          placeholder="Search claims…  (Esc to reset)"
-          spellCheck={false}
-          style={{
-            marginLeft: 'auto',
-            width: 260,
-            height: 26,
-            padding: '0 10px',
-            fontSize: 12,
-            color: COLORS.text,
-            background: COLORS.surface,
-            border: `1px solid ${COLORS.border}`,
-            borderRadius: 6,
-            outline: 'none',
-          }}
-        />
-      )}
+      <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
+        {viewToggle}
+        {onSearch && (
+          <input
+            value={search ?? ''}
+            onChange={e => onSearch(e.target.value)}
+            placeholder="Search claims…  (Esc to reset)"
+            spellCheck={false}
+            style={{
+              width: 260,
+              height: 26,
+              padding: '0 10px',
+              fontSize: 12,
+              color: COLORS.text,
+              background: COLORS.surface,
+              border: `1px solid ${COLORS.border}`,
+              borderRadius: 6,
+              outline: 'none',
+            }}
+          />
+        )}
+      </div>
     </div>
   )
 }

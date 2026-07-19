@@ -2,10 +2,10 @@
 # Source: discourse-spaces/gaza.yaml. Do not hand-edit claim texts; this migration is structural.
 #
 # 2026-07 enthymemification pass (contests-to-claims collapse):
-#   - i-e-confinement-attacks-mosul re-pointed from i-e-mosul-attacks-hamas-tactics
+#   - i-confinement-attacks-mosul re-pointed from i-mosul-attacks-hamas-tactics
 #     to the claim c-mosul-representativeness (pure re-point; warrant already existed).
 #   - c-consensus-tracks-legal-facts added as an explicit good-faith warrant, surfaced on
-#     i-e-scholarly-consensus-to-prop; i-e-antisemitism-undercuts-scholarly-authority
+#     i-scholarly-consensus-to-prop; i-antisemitism-undercuts-scholarly-authority
 #     re-pointed onto it. No contest now targets an inference (I8).
 id: gaza-genocide
 title: Is Israel's military campaign in Gaza genocide?
@@ -32,16 +32,16 @@ definitions:
       can overlap or morph into each other.
     importedFrom: null
 roots:
-  - prop-gaza-genocide
+  - c-gaza-campaign-is-genocide
 claims:
-  - id: prop-gaza-genocide
+  - id: c-gaza-campaign-is-genocide
     tag: Gaza genocide
     text: Israel's military campaign in Gaza constitutes genocide.
     terminal: false
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: t-group-existence-inviolable
+  - id: c-group-existence-inviolable
     tag: Group existence inviolable (terminal)
     text: >-
       Every distinct human group has an inviolable right to continued existence as a group, and acts
@@ -51,7 +51,7 @@ claims:
     cluster: Terminal
     uncertain: false
     submissionStatus: Accepted
-  - id: t-legal-precision-matters
+  - id: c-legal-precision-matters
     tag: Legal precision matters (terminal)
     text: >-
       Legal terms that carry grave moral weight must be applied with strict precision; promiscuous
@@ -60,7 +60,7 @@ claims:
     cluster: Terminal
     uncertain: false
     submissionStatus: Accepted
-  - id: t-self-defense-legitimate
+  - id: c-self-defense-legitimate
     tag: State self-defense legitimate (terminal)
     text: >-
       A state subjected to violent attack has a legitimate right to use military force to eliminate
@@ -70,7 +70,7 @@ claims:
     cluster: Terminal
     uncertain: false
     submissionStatus: Accepted
-  - id: t-intl-law-universal
+  - id: c-intl-law-universal
     tag: International law is universal (terminal)
     text: >-
       International humanitarian law and the Genocide Convention apply universally, without
@@ -88,7 +88,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-public-genocidal-statements
+  - id: c-netanyahu-amalek-and-rubble-statements
     tag: Public genocidal statements by leaders — grounds
     text: >-
       Bartov reports that Netanyahu invoked the biblical Amalek passage widely interpreted as
@@ -115,7 +115,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-pattern-of-ops-genocidal
+  - id: c-haaretz-174000-buildings-destroyed
     tag: Pattern of operations consistent with genocide — grounds
     text: >-
       Bartov reports that a Haaretz investigation found approximately 174,000 buildings destroyed or
@@ -142,7 +142,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-scholarly-consensus-genocide
+  - id: c-named-experts-concluded-genocide
     tag: Growing scholarly and legal consensus — grounds
     text: >-
       Bartov reports that experts including the UN Special Rapporteur Francesca Albanese, Amnesty
@@ -167,7 +167,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-denial-damages-intl-law
+  - id: c-convention-obliges-prevention-on-designation
     tag: Denial damages international legal order — grounds
     text: >-
       Bartov argues that the Genocide Convention was designed to obligate all signatory states to
@@ -191,12 +191,12 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-ethnic-cleansing-morphs-genocide
+  - id: c-herero-armenian-holocaust-began-as-expulsion
     tag: Ethnic cleansing morphing into genocide — grounds
     text: >-
-      Bartov cites historical precedents — the Herero and Nama genocide in German South West Africa
-      (1904), the Armenian genocide in World War I, and the Holocaust itself — all of which began as
-      expulsion campaigns before becoming genocidal extermination.
+      Bartov cites three cases in which expulsion campaigns became genocidal extermination once the
+      target population had no escape: the Herero and Nama in German South West Africa (1904), the
+      Armenians in World War I, and the Jews of Europe in the Holocaust.
     terminal: false
     attribution:
       source:
@@ -215,21 +215,6 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-death-toll-inconsistent-genocide
-    tag: Death toll inconsistent with genocidal intent — grounds
-    text: >-
-      Stephens notes that Israel is the leading military power of its region, has decimated
-      Hezbollah and humbled Iran, and could have produced vastly greater destruction than roughly
-      60,000 deaths in nearly two years of war if it had intended to exterminate Gazans.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Bret Stephens, New York Times, July 22 2025
-      quote: why hasn't it been more methodical and vastly more deadly?
-    cluster: Empirical
-    uncertain: false
-    submissionStatus: Accepted
   - id: c-protective-measures-inconsistent-genocide
     tag: Protective measures inconsistent with genocide
     text: >-
@@ -239,7 +224,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-protective-measures-inconsistent-genocide
+  - id: c-israel-warned-evacuations-and-risked-soldiers
     tag: Protective measures inconsistent with genocide — grounds
     text: >-
       Stephens reports that Israel routinely warned Gazans to evacuate areas before striking, risked
@@ -264,7 +249,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-as-such-intent-absent
+  - id: c-convention-requires-as-such-killing
     tag: "\"As such\" intent is absent — grounds"
     text: >-
       Stephens notes that the UN Genocide Convention's definition requires killing people "as such"
@@ -292,7 +277,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-hamas-tactics-explain-casualties
+  - id: c-hamas-shelters-fighters-exposes-civilians
     tag: Hamas tactics explain civilian casualties — grounds
     text: >-
       Stephens describes Hamas's practice of sheltering its fighters and command infrastructure in
@@ -320,7 +305,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-promiscuous-genocide-label-harmful
+  - id: c-genocide-term-coined-for-a-specific-crime
     tag: Promiscuous genocide label is harmful — grounds
     text: >-
       Stephens argues that "genocide" was coined only in the 1940s and has a specific meaning
@@ -347,7 +332,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-statements-evidence-intent
+  - id: c-law-permits-intent-inferred-from-statements
     tag: public statements evidence specific intent — grounds
     text: >-
       Genocide law, as Bartov notes, permits intent to be inferred from a pattern of statements and
@@ -373,7 +358,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-pattern-establishes-intent
+  - id: c-intent-derivable-from-operations-pattern
     tag: systematic destruction pattern establishes intent — grounds
     text: >-
       Bartov notes that genocidal intent can be derived from a pattern of operations when direct
@@ -398,7 +383,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-authority-genocide-scholars
+  - id: c-converging-scholars-are-genocide-specialists
     tag: genocide scholars are the relevant epistemic authority — grounds
     text: >-
       Bartov, citing his own quarter-century of teaching genocide, notes that most scholars now
@@ -435,7 +420,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-intl-law-obliges-designation
+  - id: c-convention-duties-contingent-on-designation
     tag: international law obliges states to name genocide to trigger prevention duties — grounds
     text: >-
       Bartov notes that the Convention obliges all signatories to prevent genocide while it is
@@ -459,24 +444,6 @@ claims:
     cluster: Analogy
     uncertain: false
     submissionStatus: Accepted
-  - id: g-morphing-precedent-established
-    tag: >-
-      historical precedent shows ethnic cleansing reliably morphs into genocide under confinement —
-      grounds
-    text: >-
-      Bartov cites three cases where expulsion campaigns became genocidal extermination when the
-      target population had no escape: the Herero and Nama (1904), the Armenians (World War I), and
-      the Jews of Europe (Holocaust), all of which began with attempts to force departure before
-      becoming extermination.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Omer Bartov, New York Times, 2025
-      quote: null
-    cluster: Empirical
-    uncertain: false
-    submissionStatus: Accepted
   - id: c-capacity-gap-reveals-intent
     tag: gap between capacity and action reveals intent
     text: >-
@@ -487,19 +454,18 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-capacity-gap-reveals-intent
-    tag: gap between capacity and action reveals intent — grounds
+  - id: c-israel-capacity-exceeds-deployment
+    tag: Capacity exceeds deployment
     text: >-
-      Stephens observes that Israel has the demonstrated military capacity to have produced far
-      higher casualties and far greater destruction than it has — it decimated Hezbollah and
-      degraded Iranian capability — making the relatively constrained (if devastating) scale of Gaza
-      operations inconsistent with a genocidal objective.
+      Stephens observes that Israel is the leading military power of its region — it decimated
+      Hezbollah and degraded Iranian capability — and could have produced far higher casualties and
+      far greater destruction than the roughly 60,000 deaths recorded in nearly two years of war.
     terminal: false
     attribution:
       source:
         type: Citation
         reference: Bret Stephens, New York Times, July 22 2025
-      quote: null
+      quote: why hasn't it been more methodical and vastly more deadly?
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
@@ -513,7 +479,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-warnings-incompatible-genocide
+  - id: c-warnings-create-tactical-disadvantage
     tag: systematic evacuation warnings are incompatible with intent to kill as such — grounds
     text: >-
       Stephens notes that Israel routinely issued advance warnings to civilians to evacuate areas
@@ -538,7 +504,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-legal-definition-as-such
+  - id: c-as-such-is-constitutive-not-rhetorical
     tag: the "as such" requirement distinguishes genocide from war crimes — grounds
     text: >-
       Stephens notes that the Convention's text specifies "as such" as a constitutive element, not
@@ -563,7 +529,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-proximate-cause-attribution
+  - id: c-tunnel-strategy-is-proximate-cause
     tag: proximate cause of civilian death determines moral responsibility — grounds
     text: >-
       Stephens argues that Hamas's tunnel strategy — sheltering combatants underground while
@@ -588,7 +554,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-term-inflation-undermines-law
+  - id: c-term-created-as-distinct-legal-category
     tag: inflation of a legal term destroys its deterrent and juridical function — grounds
     text: >-
       Stephens draws on the history of "genocide" as a term coined in the 1940s precisely to create
@@ -613,7 +579,7 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: g-incorrect-application-damages-convention
+  - id: c-both-sides-invoke-protective-purpose
     tag: >-
       incorrect application of genocide designation in either direction damages the Convention —
       grounds
@@ -640,7 +606,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-few-statements-vs-systematic-policy
+  - id: c-comments-are-not-a-wannsee-equivalent
     tag: Isolated statements vs. systematic policy — grounds
     text: >-
       Stephens acknowledges the statements made by Israeli officials but notes that furious comments
@@ -658,7 +624,7 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: g-infrastructure-destruction-beyond-military-necessity
+  - id: c-civilian-institutions-systematically-destroyed
     tag: Infrastructure destruction beyond military necessity — grounds
     text: >-
       Bartov reports systematic destruction not only of housing but of all institutions necessary
@@ -685,7 +651,7 @@ claims:
     cluster: Analogy
     uncertain: false
     submissionStatus: Accepted
-  - id: g-mosul-analogy
+  - id: c-mosul-campaign-11000-civilian-deaths
     tag: Mosul analogy — comparable tactics, no genocide charge — grounds
     text: >-
       Stephens cites the 2016–17 Mosul campaign, in which American airstrikes leveled entire blocks
@@ -711,7 +677,7 @@ claims:
     cluster: Analogy
     uncertain: false
     submissionStatus: Accepted
-  - id: g-mosul-representativeness
+  - id: c-isis-and-hamas-used-same-urban-strategy
     tag: Mosul analogy is structurally comparable to Gaza — grounds
     text: >-
       Stephens notes that ISIS, like Hamas, used a booby-trapped underground fortress strategy in a
@@ -735,7 +701,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-genocide-label-antisemitism-charge
+  - id: c-genocide-charge-among-bogus-delegitimising-charges
     tag: Genocide label serves antisemitic function — grounds
     text: >-
       Stephens argues the genocide charge is part of a pattern of "inflated or bogus charges"
@@ -760,7 +726,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-genocide-label-silences-critics
+  - id: c-genocide-scholars-accused-of-antisemitism
     tag: Antisemitism charge silences legitimate critique — grounds
     text: >-
       Bartov reports that genocide scholars who apply the designation to Gaza have been accused by
@@ -788,7 +754,7 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: g-intent-inferred-from-conduct
+  - id: c-icj-and-icty-inferred-intent-from-conduct
     tag: >-
       genocidal intent is legitimately inferred from conduct when no planning document exists —
       grounds
@@ -817,7 +783,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-confinement-transforms-cleansing
+  - id: c-sealed-borders-make-displacement-destruction
     tag: Confinement transforms expulsion into group destruction — grounds
     text: >-
       Bartov argues that Gaza's borders are sealed by Egypt and Israel, so displacement orders
@@ -843,7 +809,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-holocaust-memory-universalism
+  - id: c-holocaust-lesson-presented-as-universal
     tag: Holocaust memory carries a universal obligation, not ethnic-specific protection — grounds
     text: >-
       Bartov argues that Holocaust commemoration succeeded in finding a universal audience precisely
@@ -861,13 +827,25 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
+  - id: c-restraint-in-killing-not-restraint-in-destruction
+    tag: Restraint in killing is not restraint in destruction
+    text: >-
+      A state that deploys far less than its capacity to kill while deploying near its full capacity
+      to destroy housing, infrastructure, and civilian institutions has selected those targets
+      deliberately, and that selection is what a campaign against the conditions of group existence
+      looks like.
+    terminal: false
+    cluster: Pro
+    uncertain: false
+    submissionStatus: Accepted
+
 inferences:
   - id: i-public-genocidal-statements
     scheme: FromSign
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-public-genocidal-statements
+      - c-netanyahu-amalek-and-rubble-statements
     warrants:
       - c-statements-evidence-intent
     note: null
@@ -877,7 +855,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-pattern-of-ops-genocidal
+      - c-haaretz-174000-buildings-destroyed
     warrants:
       - c-pattern-establishes-intent
     note: null
@@ -887,7 +865,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-scholarly-consensus-genocide
+      - c-named-experts-concluded-genocide
     warrants:
       - c-authority-genocide-scholars
     note: null
@@ -897,7 +875,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-denial-damages-intl-law
+      - c-convention-obliges-prevention-on-designation
     warrants:
       - c-intl-law-obliges-designation
       - c-incorrect-application-damages-convention
@@ -908,7 +886,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-ethnic-cleansing-morphs-genocide
+      - c-herero-armenian-holocaust-began-as-expulsion
     warrants:
       - c-morphing-precedent-established
       - c-confinement-transforms-cleansing
@@ -919,7 +897,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-death-toll-inconsistent-genocide
+      - c-israel-capacity-exceeds-deployment
     warrants:
       - c-capacity-gap-reveals-intent
     note: null
@@ -929,7 +907,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-protective-measures-inconsistent-genocide
+      - c-israel-warned-evacuations-and-risked-soldiers
     warrants:
       - c-warnings-incompatible-genocide
     note: null
@@ -939,7 +917,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-as-such-intent-absent
+      - c-convention-requires-as-such-killing
     warrants:
       - c-legal-definition-as-such
     note: null
@@ -949,7 +927,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-hamas-tactics-explain-casualties
+      - c-hamas-shelters-fighters-exposes-civilians
     warrants:
       - c-proximate-cause-attribution
     note: null
@@ -959,7 +937,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-promiscuous-genocide-label-harmful
+      - c-genocide-term-coined-for-a-specific-crime
     warrants:
       - c-term-inflation-undermines-law
       - c-incorrect-application-damages-convention
@@ -970,7 +948,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-statements-evidence-intent
+      - c-law-permits-intent-inferred-from-statements
     warrants:
       - c-intent-inferred-from-conduct
     note: null
@@ -980,7 +958,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-pattern-establishes-intent
+      - c-intent-derivable-from-operations-pattern
     warrants:
       - c-intent-inferred-from-conduct
     note: null
@@ -990,7 +968,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-authority-genocide-scholars
+      - c-converging-scholars-are-genocide-specialists
     warrants: []
     note: null
     concludes: c-authority-genocide-scholars
@@ -999,7 +977,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-intl-law-obliges-designation
+      - c-convention-duties-contingent-on-designation
     warrants: []
     note: null
     concludes: c-intl-law-obliges-designation
@@ -1008,7 +986,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-morphing-precedent-established
+      - c-herero-armenian-holocaust-began-as-expulsion
     warrants: []
     note: null
     concludes: c-morphing-precedent-established
@@ -1017,7 +995,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-capacity-gap-reveals-intent
+      - c-israel-capacity-exceeds-deployment
     warrants: []
     note: null
     concludes: c-capacity-gap-reveals-intent
@@ -1026,7 +1004,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-warnings-incompatible-genocide
+      - c-warnings-create-tactical-disadvantage
     warrants: []
     note: null
     concludes: c-warnings-incompatible-genocide
@@ -1035,7 +1013,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-legal-definition-as-such
+      - c-as-such-is-constitutive-not-rhetorical
     warrants: []
     note: null
     concludes: c-legal-definition-as-such
@@ -1044,7 +1022,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-proximate-cause-attribution
+      - c-tunnel-strategy-is-proximate-cause
     warrants: []
     note: null
     concludes: c-proximate-cause-attribution
@@ -1053,7 +1031,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-term-inflation-undermines-law
+      - c-term-created-as-distinct-legal-category
     warrants: []
     note: null
     concludes: c-term-inflation-undermines-law
@@ -1062,7 +1040,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-incorrect-application-damages-convention
+      - c-both-sides-invoke-protective-purpose
     warrants: []
     note: null
     concludes: c-incorrect-application-damages-convention
@@ -1071,7 +1049,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-few-statements-vs-systematic-policy
+      - c-comments-are-not-a-wannsee-equivalent
     warrants: []
     note: null
     concludes: c-few-statements-vs-systematic-policy
@@ -1080,7 +1058,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-infrastructure-destruction-beyond-military-necessity
+      - c-civilian-institutions-systematically-destroyed
     warrants:
       - c-pattern-establishes-intent
     note: >-
@@ -1103,7 +1081,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-mosul-analogy
+      - c-mosul-campaign-11000-civilian-deaths
     warrants:
       - c-mosul-representativeness
     note: null
@@ -1113,7 +1091,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-mosul-representativeness
+      - c-isis-and-hamas-used-same-urban-strategy
     warrants: []
     note: null
     concludes: c-mosul-representativeness
@@ -1122,7 +1100,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-genocide-label-antisemitism-charge
+      - c-genocide-charge-among-bogus-delegitimising-charges
     warrants: []
     note: null
     concludes: c-genocide-label-antisemitism-charge
@@ -1131,7 +1109,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-genocide-label-silences-critics
+      - c-genocide-scholars-accused-of-antisemitism
     warrants: []
     note: null
     concludes: c-genocide-label-silences-critics
@@ -1140,7 +1118,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-intent-inferred-from-conduct
+      - c-icj-and-icty-inferred-intent-from-conduct
     warrants: []
     note: null
     concludes: c-intent-inferred-from-conduct
@@ -1149,7 +1127,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-confinement-transforms-cleansing
+      - c-sealed-borders-make-displacement-destruction
     warrants: []
     note: null
     concludes: c-confinement-transforms-cleansing
@@ -1158,54 +1136,54 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-holocaust-memory-universalism
+      - c-holocaust-lesson-presented-as-universal
     warrants: []
     note: null
     concludes: c-holocaust-memory-universalism
-  - id: i-e-public-statements-to-prop
+  - id: i-public-statements-to-prop
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
       - c-public-genocidal-statements
     warrants:
-      - t-group-existence-inviolable
+      - c-group-existence-inviolable
     note: null
-    concludes: prop-gaza-genocide
-  - id: i-e-pattern-to-prop
+    concludes: c-gaza-campaign-is-genocide
+  - id: i-pattern-to-prop
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
       - c-pattern-of-ops-genocidal
     warrants:
-      - t-group-existence-inviolable
+      - c-group-existence-inviolable
     note: null
-    concludes: prop-gaza-genocide
-  - id: i-e-scholarly-consensus-to-prop
+    concludes: c-gaza-campaign-is-genocide
+  - id: i-scholarly-consensus-to-prop
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
       - c-scholarly-consensus-genocide
     warrants:
-      - t-intl-law-universal
+      - c-intl-law-universal
       - c-consensus-tracks-legal-facts
     note: null
-    concludes: prop-gaza-genocide
-  - id: i-e-denial-damages-to-prop
+    concludes: c-gaza-campaign-is-genocide
+  - id: i-denial-damages-to-prop
     scheme: null
     uncertain: true
     submissionStatus: Accepted
     grounds:
       - c-denial-damages-intl-law
     warrants:
-      - t-intl-law-universal
+      - c-intl-law-universal
     note: >-
       Supporting the proposition indirectly — denial of the designation damages the legal order,
       which is itself a reason to apply it correctly here.
-    concludes: prop-gaza-genocide
-  - id: i-e-ethnic-cleansing-to-prop
+    concludes: c-gaza-campaign-is-genocide
+  - id: i-ethnic-cleansing-to-prop
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1213,8 +1191,8 @@ inferences:
       - c-ethnic-cleansing-morphs-genocide
     warrants: []
     note: null
-    concludes: prop-gaza-genocide
-  - id: i-e-death-toll-to-prop
+    concludes: c-gaza-campaign-is-genocide
+  - id: i-death-toll-to-prop
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1222,8 +1200,8 @@ inferences:
       - c-death-toll-inconsistent-genocide
     warrants: []
     note: null
-    contests: prop-gaza-genocide
-  - id: i-e-protective-measures-to-prop
+    contests: c-gaza-campaign-is-genocide
+  - id: i-protective-measures-to-prop
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1231,40 +1209,40 @@ inferences:
       - c-protective-measures-inconsistent-genocide
     warrants: []
     note: null
-    contests: prop-gaza-genocide
-  - id: i-e-as-such-to-prop
+    contests: c-gaza-campaign-is-genocide
+  - id: i-as-such-to-prop
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
       - c-as-such-intent-absent
     warrants:
-      - t-legal-precision-matters
+      - c-legal-precision-matters
     note: null
-    contests: prop-gaza-genocide
-  - id: i-e-hamas-tactics-to-prop
+    contests: c-gaza-campaign-is-genocide
+  - id: i-hamas-tactics-to-prop
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
       - c-hamas-tactics-explain-casualties
     warrants:
-      - t-self-defense-legitimate
+      - c-self-defense-legitimate
     note: null
-    contests: prop-gaza-genocide
-  - id: i-e-label-harmful-to-prop
+    contests: c-gaza-campaign-is-genocide
+  - id: i-label-harmful-to-prop
     scheme: null
     uncertain: true
     submissionStatus: Accepted
     grounds:
       - c-promiscuous-genocide-label-harmful
     warrants:
-      - t-legal-precision-matters
+      - c-legal-precision-matters
     note: >-
       Attacks the proposition by arguing the designation should not be applied here regardless of
       facts, because its promiscuous application is harmful.
-    contests: prop-gaza-genocide
-  - id: i-e-few-statements-attacks-w-statements-evidence
+    contests: c-gaza-campaign-is-genocide
+  - id: i-few-statements-attacks-statements-evidence
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1275,7 +1253,7 @@ inferences:
       Stephens concedes the statements were made; what he contests is the warrant that rhetorical
       statements in the heat of conflict constitute evidence of state policy intent.
     contests: c-statements-evidence-intent
-  - id: i-e-mosul-attacks-hamas-tactics
+  - id: i-mosul-attacks-hamas-tactics
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1286,7 +1264,7 @@ inferences:
       The Mosul analogy supports the claim that Hamas tactics are the explanatory variable, not
       Israeli intent, by showing a structurally similar case where no genocide charge was made.
     concludes: c-hamas-tactics-explain-casualties
-  - id: i-e-death-toll-attacks-pattern
+  - id: i-death-toll-attacks-pattern
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1297,7 +1275,7 @@ inferences:
       Both arguments read intent from scale; Stephens's counter is that the relevant scale is
       killing rate (too low for genocide), not infrastructure destruction rate.
     contests: c-pattern-of-ops-genocidal
-  - id: i-e-antisemitism-undercuts-scholarly-authority
+  - id: i-antisemitism-undercuts-scholarly-authority
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1306,7 +1284,7 @@ inferences:
     warrants: []
     note: null
     contests: c-consensus-tracks-legal-facts
-  - id: i-e-silences-critics-attacks-antisemitism-charge
+  - id: i-silences-critics-attacks-antisemitism-charge
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1315,7 +1293,7 @@ inferences:
     warrants: []
     note: null
     contests: c-genocide-label-antisemitism-charge
-  - id: i-e-confinement-attacks-mosul
+  - id: i-confinement-attacks-mosul
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1324,3 +1302,16 @@ inferences:
     warrants: []
     note: null
     contests: c-mosul-representativeness
+  - id: i-capacity-grounds-pattern-of-ops
+    scheme: FromSign
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-israel-capacity-exceeds-deployment
+    warrants:
+      - c-restraint-in-killing-not-restraint-in-destruction
+    note: >-
+      Bartov's route through the same capacity fact Stephens uses. It concedes the gap between
+      capacity and casualties and denies that the gap indexes intent, on the ground that the
+      destruction was directed at survival conditions rather than at maximising deaths.
+    concludes: c-pattern-of-ops-genocidal

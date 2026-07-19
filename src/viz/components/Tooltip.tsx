@@ -28,12 +28,12 @@ export function Tooltip({ node, x, y, nodeById }: Props) {
 
   const shell = {
     position: 'fixed' as const, left, top,
-    background: 'rgba(12, 14, 22, 0.97)',
+    background: COLORS.surface,
     border: `1px solid ${COLORS.border}`, borderRadius: 8, padding: '12px 16px',
     maxWidth: TOOLTIP_W, fontSize: 12, lineHeight: 1.5,
-    pointerEvents: 'none' as const, zIndex: 100, boxShadow: '0 4px 20px rgba(0,0,0,0.6)',
+    pointerEvents: 'none' as const, zIndex: 100, boxShadow: '0 6px 24px rgba(0,0,0,0.12)',
   }
-  const tagStyle = { fontSize: 10, fontWeight: 600 as const, textTransform: 'uppercase' as const, letterSpacing: '0.08em', color: '#666', marginBottom: 5 }
+  const tagStyle = { fontSize: 10, fontWeight: 600 as const, textTransform: 'uppercase' as const, letterSpacing: '0.08em', color: COLORS.textFaint, marginBottom: 5 }
   const chips = { display: 'flex', flexWrap: 'wrap' as const, gap: 6, marginTop: 8 }
 
   if (node._kind === 'inference') {
@@ -47,11 +47,11 @@ export function Tooltip({ node, x, y, nodeById }: Props) {
     return (
       <div style={shell}>
         <div style={tagStyle}>Inference</div>
-        <div style={{ color: '#ddd', marginBottom: 8, fontSize: 12.5 }}>
+        <div style={{ color: COLORS.text, marginBottom: 8, fontSize: 12.5 }}>
           {because}{given}.
         </div>
         {inf.note && (
-          <div style={{ color: '#aaa', fontSize: 11, marginBottom: 6, borderLeft: `2px solid ${COLORS.border}`, paddingLeft: 8 }}>
+          <div style={{ color: COLORS.textMuted, fontSize: 11, marginBottom: 6, borderLeft: `2px solid ${COLORS.border}`, paddingLeft: 8 }}>
             {inf.note}
           </div>
         )}
@@ -68,15 +68,15 @@ export function Tooltip({ node, x, y, nodeById }: Props) {
   return (
     <div style={shell}>
       <div style={tagStyle}>{claim.tag || (claim.id as unknown as string)}</div>
-      <div style={{ color: '#ddd', marginBottom: 8, fontSize: 12.5 }}>{claim.text}</div>
+      <div style={{ color: COLORS.text, marginBottom: 8, fontSize: 12.5 }}>{claim.text}</div>
       {claim.attribution && (
         <>
           {claim.attribution.quote && (
-            <div style={{ color: '#aaa', fontSize: 11, marginBottom: 4, borderLeft: `2px solid ${COLORS.border}`, paddingLeft: 8, fontStyle: 'italic' }}>
+            <div style={{ color: COLORS.textMuted, fontSize: 11, marginBottom: 4, borderLeft: `2px solid ${COLORS.border}`, paddingLeft: 8, fontStyle: 'italic' }}>
               “{claim.attribution.quote}”
             </div>
           )}
-          <div style={{ color: '#888', fontSize: 11, marginBottom: 4 }}>
+          <div style={{ color: COLORS.textFaint, fontSize: 11, marginBottom: 4 }}>
             {sourceLabel(claim.attribution.source as { type: string; reference?: string })}
           </div>
         </>

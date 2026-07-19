@@ -2,10 +2,10 @@
 # Source: discourse-spaces/free-transit.yaml. Do not hand-edit claim texts; this migration is structural.
 #
 # 2026-07 enthymemification pass (contests-to-claims collapse):
-#   - c-w-user-pays-applies-to-transit added as an explicit applicability warrant, surfaced on
-#     i-e-user-pays-attacks-root.
-#   - i-e-inconsistency-attacks-user-pays-policy re-pointed from the inference
-#     i-e-user-pays-attacks-root onto that claim. No contest now targets an inference (I8).
+#   - c-user-pays-applies-to-transit added as an explicit applicability warrant, surfaced on
+#     i-user-pays-attacks-root.
+#   - i-inconsistency-attacks-user-pays-policy re-pointed from the inference
+#     i-user-pays-attacks-root onto that claim. No contest now targets an inference (I8).
 id: free-transit
 title: Should fares be removed from public transit?
 definitions:
@@ -26,16 +26,16 @@ definitions:
       in proportion to their use.
     importedFrom: null
 roots:
-  - proposition-free-transit
+  - c-fares-should-be-removed
 claims:
-  - id: proposition-free-transit
+  - id: c-fares-should-be-removed
     tag: Fares should be removed
     text: Fares should be removed from public transit
     terminal: false
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: t-collective-obligation
+  - id: c-collective-obligation
     tag: Collective obligation (terminal)
     text: >-
       Society is collectively obligated to fund the conditions necessary for full civic and economic
@@ -44,7 +44,7 @@ claims:
     cluster: Terminal
     uncertain: false
     submissionStatus: Accepted
-  - id: t-user-pays-principle
+  - id: c-user-pays-principle
     tag: User pays as principle (terminal)
     text: Those who benefit from a service should bear its costs in proportion to their use
     terminal: true
@@ -58,7 +58,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-low-income-mobility-gains
+  - id: c-low-income-transit-spending-and-trip-rationing
     tag: Low income mobility gains — grounds
     text: >-
       Sustainable America and Dr. Destiny Thomas (Streetsblog, 2022) report that low-income people
@@ -79,7 +79,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-emissions-reduction
+  - id: c-private-vehicles-dominate-transport-emissions
     tag: Emissions reduction — grounds
     text: >-
       The Rapid Transition Alliance (2021) and World Resources Institute (2023) report that private
@@ -101,7 +101,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-congestion-reduction
+  - id: c-transit-trips-substitute-for-car-trips
     tag: Congestion reduction — grounds
     text: >-
       Increased transit ridership reduces the number of private vehicles on the road, as each
@@ -121,7 +121,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-labour-market-access
+  - id: c-transit-expands-job-access-range
     tag: Labour market access — grounds
     text: >-
       Broader transit use expands the geographic range of job opportunities accessible to workers
@@ -141,7 +141,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-boarding-speed
+  - id: c-boston-boarding-time-reduction
     tag: Boarding speed — grounds
     text: >-
       Streetsblog/Freakonomics (2022) reports Boston data showing a 6%+ reduction in boarding time
@@ -162,7 +162,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-collection-cost-not-justified
+  - id: c-kansas-city-recovery-and-collection-overhead
     tag: Collection cost not justified — grounds
     text: >-
       Streetsblog/Freakonomics (2022) and the Pacific Research Institute (2024) report that Kansas
@@ -184,7 +184,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-collective-benefit-justifies-funding
+  - id: c-transit-benefits-accrue-to-non-riders
     tag: Collective benefit justifies collective funding — grounds
     text: >-
       Reduced congestion, lower emissions, and broader labour market access benefit people who never
@@ -218,7 +218,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-service-degradation
+  - id: c-fare-revenue-share-of-infrastructure-cost
     tag: Service degradation from revenue loss — grounds
     text: >-
       TransitCenter, cited in the Pacific Research Institute (2024) and David Bragdon at the
@@ -242,7 +242,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-user-pays-as-policy
+  - id: c-rider-benefits-direct-non-rider-benefits-diffuse
     tag: User pays as policy — grounds
     text: >-
       Transit users receive direct, immediate benefits; non-users receive only diffuse spillovers
@@ -262,7 +262,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-targeted-subsidies-more-effective
+  - id: c-means-tested-passes-target-and-preserve-revenue
     tag: Targeted subsidies more effective — grounds
     text: >-
       Modeshift (2024) and Nicholas Bloom (Hunter College) report that means-tested programmes such
@@ -284,7 +284,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-ridership-increase
+  - id: c-cities-report-ridership-rise-after-fare-removal
     tag: Ridership increase — grounds
     text: >-
       Multiple cities including Boston, Kansas City, and Luxembourg have reported substantial
@@ -305,7 +305,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-racial-justice
+  - id: c-transit-dependence-skews-black-and-hispanic
     tag: Racial justice — grounds
     text: >-
       Dr. Destiny Thomas (Streetsblog, 2022) and Sustainable America report that Black and Hispanic
@@ -327,7 +327,7 @@ claims:
     cluster: Analogy
     uncertain: false
     submissionStatus: Accepted
-  - id: g-transit-utility-analogy
+  - id: c-utilities-provided-as-public-services
     tag: Transit as public utility analogy — grounds
     text: >-
       Water, electricity, and sanitation are provided as public services on the grounds that
@@ -349,11 +349,12 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-user-pays-applied-inconsistently
+  - id: c-roads-funded-below-full-cost-recovery
     tag: User pays applied inconsistently — grounds
     text: >-
       Gov1 and Planetizen (2025) report that road infrastructure is funded through general taxation
-      and fuel levies that fall well short of full-cost recovery.
+      and fuel levies that fall well short of full-cost recovery for road wear, congestion, and
+      pollution.
     terminal: false
     attribution:
       source:
@@ -370,12 +371,12 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-fare-removal-wont-reach-needy
+  - id: c-surveys-rank-reliability-above-fare-cost
     tag: Fare removal won't reach those who need it — grounds
     text: >-
-      TransitCenter rider surveys across income levels, cited in Sustainable America and the
-      Harvard/HKS debate, consistently rank reliability and frequency above fare cost as
-      determinants of transit use.
+      TransitCenter rider surveys across income levels and cities, cited in Sustainable America and
+      reported by David Bragdon at the Harvard/HKS debate, consistently find reliability and frequency
+      ranked above fare cost as determinants of transit use.
     terminal: false
     attribution:
       source:
@@ -392,7 +393,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-null-employment-effect
+  - id: c-king-county-rct-null-employment-result
     tag: Null employment effect — grounds
     text: >-
       A King County RCT reported in Rochester Beacon (2025) found no statistically significant
@@ -413,7 +414,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-universal-free-transit-regressive
+  - id: c-commuters-skew-middle-income-non-riders-pay-taxes
     tag: Universal free transit is regressive — grounds
     text: >-
       Nicholas Bloom (Hunter College), cited in Sustainable America, reports that transit commuters
@@ -434,7 +435,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-antisocial-behaviour-generalised
+  - id: c-multiple-cities-report-disorder-after-fare-removal
     tag: Antisocial behaviour (generalised) — grounds
     text: >-
       Transportation for America (2025) and The Daily Economy (2025) report that multiple
@@ -456,7 +457,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-high-farebox-recovery-viable
+  - id: c-toronto-hong-kong-high-recovery-with-ridership
     tag: High farebox recovery viable — grounds
     text: >-
       Streets.mn (2013) reports that Toronto requires 75% farebox recovery as a condition of
@@ -479,7 +480,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-ridership-gains-plateau
+  - id: c-gains-plateau-without-service-investment
     tag: Ridership gains plateau without service improvement — grounds
     text: >-
       Modeshift (2024) and Transportation for America (2025) report that cities which removed fares
@@ -500,7 +501,7 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: g-luxembourg-viability
+  - id: c-luxembourg-nationwide-free-transit-still-operating
     tag: Luxembourg operational viability — grounds
     text: >-
       Sustainable America (2023) reports that Luxembourg implemented nationwide free transit in 2020
@@ -521,7 +522,7 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: g-kansas-city-ridership
+  - id: c-kansas-city-sustained-growth-no-collapse
     tag: Kansas City ridership — grounds
     text: >-
       Modeshift (2024) and Streetsblog (2022) report that Kansas City went fare-free and reported
@@ -542,7 +543,7 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: g-boston-ridership-gains
+  - id: c-boston-routes-35-percent-growth
     tag: Boston ridership gains — grounds
     text: >-
       Modeshift (2024) reports Boston fare-free routes saw 35% ridership growth versus 15%
@@ -563,7 +564,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-many-examples-successful-implementation
+  - id: c-over-100-cities-implemented-fare-free
     tag: Many examples of successful implementation — grounds
     text: >-
       Luxembourg, Kansas City, Boston and over 100 cities globally have implemented fare-free
@@ -584,7 +585,7 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: g-antisocial-behaviour-local
+  - id: c-vandalism-theft-and-shelter-use-reported
     tag: Antisocial behaviour (local reports) — grounds
     text: >-
       Transportation for America (2025) and The Daily Economy (2025) report that some fare-free
@@ -606,7 +607,7 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: g-user-composition-shift
+  - id: c-disorder-reports-indicate-user-type-shift
     tag: User composition shift — grounds
     text: >-
       Transportation for America (2025) and The Daily Economy (2025) report increased vagrancy and
@@ -628,21 +629,6 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-service-quality-over-fare
-    tag: Service quality over fare cost — grounds
-    text: >-
-      David Bragdon (TransitCenter) at the Harvard/HKS debate reports that TransitCenter has
-      conducted systematic rider surveys across income levels and cities consistently finding
-      reliability and frequency ranked above fare price.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: David Bragdon (TransitCenter), Harvard/HKS debate
-      quote: null
-    cluster: Empirical
-    uncertain: false
-    submissionStatus: Accepted
   - id: c-rct-warrant-defence
     tag: RCT warrant defence
     text: The King County RCT is the best available evidence on employment outcomes
@@ -650,7 +636,7 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: g-rct-warrant-defence
+  - id: c-king-county-only-rct-and-rcts-isolate-cause
     tag: RCT warrant defence — grounds
     text: >-
       Rochester Beacon (2025) reports that the King County study is the only known RCT on this
@@ -673,21 +659,6 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: g-driving-underpriced
-    tag: Driving underpriced (road costs socialised) — grounds
-    text: >-
-      Gov1 and Planetizen (2025) report that road infrastructure is funded through general taxation
-      and fuel levies that fall well short of full-cost recovery for road wear, congestion, and
-      pollution.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Gov1; Planetizen (2025)
-      quote: null
-    cluster: Empirical
-    uncertain: false
-    submissionStatus: Accepted
   - id: c-utility-analogy-fails
     tag: Public utility analogy fails
     text: The public utility analogy for transit is unsound
@@ -695,7 +666,7 @@ claims:
     cluster: Analogy
     uncertain: false
     submissionStatus: Accepted
-  - id: g-utility-analogy-fails
+  - id: c-transit-has-private-substitutes-utilities-do-not
     tag: Public utility analogy fails — grounds
     text: >-
       Water and sanitation have no private substitutes; transit competes directly with cars, taxis,
@@ -708,7 +679,7 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-fare-cost-binding-constraint
+  - id: c-fare-cost-binding-constraint
     tag: Warrant — fare cost is binding constraint
     text: >-
       Fare cost is the binding constraint on low-income trip rationing, so removing it relieves that
@@ -717,7 +688,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-marginal-mobility-improvement
+  - id: c-marginal-mobility-improvement
     tag: Warrant — marginal mobility improvement
     text: >-
       Even where fare cost is not the sole constraint, removing it improves mobility at the margin
@@ -726,7 +697,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-trip-rationing-representative
+  - id: c-trip-rationing-representative
     tag: Warrant — trip rationing representative
     text: >-
       The pattern of fare-induced trip rationing reported by Sustainable America is representative
@@ -735,7 +706,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: g-w-trip-rationing-representative
+  - id: c-sustainable-america-methodology-coverage
     tag: Warrant — trip rationing representative — grounds
     text: >-
       Sustainable America's methodology covers multiple cities and income groups, making its
@@ -749,7 +720,7 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-boston-representativeness
+  - id: c-boston-representativeness
     tag: Warrant — Boston representativeness
     text: >-
       Boston's experience is representative enough of other transit contexts to support a general
@@ -758,7 +729,7 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: g-w-boston-representativeness
+  - id: c-boston-network-comparable-to-peers
     tag: Warrant — Boston representativeness — grounds
     text: >-
       Boston's network size, density, and modal mix are comparable to many other mid-to-large
@@ -771,7 +742,7 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-modal-shift-emissions
+  - id: c-modal-shift-emissions
     tag: Warrant — modal shift produces emissions reduction
     text: >-
       A ridership increase large enough to shift modal share away from private cars would produce
@@ -780,7 +751,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-modal-shift-congestion
+  - id: c-modal-shift-congestion
     tag: Warrant — modal shift reduces congestion
     text: >-
       Modal shift from cars to transit at sufficient scale produces measurable congestion reduction
@@ -789,7 +760,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-reduced-cost-expands-catchment
+  - id: c-reduced-cost-expands-catchment
     tag: Warrant — reduced cost expands labour market catchment
     text: >-
       Reduced travel cost and increased network use expands the effective labour market catchment
@@ -798,7 +769,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-fare-payment-dwell-time
+  - id: c-fare-payment-dwell-time
     tag: Warrant — fare payment causes dwell time
     text: >-
       Fare payment at boarding is a direct cause of dwell time; removing it reduces dwell time
@@ -807,7 +778,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-low-recovery-overhead
+  - id: c-low-recovery-overhead
     tag: Warrant — low recovery makes overhead disproportionate
     text: >-
       Where recovery rates are very low, the overhead of collection consumes a substantial fraction
@@ -816,7 +787,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-non-user-benefits-justify-collective
+  - id: c-non-user-benefits-justify-collective
     tag: Warrant — non-user benefits justify collective funding
     text: >-
       Benefits that accrue to non-users as well as users justify cost distribution across the whole
@@ -825,7 +796,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-systematic-burden-removal-redistributive
+  - id: c-systematic-burden-removal-redistributive
     tag: Warrant — systematic burden removal is redistributive
     text: >-
       When a cost burden falls systematically on already-disadvantaged groups, removing it is a
@@ -834,7 +805,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-transit-prerequisite-participation
+  - id: c-transit-prerequisite-participation
     tag: Warrant — transit is prerequisite for participation
     text: >-
       Transit access is a prerequisite for participation in economic and social life, and such
@@ -843,7 +814,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-revenue-dependency-representative
+  - id: c-revenue-dependency-representative
     tag: Warrant — revenue dependency representative
     text: >-
       Cities with high fare revenue dependency are representative of large transit systems
@@ -852,7 +823,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-transitcenter-methodology-reliable
+  - id: c-transitcenter-methodology-reliable
     tag: Warrant — TransitCenter methodology reliable
     text: >-
       TransitCenter's research methodology and independence make its survey findings reliable
@@ -861,7 +832,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: g-w-transitcenter-methodology-reliable
+  - id: c-transitcenter-independent-and-peer-reviewed
     tag: Warrant — TransitCenter methodology reliable — grounds
     text: >-
       TransitCenter is an independent research organisation with a track record of peer-reviewed
@@ -874,7 +845,7 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-fare-not-employment-constraint
+  - id: c-fare-not-employment-constraint
     tag: Warrant — fare not employment constraint
     text: >-
       Removing the fare barrier does not address the other factors constraining employment — job
@@ -883,7 +854,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-concentrated-benefits-bear-costs
+  - id: c-concentrated-benefits-bear-costs
     tag: Warrant — concentrated benefits justify bearing costs
     text: >-
       Those who receive concentrated benefits from a service should bear its costs proportionally;
@@ -892,7 +863,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-middle-income-transfer-regressive
+  - id: c-middle-income-transfer-regressive
     tag: Warrant — middle income transfer is regressive
     text: >-
       A subsidy transferring resources from the general tax base to middle-income commuters moves
@@ -902,7 +873,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-regressivity-quantitative-claim
+  - id: c-regressivity-quantitative-claim
     tag: Warrant — regressivity requires quantitative support
     text: >-
       The regressivity argument requires that the tax incidence on low-income non-riders be
@@ -911,7 +882,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-local-reports-representative
+  - id: c-local-reports-representative
     tag: Warrant — local antisocial reports representative
     text: >-
       Local reports of antisocial behaviour following fare elimination are representative of a
@@ -920,7 +891,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-universal-wastes-targeting-concentrates
+  - id: c-universal-wastes-targeting-concentrates
     tag: Warrant — universal wastes, targeting concentrates
     text: >-
       Universal provision wastes resources on those who do not need the subsidy; targeting
@@ -929,7 +900,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-luxembourg-representative
+  - id: c-luxembourg-representative
     tag: Warrant — Luxembourg representative
     text: >-
       Luxembourg's operational experience is sufficiently similar to other national contexts to
@@ -938,14 +909,14 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-kansas-city-representative
+  - id: c-kansas-city-representative
     tag: Warrant — Kansas City representative
     text: Kansas City is representative of mid-sized U.S. transit contexts
     terminal: false
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-unaddressed-barriers-reassert
+  - id: c-unaddressed-barriers-reassert
     tag: Warrant — unaddressed barriers reassert
     text: >-
       Fare removal addresses only one barrier to transit use; unaddressed barriers reassert
@@ -954,7 +925,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-essentiality-criteria-same
+  - id: c-essentiality-criteria-same
     tag: Warrant — transit meets essentiality criteria
     text: >-
       If transit meets the same criteria of essentiality as acknowledged public utilities it
@@ -963,7 +934,7 @@ claims:
     cluster: Analogy
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-private-substitutes-disanalogy
+  - id: c-private-substitutes-disanalogy
     tag: Warrant — private substitutes are relevant disanalogy
     text: >-
       The existence of private substitutes for transit is a relevant disanalogy that undermines the
@@ -972,7 +943,7 @@ claims:
     cluster: Analogy
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-toronto-hongkong-not-exceptional
+  - id: c-toronto-hongkong-not-exceptional
     tag: Warrant — Toronto and Hong Kong not exceptional
     text: >-
       Toronto and Hong Kong are not so exceptional that their fare recovery experience is irrelevant
@@ -981,7 +952,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-problem-character-signals-composition
+  - id: c-problem-character-signals-composition
     tag: Warrant — problem character signals composition change
     text: >-
       A change in the character of system problems, not just their scale, is a reliable sign of a
@@ -990,7 +961,7 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-rct-methodological-superiority
+  - id: c-rct-methodological-superiority
     tag: Warrant — RCT methodological superiority
     text: >-
       The methodological superiority of the RCT design makes its null finding on employment the best
@@ -999,14 +970,14 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-selective-application-requires-justification
+  - id: c-selective-application-requires-justification
     tag: Warrant — selective user-pays application requires justification
     text: Applying user-pays to transit but not roads requires justification that has not been provided
     terminal: false
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-user-pays-applies-to-transit
+  - id: c-user-pays-applies-to-transit
     tag: Warrant — user-pays legitimately applies to transit
     text: >-
       The user-pays principle is applied consistently across comparable public services, so it
@@ -1015,7 +986,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-consistent-outcome-indicates-pattern
+  - id: c-consistent-outcome-indicates-pattern
     tag: Warrant — consistent outcome indicates general pattern
     text: >-
       Consistency of outcome across independent cases indicates a general pattern rather than
@@ -1024,7 +995,7 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-diverse-success-establishes-viability
+  - id: c-diverse-success-establishes-viability
     tag: Warrant — diverse success establishes viability
     text: >-
       Consistent success across diverse contexts establishes that fare-free transit is not merely
@@ -1033,7 +1004,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-fare-elimination-causes-ridership
+  - id: c-fare-elimination-causes-ridership
     tag: Warrant — fare elimination causes ridership increase
     text: >-
       Removing a direct cost barrier to transit use causes an increase in ridership among
@@ -1042,7 +1013,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-ridership-increase-causes-modal-shift
+  - id: c-ridership-increase-causes-modal-shift
     tag: Warrant — ridership increase causes modal shift
     text: >-
       A sufficiently large ridership increase produces modal shift from private cars, since new
@@ -1051,7 +1022,7 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: c-w-fare-free-meets-justice-definition
+  - id: c-fare-free-meets-justice-definition
     tag: Warrant — fare-free meets justice definition
     text: >-
       A policy that removes a systematically inequitable burden and expands access to civic
@@ -1060,17 +1031,27 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
+  - id: c-ridership-raises-cost-without-revenue
+    tag: Ridership raises cost without revenue
+    text: >-
+      Carrying additional riders raises operating cost, and fare removal eliminates the revenue
+      stream that would otherwise fund the additional service that volume requires.
+    terminal: false
+    cluster: Anti
+    uncertain: false
+    submissionStatus: Accepted
+
 inferences:
   - id: i-low-income-mobility-gains
     scheme: FromExample
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-low-income-mobility-gains
+      - c-low-income-transit-spending-and-trip-rationing
     warrants:
-      - c-w-fare-cost-binding-constraint
-      - c-w-marginal-mobility-improvement
-      - c-w-trip-rationing-representative
+      - c-fare-cost-binding-constraint
+      - c-marginal-mobility-improvement
+      - c-trip-rationing-representative
     note: null
     concludes: c-low-income-mobility-gains
   - id: i-emissions-reduction
@@ -1078,10 +1059,10 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-emissions-reduction
+      - c-private-vehicles-dominate-transport-emissions
     warrants:
-      - c-w-modal-shift-emissions
-      - c-w-ridership-increase-causes-modal-shift
+      - c-modal-shift-emissions
+      - c-ridership-increase-causes-modal-shift
       - c-ridership-increase
     note: null
     concludes: c-emissions-reduction
@@ -1090,9 +1071,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-congestion-reduction
+      - c-transit-trips-substitute-for-car-trips
     warrants:
-      - c-w-modal-shift-congestion
+      - c-modal-shift-congestion
       - c-ridership-increase
     note: null
     concludes: c-congestion-reduction
@@ -1101,9 +1082,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-labour-market-access
+      - c-transit-expands-job-access-range
     warrants:
-      - c-w-reduced-cost-expands-catchment
+      - c-reduced-cost-expands-catchment
       - c-ridership-increase
     note: null
     concludes: c-labour-market-access
@@ -1112,9 +1093,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-boarding-speed
+      - c-boston-boarding-time-reduction
     warrants:
-      - c-w-fare-payment-dwell-time
+      - c-fare-payment-dwell-time
     note: null
     concludes: c-boarding-speed
   - id: i-collection-cost-not-justified
@@ -1122,9 +1103,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-collection-cost-not-justified
+      - c-kansas-city-recovery-and-collection-overhead
     warrants:
-      - c-w-low-recovery-overhead
+      - c-low-recovery-overhead
     note: null
     concludes: c-collection-cost-not-justified
   - id: i-collective-benefit-justifies-funding
@@ -1132,9 +1113,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-collective-benefit-justifies-funding
+      - c-transit-benefits-accrue-to-non-riders
     warrants:
-      - c-w-non-user-benefits-justify-collective
+      - c-non-user-benefits-justify-collective
     note: null
     concludes: c-collective-benefit-justifies-funding
   - id: i-service-degradation
@@ -1142,9 +1123,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-service-degradation
+      - c-fare-revenue-share-of-infrastructure-cost
     warrants:
-      - c-w-revenue-dependency-representative
+      - c-revenue-dependency-representative
     note: null
     concludes: c-service-degradation
   - id: i-user-pays-as-policy
@@ -1152,9 +1133,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-user-pays-as-policy
+      - c-rider-benefits-direct-non-rider-benefits-diffuse
     warrants:
-      - c-w-concentrated-benefits-bear-costs
+      - c-concentrated-benefits-bear-costs
     note: null
     concludes: c-user-pays-as-policy
   - id: i-targeted-subsidies-more-effective
@@ -1162,9 +1143,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-targeted-subsidies-more-effective
+      - c-means-tested-passes-target-and-preserve-revenue
     warrants:
-      - c-w-universal-wastes-targeting-concentrates
+      - c-universal-wastes-targeting-concentrates
     note: null
     concludes: c-targeted-subsidies-more-effective
   - id: i-ridership-increase
@@ -1172,9 +1153,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-ridership-increase
+      - c-cities-report-ridership-rise-after-fare-removal
     warrants:
-      - c-w-fare-elimination-causes-ridership
+      - c-fare-elimination-causes-ridership
     note: null
     concludes: c-ridership-increase
   - id: i-racial-justice
@@ -1182,9 +1163,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-racial-justice
+      - c-transit-dependence-skews-black-and-hispanic
     warrants:
-      - c-w-systematic-burden-removal-redistributive
+      - c-systematic-burden-removal-redistributive
     note: null
     concludes: c-racial-justice
   - id: i-transit-utility-analogy
@@ -1192,9 +1173,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-transit-utility-analogy
+      - c-utilities-provided-as-public-services
     warrants:
-      - c-w-essentiality-criteria-same
+      - c-essentiality-criteria-same
     note: null
     concludes: c-transit-utility-analogy
   - id: i-user-pays-applied-inconsistently
@@ -1202,9 +1183,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-user-pays-applied-inconsistently
+      - c-roads-funded-below-full-cost-recovery
     warrants:
-      - c-w-selective-application-requires-justification
+      - c-selective-application-requires-justification
     note: null
     concludes: c-user-pays-applied-inconsistently
   - id: i-fare-removal-wont-reach-needy
@@ -1212,9 +1193,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-fare-removal-wont-reach-needy
+      - c-surveys-rank-reliability-above-fare-cost
     warrants:
-      - c-w-transitcenter-methodology-reliable
+      - c-transitcenter-methodology-reliable
     note: null
     concludes: c-fare-removal-wont-reach-needy
   - id: i-null-employment-effect
@@ -1222,9 +1203,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-null-employment-effect
+      - c-king-county-rct-null-employment-result
     warrants:
-      - c-w-fare-not-employment-constraint
+      - c-fare-not-employment-constraint
     note: null
     concludes: c-null-employment-effect
   - id: i-universal-free-transit-regressive
@@ -1232,10 +1213,10 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-universal-free-transit-regressive
+      - c-commuters-skew-middle-income-non-riders-pay-taxes
     warrants:
-      - c-w-middle-income-transfer-regressive
-      - c-w-regressivity-quantitative-claim
+      - c-middle-income-transfer-regressive
+      - c-regressivity-quantitative-claim
     note: null
     concludes: c-universal-free-transit-regressive
   - id: i-antisocial-behaviour-generalised
@@ -1243,9 +1224,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-antisocial-behaviour-generalised
+      - c-multiple-cities-report-disorder-after-fare-removal
     warrants:
-      - c-w-consistent-outcome-indicates-pattern
+      - c-consistent-outcome-indicates-pattern
     note: null
     concludes: c-antisocial-behaviour-generalised
   - id: i-high-farebox-recovery-viable
@@ -1253,9 +1234,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-high-farebox-recovery-viable
+      - c-toronto-hong-kong-high-recovery-with-ridership
     warrants:
-      - c-w-toronto-hongkong-not-exceptional
+      - c-toronto-hongkong-not-exceptional
     note: null
     concludes: c-high-farebox-recovery-viable
   - id: i-ridership-gains-plateau
@@ -1263,9 +1244,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-ridership-gains-plateau
+      - c-gains-plateau-without-service-investment
     warrants:
-      - c-w-unaddressed-barriers-reassert
+      - c-unaddressed-barriers-reassert
     note: null
     concludes: c-ridership-gains-plateau
   - id: i-luxembourg-viability
@@ -1273,7 +1254,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-luxembourg-viability
+      - c-luxembourg-nationwide-free-transit-still-operating
     warrants: []
     note: null
     concludes: c-luxembourg-viability
@@ -1282,7 +1263,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-kansas-city-ridership
+      - c-kansas-city-sustained-growth-no-collapse
     warrants: []
     note: null
     concludes: c-kansas-city-ridership
@@ -1291,7 +1272,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-boston-ridership-gains
+      - c-boston-routes-35-percent-growth
     warrants: []
     note: null
     concludes: c-boston-ridership-gains
@@ -1300,9 +1281,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-many-examples-successful-implementation
+      - c-over-100-cities-implemented-fare-free
     warrants:
-      - c-w-diverse-success-establishes-viability
+      - c-diverse-success-establishes-viability
     note: null
     concludes: c-many-examples-successful-implementation
   - id: i-antisocial-behaviour-local
@@ -1310,9 +1291,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-antisocial-behaviour-local
+      - c-vandalism-theft-and-shelter-use-reported
     warrants:
-      - c-w-local-reports-representative
+      - c-local-reports-representative
     note: null
     concludes: c-antisocial-behaviour-local
   - id: i-user-composition-shift
@@ -1320,9 +1301,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-user-composition-shift
+      - c-disorder-reports-indicate-user-type-shift
     warrants:
-      - c-w-problem-character-signals-composition
+      - c-problem-character-signals-composition
     note: null
     concludes: c-user-composition-shift
   - id: i-service-quality-over-fare
@@ -1330,7 +1311,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-service-quality-over-fare
+      - c-surveys-rank-reliability-above-fare-cost
     warrants: []
     note: null
     concludes: c-service-quality-over-fare
@@ -1339,9 +1320,9 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-rct-warrant-defence
+      - c-king-county-only-rct-and-rcts-isolate-cause
     warrants:
-      - c-w-rct-methodological-superiority
+      - c-rct-methodological-superiority
     note: null
     concludes: c-rct-warrant-defence
   - id: i-driving-underpriced
@@ -1349,7 +1330,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-driving-underpriced
+      - c-roads-funded-below-full-cost-recovery
     warrants: []
     note: null
     concludes: c-driving-underpriced
@@ -1358,39 +1339,39 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-utility-analogy-fails
+      - c-transit-has-private-substitutes-utilities-do-not
     warrants:
-      - c-w-private-substitutes-disanalogy
+      - c-private-substitutes-disanalogy
     note: null
     concludes: c-utility-analogy-fails
-  - id: i-w-trip-rationing-representative
+  - id: i-trip-rationing-representative
     scheme: FromGeneralization
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-w-trip-rationing-representative
+      - c-sustainable-america-methodology-coverage
     warrants: []
     note: null
-    concludes: c-w-trip-rationing-representative
-  - id: i-w-boston-representativeness
+    concludes: c-trip-rationing-representative
+  - id: i-boston-representativeness
     scheme: FromAnalogy
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-w-boston-representativeness
+      - c-boston-network-comparable-to-peers
     warrants: []
     note: null
-    concludes: c-w-boston-representativeness
-  - id: i-w-transitcenter-methodology-reliable
+    concludes: c-boston-representativeness
+  - id: i-transitcenter-methodology-reliable
     scheme: FromAuthority
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - g-w-transitcenter-methodology-reliable
+      - c-transitcenter-independent-and-peer-reviewed
     warrants: []
     note: null
-    concludes: c-w-transitcenter-methodology-reliable
-  - id: i-e-low-income-supports-root
+    concludes: c-transitcenter-methodology-reliable
+  - id: i-low-income-supports-root
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1398,8 +1379,8 @@ inferences:
       - c-low-income-mobility-gains
     warrants: []
     note: Improving low-income mobility is an intrinsic reason to remove fares
-    concludes: proposition-free-transit
-  - id: i-e-emissions-supports-root
+    concludes: c-fares-should-be-removed
+  - id: i-emissions-supports-root
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1407,8 +1388,8 @@ inferences:
       - c-emissions-reduction
     warrants: []
     note: Emissions reduction is an intrinsic environmental reason to remove fares
-    concludes: proposition-free-transit
-  - id: i-e-congestion-supports-root
+    concludes: c-fares-should-be-removed
+  - id: i-congestion-supports-root
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1416,8 +1397,8 @@ inferences:
       - c-congestion-reduction
     warrants: []
     note: Congestion reduction benefits all road users and is an intrinsic reason to remove fares
-    concludes: proposition-free-transit
-  - id: i-e-labour-supports-root
+    concludes: c-fares-should-be-removed
+  - id: i-labour-supports-root
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1425,8 +1406,8 @@ inferences:
       - c-labour-market-access
     warrants: []
     note: Labour market access is an intrinsic economic reason to remove fares
-    concludes: proposition-free-transit
-  - id: i-e-boarding-supports-root
+    concludes: c-fares-should-be-removed
+  - id: i-boarding-supports-root
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1434,8 +1415,8 @@ inferences:
       - c-boarding-speed
     warrants: []
     note: Faster boarding is a direct operational benefit of fare removal
-    concludes: proposition-free-transit
-  - id: i-e-collection-cost-supports-root
+    concludes: c-fares-should-be-removed
+  - id: i-collection-cost-supports-root
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1443,8 +1424,8 @@ inferences:
       - c-collection-cost-not-justified
     warrants: []
     note: Unjustified collection costs are an economic reason to remove fares
-    concludes: proposition-free-transit
-  - id: i-e-collective-benefit-supports-root
+    concludes: c-fares-should-be-removed
+  - id: i-collective-benefit-supports-root
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1452,50 +1433,50 @@ inferences:
       - c-collective-benefit-justifies-funding
     warrants: []
     note: Collective benefit justifies collective funding as an intrinsic reason
-    concludes: proposition-free-transit
-  - id: i-e-access-supports-root
+    concludes: c-fares-should-be-removed
+  - id: i-access-supports-root
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
       - c-access-as-right
     warrants:
-      - c-w-transit-prerequisite-participation
-      - t-collective-obligation
+      - c-transit-prerequisite-participation
+      - c-collective-obligation
     note: Access as right is an intrinsic normative reason to remove fares
-    concludes: proposition-free-transit
-  - id: i-e-just-supports-root
+    concludes: c-fares-should-be-removed
+  - id: i-just-supports-root
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
       - c-fare-free-transit-is-just
     warrants:
-      - c-w-fare-free-meets-justice-definition
+      - c-fare-free-meets-justice-definition
     note: Justice is an intrinsic normative reason to remove fares
-    concludes: proposition-free-transit
-  - id: i-e-service-degradation-attacks-root
+    concludes: c-fares-should-be-removed
+  - id: i-service-degradation-attacks-root
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
       - c-service-degradation
     warrants:
-      - t-user-pays-principle
+      - c-user-pays-principle
     note: Service degradation from revenue loss is a direct reason not to remove fares
-    contests: proposition-free-transit
-  - id: i-e-user-pays-attacks-root
+    contests: c-fares-should-be-removed
+  - id: i-user-pays-attacks-root
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
       - c-user-pays-as-policy
     warrants:
-      - t-user-pays-principle
-      - c-w-user-pays-applies-to-transit
+      - c-user-pays-principle
+      - c-user-pays-applies-to-transit
     note: User pays as policy is a direct normative reason not to remove fares
-    contests: proposition-free-transit
-  - id: i-e-targeted-subsidies-attacks-root
+    contests: c-fares-should-be-removed
+  - id: i-targeted-subsidies-attacks-root
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1503,8 +1484,8 @@ inferences:
       - c-targeted-subsidies-more-effective
     warrants: []
     note: Better alternatives exist — targeted subsidies are more effective than universal removal
-    contests: proposition-free-transit
-  - id: i-e-racial-justice-supports-low-income
+    contests: c-fares-should-be-removed
+  - id: i-racial-justice-supports-low-income
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1513,7 +1494,7 @@ inferences:
     warrants: []
     note: Racial justice elaborates why low-income mobility gains matter
     concludes: c-low-income-mobility-gains
-  - id: i-e-racial-justice-supports-just
+  - id: i-racial-justice-supports-just
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1522,7 +1503,7 @@ inferences:
     warrants: []
     note: Racial justice provides a redistributive grounding for the justice claim
     concludes: c-fare-free-transit-is-just
-  - id: i-e-utility-analogy-supports-collective
+  - id: i-utility-analogy-supports-collective
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1531,7 +1512,7 @@ inferences:
     warrants: []
     note: The utility analogy provides analogical support for collective funding
     concludes: c-collective-benefit-justifies-funding
-  - id: i-e-driving-supports-inconsistency
+  - id: i-driving-supports-inconsistency
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1540,7 +1521,7 @@ inferences:
     warrants: []
     note: Road cost socialisation is the concrete evidence for selective application
     concludes: c-user-pays-applied-inconsistently
-  - id: i-e-service-quality-supports-wont-reach
+  - id: i-service-quality-supports-wont-reach
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1549,7 +1530,7 @@ inferences:
     warrants: []
     note: Survey evidence that service quality matters more than fare supports the won't reach claim
     concludes: c-fare-removal-wont-reach-needy
-  - id: i-e-rct-defence-supports-null-employment
+  - id: i-rct-defence-supports-null-employment
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1558,7 +1539,7 @@ inferences:
     warrants: []
     note: RCT methodology superiority supports treating the null finding as the best evidence
     concludes: c-null-employment-effect
-  - id: i-e-regressivity-attacks-just
+  - id: i-regressivity-attacks-just
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1567,7 +1548,7 @@ inferences:
     warrants: []
     note: Regressivity directly contests the justice claim
     contests: c-fare-free-transit-is-just
-  - id: i-e-antisocial-local-supports-generalised
+  - id: i-antisocial-local-supports-generalised
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1576,7 +1557,7 @@ inferences:
     warrants: []
     note: Local reports provide the evidential basis for the generalisation
     concludes: c-antisocial-behaviour-generalised
-  - id: i-e-user-composition-supports-generalised
+  - id: i-user-composition-supports-generalised
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1585,7 +1566,7 @@ inferences:
     warrants: []
     note: User composition shift provides a mechanistic explanation for the antisocial pattern
     concludes: c-antisocial-behaviour-generalised
-  - id: i-e-high-farebox-attacks-collection-cost
+  - id: i-high-farebox-attacks-collection-cost
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1594,7 +1575,7 @@ inferences:
     warrants: []
     note: Counterexample showing high recovery is possible undermines the collection cost argument
     contests: c-collection-cost-not-justified
-  - id: i-e-plateau-attacks-ridership
+  - id: i-plateau-attacks-ridership
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1605,37 +1586,37 @@ inferences:
       Ridership gains are unsustained without service improvements, qualifying the ridership
       increase claim
     contests: c-ridership-increase
-  - id: i-e-luxembourg-supports-many-examples
+  - id: i-luxembourg-supports-many-examples
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
       - c-luxembourg-viability
     warrants:
-      - c-w-luxembourg-representative
+      - c-luxembourg-representative
     note: Luxembourg is one of the many successful implementations
     concludes: c-many-examples-successful-implementation
-  - id: i-e-kansas-city-supports-many-examples
+  - id: i-kansas-city-supports-many-examples
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
       - c-kansas-city-ridership
     warrants:
-      - c-w-kansas-city-representative
+      - c-kansas-city-representative
     note: Kansas City is one of the many successful implementations
     concludes: c-many-examples-successful-implementation
-  - id: i-e-boston-supports-many-examples
+  - id: i-boston-supports-many-examples
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
       - c-boston-ridership-gains
     warrants:
-      - c-w-boston-representativeness
+      - c-boston-representativeness
     note: Boston is one of the many successful implementations
     concludes: c-many-examples-successful-implementation
-  - id: i-e-many-examples-supports-ridership
+  - id: i-many-examples-supports-ridership
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1644,7 +1625,7 @@ inferences:
     warrants: []
     note: Many successful examples provide empirical support for the ridership increase claim
     concludes: c-ridership-increase
-  - id: i-e-utility-fails-attacks-analogy
+  - id: i-utility-fails-attacks-analogy
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1653,7 +1634,7 @@ inferences:
     warrants: []
     note: Private substitutes disanalogy directly undermines the utility comparison
     contests: c-transit-utility-analogy
-  - id: i-e-inconsistency-attacks-user-pays-policy
+  - id: i-inconsistency-attacks-user-pays-policy
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1661,30 +1642,30 @@ inferences:
       - c-user-pays-applied-inconsistently
     warrants: []
     note: null
-    contests: c-w-user-pays-applies-to-transit
-  - id: i-e-user-pays-policy-supports-targeted
+    contests: c-user-pays-applies-to-transit
+  - id: i-user-pays-policy-supports-targeted
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
       - c-user-pays-as-policy
     warrants:
-      - t-user-pays-principle
+      - c-user-pays-principle
     note: >-
       User pays as policy provides normative grounding for preferring targeted over universal
       provision
     concludes: c-targeted-subsidies-more-effective
-  - id: i-e-user-pays-policy-supports-regressive
+  - id: i-user-pays-policy-supports-regressive
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
       - c-user-pays-as-policy
     warrants:
-      - t-user-pays-principle
+      - c-user-pays-principle
     note: User pays as policy provides the distributional framework for the regressivity argument
     concludes: c-universal-free-transit-regressive
-  - id: i-e-antisocial-generalised-attacks-root
+  - id: i-antisocial-generalised-attacks-root
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1692,8 +1673,8 @@ inferences:
       - c-antisocial-behaviour-generalised
     warrants: []
     note: Reliable antisocial behaviour increase is a direct reason not to remove fares
-    contests: proposition-free-transit
-  - id: i-e-wont-reach-attacks-root
+    contests: c-fares-should-be-removed
+  - id: i-wont-reach-attacks-root
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1701,8 +1682,8 @@ inferences:
       - c-fare-removal-wont-reach-needy
     warrants: []
     note: If fare removal doesn't reach those who need it, the primary equity justification fails
-    contests: proposition-free-transit
-  - id: i-e-null-employment-attacks-root
+    contests: c-fares-should-be-removed
+  - id: i-null-employment-attacks-root
     scheme: null
     uncertain: false
     submissionStatus: Accepted
@@ -1710,4 +1691,17 @@ inferences:
       - c-null-employment-effect
     warrants: []
     note: Null employment effect undermines the labour market access and equity case for fare removal
-    contests: proposition-free-transit
+    contests: c-fares-should-be-removed
+  - id: i-ridership-grounds-service-degradation
+    scheme: FromCause
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-ridership-increase
+    warrants:
+      - c-ridership-raises-cost-without-revenue
+    note: >-
+      Independent route to service degradation: the ridership gain is itself the cost driver.
+      Distinct from the TransitCenter revenue-dependency evidence, and it concedes the Pro side's
+      ridership claim rather than contesting it.
+    concludes: c-service-degradation
