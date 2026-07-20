@@ -181,6 +181,37 @@ export const COLORS = {
   },
 } as const
 
+// ── Stance colours (LCH-canonical) ────────────────────────────────────────────
+// A four-value vocabulary for the *stance* of a claim/edge — how the sides of a
+// dispute line up — kept deliberately separate from the cluster/role hues in
+// COLORS above. Nothing consumes these yet; later stages do.
+//
+// Canonical values are LCH. The sRGB hex baked here is the standard CSS Color 4
+// `lch()` / d3-color rendering (CIELAB, D50 white point), so any triple below
+// regenerates its hex. Keep the LCH comment on each line — it is the source of
+// truth; the hex is derived.
+//
+// TWO RULES — comments here so nobody "fixes" them later:
+//   1. `aligned` and `opposed` share the SAME lightness and chroma (52, 42) and
+//      differ ONLY in hue. This is deliberate — equal visual weight, so neither
+//      side of a dispute looks more important. Do NOT nudge one to "balance" it.
+//   2. `divided` is set apart by LOW CHROMA, not by hue. Its hue (256) sits
+//      between the two poles; only its reduced colourfulness (26 vs 42) keeps it
+//      from colliding with them. Do NOT raise its chroma.
+//
+// (`aligned` at LCH(52,42,196) falls just outside the sRGB gamut; its hex is the
+// standard gamut-clamped rendering. The LCH triple stays the source of truth.)
+export const STANCE = {
+  aligned: '#008E8F',   // LCH(52, 42, 196) — blue-teal
+  opposed: '#AB63A1',   // LCH(52, 42, 330) — violet-magenta
+  divided: '#6890B7',   // LCH(58, 26, 256) — muted slate-blue
+  neutral: 'none',      // no fill — outline only (see STANCE_NEUTRAL_STROKE)
+} as const
+
+// Neutral stance carries no hue: an outline/stroke-only treatment on a muted
+// border, never a fill. Per the spec it needs no colour token beyond this.
+export const STANCE_NEUTRAL_STROKE = COLORS.border
+
 // ── Layered layout (dagre) ────────────────────────────────────────────────────
 // Clarity of relationships is the top priority: every edge must be easy to
 // follow and must not run through unrelated nodes. dagre runs the full Sugiyama
@@ -224,4 +255,19 @@ export const EDGE = {
   opacity: 0.72,
   // SVG stroke-dasharray: 'dash-length, gap-length' (px at scale 1)
   dashWarrants: '5,3',
+
+  // Edge relation mark — concluding vs contesting — carried by GEOMETRY, not
+  // colour. A concluding edge is a plain line; a contesting edge is a plain line
+  // with a short double tick (two parallel strokes) crossing it near the target
+  // end. The tick is colour-independent: it can overlay ANY stance colour, and
+  // it stays legible when the line is thin or zoomed out — where a filled-vs-
+  // hollow arrowhead would vanish. Do NOT swap this for an arrowhead-fill cue.
+  // Built by contestTickForPolyline()/contestTickSegments() in graphData.ts.
+  contestTick: {
+    count: 2,          // two short parallel strokes
+    length: 8,         // full length of each cross-stroke (±4 across the line)
+    gap: 4,            // spacing between the two strokes, measured along the edge
+    offset: 15,        // distance back from the (padded) target end to the tick centre
+    strokeWidth: 1.6,
+  },
 } as const

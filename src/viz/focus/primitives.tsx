@@ -24,6 +24,24 @@ export function useFromHighlight(id: string): { boxShadow: string; background: s
     : null
 }
 
+/** "Show <claim> in the graph, zoomed to its neighbourhood." Provided by the
+ *  focus view so every visible claim can locate itself, not just the centre. */
+export const LocateContext = createContext<(id: string) => void>(() => {})
+
+/** A small node-and-edge network glyph: the "show in graph" affordance. */
+export function GraphIcon({ size = 15 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <circle cx="6" cy="7" r="2.4" />
+      <circle cx="18" cy="6" r="2.4" />
+      <circle cx="13" cy="18" r="2.4" />
+      <line x1="8.4" y1="6.8" x2="15.6" y2="6.2" />
+      <line x1="7.3" y1="9" x2="11.7" y2="16" />
+      <line x1="17.1" y1="8.2" x2="13.9" y2="15.8" />
+    </svg>
+  )
+}
+
 /** One §4 pip: 8px circle, one of two solid fills. Presence only. */
 export function Pip({ kind }: { kind: 'supported' | 'contested' }) {
   return (
@@ -80,6 +98,26 @@ export function ClaimStatus({ gd, id }: { gd: GraphData; id: string }) {
 }
 
 /**
+ * The right-hand marks on any claim: its status (pips / bedrock) with a small
+ * "show in graph" button stacked just below. The button locates *this* claim on
+ * the map; stopPropagation keeps the click off the row's recentre gesture.
+ */
+export function ClaimMarks({ gd, id }: { gd: GraphData; id: string }) {
+  const onLocate = useContext(LocateContext)
+  return (
+    <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+      <ClaimStatus gd={gd} id={id} />
+      <button
+        type="button" className="pz-graphbtn" title="Show in graph" aria-label="Show in graph"
+        onClick={e => { e.stopPropagation(); onLocate(id) }}
+      >
+        <GraphIcon size={13} />
+      </button>
+    </span>
+  )
+}
+
+/**
  * A claim as one clickable row: its text plus status marks. Clicking refocuses
  * the whole stack on that claim — the only navigation gesture in a cell.
  * Attributive claims render text only here; source/quote read in the focus
@@ -97,7 +135,7 @@ export function ClaimRow({
       style={{
         display: 'flex',
         gap: 10,
-        alignItems: 'baseline',
+        alignItems: 'flex-start',
         padding: '6px 8px',
         borderRadius: 6,
         cursor: 'pointer',
@@ -108,7 +146,7 @@ export function ClaimRow({
       }}
     >
       <span style={{ flex: 1, minWidth: 0 }}>{claim?.text ?? id}</span>
-      <ClaimStatus gd={gd} id={id} />
+      <ClaimMarks gd={gd} id={id} />
     </div>
   )
 }

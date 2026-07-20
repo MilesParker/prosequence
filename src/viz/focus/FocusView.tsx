@@ -13,7 +13,7 @@ import { sourceLabel } from '../graphData'
 import {
   getClaim, supportsOf, attacksOf, consumersOf, outputOf, roleOf, renderedClaimIds, type Output,
 } from './focusData'
-import { ClaimStatus, BedrockBadge, EmptyCell, FromHighlight, useFromHighlight } from './primitives'
+import { BedrockBadge, EmptyCell, FromHighlight, useFromHighlight, ClaimMarks, GraphIcon, LocateContext } from './primitives'
 import { Cell } from './Cell'
 
 // Hover affordances live in CSS so rows/entries need no per-node state.
@@ -25,6 +25,8 @@ const focusCss = `
   .pz-chev:disabled { opacity: 0.3; cursor: default; }
   .pz-iconbtn { display: inline-flex; align-items: center; justify-content: center; width: 26px; height: 26px; padding: 0; border-radius: 6px; border: 1px solid transparent; background: none; cursor: pointer; color: ${COLORS.textDim}; transition: color .12s ease, background .12s ease, border-color .12s ease; }
   .pz-iconbtn:hover { color: ${COLORS.text}; background: hsla(220, 24%, 20%, 0.05); border-color: ${COLORS.border}; }
+  .pz-graphbtn { display: inline-flex; align-items: center; justify-content: center; padding: 2px; border: none; background: none; cursor: pointer; color: ${COLORS.textDimmer}; border-radius: 4px; transition: color .12s ease, background .12s ease; }
+  .pz-graphbtn:hover { color: ${COLORS.text}; background: hsla(220, 24%, 20%, 0.06); }
 `
 
 function Connector() {
@@ -54,10 +56,10 @@ function ClaimTap({ gd, id, onFocus }: { gd: GraphData; id: string; onFocus: (id
     <span
       className="pz-row"
       onClick={() => onFocus(id)}
-      style={{ display: 'inline-flex', gap: FOCUS.pipGap, alignItems: 'baseline', cursor: 'pointer', borderRadius: 5, padding: '1px 4px', color: COLORS.text, ...hl }}
+      style={{ display: 'inline-flex', gap: FOCUS.pipGap, alignItems: 'flex-start', cursor: 'pointer', borderRadius: 5, padding: '1px 4px', color: COLORS.text, ...hl }}
     >
       <span>{claim?.text ?? id}</span>
-      <ClaimStatus gd={gd} id={id} />
+      <ClaimMarks gd={gd} id={id} />
     </span>
   )
 }
@@ -207,20 +209,6 @@ function CameFromIcon() {
   )
 }
 
-// A crosshair: locate this claim back on the map, zoomed to its surroundings.
-function LocateIcon() {
-  return (
-    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <circle cx="12" cy="12" r="8.5" />
-      <line x1="12" y1="1.5" x2="12" y2="6" />
-      <line x1="12" y1="18" x2="12" y2="22.5" />
-      <line x1="1.5" y1="12" x2="6" y2="12" />
-      <line x1="18" y1="12" x2="22.5" y2="12" />
-      <circle cx="12" cy="12" r="1.6" fill="currentColor" stroke="none" />
-    </svg>
-  )
-}
-
 function FocusBand({ gd, focusId, fromId, showFromIcon, onFromHover, onFocus, onLocate }: {
   gd: GraphData
   focusId: string
@@ -257,7 +245,7 @@ function FocusBand({ gd, focusId, fromId, showFromIcon, onFromHover, onFocus, on
           </IconBtn>
         )}
         <IconBtn title="Show in graph, zoomed to this claim" onClick={() => onLocate(focusId)}>
-          <LocateIcon />
+          <GraphIcon />
         </IconBtn>
       </div>
       <div style={{ fontSize: FOCUS.focusFont, fontWeight: 600, lineHeight: 1.45, color: COLORS.text, paddingRight: showFromIcon ? 64 : 34 }}>
@@ -333,6 +321,7 @@ export function FocusView({
     <div style={{ position: 'fixed', top: TITLE_BAR_HEIGHT, left: 0, right: 0, bottom: 0, overflowY: 'auto', background: COLORS.background }}>
       <style>{focusCss}</style>
       <FromHighlight.Provider value={{ id: fromVisible ? fromId : null, active: showFrom }}>
+       <LocateContext.Provider value={onLocate}>
         <div style={{ maxWidth: FOCUS.columnMaxWidth, margin: '0 auto', padding: '28px 20px 96px', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
           {hasParents && (
             <>
@@ -361,6 +350,7 @@ export function FocusView({
             </>
           )}
         </div>
+       </LocateContext.Provider>
       </FromHighlight.Provider>
     </div>
   )

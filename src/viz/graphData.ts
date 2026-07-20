@@ -1,6 +1,6 @@
 import type { SimulationNodeDatum, SimulationLinkDatum } from 'd3'
 import type { DiscourseSpace, Claim, Inference, Cluster } from '../types'
-import { COLORS, NODE } from '../config'
+import { COLORS, NODE, EDGE } from '../config'
 
 // ── Node types ────────────────────────────────────────────────────────────────
 //
@@ -300,6 +300,54 @@ export function edgeColor(role: EdgeRole): string {
 
 export function edgeMarkerId(role: EdgeRole): string {
   return `arr-${role.toLowerCase()}`
+}
+
+// ── Contest tick — the "contesting" relation mark ───────────────────────────────
+// A concluding edge is just a plain line; a contesting edge adds a short double
+// tick crossing the line near its target end (geometry in EDGE.contestTick). The
+// mark is independent of the edge's colour — the two strokes read as "contest"
+// whatever hue the line is, and stay legible when the line is thin or zoomed out
+// (unlike a filled-vs-hollow arrowhead). These builders return plain line
+// segments, so any renderer — the d3 graph, React SVG, or a static sample —
+// draws the identical mark from one source of truth. Nothing calls them yet.
+
+export interface TickSeg { x1: number; y1: number; x2: number; y2: number }
+
+/**
+ * The double tick as `count` cross-strokes, centred at (cx,cy) and crossing a
+ * line whose direction is `angle` (radians). Renderer-agnostic — the caller
+ * decides colour and stroke width. This is the primitive; wrappers below place
+ * it relative to a concrete edge.
+ */
+export function contestTickSegments(cx: number, cy: number, angle: number): TickSeg[] {
+  const { count, length, gap } = EDGE.contestTick
+  const tx = Math.cos(angle), ty = Math.sin(angle)     // unit vector along the edge
+  const nx = -Math.sin(angle), ny = Math.cos(angle)    // unit vector across the edge
+  const half = length / 2
+  const segs: TickSeg[] = []
+  for (let k = 0; k < count; k++) {
+    const d = (k - (count - 1) / 2) * gap              // stroke offset along the edge
+    const ox = cx + tx * d, oy = cy + ty * d
+    segs.push({ x1: ox - nx * half, y1: oy - ny * half, x2: ox + nx * half, y2: oy + ny * half })
+  }
+  return segs
+}
+
+/**
+ * Place the double tick near the target end of a source→target polyline (the
+ * shape the graph's routed edges use). Walks `EDGE.contestTick.offset` back from
+ * the final point along the last segment and orients the tick to that segment.
+ */
+export function contestTickForPolyline(pts: Array<{ x: number; y: number }>): TickSeg[] {
+  if (pts.length < 2) return []
+  const end = pts[pts.length - 1]
+  const prev = pts[pts.length - 2]
+  const dx = end.x - prev.x, dy = end.y - prev.y
+  const len = Math.hypot(dx, dy) || 1
+  const off = Math.min(EDGE.contestTick.offset, len)   // never overshoot a short final segment
+  const cx = end.x - (dx / len) * off
+  const cy = end.y - (dy / len) * off
+  return contestTickSegments(cx, cy, Math.atan2(dy, dx))
 }
 
 export type ChipKind = keyof typeof COLORS.chip
