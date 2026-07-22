@@ -1,7 +1,33 @@
-import { COLORS } from '../../config'
+import { COLORS, STANCE, STANCE_NEUTRAL_STROKE, STANCE_FILL_OPACITY, REF_ROOT } from '../../config'
 
-function NodeSwatch({ fill, stroke }: { fill: string; stroke: string }) {
-  return <div style={{ width: 22, height: 12, flexShrink: 0, background: fill, border: `1.5px solid ${stroke}`, borderRadius: 3 }} />
+/** Full-chroma stance hex → the pale fill used on nodes (matches the graph wash). */
+function tint(hex: string, a: number): string {
+  if (!hex.startsWith('#')) return 'transparent'
+  const n = parseInt(hex.slice(1), 16)
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`
+}
+
+// A claim-box swatch in a stance colour: pale fill under a saturated border, as on
+// the graph. Neutral is outline-only (no fill).
+function StanceSwatch({ fill, stroke }: { fill: string; stroke: string }) {
+  return (
+    <div style={{
+      width: 22, height: 13, flexShrink: 0, borderRadius: 3,
+      background: fill === 'none' ? 'transparent' : tint(fill, STANCE_FILL_OPACITY),
+      border: `1.5px solid ${stroke}`,
+    }} />
+  )
+}
+
+// The reference-root marker: an aligned (blue) claim box wrapped in a single ring of
+// its own colour, matching the graph — the root is always painted its aligned valence.
+function TargetSwatch() {
+  return (
+    <svg width={24} height={18} viewBox="-12 -9 24 18" style={{ flexShrink: 0, overflow: 'visible' }}>
+      <rect x={-6.5} y={-4} width={13} height={8} rx={2} fill={tint(STANCE.aligned, STANCE_FILL_OPACITY)} stroke={STANCE.aligned} strokeWidth={1.4} />
+      <rect x={-9.5} y={-7} width={19} height={14} rx={4} fill="none" stroke={STANCE.aligned} strokeWidth={REF_ROOT.ringWidth} />
+    </svg>
+  )
 }
 
 function InfSwatch() {
@@ -10,8 +36,18 @@ function InfSwatch() {
   )
 }
 
-function EdgeSwatch({ color, dashed = false }: { color: string; dashed?: boolean }) {
-  return <div style={{ width: 26, height: 0, flexShrink: 0, borderTop: `2.5px ${dashed ? 'dashed' : 'solid'} ${color}` }} />
+// A neutral edge line, optionally dashed (warrant) and/or with the contest double-tick.
+function EdgeSwatch({ dashed = false, tick = false }: { dashed?: boolean; tick?: boolean }) {
+  const c = COLORS.textMuted
+  return (
+    <svg width={26} height={12} viewBox="0 0 26 12" style={{ flexShrink: 0 }}>
+      <line x1={0} y1={6} x2={26} y2={6} stroke={c} strokeWidth={2} strokeDasharray={dashed ? '5,3' : undefined} />
+      {tick && <>
+        <line x1={15} y1={1.5} x2={15} y2={10.5} stroke={c} strokeWidth={1.6} strokeLinecap="round" />
+        <line x1={19} y1={1.5} x2={19} y2={10.5} stroke={c} strokeWidth={1.6} strokeLinecap="round" />
+      </>}
+    </svg>
+  )
 }
 
 function Row({ children }: { children: React.ReactNode }) {
@@ -26,29 +62,50 @@ function Divider() {
   return <div style={{ marginTop: 10, borderTop: `1px solid ${COLORS.border}`, paddingTop: 10 }} />
 }
 
-export function Legend() {
-  const n = COLORS.node
+export function Legend({ nominating, onToggleNominate }: { nominating: boolean; onToggleNominate: () => void }) {
   return (
-    <div style={{ position: 'fixed', bottom: 20, left: 20, background: COLORS.surfaceBlur, backdropFilter: 'blur(4px)', border: `1px solid ${COLORS.border}`, borderRadius: 8, boxShadow: '0 6px 24px rgba(0,0,0,0.10)', padding: '12px 16px', fontSize: 11, zIndex: 50, userSelect: 'none' }}>
-      <SectionTitle>Claims</SectionTitle>
-      <Row><NodeSwatch fill={n.root.fill} stroke={n.root.stroke} /> Root (contested question)</Row>
-      <Row><NodeSwatch fill={n.pro.fill} stroke={n.pro.stroke} /> Pro</Row>
-      <Row><NodeSwatch fill={n.anti.fill} stroke={n.anti.stroke} /> Anti</Row>
-      <Row><NodeSwatch fill={n.empirical.fill} stroke={n.empirical.stroke} /> Empirical</Row>
-      <Row><NodeSwatch fill={n.analogy.fill} stroke={n.analogy.stroke} /> Analogy</Row>
-      <Row><NodeSwatch fill={n.attributive.fill} stroke={n.attributive.stroke} /> Attributive (grounds)</Row>
-      <Row><NodeSwatch fill={n.terminal.fill} stroke={n.terminal.stroke} /> Terminal value</Row>
+    <div style={{ position: 'fixed', bottom: 20, left: 20, background: COLORS.surfaceBlur, backdropFilter: 'blur(4px)', border: `1px solid ${COLORS.border}`, borderRadius: 8, boxShadow: '0 6px 24px rgba(0,0,0,0.10)', padding: '12px 16px', fontSize: 11, zIndex: 50, userSelect: 'none', maxWidth: 230 }}>
+      <SectionTitle>Reference root</SectionTitle>
+      {/* Arming this mode makes the next graph click nominate a claim as the origin —
+          a deliberate act, kept off the individual nodes so nothing clutters the map. */}
+      <button
+        type="button"
+        onClick={onToggleNominate}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 9, width: '100%', textAlign: 'left',
+          padding: '6px 8px', borderRadius: 6, cursor: 'pointer', font: 'inherit', fontSize: 11,
+          border: `1px solid ${nominating ? REF_ROOT.ringColor : COLORS.border}`,
+          background: nominating ? 'hsla(220, 24%, 20%, 0.06)' : COLORS.surface,
+          color: nominating ? COLORS.text : COLORS.textMuted,
+        }}
+      >
+        <TargetSwatch /> {nominating ? 'Pick a claim to anchor…' : 'Set reference root'}
+      </button>
+      <div style={{ fontSize: 10.5, color: COLORS.textFaint, marginTop: 6, lineHeight: 1.35 }}>
+        {nominating
+          ? 'Click a claim to measure stance from it — or click empty space to clear.'
+          : <>Everything is coloured by its stance <em>relative to the reference root</em>.</>}
+      </div>
+
+      <Divider />
+      <SectionTitle>Stance</SectionTitle>
+      <Row><StanceSwatch fill={STANCE.aligned} stroke={STANCE.aligned} /> Aligned (same side)</Row>
+      <Row><StanceSwatch fill={STANCE.opposed} stroke={STANCE.opposed} /> Opposed (other side)</Row>
+      <Row><StanceSwatch fill={STANCE.divided} stroke={STANCE.divided} /> Divided (cuts both ways)</Row>
+      <Row><StanceSwatch fill="none" stroke={STANCE_NEUTRAL_STROKE} /> Neutral (unconnected)</Row>
+
+      <Divider />
+      <SectionTitle>Edge marks</SectionTitle>
+      <Row><EdgeSwatch /> Grounds / concludes</Row>
+      <Row><EdgeSwatch dashed /> Warrant (dashed)</Row>
+      <Row><EdgeSwatch tick /> Contests (double-tick)</Row>
+      <div style={{ fontSize: 10.5, color: COLORS.textFaint, marginTop: 2, lineHeight: 1.35 }}>
+        Marks are geometry — edge <em>colour</em> is its stance, above.
+      </div>
 
       <Divider />
       <SectionTitle>Inference</SectionTitle>
-      <Row><InfSwatch /> Inference junction</Row>
-
-      <Divider />
-      <SectionTitle>Edges</SectionTitle>
-      <Row><EdgeSwatch color={COLORS.edge.grounds} /> Grounds</Row>
-      <Row><EdgeSwatch color={COLORS.edge.warrants} dashed /> Warrants</Row>
-      <Row><EdgeSwatch color={COLORS.edge.concludes} /> Concludes</Row>
-      <Row><EdgeSwatch color={COLORS.edge.contests} /> Contests</Row>
+      <Row><InfSwatch /> Junction</Row>
     </div>
   )
 }

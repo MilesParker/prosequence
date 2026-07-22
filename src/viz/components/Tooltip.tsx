@@ -81,10 +81,12 @@ export function Tooltip({ node, x, y, nodeById }: Props) {
           </div>
         </>
       )}
-      <div style={chips}>
-        <span style={chipStyle(kind)}>{claim._isRoot ? 'root' : claim.terminal ? 'terminal' : claim.attribution ? 'attributive' : claim.cluster}</span>
-        {claim.uncertain && <span style={chipStyle('default')}>uncertain</span>}
-      </div>
+      {(kind || claim.uncertain) && (
+        <div style={chips}>
+          {kind && <span style={chipStyle(kind)}>{kind}</span>}
+          {claim.uncertain && <span style={chipStyle('default')}>uncertain</span>}
+        </div>
+      )}
     </div>
   )
 }

@@ -5,9 +5,10 @@
 // shared pip/colour tokens; they do not reach above the primitive level.
 
 import { createContext, useContext } from 'react'
-import { COLORS, FOCUS } from '../../config'
-import type { GraphData } from '../graphData'
-import { getClaim, isSupported, isContested } from './focusData'
+import { COLORS, FOCUS, REF_ROOT } from '../../config'
+import type { GraphData, StanceMap } from '../graphData'
+import { stanceColor } from '../graphData'
+import { getClaim, frontierStance } from './focusData'
 
 /**
  * The claim you navigated *from*, plus whether the focus band's trace icon is
@@ -28,6 +29,27 @@ export function useFromHighlight(id: string): { boxShadow: string; background: s
  *  focus view so every visible claim can locate itself, not just the centre. */
 export const LocateContext = createContext<(id: string) => void>(() => {})
 
+/**
+ * The Stage 3 stance map plus the claims currently on screen, provided by the
+ * focus view so any claim rendered as a continuation can mark what's hidden past
+ * it (see `frontierStance`). Null when there's no reference root to measure from.
+ */
+export const FrontierContext = createContext<{ sm: StanceMap; visible: Set<string> } | null>(null)
+
+/** The reference-root "target": a small bullseye in ink, no stance hue — it marks
+ *  the origin all stance is measured from, matching the graph's ringed target. Used
+ *  only to *label* the root in the focus view (root line / focus-band header); the
+ *  reference root is moved from the graph's key, never from here. */
+export function TargetIcon({ size = FOCUS.targetIcon }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={REF_ROOT.ringColor} strokeWidth="2" aria-hidden>
+      <circle cx="12" cy="12" r="9" />
+      <circle cx="12" cy="12" r="4.5" />
+      <circle cx="12" cy="12" r="1.4" fill={REF_ROOT.ringColor} stroke="none" />
+    </svg>
+  )
+}
+
 /** A small node-and-edge network glyph: the "show in graph" affordance. */
 export function GraphIcon({ size = 15 }: { size?: number }) {
   return (
@@ -42,24 +64,8 @@ export function GraphIcon({ size = 15 }: { size?: number }) {
   )
 }
 
-/** One §4 pip: 8px circle, one of two solid fills. Presence only. */
-export function Pip({ kind }: { kind: 'supported' | 'contested' }) {
-  return (
-    <span
-      aria-hidden
-      style={{
-        display: 'inline-block',
-        width: FOCUS.pipSize,
-        height: FOCUS.pipSize,
-        borderRadius: '50%',
-        flexShrink: 0,
-        background: kind === 'supported' ? COLORS.pip.supported : COLORS.pip.contested,
-      }}
-    />
-  )
-}
-
-/** Terminal claims wear this instead of pips: outlined, muted, no fill. */
+/** Terminal claims wear this: outlined, muted, no fill. A bedrock claim is a
+ *  dead end — nothing is hidden past it — so it reads as "no continuation here". */
 export function BedrockBadge() {
   return (
     <span
@@ -79,34 +85,51 @@ export function BedrockBadge() {
   )
 }
 
-/**
- * Status marks for a claim id: a bedrock badge if terminal, otherwise zero,
- * one, or two pips per the §4 predicates. Both pips = live dispute.
- */
-export function ClaimStatus({ gd, id }: { gd: GraphData; id: string }) {
-  const claim = getClaim(gd, id)
-  if (claim?.terminal) return <BedrockBadge />
-  const sup = isSupported(gd, id)
-  const con = isContested(gd, id)
-  if (!sup && !con) return null
+/** A small double chevron in a stance colour: "there's more this way, and here's
+ *  where it leads." The only status mark in the focus view — it rides only on
+ *  claims whose own support/attack is off-frame (see FrontierMark). */
+function FrontierGlyph({ color }: { color: string }) {
   return (
-    <span style={{ display: 'inline-flex', gap: FOCUS.pipGap, alignItems: 'center', flexShrink: 0 }}>
-      {sup && <Pip kind="supported" />}
-      {con && <Pip kind="contested" />}
+    <svg width="13" height="13" viewBox="0 0 12 12" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
+      <path d="M2.5 2 L6.5 6 L2.5 10" />
+      <path d="M6 2 L10 6 L6 10" opacity="0.5" />
+    </svg>
+  )
+}
+
+/**
+ * The frontier mark for a claim shown as a continuation: a bedrock badge if it's
+ * a dead end, otherwise a stance-coloured chevron hinting where the hidden branch
+ * below it leads (aligned / opposed / divided). Nothing at all when there's no
+ * reference root, or when nothing is hidden past this claim. This is the sole
+ * place "status" surfaces — never on a claim whose support/attack is already in
+ * frame (that claim renders no marks at all).
+ */
+export function FrontierMark({ gd, id }: { gd: GraphData; id: string }) {
+  const claim = getClaim(gd, id)
+  const ctx = useContext(FrontierContext)
+  if (claim?.terminal) return <BedrockBadge />
+  if (!ctx) return null
+  const st = frontierStance(gd, ctx.sm, id, ctx.visible)
+  if (!st) return null
+  return (
+    <span title={`Hidden past here leads: ${st}`} style={{ display: 'inline-flex', flexShrink: 0 }}>
+      <FrontierGlyph color={stanceColor(st)} />
     </span>
   )
 }
 
 /**
- * The right-hand marks on any claim: its status (pips / bedrock) with a small
- * "show in graph" button stacked just below. The button locates *this* claim on
- * the map; stopPropagation keeps the click off the row's recentre gesture.
+ * The right-hand marks on any claim: its frontier hint (stance chevron / bedrock)
+ * with a small "show in graph" button stacked just below. The button locates
+ * *this* claim on the map; stopPropagation keeps the click off the row's
+ * recentre gesture.
  */
 export function ClaimMarks({ gd, id }: { gd: GraphData; id: string }) {
   const onLocate = useContext(LocateContext)
   return (
     <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-      <ClaimStatus gd={gd} id={id} />
+      <FrontierMark gd={gd} id={id} />
       <button
         type="button" className="pz-graphbtn" title="Show in graph" aria-label="Show in graph"
         onClick={e => { e.stopPropagation(); onLocate(id) }}

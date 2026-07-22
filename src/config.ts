@@ -70,14 +70,23 @@ export const FOCUS = {
   cellRadius: 8,
   bracketWidth: 2,       // warrant bracket rule
 
-  // Parent band: two fixed columns (Supports/Contests), role-bucketed, never
-  // pages — sizes to content (max 4 tiles in the corpora), so no reserved height.
+  // Parent band: two fixed columns (Supports/Contests) by polarity, each paged
+  // one entry at a time like For/Against (grounds-role entries first); the role C
+  // plays is a group header above the tile, not a per-tile label.
   parentColGap: 16,        // Supports/Contests gap (mirrors the For/Against gap)
 
   // "Came from" trace: the claim you navigated from wears this ring/wash while
   // the focus-band icon is engaged. Amber matches the graph's search highlight.
   fromRing: 'hsl(35, 95%, 48%)',
   fromTint: 'hsla(35, 95%, 48%, 0.13)',
+
+  // Stage 4 — the reference root pinned at the top ("what's ultimately at
+  // stake"), the inert "torn sheet" that stands in for the hidden chain of hops
+  // between it and the parent band, and the bullseye that marks the origin.
+  targetIcon: 16,        // bullseye glyph — root line + focus-band root header
+  rootLineGap: 8,        // breathing room above/below the tear
+  tearHeight: 13,        // torn-edge zigzag band height
+  tearToothW: 14,        // width of one zigzag tooth (the pattern tile)
 
   // Reserved heights that keep the landscape from shifting as you refocus
   // (best-guess maxima; tiles scroll internally on the rare overflow).
@@ -118,46 +127,16 @@ export const COLORS = {
   textFaint:   'hsl(220, 10%, 50%)',
   textDim:     'hsl(220, 10%, 58%)',
   textDimmer:  'hsl(220, 10%, 70%)',
-  textLabel:   'hsl(220, 12%, 40%)',
-  textCode:    'hsl(220, 12%, 45%)',
-
-  // Claim nodes — coloured by role/cluster. Pale fills, saturated strokes.
-  node: {
-    root:        { fill: 'hsl(212, 90%, 95%)', stroke: 'hsl(212, 68%, 48%)' },
-    terminal:    { fill: 'hsl(45, 92%, 90%)',  stroke: 'hsl(36, 76%, 44%)'  },
-    pro:         { fill: 'hsl(131, 48%, 93%)', stroke: 'hsl(140, 44%, 36%)' },
-    anti:        { fill: 'hsl(2, 72%, 95%)',   stroke: 'hsl(2, 58%, 50%)'   },
-    empirical:   { fill: 'hsl(205, 40%, 94%)', stroke: 'hsl(205, 30%, 42%)' },
-    analogy:     { fill: 'hsl(280, 45%, 95%)', stroke: 'hsl(282, 38%, 52%)' },
-    attributive: { fill: 'hsl(210, 18%, 94%)', stroke: 'hsl(210, 12%, 46%)' },
-  },
+  error:       'hsl(2, 62%, 50%)',         // error-state text only
 
   // Inference junction marks — subordinate wiring.
   inference: { fill: 'hsl(230, 16%, 90%)', stroke: 'hsl(230, 12%, 55%)' },
 
-  // Four edge roles, each distinct.
-  edge: {
-    grounds:   'hsl(205, 38%, 46%)',   // steel — evidence into an inference
-    warrants:  'hsl(205, 38%, 46%)',   // steel (dashed) — an inference input like
-                                       // grounds; the dash marks it a bridging
-                                       // assumption. Green is reserved for Concludes.
-    concludes: 'hsl(140, 46%, 38%)',   // green — was Support
-    contests:  'hsl(2, 62%, 50%)',     // red — was Attack
-  },
-
-  // Role badges (kept for token parity; the detail panel is retired).
-  rel: {
-    grounds:   { bg: 'hsl(205, 40%, 92%)', color: 'hsl(205, 45%, 34%)' },
-    warrants:  { bg: 'hsl(205, 40%, 92%)', color: 'hsl(205, 45%, 34%)' },
-    concludes: { bg: 'hsl(140, 45%, 91%)', color: 'hsl(140, 48%, 28%)' },
-    contests:  { bg: 'hsl(2, 60%, 93%)',   color: 'hsl(2, 58%, 42%)'   },
-  },
-
-  // Cluster / kind chips in tooltips.
+  // Claim-TYPE chips in tooltips — the argumentative function a claim serves
+  // (its stance/valence is carried by STANCE, not here). Each type keeps its own
+  // hue; Pro/Anti claims have no functional type and get no chip.
   chip: {
     default:     { bg: 'hsl(40, 16%, 91%)',  color: 'hsl(220, 10%, 40%)' },
-    pro:         { bg: 'hsl(131, 44%, 90%)', color: 'hsl(140, 46%, 28%)' },
-    anti:        { bg: 'hsl(2, 62%, 93%)',   color: 'hsl(2, 56%, 42%)'   },
     empirical:   { bg: 'hsl(205, 38%, 92%)', color: 'hsl(205, 32%, 36%)' },
     analogy:     { bg: 'hsl(280, 40%, 93%)', color: 'hsl(282, 38%, 42%)' },
     root:        { bg: 'hsl(212, 80%, 92%)', color: 'hsl(212, 64%, 38%)' },
@@ -166,18 +145,11 @@ export const COLORS = {
     inference:   { bg: 'hsl(230, 16%, 90%)', color: 'hsl(230, 14%, 40%)' },
   },
 
-  // Focus-view pip fills (§4). Presence markers only — teal = supported,
-  // coral = contested. Shared token so both views read one source.
-  pip: {
-    supported: '#1D9E75',
-    contested: '#D85A30',
-  },
-
-  // For / Against column tint families (focus view). Green = For (concludes
-  // family), coral = Against (contests family). Column-derived, not content-.
+  // For / Against column families (focus view). Green = For (concludes family),
+  // red = Against (contests family). Column-derived, not content-.
   column: {
-    for:     { tint: 'hsl(140, 46%, 40%)', bg: 'hsl(131, 46%, 96%)', border: 'hsl(131, 34%, 82%)', label: 'hsl(140, 46%, 32%)' },
-    against: { tint: 'hsl(2, 62%, 52%)',   bg: 'hsl(2, 66%, 97%)',   border: 'hsl(2, 52%, 86%)',   label: 'hsl(2, 56%, 44%)' },
+    for:     { tint: 'hsl(140, 46%, 40%)', bg: 'hsl(140, 46%, 96%)', border: 'hsl(140, 34%, 82%)', label: 'hsl(140, 46%, 30%)' },
+    against: { tint: 'hsl(2, 62%, 52%)',   bg: 'hsl(2, 66%, 97%)',   border: 'hsl(2, 52%, 86%)',   label: 'hsl(2, 56%, 43%)' },
   },
 } as const
 
@@ -187,30 +159,68 @@ export const COLORS = {
 // COLORS above. Nothing consumes these yet; later stages do.
 //
 // Canonical values are LCH. The sRGB hex baked here is the standard CSS Color 4
-// `lch()` / d3-color rendering (CIELAB, D50 white point), so any triple below
-// regenerates its hex. Keep the LCH comment on each line — it is the source of
-// truth; the hex is derived.
+// `lch()` / d3-color rendering (CIELAB, D50 white point), so any in-gamut triple
+// below regenerates its hex. Keep the LCH comment on each line — it is the source
+// of truth; the hex is derived.
 //
 // TWO RULES — comments here so nobody "fixes" them later:
-//   1. `aligned` and `opposed` share the SAME lightness and chroma (52, 42) and
-//      differ ONLY in hue. This is deliberate — equal visual weight, so neither
-//      side of a dispute looks more important. Do NOT nudge one to "balance" it.
-//   2. `divided` is set apart by LOW CHROMA, not by hue. Its hue (256) sits
-//      between the two poles; only its reduced colourfulness (26 vs 42) keeps it
-//      from colliding with them. Do NOT raise its chroma.
+//   1. `aligned` and `opposed` are matched on PERCEIVED weight ("loudness"), not
+//      on equal L and C. They cannot be equal in L and C: `aligned` is a blue and
+//      blue is gamut-limited to ~C44 in sRGB, while `opposed` orange reaches far
+//      higher — so equal chroma is physically impossible for this pair. Instead
+//      `opposed` was darkened/muted until it FEELS as prominent as the gamut-capped
+//      blue (both land at the same crude weight ≈ C·0.75 + (100−L)·0.55). The point
+//      is unchanged: neither side of a dispute should look more important. Do NOT
+//      "rebalance" them to equal C — that would make the blue impossible and re-load
+//      the orange. Tune by eye against thin EDGES, not against big swatches.
+//   2. `divided` is set apart by LOW CHROMA, not by hue. Blue + orange average to a
+//      hue near red (a dusty rose, ~H1); its reduced colourfulness (15 vs ~44/50) is
+//      the ONLY thing keeping it from reading as a pole or as a valence of its own.
+//      Do NOT raise its chroma. Its slight warmth is intended: it must not twin with
+//      the blue, and low chroma keeps it clear of the orange and of `neutral`.
 //
-// (`aligned` at LCH(52,42,196) falls just outside the sRGB gamut; its hex is the
-// standard gamut-clamped rendering. The LCH triple stays the source of truth.)
+// `aligned` at LCH(48, 44, 258) sits just outside the sRGB gamut; its hex is the
+// standard gamut-clamped rendering. The LCH triple stays the source of truth.
+//
+// Poles are blue / orange on purpose: it is the canonical colour-blind-safe pair
+// and the only one that survived rendering at thin-EDGE scale — teal/violet and
+// teal/magenta both collapsed toward green/red on 2–3px strokes. `aligned` is a
+// pure blue (no green to shift toward); `opposed` a warm orange that reads as a
+// team colour, not a hazard, because `aligned` carries the distinction.
 export const STANCE = {
-  aligned: '#008E8F',   // LCH(52, 42, 196) — blue-teal
-  opposed: '#AB63A1',   // LCH(52, 42, 330) — violet-magenta
-  divided: '#6890B7',   // LCH(58, 26, 256) — muted slate-blue
+  aligned: '#0074B5',   // LCH(48, 44, 258) — blue (gamut-clamped)
+  opposed: '#B46E35',   // LCH(54, 50,  60) — orange, loudness-matched to blue
+  divided: '#A597A7',   // LCH(64, 12, 260) — muted dusty-rose, recedes by low chroma
   neutral: 'none',      // no fill — outline only (see STANCE_NEUTRAL_STROKE)
 } as const
 
 // Neutral stance carries no hue: an outline/stroke-only treatment on a muted
 // border, never a fill. Per the spec it needs no colour token beyond this.
 export const STANCE_NEUTRAL_STROKE = COLORS.border
+
+// The stance "wash" paints a node with its stance hue: the full-chroma token as
+// the stroke, over a pale fill of the same token at this opacity. Matches the
+// paper theme's "pale fill, saturated stroke" language and keeps ink text legible.
+// (Neutral nodes get no fill — outline only.)
+export const STANCE_FILL_OPACITY = 0.18
+
+// The selected/centred node is emphasised, not re-coloured: same stance hue, a
+// denser fill and a heavier border, so "you are here" reads at a glance without a
+// competing ring.
+export const STANCE_SELECTED_FILL_OPACITY = 0.34
+export const STANCE_SELECTED_STROKE_BUMP = 1.4
+
+// ── Reference root marker ─────────────────────────────────────────────────────
+// The reference root is the origin all stance is measured from (a movable viewing
+// choice, not a property of the claim). It IS painted — always its ALIGNED valence
+// (it is on its own side by definition; `divided` is reserved for nodes whose paths
+// reach both sides) — and surrounded by a single strong ink ring so it's
+// unmistakable, its whole-box outline reading even at overview zoom.
+export const REF_ROOT = {
+  ringColor: 'hsl(220, 18%, 26%)',   // ink — legible on paper and over any stance fill
+  ringWidth: 2.6,                     // one bold rounded-rect ring around the box
+  ringGap:   4.5,                     // gap from the box edge out to the ring
+} as const
 
 // ── Layered layout (dagre) ────────────────────────────────────────────────────
 // Clarity of relationships is the top priority: every edge must be easy to

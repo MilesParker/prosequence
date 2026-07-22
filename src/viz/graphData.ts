@@ -1,6 +1,6 @@
 import type { SimulationNodeDatum, SimulationLinkDatum } from 'd3'
 import type { DiscourseSpace, Claim, Inference, Cluster } from '../types'
-import { COLORS, NODE, EDGE } from '../config'
+import { COLORS, NODE, EDGE, STANCE, STANCE_NEUTRAL_STROKE } from '../config'
 
 // ── Node types ────────────────────────────────────────────────────────────────
 //
@@ -266,40 +266,141 @@ export function fitTag(tag: string, hw: number, hh: number, fontSize: number): s
 
 // ── Colour helpers ─────────────────────────────────────────────────────────────
 
-export function claimColorKey(n: ClaimNode): keyof typeof COLORS.node {
+// The claim's argumentative TYPE (the function it serves), or null when it has
+// none — a bare Pro/Anti claim is stance-only, and that valence is carried by
+// STANCE/colour, not by a type chip.
+export function claimColorKey(n: ClaimNode): keyof typeof COLORS.chip | null {
   if (n._isRoot) return 'root'
   if (n.terminal) return 'terminal'
-  if (n.attribution) return 'attributive'
   const c: Cluster = n.cluster
-  if (c === 'Pro') return 'pro'
-  if (c === 'Anti') return 'anti'
+  // The claim's own kind wins over the fact that it cites a source: a sourced
+  // empirical claim reads as `empirical`, not `attributive`.
+  if (c === 'Terminal') return 'terminal'
+  if (c === 'Empirical') return 'empirical'
   if (c === 'Analogy') return 'analogy'
-  return 'empirical'
+  if (n.attribution) return 'attributive'   // sourced, but no distinctive kind
+  return null   // Pro / Anti — stance only
 }
 
-export function nodeFill(n: GraphNode): string {
-  if (n._kind === 'inference') return COLORS.inference.fill
-  return COLORS.node[claimColorKey(n as ClaimNode)].fill
+// ── Stance relative to a reference root ─────────────────────────────────────────
+//
+// A claim's "side" is not fixed — it depends on which claim you measure against.
+// Pick a *reference root*; every node's stance is the PARITY of the contesting
+// steps on the DIRECTED argument paths that connect it to the root — the chains
+// running UP to R (claims that support/attack R) or DOWN from R (what R feeds).
+// The graph is a DAG, so these paths never loop (an undirected walk would instead
+// turn every reconvergence into a cycle, and a stray odd one would smear "divided"
+// across the whole graph — see the git history of this function):
+//
+//   • every path even  → aligned  (an even number of contests ⇒ same side)
+//   • every path odd   → opposed  (an odd number of contests ⇒ the other side)
+//   • paths disagree   → divided  (the claim genuinely cuts both ways)
+//   • no directed path → neutral  (nothing connects it to the reference root)
+//
+// Only `Contests` edges flip parity; Grounds / Warrants / Concludes preserve it
+// (grounds support their inference's output; a contest inverts it). Reaching the
+// root by several routes is normal — routes *disagreeing* is exactly "divided".
+
+export type Stance = 'aligned' | 'opposed' | 'divided' | 'neutral'
+
+export interface StanceMap {
+  /** Stance of each reachable node (claims AND inference junctions). Absent ⇒ neutral. */
+  node: Map<string, Stance>
+  /** Hop distance from the reference root; picks an edge's far (owning) endpoint. */
+  dist: Map<string, number>
+  refRootId: string | null
 }
 
-export function nodeStroke(n: GraphNode): string {
-  if (n._kind === 'inference') return COLORS.inference.stroke
-  // The outline reflects the claim's own identity (cluster / root / terminal).
-  // Its role as grounds vs warrant in a given inference is carried by the edge
-  // (solid vs dashed), not painted onto the node — a claim can be a warrant in
-  // one inference and grounds in another, so a global override would be lossy.
-  return COLORS.node[claimColorKey(n as ClaimNode)].stroke
+const REACH_EVEN = 1   // bitmask: node reached with an even contest-count (aligned)
+const REACH_ODD  = 2   // bitmask: node reached with an odd contest-count (opposed)
+
+/**
+ * Colour the whole graph relative to `refRootId`. Parity is taken over the DIRECTED
+ * argument paths connecting each node to the root — followed UP from R (its
+ * supporters/attackers, via reversed edges) and DOWN from R (what R feeds, via
+ * forward edges). A node is aligned/opposed when every such path agrees, divided
+ * when they disagree, neutral when none connect it. The `visited` set keeps each
+ * path simple; since the graph is a DAG it also can't loop. A null / unknown root
+ * ⇒ everything neutral. These are small DAGs, so full path enumeration is cheap;
+ * the step cap only guards a pathologically dense input.
+ */
+export function computeStance(gd: GraphData, refRootId: string | null): StanceMap {
+  const node = new Map<string, Stance>()
+  const dist = new Map<string, number>()
+  const ref = refRootId && gd.nodeById.has(refRootId) ? refRootId : null
+  if (!ref) return { node, dist, refRootId: null }
+
+  // Directed adjacency (argument flow: grounds/warrant → inference → conclusion),
+  // plus its reverse, each carrying a per-edge parity flip (Contests = 1, else 0).
+  const fwd = new Map<string, Array<{ to: string; flip: number }>>()
+  const rev = new Map<string, Array<{ to: string; flip: number }>>()
+  const add = (m: typeof fwd, a: string, b: string, flip: number) => {
+    const list = m.get(a); if (list) list.push({ to: b, flip }); else m.set(a, [{ to: b, flip }])
+  }
+  for (const l of gd.links) {
+    const s = l.source as unknown as string, t = l.target as unknown as string
+    const flip = l.role === 'Contests' ? 1 : 0
+    add(fwd, s, t, flip); add(rev, t, s, flip)
+  }
+
+  // Parity over directed simple paths from R, accumulated as a per-node bitmask of
+  // the parities its paths carry. Run once UP (R's ancestors) and once DOWN.
+  const parity = new Map<string, number>()
+  let steps = 0
+  const STEP_CAP = 2_000_000
+  const explore = (adj: typeof fwd) => {
+    const visited = new Set<string>([ref])
+    const walk = (u: string, p: number) => {
+      for (const { to, flip } of adj.get(u) ?? []) {
+        if (visited.has(to) || steps++ > STEP_CAP) continue
+        const np = p ^ flip
+        parity.set(to, (parity.get(to) ?? 0) | (np === 0 ? REACH_EVEN : REACH_ODD))
+        visited.add(to); walk(to, np); visited.delete(to)
+      }
+    }
+    walk(ref, 0)
+  }
+  explore(rev)   // chains that reach R  (claims supporting / attacking R)
+  explore(fwd)   // chains R reaches     (what R itself feeds into)
+
+  // Directed hop distance from R (either direction) — picks an edge's far endpoint.
+  // In a DAG a node is an ancestor or a descendant of R, never both.
+  const bfsDist = (adj: typeof fwd) => {
+    const queue = [ref]; const seen = new Map<string, number>([[ref, 0]])
+    for (let h = 0; h < queue.length; h++) {
+      const u = queue[h], d = seen.get(u)!
+      for (const { to } of adj.get(u) ?? []) if (!seen.has(to)) { seen.set(to, d + 1); queue.push(to) }
+    }
+    for (const [k, v] of seen) if (!dist.has(k) || v < dist.get(k)!) dist.set(k, v)
+  }
+  bfsDist(rev); bfsDist(fwd)
+
+  for (const [id, mask] of parity) {
+    node.set(id, mask === REACH_EVEN ? 'aligned' : mask === REACH_ODD ? 'opposed' : 'divided')
+  }
+  return { node, dist, refRootId: ref }
 }
 
-export function edgeColor(role: EdgeRole): string {
-  if (role === 'Grounds')  return COLORS.edge.grounds
-  if (role === 'Warrants') return COLORS.edge.warrants
-  if (role === 'Concludes') return COLORS.edge.concludes
-  return COLORS.edge.contests
+/** The stance token for a node's stance (neutral / undefined ⇒ the muted outline). */
+export function stanceColor(s: Stance | undefined): string {
+  if (s === 'aligned') return STANCE.aligned
+  if (s === 'opposed') return STANCE.opposed
+  if (s === 'divided') return STANCE.divided
+  return STANCE_NEUTRAL_STROKE
 }
 
-export function edgeMarkerId(role: EdgeRole): string {
-  return `arr-${role.toLowerCase()}`
+/**
+ * An edge's stance = the stance of its endpoint FURTHER from the reference root
+ * (the region the edge leads into as you move away from the root). An edge with
+ * either end outside R's directed neighbourhood is leaving the stance picture, so
+ * it's neutral. Contest edges straddle two sides by nature — the double-tick (a
+ * separate channel) marks them regardless.
+ */
+export function edgeStance(sm: StanceMap, sourceId: string, targetId: string): Stance {
+  const ds = sm.dist.get(sourceId)
+  const dt = sm.dist.get(targetId)
+  if (ds == null || dt == null) return 'neutral'
+  return sm.node.get(dt >= ds ? targetId : sourceId) ?? 'neutral'
 }
 
 // ── Contest tick — the "contesting" relation mark ───────────────────────────────
@@ -352,8 +453,8 @@ export function contestTickForPolyline(pts: Array<{ x: number; y: number }>): Ti
 
 export type ChipKind = keyof typeof COLORS.chip
 
-export function claimChipKind(n: ClaimNode): ChipKind {
-  return claimColorKey(n) as ChipKind
+export function claimChipKind(n: ClaimNode): ChipKind | null {
+  return claimColorKey(n)
 }
 
 export function sourceLabel(src: { type: string; reference?: string } | undefined): string {

@@ -16,7 +16,7 @@ export function Loading({ message = 'Loading graph…', error = false }: Props) 
       background: COLORS.background,
       zIndex: 999,
       fontSize: 14,
-      color: error ? COLORS.edge.contests : COLORS.textDim,
+      color: error ? COLORS.error : COLORS.textDim,
     }}>
       {message}
     </div>

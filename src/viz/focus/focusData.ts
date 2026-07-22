@@ -4,7 +4,7 @@
 // is read off `supports` / `attacks` / `consumers`, which buildGraphData
 // computes once on load — neither view recomputes them.
 
-import type { GraphData, ClaimNode } from '../graphData'
+import type { GraphData, ClaimNode, Stance, StanceMap } from '../graphData'
 import type { Inference } from '../../types'
 
 export function getClaim(gd: GraphData, id: string): ClaimNode | null {
@@ -18,10 +18,6 @@ export const supportsOf = (gd: GraphData, id: string): Inference[] => gd.support
 export const attacksOf = (gd: GraphData, id: string): Inference[] => gd.attacks.get(id) ?? []
 /** Inferences that use `id` as grounds or warrant — the parent band. */
 export const consumersOf = (gd: GraphData, id: string): Inference[] => gd.consumers.get(id) ?? []
-
-/** §4 pip predicates — presence only, never counts. */
-export const isSupported = (gd: GraphData, id: string): boolean => supportsOf(gd, id).length > 0
-export const isContested = (gd: GraphData, id: string): boolean => attacksOf(gd, id).length > 0
 
 export type Output = { id: string; kind: 'concludes' | 'contests' }
 
@@ -56,4 +52,45 @@ export function renderedClaimIds(gd: GraphData, focusId: string): Set<string> {
     for (const c of [...(inf.grounds ?? []), ...(inf.warrants ?? [])]) ids.add(String(c))
   }
   return ids
+}
+
+/**
+ * The stance of the branch hidden *below* a continuation claim — a claim shown as
+ * a tap target (a cell ground/warrant or a parent destination) whose own
+ * support/attack is off-frame. Walks down from `id` (its supporting/attacking
+ * inferences → their grounds/warrants, recursively) and reports where everything
+ * hidden past it leads *relative to the reference root*, reusing the Stage 3 stance
+ * map: one-sided ⇒ that stance's colour, two-sided (or any genuinely `divided`
+ * node) ⇒ `divided`. Claims already on screen (`visible`) are the frame, not the
+ * frontier, so they don't count — we still descend past them to reach what's
+ * hidden deeper. Returns null when nothing is hidden past `id` (a bedrock/leaf, or
+ * an unpainted graph): a claim you can already read past has no continuation to
+ * hint at, and gets no mark (§ "status only on continuations").
+ */
+export function frontierStance(
+  gd: GraphData, sm: StanceMap, id: string, visible: Set<string>,
+): Stance | null {
+  const seen = new Set<string>([id])
+  let aligned = false, opposed = false, divided = false
+  const stack = [id]
+  while (stack.length) {
+    const u = stack.pop() as string
+    for (const inf of [...supportsOf(gd, u), ...attacksOf(gd, u)]) {
+      for (const c of [...(inf.grounds ?? []), ...(inf.warrants ?? [])]) {
+        const cid = String(c)
+        if (seen.has(cid)) continue
+        seen.add(cid)
+        if (!visible.has(cid)) {
+          const st = sm.node.get(cid)
+          if (st === 'aligned') aligned = true
+          else if (st === 'opposed') opposed = true
+          else if (st === 'divided') divided = true
+        }
+        stack.push(cid)   // descend even through visible claims — deeper is still hidden
+      }
+    }
+  }
+  if (!aligned && !opposed && !divided) return null
+  if (divided || (aligned && opposed)) return 'divided'
+  return aligned ? 'aligned' : 'opposed'
 }

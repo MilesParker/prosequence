@@ -9,11 +9,11 @@ import { useState, useEffect, useMemo, Fragment, type ReactNode } from 'react'
 import { COLORS, FOCUS, TITLE_BAR_HEIGHT } from '../../config'
 import type { GraphData } from '../graphData'
 import type { Inference, Attribution as AttributionT } from '../../types'
-import { sourceLabel } from '../graphData'
+import { sourceLabel, computeStance } from '../graphData'
 import {
   getClaim, supportsOf, attacksOf, consumersOf, outputOf, roleOf, renderedClaimIds, type Output,
 } from './focusData'
-import { BedrockBadge, EmptyCell, FromHighlight, useFromHighlight, ClaimMarks, GraphIcon, LocateContext } from './primitives'
+import { BedrockBadge, EmptyCell, FromHighlight, useFromHighlight, ClaimMarks, GraphIcon, LocateContext, TargetIcon, FrontierContext } from './primitives'
 import { Cell } from './Cell'
 
 // Hover affordances live in CSS so rows/entries need no per-node state.
@@ -33,15 +33,89 @@ function Connector() {
   return <div style={{ width: 1, height: FOCUS.connector, background: COLORS.border, alignSelf: 'center' }} />
 }
 
+// ── Reference-root line & tear (Stage 4) ──────────────────────────────────────
+//
+// The reference root — the origin all stance is measured from, the same claim the
+// graph pins with a target — rides at the very top as "what is this ultimately
+// for", which the one-hop parent band otherwise loses. Below it an inert torn
+// sheet stands in for the chain of hops we are NOT showing (that structure lives
+// in the graph, or one refocus away), captioned with how far the centred claim
+// really sits from the root. Neither is drawn when the centred claim IS the root
+// — that band carries the target itself — so the same claim never appears twice
+// with a 0-gap between (see the frame's suppression logic).
+
+// The pinned root: target icon, no stance hue (it's the origin), truncated to a
+// single banner line. Clicking it recentres the stack on the root — the
+// always-available "take me back to the top".
+function RootLine({ gd, rootId, onFocus }: { gd: GraphData; rootId: string; onFocus: (id: string) => void }) {
+  const claim = getClaim(gd, rootId)
+  return (
+    <div
+      className="pz-row"
+      onClick={() => onFocus(rootId)}
+      title={claim?.text ?? rootId}
+      style={{
+        display: 'flex', gap: 10, alignItems: 'center', cursor: 'pointer',
+        padding: '8px 12px', borderRadius: 8,
+        border: `1px solid ${COLORS.border}`, background: COLORS.surface,
+      }}
+    >
+      <TargetIcon />
+      <span style={{ flex: 1, minWidth: 0, fontSize: FOCUS.rowFont, fontWeight: 600, color: COLORS.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+        {claim?.text ?? rootId}
+      </span>
+      <span style={{ flexShrink: 0, fontSize: FOCUS.labelFont, textTransform: 'uppercase', letterSpacing: '0.08em', color: COLORS.textDim }}>
+        reference root
+      </span>
+    </div>
+  )
+}
+
+// The torn edge: a repeating zigzag "perforation" the full width of the stack.
+// Pure decoration — the enclosing tear sets pointer-events: none, so nothing here
+// is a target and it never expands.
+function TornEdge() {
+  const { tearHeight: h, tearToothW: w } = FOCUS
+  return (
+    <svg width="100%" height={h} style={{ display: 'block' }} aria-hidden>
+      <defs>
+        <pattern id="pz-tear" width={w} height={h} patternUnits="userSpaceOnUse">
+          <path d={`M0 ${h - 3} L${w / 2} 3 L${w} ${h - 3}`} fill="none" stroke={COLORS.border} strokeWidth="1.5" />
+        </pattern>
+      </defs>
+      <rect width="100%" height={h} fill="url(#pz-tear)" />
+    </svg>
+  )
+}
+
+// Torn edge + the hop count beside it. Inert: the tear only says "there's more
+// between here and the root, and it's this many inference hops away".
+function TearLine({ hops }: { hops: number }) {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, pointerEvents: 'none', margin: `${FOCUS.rootLineGap}px 0` }}>
+      <div style={{ flex: 1, minWidth: 0 }}><TornEdge /></div>
+      <span style={{ flexShrink: 0, fontSize: FOCUS.labelFont, color: COLORS.textDim, whiteSpace: 'nowrap' }}>
+        <span style={{ fontWeight: 700, color: COLORS.textMuted }}>{hops}</span> hop{hops === 1 ? '' : 's'} to root
+      </span>
+    </div>
+  )
+}
+
 // ── Parent band (§1–§3) — two fixed columns, paged like For/Against ───────────
 //
 // Supports / Contests are fixed positions assigned by each consumer inference's
 // output polarity (concludes / contests). Each column is a fixed-height card
 // paged one entry at a time (grounds-role entries before assumption-role); an
 // empty column keeps its header and shows nothing under it — no placeholder,
-// since a parent entry can't be authored from this frame (§1). A grounds-role
-// entry is the destination claim; a warrant-role entry the `{grounds} → {dest}`
-// pair (§3). Every claim shown recentres on tap (§7).
+// since a parent entry can't be authored from this frame (§1).
+//
+// The role C plays in the current entry — `as grounds` / `as an assumption` — is
+// a header spanning the column, anchored under the polarity heading and set off
+// from the tile, NOT a label on the tile (§2): a label touching a tile reads as
+// naming that tile, but the tile's claim is the *destination*, and C is the
+// thing acting as grounds. A grounds-role entry is the destination claim; a
+// warrant-role entry the `{grounds} → {dest}` pair (§3). Every claim shown
+// recentres on tap (§7).
 
 type ParentEntry = { inf: Inference; out: Output; role: 'grounds' | 'warrants' }
 type Tint = { tint: string; bg: string; border: string; label: string }
@@ -67,8 +141,9 @@ function ClaimTap({ gd, id, onFocus }: { gd: GraphData; id: string; onFocus: (id
 // One paged entry, filling the reserved height as a tinted card that mirrors a
 // For/Against cell. A grounds-role entry is the destination claim alone; a
 // warrant-role entry the `{grounds} → {destination}` pair (§3) — the destination
-// alone can't say which inference C bridges. The role label names how C (not the
-// tile's claim) participates; the `→` is decoration, not a tap target (§7).
+// alone can't say which inference C bridges. The tile carries no role label —
+// that's the column's group header (§2); the `→` is decoration, not a tap
+// target (§7).
 function ParentEntryCard({ gd, entry, tint, onFocus }: { gd: GraphData; entry: ParentEntry; tint: Tint; onFocus: (id: string) => void }) {
   const { inf, out, role } = entry
   const grounds = (inf.grounds ?? []).map(String)
@@ -87,9 +162,6 @@ function ParentEntryCard({ gd, entry, tint, onFocus }: { gd: GraphData; entry: P
       }}
     >
       <div style={{ flex: 1, minHeight: 0, overflowY: 'auto', padding: '8px 10px 10px', fontSize: FOCUS.rowFont, lineHeight: 1.4, color: COLORS.text }}>
-        <div style={{ fontSize: FOCUS.labelFont, color: tint.label, fontStyle: 'italic', letterSpacing: '0.03em', marginBottom: 6 }}>
-          {role === 'grounds' ? 'as grounds' : 'as an assumption'}
-        </div>
         {role === 'grounds' ? (
           <ClaimTap gd={gd} id={out.id} onFocus={onFocus} />
         ) : (
@@ -114,9 +186,13 @@ function ParentEntryCard({ gd, entry, tint, onFocus }: { gd: GraphData; entry: P
   )
 }
 
-// One fixed-height column, paged like For/Against (§5 reversed on request). Both
-// headers always render (§1); an empty column is a header over reserved space —
-// polarity is a position, not a presence — with no placeholder card.
+// One fixed-height column, paged like For/Against. Both polarity headers always
+// render (§1); an empty column is a header over reserved space — polarity is a
+// position, not a presence — with no placeholder card. Below the polarity
+// heading a role header (§2) names how C acts in the *current* entry; it spans
+// the column and is set off from the tile by the reserved pager slot, so it
+// heads the group rather than captioning the tile. Only a non-empty column shows
+// one — an empty column is its polarity heading and nothing else.
 function ParentColumn({ gd, column, entries, onFocus }: { gd: GraphData; column: 'supports' | 'contests'; entries: ParentEntry[]; onFocus: (id: string) => void }) {
   const [page, setPage] = useState(0)
   const heading = column === 'supports' ? 'Supports' : 'Contests'
@@ -124,17 +200,23 @@ function ParentColumn({ gd, column, entries, onFocus }: { gd: GraphData; column:
 
   const n = entries.length
   const i = Math.min(page, Math.max(0, n - 1))
+  const current = n > 0 ? entries[i] : null
 
   return (
     <div style={{ flex: 1, minWidth: 0, height: FOCUS.columnHeight, display: 'flex', flexDirection: 'column' }}>
       <div style={{ flexShrink: 0, fontSize: FOCUS.labelFont, textTransform: 'uppercase', letterSpacing: '0.08em', color: tint.label, textAlign: 'center' }}>
         {heading}
       </div>
+      {current && (
+        <div style={{ flexShrink: 0, textAlign: 'center', margin: '3px 0 1px', fontSize: FOCUS.labelFont, color: tint.label, fontStyle: 'italic', letterSpacing: '0.03em' }}>
+          {current.role === 'grounds' ? 'as grounds' : 'as an assumption'}
+        </div>
+      )}
       <div style={{ flexShrink: 0, height: FOCUS.pagerHeight, display: 'flex', alignItems: 'center' }}>
         {n > 1 && <div style={{ width: '100%' }}><Pager i={i} n={n} onPrev={() => setPage(i - 1)} onNext={() => setPage(i + 1)} /></div>}
       </div>
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-        {n > 0 && <ParentEntryCard gd={gd} entry={entries[i]} tint={tint} onFocus={onFocus} />}
+        {current && <ParentEntryCard gd={gd} entry={current} tint={tint} onFocus={onFocus} />}
       </div>
     </div>
   )
@@ -209,11 +291,12 @@ function CameFromIcon() {
   )
 }
 
-function FocusBand({ gd, focusId, fromId, showFromIcon, onFromHover, onFocus, onLocate }: {
+function FocusBand({ gd, focusId, fromId, showFromIcon, isReferenceRoot, onFromHover, onFocus, onLocate }: {
   gd: GraphData
   focusId: string
   fromId: string | null
   showFromIcon: boolean
+  isReferenceRoot: boolean
   onFromHover: (on: boolean) => void
   onFocus: (id: string) => void
   onLocate: (id: string) => void
@@ -231,6 +314,15 @@ function FocusBand({ gd, focusId, fromId, showFromIcon, onFromHover, onFocus, on
         padding: '16px 18px',
       }}
     >
+      {/* At the root, the band carries the target itself (no separate root line). */}
+      {isReferenceRoot && (
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
+          <TargetIcon size={15} />
+          <span style={{ fontSize: FOCUS.labelFont, textTransform: 'uppercase', letterSpacing: '0.08em', color: COLORS.textDim }}>
+            reference root
+          </span>
+        </div>
+      )}
       <div style={{ position: 'absolute', top: 10, right: 12, display: 'flex', gap: 4 }}>
         {showFromIcon && (
           <IconBtn
@@ -302,11 +394,38 @@ function Column({
 // ── Frame ─────────────────────────────────────────────────────────────────────
 
 export function FocusView({
-  gd, focusId, fromId = null, onFocus, onLocate,
-}: { gd: GraphData; focusId: string; fromId?: string | null; onFocus: (id: string) => void; onLocate: (id: string) => void }) {
+  gd, focusId, fromId = null, referenceRootId = null, onFocus, onLocate,
+}: { gd: GraphData; focusId: string; fromId?: string | null; referenceRootId?: string | null; onFocus: (id: string) => void; onLocate: (id: string) => void }) {
   const claim = getClaim(gd, focusId)
   const hasParents = consumersOf(gd, focusId).length > 0
   const terminal = !!claim?.terminal
+
+  // Stance relative to the reference root (the graph's Stage 3 origin; App has
+  // already defaulted a cleared root back to the structural root before it reaches
+  // us). Recomputed only when the root moves — navigating the stack keeps it. It
+  // feeds both the hop count up to the root and the frontier hints on continuations.
+  const sm = useMemo(() => computeStance(gd, referenceRootId), [gd, referenceRootId])
+  const rootClaim = referenceRootId ? getClaim(gd, referenceRootId) : null
+  const isAtRoot = rootClaim != null && referenceRootId === focusId
+  // `dist` counts every claim↔inference edge — two per inference hop.
+  const hopDist = rootClaim ? sm.dist.get(focusId) : undefined
+  const hops = hopDist != null ? Math.round(hopDist / 2) : null
+  // Root line + tear only when the root is real, off-centre, and genuinely above
+  // us (a directed path exists). Centred ON the root, the focus band carries the
+  // target instead — no line, no tear, no 0-hop restatement of the same claim.
+  const showRootLine = rootClaim != null && !isAtRoot && hops != null && hops > 0
+
+  // The claims already on screen — the frame the frontier hints measure *past*.
+  const visible = useMemo(() => {
+    const s = new Set(renderedClaimIds(gd, focusId))
+    s.add(focusId)
+    if (referenceRootId) s.add(referenceRootId)
+    return s
+  }, [gd, focusId, referenceRootId])
+  const frontier = useMemo(
+    () => (referenceRootId ? { sm, visible } : null),
+    [referenceRootId, sm, visible],
+  )
 
   // The claim you came from is only traceable when it's actually on screen — not
   // a co-input hidden behind a grounds-role tile, and not an entry from the graph.
@@ -322,7 +441,16 @@ export function FocusView({
       <style>{focusCss}</style>
       <FromHighlight.Provider value={{ id: fromVisible ? fromId : null, active: showFrom }}>
        <LocateContext.Provider value={onLocate}>
+        <FrontierContext.Provider value={frontier}>
         <div style={{ maxWidth: FOCUS.columnMaxWidth, margin: '0 auto', padding: '28px 20px 96px', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+          {/* What's ultimately at stake, then the inert tear for the hidden hops. */}
+          {showRootLine && (
+            <>
+              <RootLine gd={gd} rootId={referenceRootId as string} onFocus={onFocus} />
+              <TearLine hops={hops as number} />
+            </>
+          )}
+
           {hasParents && (
             <>
               <ParentBand gd={gd} focusId={focusId} onFocus={onFocus} />
@@ -333,6 +461,7 @@ export function FocusView({
           <FocusBand
             gd={gd} focusId={focusId} fromId={fromId}
             showFromIcon={fromVisible}
+            isReferenceRoot={isAtRoot}
             onFromHover={setShowFrom}
             onFocus={onFocus}
             onLocate={onLocate}
@@ -350,6 +479,7 @@ export function FocusView({
             </>
           )}
         </div>
+        </FrontierContext.Provider>
        </LocateContext.Provider>
       </FromHighlight.Provider>
     </div>
