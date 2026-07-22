@@ -323,7 +323,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-statements-evidence-intent
-    tag: public statements evidence specific intent
+    tag: Public statements evidence specific intent
     text: >-
       When senior political and military leaders publicly articulate objectives that match the legal
       definition of genocidal intent, those statements constitute evidence of specific intent, not
@@ -333,7 +333,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-law-permits-intent-inferred-from-statements
-    tag: public statements evidence specific intent — grounds
+    tag: Public statements evidence specific intent — grounds
     text: >-
       Genocide law, as Bartov notes, permits intent to be inferred from a pattern of statements and
       acts; the Genocide Convention requires dolus specialis — specific intent — which courts have
@@ -349,7 +349,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-pattern-establishes-intent
-    tag: systematic destruction pattern establishes intent
+    tag: Systematic destruction pattern establishes intent
     text: >-
       When the scope and nature of destruction systematically targets the conditions for group
       existence — not just military infrastructure — the pattern itself establishes genocidal intent
@@ -359,7 +359,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-intent-derivable-from-operations-pattern
-    tag: systematic destruction pattern establishes intent — grounds
+    tag: Systematic destruction pattern establishes intent — grounds
     text: >-
       Bartov notes that genocidal intent can be derived from a pattern of operations when direct
       statements of intent are contested; destruction of civilian infrastructure beyond any
@@ -374,7 +374,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-authority-genocide-scholars
-    tag: genocide scholars are the relevant epistemic authority
+    tag: Genocide scholars are the relevant authority
     text: >-
       Scholars who specialise in genocide studies and comparative genocide are better positioned
       than general historians or political commentators to apply the genocide definition to
@@ -384,7 +384,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-converging-scholars-are-genocide-specialists
-    tag: genocide scholars are the relevant epistemic authority — grounds
+    tag: Genocide scholars are the relevant epistemic authority — grounds
     text: >-
       Bartov, citing his own quarter-century of teaching genocide, notes that most scholars now
       converging on the genocide conclusion are genocide specialists, while those resisting it are
@@ -401,7 +401,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-consensus-tracks-legal-facts
-    tag: Scholarly consensus tracks the legal facts, not a political function
+    tag: Consensus tracks facts, not politics
     text: >-
       The scholars' convergence on the genocide designation reflects disinterested legal and
       scholarly judgment of the facts rather than a politically delegitimising function, so their
@@ -411,7 +411,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-intl-law-obliges-designation
-    tag: international law obliges states to name genocide to trigger prevention duties
+    tag: Designation triggers prevention duties
     text: >-
       The Genocide Convention's prevention and punishment obligations are only triggered when the
       genocide designation is applied; failure to designate events as genocide disables the legal
@@ -421,7 +421,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-convention-duties-contingent-on-designation
-    tag: international law obliges states to name genocide to trigger prevention duties — grounds
+    tag: International law obliges states to name genocide to trigger prevention duties — grounds
     text: >-
       Bartov notes that the Convention obliges all signatories to prevent genocide while it is
       occurring and to punish perpetrators afterward; these duties are contingent on the designation
@@ -436,7 +436,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-morphing-precedent-established
-    tag: historical precedent shows ethnic cleansing reliably morphs into genocide under confinement
+    tag: 'Precedent: confined cleansing becomes genocide'
     text: >-
       When a population cannot flee expulsion and is subjected to ongoing destruction of survival
       conditions, the historical record shows that ethnic cleansing reliably escalates to genocide.
@@ -445,7 +445,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-capacity-gap-reveals-intent
-    tag: gap between capacity and action reveals intent
+    tag: Gap between capacity and action reveals intent
     text: >-
       When a state has demonstrably greater destructive capacity than it is deploying, the gap
       between capacity and action is evidence against the hypothesis that its intent is total
@@ -470,7 +470,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-warnings-incompatible-genocide
-    tag: systematic evacuation warnings are incompatible with intent to kill as such
+    tag: Evacuation warnings contradict genocidal intent
     text: >-
       An actor intending to destroy a population as such has no rational motive to systematically
       warn that population to evacuate before attacks; the practice of issuing such warnings is
@@ -480,7 +480,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-warnings-create-tactical-disadvantage
-    tag: systematic evacuation warnings are incompatible with intent to kill as such — grounds
+    tag: Systematic evacuation warnings are incompatible with intent to kill as such — grounds
     text: >-
       Stephens notes that Israel routinely issued advance warnings to civilians to evacuate areas
       before striking, a practice that creates tactical disadvantage (alerting the enemy) and is
@@ -495,7 +495,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-legal-definition-as-such
-    tag: the "as such" requirement distinguishes genocide from war crimes
+    tag: '"As such" distinguishes genocide from war crimes'
     text: >-
       The UN Genocide Convention's requirement that killing be directed at people "as such" — solely
       because of their group membership — is a necessary and legally operative condition that
@@ -505,7 +505,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-as-such-is-constitutive-not-rhetorical
-    tag: the "as such" requirement distinguishes genocide from war crimes — grounds
+    tag: The "as such" requirement distinguishes genocide from war crimes — grounds
     text: >-
       Stephens notes that the Convention's text specifies "as such" as a constitutive element, not
       rhetorical emphasis; the purpose was to distinguish the attempt to destroy a group from the
@@ -520,7 +520,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-proximate-cause-attribution
-    tag: proximate cause of civilian death determines moral responsibility
+    tag: Human shielding shifts responsibility
     text: >-
       When an armed group deliberately uses civilians as human shields, the moral and legal
       responsibility for resulting civilian deaths shifts substantially to the shielding party, not
@@ -530,7 +530,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-tunnel-strategy-is-proximate-cause
-    tag: proximate cause of civilian death determines moral responsibility — grounds
+    tag: Proximate cause of civilian death determines moral responsibility — grounds
     text: >-
       Stephens argues that Hamas's tunnel strategy — sheltering combatants underground while
       civilians remain exposed above ground — constitutes a war crime in itself and is the proximate
@@ -545,7 +545,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-term-inflation-undermines-law
-    tag: inflation of a legal term destroys its deterrent and juridical function
+    tag: Term inflation destroys legal function
     text: >-
       A legal term whose application is not governed by precise criteria loses its capacity to
       trigger the legal consequences — sanctions, prosecutions, prevention duties — it was designed
@@ -555,7 +555,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-term-created-as-distinct-legal-category
-    tag: inflation of a legal term destroys its deterrent and juridical function — grounds
+    tag: Inflation of a legal term destroys its deterrent and juridical function — grounds
     text: >-
       Stephens draws on the history of "genocide" as a term coined in the 1940s precisely to create
       a distinct, higher category of crime with distinct legal consequences; that function depends
@@ -570,7 +570,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-incorrect-application-damages-convention
-    tag: incorrect application of genocide designation in either direction damages the Convention
+    tag: Error in either direction damages the Convention
     text: >-
       The Genocide Convention's protective function depends on the designation being applied neither
       too liberally nor too narrowly; systematic error in either direction erodes the legal
@@ -581,7 +581,7 @@ claims:
     submissionStatus: Accepted
   - id: c-both-sides-invoke-protective-purpose
     tag: >-
-      incorrect application of genocide designation in either direction damages the Convention —
+      Incorrect application of genocide designation in either direction damages the Convention —
       grounds
     text: >-
       Both Bartov and Stephens invoke the Convention's protective purpose — Bartov arguing that
@@ -745,7 +745,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-intent-inferred-from-conduct
-    tag: genocidal intent is legitimately inferred from conduct when no planning document exists
+    tag: Intent inferable without a planning document
     text: >-
       In genocide adjudication, specific intent (dolus specialis) may be established by inference
       from the totality of acts and statements when no direct planning document is available; the
@@ -756,7 +756,7 @@ claims:
     submissionStatus: Accepted
   - id: c-icj-and-icty-inferred-intent-from-conduct
     tag: >-
-      genocidal intent is legitimately inferred from conduct when no planning document exists —
+      Genocidal intent is legitimately inferred from conduct when no planning document exists —
       grounds
     text: >-
       Bartov notes that the Genocide Convention permits intent to be derived from a pattern of
@@ -773,7 +773,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-confinement-transforms-cleansing
-    tag: Confinement transforms expulsion into group destruction
+    tag: No receiving territory makes expulsion destruction
     text: >-
       When a target population has no adjacent territory to receive them, expulsion orders combined
       with ongoing destruction of survival conditions are functionally equivalent to destruction of
@@ -828,7 +828,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-restraint-in-killing-not-restraint-in-destruction
-    tag: Restraint in killing is not restraint in destruction
+    tag: Restraint in killing, not in destruction
     text: >-
       A state that deploys far less than its capacity to kill while deploying near its full capacity
       to destroy housing, infrastructure, and civilian institutions has selected those targets

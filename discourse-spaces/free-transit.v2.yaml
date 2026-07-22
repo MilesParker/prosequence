@@ -680,7 +680,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-fare-cost-binding-constraint
-    tag: Warrant — fare cost is binding constraint
+    tag: Fare cost is binding constraint
     text: >-
       Fare cost is the binding constraint on low-income trip rationing, so removing it relieves that
       constraint
@@ -689,7 +689,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-marginal-mobility-improvement
-    tag: Warrant — marginal mobility improvement
+    tag: Fare removal helps at the margin
     text: >-
       Even where fare cost is not the sole constraint, removing it improves mobility at the margin
       for those who currently ration trips
@@ -698,7 +698,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-trip-rationing-representative
-    tag: Warrant — trip rationing representative
+    tag: Trip rationing is representative
     text: >-
       The pattern of fare-induced trip rationing reported by Sustainable America is representative
       of low-income transit users generally
@@ -721,7 +721,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-boston-representativeness
-    tag: Warrant — Boston representativeness
+    tag: Boston is representative
     text: >-
       Boston's experience is representative enough of other transit contexts to support a general
       conclusion about ridership response to fare elimination
@@ -743,7 +743,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-modal-shift-emissions
-    tag: Warrant — modal shift produces emissions reduction
+    tag: Modal shift produces emissions reduction
     text: >-
       A ridership increase large enough to shift modal share away from private cars would produce
       measurable emissions reductions
@@ -752,7 +752,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-modal-shift-congestion
-    tag: Warrant — modal shift reduces congestion
+    tag: Modal shift reduces congestion
     text: >-
       Modal shift from cars to transit at sufficient scale produces measurable congestion reduction
       benefiting all road users
@@ -761,7 +761,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-reduced-cost-expands-catchment
-    tag: Warrant — reduced cost expands labour market catchment
+    tag: Reduced cost expands labour market catchment
     text: >-
       Reduced travel cost and increased network use expands the effective labour market catchment
       for low-income workers
@@ -770,7 +770,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-fare-payment-dwell-time
-    tag: Warrant — fare payment causes dwell time
+    tag: Fare payment causes dwell time
     text: >-
       Fare payment at boarding is a direct cause of dwell time; removing it reduces dwell time
       regardless of ridership levels
@@ -779,7 +779,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-low-recovery-overhead
-    tag: Warrant — low recovery makes overhead disproportionate
+    tag: Low recovery makes overhead disproportionate
     text: >-
       Where recovery rates are very low, the overhead of collection consumes a substantial fraction
       of what is recovered, making collection economically irrational
@@ -788,7 +788,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-non-user-benefits-justify-collective
-    tag: Warrant — non-user benefits justify collective funding
+    tag: Non-user benefits justify collective funding
     text: >-
       Benefits that accrue to non-users as well as users justify cost distribution across the whole
       population rather than individual user charges
@@ -797,7 +797,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-systematic-burden-removal-redistributive
-    tag: Warrant — systematic burden removal is redistributive
+    tag: Systematic burden removal is redistributive
     text: >-
       When a cost burden falls systematically on already-disadvantaged groups, removing it is a
       redistributive act that advances racial and economic justice
@@ -806,7 +806,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-transit-prerequisite-participation
-    tag: Warrant — transit is prerequisite for participation
+    tag: Transit is prerequisite for participation
     text: >-
       Transit access is a prerequisite for participation in economic and social life, and such
       prerequisites should be guaranteed regardless of income
@@ -815,7 +815,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-revenue-dependency-representative
-    tag: Warrant — revenue dependency representative
+    tag: Revenue dependency is representative
     text: >-
       Cities with high fare revenue dependency are representative of large transit systems
       generally, and the dependency would apply elsewhere
@@ -824,7 +824,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-transitcenter-methodology-reliable
-    tag: Warrant — TransitCenter methodology reliable
+    tag: TransitCenter methodology reliable
     text: >-
       TransitCenter's research methodology and independence make its survey findings reliable
       evidence about rider priorities across income levels
@@ -846,7 +846,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-fare-not-employment-constraint
-    tag: Warrant — fare not employment constraint
+    tag: Fare not employment constraint
     text: >-
       Removing the fare barrier does not address the other factors constraining employment — job
       availability, skill match, childcare
@@ -855,7 +855,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-concentrated-benefits-bear-costs
-    tag: Warrant — concentrated benefits justify bearing costs
+    tag: Concentrated benefits justify bearing costs
     text: >-
       Those who receive concentrated benefits from a service should bear its costs proportionally;
       diffuse spillover benefits do not justify general-population funding
@@ -864,7 +864,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-middle-income-transfer-regressive
-    tag: Warrant — middle income transfer is regressive
+    tag: Middle income transfer is regressive
     text: >-
       A subsidy transferring resources from the general tax base to middle-income commuters moves
       money in the wrong direction, but only if tax incidence on low-income non-riders is
@@ -874,7 +874,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-regressivity-quantitative-claim
-    tag: Warrant — regressivity requires quantitative support
+    tag: Regressivity requires quantitative support
     text: >-
       The regressivity argument requires that the tax incidence on low-income non-riders be
       non-trivial — a quantitative claim not established by the grounds alone
@@ -883,7 +883,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-local-reports-representative
-    tag: Warrant — local antisocial reports representative
+    tag: Local antisocial reports are representative
     text: >-
       Local reports of antisocial behaviour following fare elimination are representative of a
       general effect rather than local anomalies
@@ -892,7 +892,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-universal-wastes-targeting-concentrates
-    tag: Warrant — universal wastes, targeting concentrates
+    tag: Universal wastes, targeting concentrates
     text: >-
       Universal provision wastes resources on those who do not need the subsidy; targeting
       concentrates them where they have effect
@@ -901,7 +901,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-luxembourg-representative
-    tag: Warrant — Luxembourg representative
+    tag: Luxembourg is representative
     text: >-
       Luxembourg's operational experience is sufficiently similar to other national contexts to
       demonstrate general viability
@@ -910,14 +910,14 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-kansas-city-representative
-    tag: Warrant — Kansas City representative
+    tag: Kansas City is representative
     text: Kansas City is representative of mid-sized U.S. transit contexts
     terminal: false
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-unaddressed-barriers-reassert
-    tag: Warrant — unaddressed barriers reassert
+    tag: Unaddressed barriers reassert
     text: >-
       Fare removal addresses only one barrier to transit use; unaddressed barriers reassert
       themselves over time and erode initial ridership gains
@@ -926,7 +926,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-essentiality-criteria-same
-    tag: Warrant — transit meets essentiality criteria
+    tag: Transit meets essentiality criteria
     text: >-
       If transit meets the same criteria of essentiality as acknowledged public utilities it
       warrants the same treatment
@@ -935,7 +935,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-private-substitutes-disanalogy
-    tag: Warrant — private substitutes are relevant disanalogy
+    tag: Private substitutes are relevant disanalogy
     text: >-
       The existence of private substitutes for transit is a relevant disanalogy that undermines the
       public utility comparison
@@ -944,7 +944,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-toronto-hongkong-not-exceptional
-    tag: Warrant — Toronto and Hong Kong not exceptional
+    tag: Toronto and Hong Kong not exceptional
     text: >-
       Toronto and Hong Kong are not so exceptional that their fare recovery experience is irrelevant
       to other systems
@@ -953,7 +953,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-problem-character-signals-composition
-    tag: Warrant — problem character signals composition change
+    tag: Problem character signals composition change
     text: >-
       A change in the character of system problems, not just their scale, is a reliable sign of a
       change in user composition
@@ -962,7 +962,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-rct-methodological-superiority
-    tag: Warrant — RCT methodological superiority
+    tag: RCT supersedes observational studies
     text: >-
       The methodological superiority of the RCT design makes its null finding on employment the best
       available evidence, superseding observational studies
@@ -971,14 +971,14 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-selective-application-requires-justification
-    tag: Warrant — selective user-pays application requires justification
+    tag: Selective user-pays needs justification
     text: Applying user-pays to transit but not roads requires justification that has not been provided
     terminal: false
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-user-pays-applies-to-transit
-    tag: Warrant — user-pays legitimately applies to transit
+    tag: User-pays legitimately applies to transit
     text: >-
       The user-pays principle is applied consistently across comparable public services, so it
       legitimately governs transit funding rather than being invoked selectively.
@@ -987,7 +987,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-consistent-outcome-indicates-pattern
-    tag: Warrant — consistent outcome indicates general pattern
+    tag: Consistent outcome indicates general pattern
     text: >-
       Consistency of outcome across independent cases indicates a general pattern rather than
       coincidence or local factors
@@ -996,7 +996,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-diverse-success-establishes-viability
-    tag: Warrant — diverse success establishes viability
+    tag: Diverse success establishes viability
     text: >-
       Consistent success across diverse contexts establishes that fare-free transit is not merely
       theoretical but a proven operational model
@@ -1005,7 +1005,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-fare-elimination-causes-ridership
-    tag: Warrant — fare elimination causes ridership increase
+    tag: Fare elimination causes ridership increase
     text: >-
       Removing a direct cost barrier to transit use causes an increase in ridership among
       price-sensitive riders
@@ -1014,7 +1014,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-ridership-increase-causes-modal-shift
-    tag: Warrant — ridership increase causes modal shift
+    tag: Ridership increase causes modal shift
     text: >-
       A sufficiently large ridership increase produces modal shift from private cars, since new
       riders must come from somewhere
@@ -1023,7 +1023,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-fare-free-meets-justice-definition
-    tag: Warrant — fare-free meets justice definition
+    tag: Fare-free meets justice definition
     text: >-
       A policy that removes a systematically inequitable burden and expands access to civic
       participation meets the standard of justice as defined in this discourse space

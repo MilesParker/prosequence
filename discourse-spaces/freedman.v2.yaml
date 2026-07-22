@@ -201,7 +201,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-electoral-calendar
-    tag: Warrant — electoral calendar proximate cause
+    tag: Electoral calendar proximate cause
     text: >-
       When a negotiating outcome tracks the leader's electoral calendar rather than strategic logic,
       electoral pressure is the proximate cause.
@@ -223,7 +223,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-capability-retention
-    tag: Warrant — capability retention increases exposure
+    tag: Capability retention increases exposure
     text: >-
       Removing US military pressure while leaving Iran's threatening capabilities intact increases
       allies' net threat exposure.
@@ -245,7 +245,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-withdrawal-signal
-    tag: Warrant — withdrawal signal forces accommodation
+    tag: Withdrawal signal forces accommodation
     text: >-
       Allies who receive credible signals of US withdrawal must independently accommodate the rising
       regional power, shifting the balance against the US.
@@ -265,7 +265,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-hormuz-precedent
-    tag: Warrant — 60-day carve-out establishes precedent
+    tag: 60-day carve-out establishes precedent
     text: >-
       A time-limited toll-free commitment without a permanent successor establishes the precedent
       that Iran holds authority to charge for Hormuz passage.
@@ -287,7 +287,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-leverage-expended
-    tag: Warrant — ended campaign signals escalation ceiling
+    tag: Ended campaign signals escalation ceiling
     text: >-
       Once a military campaign ends without achieving its core objective, the threat of renewed
       force becomes less credible, weakening the position for deferred objectives.
@@ -309,7 +309,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-economic-harm
-    tag: Warrant — citizen welfare is national interest
+    tag: Citizen welfare is national interest
     text: >-
       Ending a war causing domestic inflation serves the material interests of US citizens, which
       are a component of US national interests.
@@ -390,7 +390,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-democratic-criterion-governs
-    tag: The democratic-governance criterion is the right yardstick here
+    tag: Democratic survival is a valid yardstick
     text: >-
       Evaluating this deal by its effect on the survival of democratic governance in the
       international order is a legitimate and applicable standard for judging US strategic
@@ -421,7 +421,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-expert-exclusion
-    tag: Warrant — expert exclusion causes predictive failure
+    tag: Expert exclusion causes predictive failure
     text: >-
       When decision-makers exclude expert challenge, predictive failures that experts would have
       flagged are structurally caused by that exclusion.
@@ -443,7 +443,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-identity-evaluation
-    tag: Warrant — identity-driven evaluation lacks evidentiary weight
+    tag: Partisan evaluation lacks evidentiary weight
     text: >-
       When the same outcome is condemned under one administration and praised under another with no
       change in strategic logic, the evaluation is partisan and carries no independent evidentiary
@@ -466,7 +466,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-threat-removal-unlocks-politics
-    tag: Warrant — external threat removal unlocks internal politics
+    tag: External threat removal unlocks internal politics
     text: >-
       Regimes that use external threat narratives to suppress dissent lose that justification when
       the threat recedes, potentially enabling domestic opposition to organise.
@@ -512,7 +512,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-dealmaking-transfer
-    tag: Warrant — dealmaking skills are not geopolitical skills
+    tag: Dealmaking skills are not geopolitical skills
     text: >-
       Real-estate negotiation optimises for closing a transaction; geopolitical negotiation requires
       preserving leverage and foreclosing future coercion options — these are not extensions of the
