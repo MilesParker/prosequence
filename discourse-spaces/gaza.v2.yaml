@@ -42,7 +42,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-group-existence-inviolable
-    tag: Group existence inviolable (terminal)
+    tag: Every group has a right to continued existence
     text: >-
       Every distinct human group has an inviolable right to continued existence as a group, and acts
       that destroy the conditions for that existence are wrong regardless of the perpetrator's other
@@ -52,7 +52,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-legal-precision-matters
-    tag: Legal precision matters (terminal)
+    tag: Legal precision matters
     text: >-
       Legal terms that carry grave moral weight must be applied with strict precision; promiscuous
       application destroys the protective function the term was designed to serve.
@@ -61,7 +61,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-self-defense-legitimate
-    tag: State self-defense legitimate (terminal)
+    tag: States may use force to eliminate a threat
     text: >-
       A state subjected to violent attack has a legitimate right to use military force to eliminate
       the threat, including force that causes substantial civilian harm when the attacking force
@@ -71,7 +71,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-intl-law-universal
-    tag: International law is universal (terminal)
+    tag: International law is universal
     text: >-
       International humanitarian law and the Genocide Convention apply universally, without
       exception for any state's history, security situation, or political alliances.
@@ -89,7 +89,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-netanyahu-amalek-and-rubble-statements
-    tag: Public genocidal statements by leaders — grounds
+    tag: 'Bartov: Officials called for annihilation'
     text: >-
       Bartov reports that Netanyahu invoked the biblical Amalek passage widely interpreted as
       demanding total destruction of the enemy, promised to turn parts of Gaza "into rubble," called
@@ -116,7 +116,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-haaretz-174000-buildings-destroyed
-    tag: Pattern of operations consistent with genocide — grounds
+    tag: 'Haaretz: 174,000 buildings hit'
     text: >-
       Bartov reports that a Haaretz investigation found approximately 174,000 buildings destroyed or
       damaged, up to 70 percent of all structures in the Strip, along with systematic destruction of
@@ -143,7 +143,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-named-experts-concluded-genocide
-    tag: Growing scholarly and legal consensus — grounds
+    tag: 'Bartov: Experts converge on genocide'
     text: >-
       Bartov reports that experts including the UN Special Rapporteur Francesca Albanese, Amnesty
       International, genocide scholars Shmuel Lederman, William Schabas, Melanie O'Brien, Martin
@@ -168,7 +168,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-convention-obliges-prevention-on-designation
-    tag: Denial damages international legal order — grounds
+    tag: 'Bartov: Convention obliges states to prevent'
     text: >-
       Bartov argues that the Genocide Convention was designed to obligate all signatory states to
       prevent, stop, and punish genocide wherever it occurs, and that failure to apply the
@@ -192,7 +192,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-herero-armenian-holocaust-began-as-expulsion
-    tag: Ethnic cleansing morphing into genocide — grounds
+    tag: 'Bartov: Three expulsions became extermination'
     text: >-
       Bartov cites three cases in which expulsion campaigns became genocidal extermination once the
       target population had no escape: the Herero and Nama in German South West Africa (1904), the
@@ -225,7 +225,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-israel-warned-evacuations-and-risked-soldiers
-    tag: Protective measures inconsistent with genocide — grounds
+    tag: 'Stephens: Israel warned and risked soldiers'
     text: >-
       Stephens reports that Israel routinely warned Gazans to evacuate areas before striking, risked
       and lost hundreds of its own soldiers in ground combat rather than bombing without restraint,
@@ -249,23 +249,42 @@ claims:
     cluster: Anti
     uncertain: false
     submissionStatus: Accepted
-  - id: c-convention-requires-as-such-killing
-    tag: "\"As such\" intent is absent — grounds"
+  - id: c-israel-aim-is-hamas-not-palestinians
+    tag: 'Stephens: War aim is Hamas, not Palestinians'
     text: >-
-      Stephens notes that the UN Genocide Convention's definition requires killing people "as such"
-      — solely because they belong to the protected group — and distinguishes this from civilian
-      deaths caused by war, citing the Allied bombing of German cities in World War II as killing
-      Germans without constituting genocide because the aim was to defeat Nazism, not to destroy
-      Germans as Germans.
+      Stephens argues that Israel's war aim is the defeat of Hamas as a military-political force rather
+      than the destruction of Palestinians as a group.
     terminal: false
     attribution:
       source:
         type: Citation
-        reference: Bret Stephens, New York Times, July 22 2025, citing UN Genocide Convention
+        reference: Bret Stephens, New York Times, July 22 2025
       quote: >-
-        intent to destroy, in whole or in part, a national, ethnical, racial or religious group, as
-        such
+        CITATION NEEDED
     cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-allied-bombing-not-genocide
+    tag: 'Stephens: Allied bombing of Germany not genocide'
+    text: >-
+      Stephens cites the Allied bombing of German cities in the Second World War as killing Germans without
+      constituting genocide, because the aim was to defeat Nazism rather than to destroy Germans as Germans.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Bret Stephens, New York Times, July 22 2025
+      quote: null
+    cluster: Analogy
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-military-aim-killing-not-genocide
+    tag: Military-aim killing is not genocide
+    text: >-
+      Mass civilian death inflicted in pursuit of a military objective does not constitute genocide where
+      the objective is the defeat of an adversary rather than the destruction of the group as such.
+    terminal: false
+    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-hamas-tactics-explain-casualties
@@ -278,7 +297,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-hamas-shelters-fighters-exposes-civilians
-    tag: Hamas tactics explain civilian casualties — grounds
+    tag: 'Stephens: Hamas shelters below, civilians above'
     text: >-
       Stephens describes Hamas's practice of sheltering its fighters and command infrastructure in
       tunnels while leaving civilians exposed above ground, contrasting this with Ukrainian practice
@@ -306,7 +325,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-genocide-term-coined-for-a-specific-crime
-    tag: Promiscuous genocide label is harmful — grounds
+    tag: 'Stephens: Genocide names a specific crime'
     text: >-
       Stephens argues that "genocide" was coined only in the 1940s and has a specific meaning
       designed to identify a uniquely horrific crime; applying it to any military situation one
@@ -333,7 +352,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-law-permits-intent-inferred-from-statements
-    tag: Public statements evidence specific intent — grounds
+    tag: 'Bartov: Intent inferable from statements'
     text: >-
       Genocide law, as Bartov notes, permits intent to be inferred from a pattern of statements and
       acts; the Genocide Convention requires dolus specialis — specific intent — which courts have
@@ -358,18 +377,17 @@ claims:
     cluster: Pro
     uncertain: false
     submissionStatus: Accepted
-  - id: c-intent-derivable-from-operations-pattern
-    tag: Systematic destruction pattern establishes intent — grounds
+  - id: c-destruction-beyond-military-necessity
+    tag: 'Bartov: Destruction beyond military necessity'
     text: >-
-      Bartov notes that genocidal intent can be derived from a pattern of operations when direct
-      statements of intent are contested; destruction of civilian infrastructure beyond any
-      plausible military necessity is the standard evidentiary basis in genocide jurisprudence.
+      Bartov argues that destruction of civilian infrastructure beyond any plausible military necessity
+      is the standard evidentiary basis for inferring genocidal intent.
     terminal: false
     attribution:
       source:
         type: Citation
         reference: Omer Bartov, New York Times, 2025
-      quote: intent can also be derived from a pattern of operations on the ground
+      quote: CITATION NEEDED
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
@@ -384,7 +402,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-converging-scholars-are-genocide-specialists
-    tag: Genocide scholars are the relevant epistemic authority — grounds
+    tag: 'Bartov: Converging scholars are specialists'
     text: >-
       Bartov, citing his own quarter-century of teaching genocide, notes that most scholars now
       converging on the genocide conclusion are genocide specialists, while those resisting it are
@@ -421,7 +439,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-convention-duties-contingent-on-designation
-    tag: International law obliges states to name genocide to trigger prevention duties — grounds
+    tag: 'Bartov: Duties depend on the designation'
     text: >-
       Bartov notes that the Convention obliges all signatories to prevent genocide while it is
       occurring and to punish perpetrators afterward; these duties are contingent on the designation
@@ -480,7 +498,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-warnings-create-tactical-disadvantage
-    tag: Systematic evacuation warnings are incompatible with intent to kill as such — grounds
+    tag: 'Stephens: Warnings cost tactical advantage'
     text: >-
       Stephens notes that Israel routinely issued advance warnings to civilians to evacuate areas
       before striking, a practice that creates tactical disadvantage (alerting the enemy) and is
@@ -505,7 +523,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-as-such-is-constitutive-not-rhetorical
-    tag: The "as such" requirement distinguishes genocide from war crimes — grounds
+    tag: 'Stephens: As such is constitutive, not rhetorical'
     text: >-
       Stephens notes that the Convention's text specifies "as such" as a constitutive element, not
       rhetorical emphasis; the purpose was to distinguish the attempt to destroy a group from the
@@ -516,6 +534,21 @@ claims:
         type: Citation
         reference: Bret Stephens, New York Times, July 22 2025
       quote: Note the words 'intent' and 'as such.'
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-convention-as-such-text
+    tag: 'Genocide Convention: Intent to destroy as such'
+    text: >-
+      The UN Genocide Convention defines genocide as acts committed with intent to destroy a national,
+      ethnical, racial or religious group as such.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: UN Genocide Convention (1948), Article II
+      quote: >-
+        intent to destroy, in whole or in part, a national, ethnical, racial or religious group, as such
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
@@ -530,7 +563,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-tunnel-strategy-is-proximate-cause
-    tag: Proximate cause of civilian death determines moral responsibility — grounds
+    tag: 'Stephens: Tunnels are the proximate cause'
     text: >-
       Stephens argues that Hamas's tunnel strategy — sheltering combatants underground while
       civilians remain exposed above ground — constitutes a war crime in itself and is the proximate
@@ -555,7 +588,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-term-created-as-distinct-legal-category
-    tag: Inflation of a legal term destroys its deterrent and juridical function — grounds
+    tag: 'Stephens: Term created as a distinct category'
     text: >-
       Stephens draws on the history of "genocide" as a term coined in the 1940s precisely to create
       a distinct, higher category of crime with distinct legal consequences; that function depends
@@ -581,8 +614,7 @@ claims:
     submissionStatus: Accepted
   - id: c-both-sides-invoke-protective-purpose
     tag: >-
-      Incorrect application of genocide designation in either direction damages the Convention —
-      grounds
+      Both sides invoke the protective purpose
     text: >-
       Both Bartov and Stephens invoke the Convention's protective purpose — Bartov arguing that
       under-application disables prevention duties, Stephens arguing that over-application dilutes
@@ -607,7 +639,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-comments-are-not-a-wannsee-equivalent
-    tag: Isolated statements vs. systematic policy — grounds
+    tag: 'Stephens: Comments are no Wannsee equivalent'
     text: >-
       Stephens acknowledges the statements made by Israeli officials but notes that furious comments
       in the immediate aftermath of a mass atrocity do not constitute the equivalent of the Wannsee
@@ -625,7 +657,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-civilian-institutions-systematically-destroyed
-    tag: Infrastructure destruction beyond military necessity — grounds
+    tag: 'Bartov: Civilian institutions destroyed'
     text: >-
       Bartov reports systematic destruction not only of housing but of all institutions necessary
       for civilian life and for the reconstitution of the group: hospitals, universities, schools,
@@ -642,7 +674,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-mosul-analogy
-    tag: Mosul analogy — comparable tactics, no genocide charge
+    tag: Mosul drew no genocide charge
     text: >-
       The US-backed Mosul campaign against ISIS used comparable tactics to Israel's Gaza campaign
       and produced comparable civilian casualties, yet no credible genocide charge was made against
@@ -651,8 +683,18 @@ claims:
     cluster: Analogy
     uncertain: false
     submissionStatus: Accepted
+  - id: c-embedded-adversary-explains-casualties
+    tag: Embedded adversary explains casualty rate
+    text: >-
+      Where an armed group embeds itself in dense urban terrain and uses the civilian population as cover,
+      the resulting civilian casualty rate is explained by the tactical situation rather than by the attacking
+      state's intent.
+    terminal: false
+    cluster: Anti
+    uncertain: false
+    submissionStatus: Accepted
   - id: c-mosul-campaign-11000-civilian-deaths
-    tag: Mosul analogy — comparable tactics, no genocide charge — grounds
+    tag: 'Stephens: Mosul killed up to 11,000 civilians'
     text: >-
       Stephens cites the 2016–17 Mosul campaign, in which American airstrikes leveled entire blocks
       and as many as 11,000 civilians died over nine months as ISIS used civilians as human shields,
@@ -678,7 +720,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-isis-and-hamas-used-same-urban-strategy
-    tag: Mosul analogy is structurally comparable to Gaza — grounds
+    tag: 'Stephens: ISIS and Hamas used one strategy'
     text: >-
       Stephens notes that ISIS, like Hamas, used a booby-trapped underground fortress strategy in a
       dense urban environment, with the same dynamic of combatants below ground and civilians above
@@ -702,7 +744,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-genocide-charge-among-bogus-delegitimising-charges
-    tag: Genocide label serves antisemitic function — grounds
+    tag: 'Stephens: Charge delegitimises the state'
     text: >-
       Stephens argues the genocide charge is part of a pattern of "inflated or bogus charges"
       deployed by Israel's opponents to delegitimise the state and generate hatred not only of
@@ -727,7 +769,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-genocide-scholars-accused-of-antisemitism
-    tag: Antisemitism charge silences legitimate critique — grounds
+    tag: 'Bartov: Scholars accused of antisemitism'
     text: >-
       Bartov reports that genocide scholars who apply the designation to Gaza have been accused by
       Holocaust historians of "well-poisoning" and antisemitism, and specifically that Norman Goda
@@ -754,21 +796,32 @@ claims:
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
-  - id: c-icj-and-icty-inferred-intent-from-conduct
+  - id: c-intent-derivable-from-operations
     tag: >-
-      Genocidal intent is legitimately inferred from conduct when no planning document exists —
-      grounds
+      Bartov: Intent derivable from operations pattern
     text: >-
-      Bartov notes that the Genocide Convention permits intent to be derived from a pattern of
-      operations; this reflects established genocide jurisprudence in which courts including the ICJ
-      and ICTY have found genocidal intent by inference from conduct in the absence of direct
-      documentary evidence.
+      Bartov states that genocidal intent can also be derived from a pattern of operations on the ground.
     terminal: false
     attribution:
       source:
         type: Citation
         reference: Omer Bartov, New York Times, 2025, citing genocide jurisprudence
       quote: intent can also be derived from a pattern of operations on the ground
+    cluster: Empirical
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-courts-inferred-intent-from-conduct
+    tag: 'ICJ/ICTY: Intent inferred from conduct'
+    text: >-
+      Courts including the ICJ and the ICTY have found genocidal intent by inference from conduct in the
+      absence of direct documentary evidence.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: ICJ and ICTY genocide judgments
+      quote: >-
+        CITATION NEEDED
     cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
@@ -784,7 +837,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-sealed-borders-make-displacement-destruction
-    tag: Confinement transforms expulsion into group destruction — grounds
+    tag: 'Bartov: Sealed borders make flight impossible'
     text: >-
       Bartov argues that Gaza's borders are sealed by Egypt and Israel, so displacement orders
       combined with bombardment are equivalent to an order to cease to exist as a group; Stephens's
@@ -800,7 +853,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-holocaust-memory-universalism
-    tag: Holocaust memory carries a universal obligation, not ethnic-specific protection
+    tag: Holocaust's lesson is universal, not particular
     text: >-
       The moral authority Holocaust remembrance generates is premised on the universality of its
       lesson; invoking that memory to shield a state from genocide charges contradicts the
@@ -810,7 +863,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-holocaust-lesson-presented-as-universal
-    tag: Holocaust memory carries a universal obligation, not ethnic-specific protection — grounds
+    tag: 'Bartov: Holocaust lesson framed as universal'
     text: >-
       Bartov argues that Holocaust commemoration succeeded in finding a universal audience precisely
       by presenting its lesson as a warning for all humanity; using Holocaust victimhood as a
@@ -917,9 +970,10 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-convention-requires-as-such-killing
+      - c-israel-aim-is-hamas-not-palestinians
     warrants:
       - c-legal-definition-as-such
+      - c-military-aim-killing-not-genocide
     note: null
     concludes: c-as-such-intent-absent
   - id: i-hamas-tactics-explain-casualties
@@ -958,7 +1012,7 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-intent-derivable-from-operations-pattern
+      - c-destruction-beyond-military-necessity
     warrants:
       - c-intent-inferred-from-conduct
     note: null
@@ -1013,10 +1067,20 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
+      - c-convention-as-such-text
       - c-as-such-is-constitutive-not-rhetorical
     warrants: []
     note: null
     concludes: c-legal-definition-as-such
+  - id: i-military-aim-killing-not-genocide
+    scheme: FromGeneralization
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-allied-bombing-not-genocide
+    warrants: []
+    note: null
+    concludes: c-military-aim-killing-not-genocide
   - id: i-proximate-cause-attribution
     scheme: FromCause
     uncertain: false
@@ -1118,7 +1182,8 @@ inferences:
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-icj-and-icty-inferred-intent-from-conduct
+      - c-intent-derivable-from-operations
+      - c-courts-inferred-intent-from-conduct
     warrants: []
     note: null
     concludes: c-intent-inferred-from-conduct
@@ -1253,17 +1318,36 @@ inferences:
       Stephens concedes the statements were made; what he contests is the warrant that rhetorical
       statements in the heat of conflict constitute evidence of state policy intent.
     contests: c-statements-evidence-intent
-  - id: i-mosul-attacks-hamas-tactics
-    scheme: null
+  - id: i-mosul-supports-embedded-adversary
+    scheme: FromAnalogy
     uncertain: false
     submissionStatus: Accepted
     grounds:
       - c-mosul-analogy
-    warrants: []
-    note: >-
-      The Mosul analogy supports the claim that Hamas tactics are the explanatory variable, not
-      Israeli intent, by showing a structurally similar case where no genocide charge was made.
+    warrants:
+      - c-mosul-representativeness
+    note: null
+    concludes: c-embedded-adversary-explains-casualties
+  - id: i-embedded-adversary-to-hamas-tactics
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-hamas-shelters-fighters-exposes-civilians
+    warrants:
+      - c-embedded-adversary-explains-casualties
+    note: null
     concludes: c-hamas-tactics-explain-casualties
+  - id: i-mosul-supports-military-aim
+    scheme: FromAnalogy
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-mosul-analogy
+    warrants:
+      - c-mosul-representativeness
+    note: null
+    concludes: c-military-aim-killing-not-genocide
   - id: i-death-toll-attacks-pattern
     scheme: null
     uncertain: false

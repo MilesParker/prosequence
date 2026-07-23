@@ -38,21 +38,22 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-alliance-system-value
-    tag: Alliance system value (terminal)
-    text: States are more secure inside a reliable alliance system than they can ever be acting alone.
-    terminal: true
+    tag: Alliances make states more secure
+    text: States are more secure inside a reliable alliance system than they can ever be acting
+      alone.
+    terminal: false
     cluster: Terminal
     uncertain: false
     submissionStatus: Accepted
   - id: c-leader-self-interest-legitimate
-    tag: Leader self-interest legitimate (terminal)
+    tag: Political survival is a legitimate criterion
     text: A leader's personal political survival is a legitimate criterion in state decisions.
     terminal: true
     cluster: Terminal
     uncertain: false
     submissionStatus: Accepted
   - id: c-suffering-constrains-strategy
-    tag: Suffering constrains strategy (terminal)
+    tag: Suffering constrains strategy
     text: >-
       Minimising human suffering is a supreme obligation that constrains permissible strategic
       action.
@@ -61,7 +62,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-reason-over-instinct
-    tag: Reason over instinct (terminal)
+    tag: Reason is a more reliable guide than instinct
     text: >-
       Human reason carefully applied and subject to correction is a more reliable guide to action
       than instinct or intuition.
@@ -70,16 +71,16 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-order-depends-on-democracy
-    tag: Order depends on democracy (terminal)
+    tag: Security depends on democratic survival
     text: >-
       A state's long-run security depends on the survival of democratic governance in the
       international order it inhabits.
-    terminal: true
+    terminal: false
     cluster: Terminal
     uncertain: false
     submissionStatus: Accepted
   - id: c-realist-state-primacy
-    tag: Realist state primacy (terminal)
+    tag: A state owes obligations only to its citizens
     text: >-
       A state owes obligations only to its own citizens; the political character of other states is
       not a legitimate basis for foreign policy.
@@ -95,7 +96,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-trump-assessed-war-as-midterm-liability
-    tag: Electoral not strategic — grounds
+    tag: Trump saw the war as a midterm liability
     text: >-
       Friedman reports Trump assessed the war's inflation and gasoline price effects as a
       prescription for Republican midterm losses, and publicly pre-assigned credit and blame to
@@ -117,7 +118,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-deal-silent-on-missiles-and-proxies
-    tag: Allies abandoned — grounds
+    tag: Deal is silent on missiles and proxies
     text: >-
       Friedman reports the deal is silent on Iran's missiles and proxy networks, makes nuclear talks
       contingent on Israeli concessions in Lebanon, and signals to Gulf Arab states that the US is
@@ -141,7 +142,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-hormuz-toll-free-60-days-only
-    tag: Hormuz toll concession — grounds
+    tag: 'US-Iran MOU: Toll-free passage for 60 days'
     text: >-
       The memorandum of understanding states Iran will ensure toll-free Hormuz passage "for 60 days
       only," as quoted by Friedman.
@@ -164,7 +165,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-uranium-deferred-after-campaign-ended
-    tag: Nuclear leverage expended — grounds
+    tag: Uranium deferred after the campaign ended
     text: >-
       Friedman reports the deal leaves Iran's near-bomb-grade uranium for future negotiations after
       the military campaign ended without achieving that objective.
@@ -187,7 +188,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-war-caused-inflation-harming-households
-    tag: Deal ended economic harm — grounds
+    tag: War drove inflation that hurt households
     text: >-
       Friedman acknowledges Trump assessed the war as causing food inflation and high gasoline
       prices harmful to American households.
@@ -210,7 +211,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-electoral-explanation-leaves-no-remainder
-    tag: Warrant — electoral calendar proximate cause — grounds
+    tag: Electoral timing leaves no remainder
     text: >-
       An outcome explicable by electoral timing without remainder requires no additional strategic
       explanation.
@@ -232,7 +233,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-force-removed-capability-remains-threat-rises
-    tag: Warrant — capability retention increases exposure — grounds
+    tag: Remove the force, the threat rises
     text: >-
       If the constraining force is removed and the constrained capability remains, the net threat to
       those the force was protecting increases.
@@ -254,7 +255,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-states-balance-when-patron-withdraws
-    tag: Warrant — withdrawal signal forces accommodation — grounds
+    tag: States balance when a patron withdraws
     text: States balance against threats when patron protection is withdrawn.
     terminal: false
     attribution:
@@ -265,7 +266,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-hormuz-precedent
-    tag: 60-day carve-out establishes precedent
+    tag: Time-limited carve-out sets a precedent
     text: >-
       A time-limited toll-free commitment without a permanent successor establishes the precedent
       that Iran holds authority to charge for Hormuz passage.
@@ -274,7 +275,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-carve-out-implies-iran-set-default
-    tag: Warrant — 60-day carve-out establishes precedent — grounds
+    tag: A carve-out implies Iran sets the default
     text: >-
       A 60-day carve-out implies a default state to which passage reverts — a default in which Iran
       determines the terms.
@@ -296,7 +297,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-deal-short-of-objective-signals-escalation-ceiling
-    tag: Warrant — ended campaign signals escalation ceiling — grounds
+    tag: Settling short signals an escalation ceiling
     text: >-
       A state that has struck and accepted a deal short of its objective signals a ceiling on its
       willingness to escalate.
@@ -318,7 +319,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-ending-harmful-war-advances-citizen-welfare
-    tag: Warrant — citizen welfare is national interest — grounds
+    tag: Ending a harmful war advances welfare
     text: >-
       If citizen material welfare is a component of national interests, and the war was harming that
       welfare, ending it advances national interests on that dimension.
@@ -340,7 +341,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-mukunda-both-decision-mechanisms-failed
-    tag: Sycophancy caused miscalculation — grounds
+    tag: 'Mukunda: Both decision mechanisms failed'
     text: >-
       Mukunda told Friedman that America and Israel "failed at both" mechanisms for good executive
       decisions, and that "experts had predicted everything that went wrong in the war."
@@ -363,7 +364,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-critique-invokes-foreign-democracy-criterion
-    tag: Double-standard critique invokes a democratic-governance criterion — grounds
+    tag: Critique invokes foreign democratic survival
     text: >-
       The double-standard critique evaluates the deal against the survival of democratic
       governance in other states rather than against the interests of US citizens.
@@ -376,7 +377,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-obama-would-have-been-denounced-for-same-terms
-    tag: Obama double standard — grounds
+    tag: Obama would have been denounced for this
     text: >-
       Friedman notes the deal makes nuclear talks contingent on Israeli military concessions in
       Lebanon, and states Obama would have been denounced for agreeing to such terms.
@@ -401,13 +402,14 @@ claims:
     submissionStatus: Accepted
   - id: c-iranian-politics-unlocked
     tag: Iranian domestic politics unlocked
-    text: A diminished external threat may create space for internal Iranian pressure for regime reform.
+    text: A diminished external threat may create space for internal Iranian pressure for regime
+      reform.
     terminal: false
     cluster: Pro
     uncertain: true
     submissionStatus: Accepted
   - id: c-removed-threat-may-prompt-iranian-questioning
-    tag: Iranian domestic politics unlocked — grounds
+    tag: Iranians may question theocratic rule
     text: >-
       Friedman speculates that without an external threat to justify repression, Iranians may ask
       what 47 years of theocratic rule has produced besides nuclear spending and proxy funding.
@@ -430,7 +432,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-removing-corrective-input-attributes-error
-    tag: Warrant — expert exclusion causes predictive failure — grounds
+    tag: Removing the corrective attributes the error
     text: >-
       Removing the input that would have corrected an error makes that error attributable to the
       removal.
@@ -453,7 +455,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-identity-selective-criterion-lacks-evidentiary-force
-    tag: Warrant — identity-driven evaluation lacks evidentiary weight — grounds
+    tag: Identity-selective criteria lack force
     text: >-
       An evaluation criterion applied selectively by identity rather than consistently by logic
       cannot serve as independent evidence of merit.
@@ -475,7 +477,7 @@ claims:
     uncertain: true
     submissionStatus: Accepted
   - id: c-regimes-instrumentalise-external-threats
-    tag: Warrant — external threat removal unlocks internal politics — grounds
+    tag: Regimes instrumentalise external threats
     text: >-
       It is common knowledge that authoritarian regimes instrumentalise external threats to justify
       internal repression.
@@ -497,7 +499,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-negotiators-secured-only-60-days
-    tag: Dealmaking skills don't transfer — grounds
+    tag: Negotiators secured only 60 days
     text: >-
       Friedman reports that real-estate negotiators Witkoff and Kushner, after billions spent in
       military action, secured only 60 days of toll-free Hormuz passage, with no constraints on
@@ -522,7 +524,7 @@ claims:
     uncertain: false
     submissionStatus: Accepted
   - id: c-closing-and-foreclosing-are-distinct-objectives
-    tag: Warrant — dealmaking skills are not geopolitical skills — grounds
+    tag: Closing and foreclosing are distinct
     text: >-
       Closing a deal and foreclosing an adversary's future coercion options are structurally
       distinct objectives requiring distinct competencies.
@@ -832,7 +834,8 @@ inferences:
     grounds:
       - c-dealmaking-skills-dont-transfer
     warrants: []
-    note: The generalisation about dealmaking skills supports the sycophancy/miscalculation argument.
+    note: The generalisation about dealmaking skills supports the sycophancy/miscalculation
+      argument.
     concludes: c-sycophancy-caused-miscalculation
   - id: i-witkoff-supports-dealmaking
     scheme: null
