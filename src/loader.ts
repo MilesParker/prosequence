@@ -26,7 +26,6 @@ function castClaim(c: any): Claim {
     text: c.text,
     terminal: c.terminal ?? false,
     attribution: castAttribution(c.attribution),
-    cluster: c.cluster,
     uncertain: c.uncertain ?? false,
     submissionStatus: c.submissionStatus ?? 'Accepted'
   }

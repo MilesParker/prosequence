@@ -34,7 +34,6 @@ claims:
     tag: Deal serves US strategic interests
     text: The US-Iran ceasefire agreement of June 2026 serves US strategic interests.
     terminal: false
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-alliance-system-value
@@ -42,14 +41,12 @@ claims:
     text: States are more secure inside a reliable alliance system than they can ever be acting
       alone.
     terminal: false
-    cluster: Terminal
     uncertain: false
     submissionStatus: Accepted
   - id: c-leader-self-interest-legitimate
     tag: Political survival is a legitimate criterion
     text: A leader's personal political survival is a legitimate criterion in state decisions.
     terminal: true
-    cluster: Terminal
     uncertain: false
     submissionStatus: Accepted
   - id: c-suffering-constrains-strategy
@@ -58,7 +55,6 @@ claims:
       Minimising human suffering is a supreme obligation that constrains permissible strategic
       action.
     terminal: true
-    cluster: Terminal
     uncertain: false
     submissionStatus: Accepted
   - id: c-reason-over-instinct
@@ -67,7 +63,6 @@ claims:
       Human reason carefully applied and subject to correction is a more reliable guide to action
       than instinct or intuition.
     terminal: true
-    cluster: Terminal
     uncertain: false
     submissionStatus: Accepted
   - id: c-order-depends-on-democracy
@@ -76,7 +71,6 @@ claims:
       A state's long-run security depends on the survival of democratic governance in the
       international order it inhabits.
     terminal: false
-    cluster: Terminal
     uncertain: false
     submissionStatus: Accepted
   - id: c-realist-state-primacy
@@ -85,14 +79,12 @@ claims:
       A state owes obligations only to its own citizens; the political character of other states is
       not a legitimate basis for foreign policy.
     terminal: true
-    cluster: Terminal
     uncertain: false
     submissionStatus: Accepted
   - id: c-electoral-not-strategic
     tag: Electoral not strategic
     text: The deal was shaped by Trump's electoral interests, not US strategic interests.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-trump-assessed-war-as-midterm-liability
@@ -107,14 +99,12 @@ claims:
         type: Citation
         reference: Thomas L. Friedman, New York Times, June 19 2026
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-allies-abandoned
     tag: Allies abandoned
     text: The deal leaves US allies more exposed than before the war began.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-deal-silent-on-missiles-and-proxies
@@ -129,7 +119,6 @@ claims:
         type: Citation
         reference: Thomas L. Friedman, New York Times, June 19 2026
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-hormuz-concession
@@ -138,7 +127,6 @@ claims:
       The deal concedes Iran a potential future right to toll commercial shipping through the Strait
       of Hormuz.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-hormuz-toll-free-60-days-only
@@ -152,7 +140,6 @@ claims:
         type: Citation
         reference: US-Iran MOU June 2026, as quoted by Friedman, New York Times, June 19 2026
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-nuclear-leverage-gone
@@ -161,7 +148,6 @@ claims:
       The deal defers the nuclear question into a negotiation where the US has already expended its
       military leverage.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-uranium-deferred-after-campaign-ended
@@ -175,7 +161,6 @@ claims:
         type: Citation
         reference: Thomas L. Friedman, New York Times, June 19 2026
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-deal-ended-economic-harm
@@ -184,7 +169,6 @@ claims:
       The deal serves US interests by ending a war that was driving inflation and energy price
       increases.
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-war-caused-inflation-harming-households
@@ -198,7 +182,6 @@ claims:
         type: Citation
         reference: Thomas L. Friedman, New York Times, June 19 2026
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-electoral-calendar
@@ -207,7 +190,6 @@ claims:
       When a negotiating outcome tracks the leader's electoral calendar rather than strategic logic,
       electoral pressure is the proximate cause.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-electoral-explanation-leaves-no-remainder
@@ -220,7 +202,6 @@ claims:
       source:
         type: SelfEvident
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-capability-retention
@@ -229,7 +210,6 @@ claims:
       Removing US military pressure while leaving Iran's threatening capabilities intact increases
       allies' net threat exposure.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-force-removed-capability-remains-threat-rises
@@ -242,7 +222,6 @@ claims:
       source:
         type: LogicalNecessity
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-withdrawal-signal
@@ -251,7 +230,6 @@ claims:
       Allies who receive credible signals of US withdrawal must independently accommodate the rising
       regional power, shifting the balance against the US.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-states-balance-when-patron-withdraws
@@ -262,7 +240,6 @@ claims:
       source:
         type: CommonKnowledge
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-hormuz-precedent
@@ -271,7 +248,6 @@ claims:
       A time-limited toll-free commitment without a permanent successor establishes the precedent
       that Iran holds authority to charge for Hormuz passage.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-carve-out-implies-iran-set-default
@@ -284,7 +260,6 @@ claims:
       source:
         type: LogicalNecessity
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-leverage-expended
@@ -293,7 +268,6 @@ claims:
       Once a military campaign ends without achieving its core objective, the threat of renewed
       force becomes less credible, weakening the position for deferred objectives.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-deal-short-of-objective-signals-escalation-ceiling
@@ -306,7 +280,6 @@ claims:
       source:
         type: CommonKnowledge
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-economic-harm
@@ -315,7 +288,6 @@ claims:
       Ending a war causing domestic inflation serves the material interests of US citizens, which
       are a component of US national interests.
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-ending-harmful-war-advances-citizen-welfare
@@ -328,7 +300,6 @@ claims:
       source:
         type: LogicalNecessity
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-sycophancy-caused-miscalculation
@@ -337,7 +308,6 @@ claims:
       Trump and Netanyahu's purge of internal dissent caused the strategic miscalculation about
       Iran's likely response.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-mukunda-both-decision-mechanisms-failed
@@ -351,7 +321,6 @@ claims:
         type: Citation
         reference: Gautam Mukunda, as quoted by Friedman, New York Times, June 19 2026
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-obama-double-standard
@@ -360,7 +329,6 @@ claims:
       The deal's terms are worse than what the same actors condemned as unacceptable under Obama, so
       partisan praise carries no evidentiary weight.
     terminal: false
-    cluster: Analogy
     uncertain: false
     submissionStatus: Accepted
   - id: c-critique-invokes-foreign-democracy-criterion
@@ -373,7 +341,6 @@ claims:
       source:
         type: LogicalNecessity
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-obama-would-have-been-denounced-for-same-terms
@@ -387,7 +354,6 @@ claims:
         type: Citation
         reference: Thomas L. Friedman, New York Times, June 19 2026
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-democratic-criterion-governs
@@ -397,7 +363,6 @@ claims:
       international order is a legitimate and applicable standard for judging US strategic
       interest, not an illegitimate substitution for the interests of US citizens.
     terminal: false
-    cluster: Analogy
     uncertain: false
     submissionStatus: Accepted
   - id: c-iranian-politics-unlocked
@@ -405,7 +370,6 @@ claims:
     text: A diminished external threat may create space for internal Iranian pressure for regime
       reform.
     terminal: false
-    cluster: Pro
     uncertain: true
     submissionStatus: Accepted
   - id: c-removed-threat-may-prompt-iranian-questioning
@@ -419,7 +383,6 @@ claims:
         type: Citation
         reference: Thomas L. Friedman, New York Times, June 19 2026
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-expert-exclusion
@@ -428,7 +391,6 @@ claims:
       When decision-makers exclude expert challenge, predictive failures that experts would have
       flagged are structurally caused by that exclusion.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-removing-corrective-input-attributes-error
@@ -441,7 +403,6 @@ claims:
       source:
         type: LogicalNecessity
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-identity-evaluation
@@ -451,7 +412,6 @@ claims:
       change in strategic logic, the evaluation is partisan and carries no independent evidentiary
       weight.
     terminal: false
-    cluster: Analogy
     uncertain: false
     submissionStatus: Accepted
   - id: c-identity-selective-criterion-lacks-evidentiary-force
@@ -464,7 +424,6 @@ claims:
       source:
         type: SelfEvident
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-threat-removal-unlocks-politics
@@ -473,7 +432,6 @@ claims:
       Regimes that use external threat narratives to suppress dissent lose that justification when
       the threat recedes, potentially enabling domestic opposition to organise.
     terminal: false
-    cluster: Pro
     uncertain: true
     submissionStatus: Accepted
   - id: c-regimes-instrumentalise-external-threats
@@ -486,7 +444,6 @@ claims:
       source:
         type: CommonKnowledge
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-dealmaking-skills-dont-transfer
@@ -495,7 +452,6 @@ claims:
       Transactional deal-making skills do not transfer to geopolitical negotiations involving
       military leverage and alliance management.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-negotiators-secured-only-60-days
@@ -510,7 +466,6 @@ claims:
         type: Citation
         reference: Thomas L. Friedman, New York Times, June 19 2026
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-dealmaking-transfer
@@ -520,7 +475,6 @@ claims:
       preserving leverage and foreclosing future coercion options — these are not extensions of the
       same skill.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-closing-and-foreclosing-are-distinct-objectives
@@ -533,7 +487,6 @@ claims:
       source:
         type: SelfEvident
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-witkoff-kushner-example
@@ -542,7 +495,6 @@ claims:
       The Witkoff-Kushner Hormuz negotiation is a concrete instance of transactional logic producing
       a strategically deficient outcome.
     terminal: false
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
 

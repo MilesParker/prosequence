@@ -1,5 +1,5 @@
 import type { SimulationNodeDatum, SimulationLinkDatum } from 'd3'
-import type { DiscourseSpace, Claim, Inference, Cluster } from '../types'
+import type { DiscourseSpace, Claim, Inference } from '../types'
 import { COLORS, NODE, EDGE, STANCE, STANCE_NEUTRAL_STROKE } from '../config'
 
 // ── Node types ────────────────────────────────────────────────────────────────
@@ -264,24 +264,6 @@ export function fitTag(tag: string, hw: number, hh: number, fontSize: number): s
   return kept
 }
 
-// ── Colour helpers ─────────────────────────────────────────────────────────────
-
-// The claim's argumentative TYPE (the function it serves), or null when it has
-// none — a bare Pro/Anti claim is stance-only, and that valence is carried by
-// STANCE/colour, not by a type chip.
-export function claimColorKey(n: ClaimNode): keyof typeof COLORS.chip | null {
-  if (n._isRoot) return 'root'
-  if (n.terminal) return 'terminal'
-  const c: Cluster = n.cluster
-  // The claim's own kind wins over the fact that it cites a source: a sourced
-  // empirical claim reads as `empirical`, not `attributive`.
-  if (c === 'Terminal') return 'terminal'
-  if (c === 'Empirical') return 'empirical'
-  if (c === 'Analogy') return 'analogy'
-  if (n.attribution) return 'attributive'   // sourced, but no distinctive kind
-  return null   // Pro / Anti — stance only
-}
-
 // ── Stance relative to a reference root ─────────────────────────────────────────
 //
 // A claim's "side" is not fixed — it depends on which claim you measure against.
@@ -452,10 +434,6 @@ export function contestTickForPolyline(pts: Array<{ x: number; y: number }>): Ti
 }
 
 export type ChipKind = keyof typeof COLORS.chip
-
-export function claimChipKind(n: ClaimNode): ChipKind | null {
-  return claimColorKey(n)
-}
 
 export function sourceLabel(src: { type: string; reference?: string } | undefined): string {
   if (!src) return 'unknown'

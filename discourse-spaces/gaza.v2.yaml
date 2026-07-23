@@ -38,7 +38,6 @@ claims:
     tag: Gaza genocide
     text: Israel's military campaign in Gaza constitutes genocide.
     terminal: false
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-group-existence-inviolable
@@ -48,7 +47,6 @@ claims:
       that destroy the conditions for that existence are wrong regardless of the perpetrator's other
       justifications.
     terminal: true
-    cluster: Terminal
     uncertain: false
     submissionStatus: Accepted
   - id: c-legal-precision-matters
@@ -57,7 +55,6 @@ claims:
       Legal terms that carry grave moral weight must be applied with strict precision; promiscuous
       application destroys the protective function the term was designed to serve.
     terminal: true
-    cluster: Terminal
     uncertain: false
     submissionStatus: Accepted
   - id: c-self-defense-legitimate
@@ -67,7 +64,6 @@ claims:
       the threat, including force that causes substantial civilian harm when the attacking force
       uses civilians as cover.
     terminal: true
-    cluster: Terminal
     uncertain: false
     submissionStatus: Accepted
   - id: c-intl-law-universal
@@ -76,7 +72,6 @@ claims:
       International humanitarian law and the Genocide Convention apply universally, without
       exception for any state's history, security situation, or political alliances.
     terminal: true
-    cluster: Terminal
     uncertain: false
     submissionStatus: Accepted
   - id: c-public-genocidal-statements
@@ -85,7 +80,6 @@ claims:
       Israeli political and military leaders publicly expressed intent consistent with genocide in
       the days and months after October 7.
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-netanyahu-amalek-and-rubble-statements
@@ -102,7 +96,6 @@ claims:
         type: Citation
         reference: Omer Bartov, New York Times, 2025
       quote: turning parts of Gaza, where Hamas was operating, 'into rubble'
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-pattern-of-ops-genocidal
@@ -112,7 +105,6 @@ claims:
       civilian institutions across the entire Strip — is consistent with intent to make Palestinian
       life in Gaza non-reconstitutable.
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-haaretz-174000-buildings-destroyed
@@ -130,7 +122,6 @@ claims:
       quote: >-
         an estimated 174,000 buildings have been destroyed or damaged, accounting for up to 70
         percent of all structures in the Strip
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-scholarly-consensus-genocide
@@ -139,7 +130,6 @@ claims:
       A significant and growing body of genocide scholars and international law experts has
       concluded that Israel's actions in Gaza meet the definition of genocide.
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-named-experts-concluded-genocide
@@ -155,7 +145,6 @@ claims:
         type: Citation
         reference: Omer Bartov, New York Times, 2025
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-denial-damages-intl-law
@@ -164,7 +153,6 @@ claims:
       Continued denial of the genocide designation by states and institutions damages the system of
       international humanitarian law established after the Holocaust.
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-convention-obliges-prevention-on-designation
@@ -179,7 +167,6 @@ claims:
         type: Citation
         reference: Omer Bartov, New York Times, 2025
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-ethnic-cleansing-morphs-genocide
@@ -188,7 +175,6 @@ claims:
       When a population has nowhere to flee and is continuously displaced, bombed, and starved,
       ethnic cleansing morphs into genocide.
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-herero-armenian-holocaust-began-as-expulsion
@@ -203,7 +189,6 @@ claims:
         type: Citation
         reference: Omer Bartov, New York Times, 2025
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-death-toll-inconsistent-genocide
@@ -212,7 +197,6 @@ claims:
       The scale of Palestinian deaths is far below what a state with Israel's military capacity
       would produce if its intent were genuinely genocidal.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-protective-measures-inconsistent-genocide
@@ -221,7 +205,6 @@ claims:
       Israel has taken protective measures — advance warnings, targeted strikes, acceptance of risk
       to its own soldiers — that are inconsistent with genocidal intent.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-israel-warned-evacuations-and-risked-soldiers
@@ -237,7 +220,6 @@ claims:
         type: Citation
         reference: Bret Stephens, New York Times, July 22 2025
       quote: routinely warning Gazans to evacuate areas it intended to strike
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-as-such-intent-absent
@@ -246,7 +228,6 @@ claims:
       Israel is fighting to defeat Hamas as a military-political force, not to destroy Palestinians
       as a group; this fails the legal "as such" requirement for genocide.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-israel-aim-is-hamas-not-palestinians
@@ -261,7 +242,6 @@ claims:
         reference: Bret Stephens, New York Times, July 22 2025
       quote: >-
         CITATION NEEDED
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-allied-bombing-not-genocide
@@ -275,7 +255,6 @@ claims:
         type: Citation
         reference: Bret Stephens, New York Times, July 22 2025
       quote: null
-    cluster: Analogy
     uncertain: false
     submissionStatus: Accepted
   - id: c-military-aim-killing-not-genocide
@@ -284,7 +263,6 @@ claims:
       Mass civilian death inflicted in pursuit of a military objective does not constitute genocide where
       the objective is the defeat of an adversary rather than the destruction of the group as such.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-hamas-tactics-explain-casualties
@@ -293,7 +271,6 @@ claims:
       Hamas's use of civilians as human shields and its tunnel infrastructure, rather than Israeli
       genocidal intent, is the primary explanation for the high civilian casualty rate.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-hamas-shelters-fighters-exposes-civilians
@@ -312,7 +289,6 @@ claims:
       quote: >-
         Hamas hides and feeds and preserves itself in its vast warren of tunnels rather than open
         them to civilians for protection
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-promiscuous-genocide-label-harmful
@@ -321,7 +297,6 @@ claims:
       Applying the genocide label outside its strict legal meaning dilutes its force and ultimately
       blinds the world to real genocides when they occur.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-genocide-term-coined-for-a-specific-crime
@@ -338,7 +313,6 @@ claims:
       quote: >-
         the abuse of the term 'genocide' runs the risk of ultimately blinding us to real ones when
         they unfold
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-statements-evidence-intent
@@ -348,7 +322,6 @@ claims:
       definition of genocidal intent, those statements constitute evidence of specific intent, not
       mere rhetorical excess.
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-law-permits-intent-inferred-from-statements
@@ -364,7 +337,6 @@ claims:
         type: Citation
         reference: Omer Bartov, New York Times, 2025, citing genocide legal scholarship
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-pattern-establishes-intent
@@ -374,7 +346,6 @@ claims:
       existence — not just military infrastructure — the pattern itself establishes genocidal intent
       in the absence of direct documentary evidence.
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-destruction-beyond-military-necessity
@@ -388,7 +359,6 @@ claims:
         type: Citation
         reference: Omer Bartov, New York Times, 2025
       quote: CITATION NEEDED
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-authority-genocide-scholars
@@ -398,7 +368,6 @@ claims:
       than general historians or political commentators to apply the genocide definition to
       contemporary events.
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-converging-scholars-are-genocide-specialists
@@ -415,7 +384,6 @@ claims:
       quote: >-
         I have been teaching classes on genocide for a quarter of a century. I can recognize one
         when I see one.
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-consensus-tracks-legal-facts
@@ -425,7 +393,6 @@ claims:
       scholarly judgment of the facts rather than a politically delegitimising function, so their
       consensus is evidence that the designation is correct.
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-intl-law-obliges-designation
@@ -435,7 +402,6 @@ claims:
       genocide designation is applied; failure to designate events as genocide disables the legal
       mechanism designed to stop it.
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-convention-duties-contingent-on-designation
@@ -450,7 +416,6 @@ claims:
         type: Citation
         reference: Omer Bartov, New York Times, 2025
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-morphing-precedent-established
@@ -459,7 +424,14 @@ claims:
       When a population cannot flee expulsion and is subjected to ongoing destruction of survival
       conditions, the historical record shows that ethnic cleansing reliably escalates to genocide.
     terminal: false
-    cluster: Analogy
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-three-cases-establish-pattern
+    tag: Three cases establish a reliable pattern
+    text: >-
+      Three cases separated by period, region, and perpetrating state are sufficient to establish confinement-to-extermination
+      as a reliable pattern rather than a coincidence of particular circumstances.
+    terminal: false
     uncertain: false
     submissionStatus: Accepted
   - id: c-capacity-gap-reveals-intent
@@ -469,7 +441,6 @@ claims:
       between capacity and action is evidence against the hypothesis that its intent is total
       destruction of the target population.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-israel-capacity-exceeds-deployment
@@ -484,7 +455,6 @@ claims:
         type: Citation
         reference: Bret Stephens, New York Times, July 22 2025
       quote: why hasn't it been more methodical and vastly more deadly?
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-warnings-incompatible-genocide
@@ -494,7 +464,6 @@ claims:
       warn that population to evacuate before attacks; the practice of issuing such warnings is
       structurally incompatible with genocidal intent.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-warnings-create-tactical-disadvantage
@@ -509,7 +478,6 @@ claims:
         type: Citation
         reference: Bret Stephens, New York Times, July 22 2025
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-legal-definition-as-such
@@ -519,7 +487,92 @@ claims:
       because of their group membership — is a necessary and legally operative condition that
       distinguishes genocide from other grave crimes under international humanitarian law.
     terminal: false
-    cluster: Anti
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-gaza-satisfies-as-such
+    tag: Gaza satisfies the as such element
+    text: >-
+      The Gaza campaign is conducted with intent to destroy Palestinians as a national group as such,
+      satisfying the constitutive element that distinguishes genocide from other grave crimes.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-military-objective-excludes-as-such
+    tag: Any military objective excludes as such
+    text: >-
+      Killing carried out in pursuit of a stated military or security objective cannot satisfy the "as
+      such" requirement, whatever its scale or foreseeable effect on the group.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-holocaust-framed-as-defensive
+    tag: Holocaust framed as defence against an enemy
+    text: >-
+      The Nazi extermination of European Jews was cast by its perpetrators as a defensive necessity against
+      an internal and existential enemy.
+    terminal: false
+    attribution:
+      source:
+        type: CommonKnowledge
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-armenian-framed-as-relocation
+    tag: Armenian genocide framed as wartime relocation
+    text: >-
+      The Armenian genocide was cast by the Ottoman authorities as a wartime security relocation of a
+      population alleged to be disloyal.
+    terminal: false
+    attribution:
+      source:
+        type: CommonKnowledge
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-srebrenica-carried-out-as-military-op
+    tag: Srebrenica carried out as a military operation
+    text: >-
+      The killing of Bosniak men and boys at Srebrenica was carried out in the course of a declared military
+      operation.
+    terminal: false
+    attribution:
+      source:
+        type: CommonKnowledge
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-holocaust-recognized-genocide
+    tag: Holocaust is universally recognized genocide
+    text: >-
+      The Holocaust is universally recognized as genocide.
+    terminal: false
+    attribution:
+      source:
+        type: CommonKnowledge
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-armenian-recognized-genocide
+    tag: Armenian genocide is widely recognized
+    text: >-
+      The Armenian genocide is widely recognized as genocide by historians and many states.
+    terminal: false
+    attribution:
+      source:
+        type: CommonKnowledge
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-srebrenica-adjudicated-genocide
+    tag: 'ICTY/ICJ: Srebrenica adjudicated genocide'
+    text: >-
+      The ICTY and the ICJ adjudicated the Srebrenica massacre as genocide.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: ICTY Prosecutor v. Krstic (2004); ICJ Bosnia v. Serbia (2007)
+      quote: null
     uncertain: false
     submissionStatus: Accepted
   - id: c-as-such-is-constitutive-not-rhetorical
@@ -534,7 +587,6 @@ claims:
         type: Citation
         reference: Bret Stephens, New York Times, July 22 2025
       quote: Note the words 'intent' and 'as such.'
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-convention-as-such-text
@@ -549,7 +601,6 @@ claims:
         reference: UN Genocide Convention (1948), Article II
       quote: >-
         intent to destroy, in whole or in part, a national, ethnical, racial or religious group, as such
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-proximate-cause-attribution
@@ -559,7 +610,6 @@ claims:
       responsibility for resulting civilian deaths shifts substantially to the shielding party, not
       the attacking force acting within the laws of war.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-tunnel-strategy-is-proximate-cause
@@ -574,7 +624,6 @@ claims:
         type: Citation
         reference: Bret Stephens, New York Times, July 22 2025
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-term-inflation-undermines-law
@@ -584,7 +633,6 @@ claims:
       trigger the legal consequences — sanctions, prosecutions, prevention duties — it was designed
       to produce.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-term-created-as-distinct-legal-category
@@ -599,7 +647,6 @@ claims:
         type: Citation
         reference: Bret Stephens, New York Times, July 22 2025
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-incorrect-application-damages-convention
@@ -609,7 +656,6 @@ claims:
       too liberally nor too narrowly; systematic error in either direction erodes the legal
       mechanism the Convention was designed to create.
     terminal: false
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-both-sides-invoke-protective-purpose
@@ -625,7 +671,6 @@ claims:
       source:
         type: CommonKnowledge
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-few-statements-vs-systematic-policy
@@ -635,7 +680,6 @@ claims:
       state policy of genocide; the relevant question is official policy, not rhetorical excess in
       the heat of conflict.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-comments-are-not-a-wannsee-equivalent
@@ -653,7 +697,6 @@ claims:
       quote: >-
         furious comments in the wake of Hamas's Oct. 7 atrocities hardly amount to a Wannsee
         conference
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-civilian-institutions-systematically-destroyed
@@ -670,7 +713,6 @@ claims:
         type: Citation
         reference: Omer Bartov, New York Times, 2025
       quote: the systematic destruction in Gaza not only of housing but also of other infrastructure
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-mosul-analogy
@@ -680,7 +722,6 @@ claims:
       and produced comparable civilian casualties, yet no credible genocide charge was made against
       the US or Iraq.
     terminal: false
-    cluster: Analogy
     uncertain: false
     submissionStatus: Accepted
   - id: c-embedded-adversary-explains-casualties
@@ -690,7 +731,19 @@ claims:
       the resulting civilian casualty rate is explained by the tactical situation rather than by the attacking
       state's intent.
     terminal: false
-    cluster: Anti
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-tactical-explanation-is-unbounded
+    tag: Tactical explanation admits no upper limit
+    text: >-
+      An explanation that attributes civilian casualties to an adversary's embedding admits no upper limit:
+      it is equally available at any level of destruction, up to the elimination of the entire built environment.
+      A defence consistent with every outcome constrains none of them.
+    terminal: false
+    attribution:
+      source:
+        type: LogicalNecessity
+      quote: null
     uncertain: false
     submissionStatus: Accepted
   - id: c-mosul-campaign-11000-civilian-deaths
@@ -706,7 +759,6 @@ claims:
         type: Citation
         reference: Bret Stephens, New York Times, July 22 2025
       quote: American airstrikes have at times leveled entire blocks
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-mosul-representativeness
@@ -716,7 +768,15 @@ claims:
       urban terrain against an armed group using human shields and tunnel infrastructure — making
       the absence of a genocide charge in that case evidentially relevant to Gaza.
     terminal: false
-    cluster: Analogy
+    uncertain: false
+    submissionStatus: Accepted
+  - id: c-tactical-similarity-suffices-for-comparison
+    tag: Tactical similarity licenses the comparison
+    text: >-
+      Where two campaigns share tactical structure — dense urban terrain, an adversary using tunnel infrastructure
+      and human shields — that similarity is sufficient to make the legal characterisation of one evidentially
+      relevant to the other.
+    terminal: false
     uncertain: false
     submissionStatus: Accepted
   - id: c-isis-and-hamas-used-same-urban-strategy
@@ -731,7 +791,6 @@ claims:
         type: Citation
         reference: Bret Stephens, New York Times, July 22 2025
       quote: booby-trapped, underground fortress
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-genocide-label-antisemitism-charge
@@ -740,7 +799,6 @@ claims:
       The genocide charge against Israel is used by anti-Zionists to equate Israel with Nazi
       Germany, licensing Jew-hatred and targeting diaspora Jews who support Israel.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-genocide-charge-among-bogus-delegitimising-charges
@@ -756,7 +814,6 @@ claims:
         type: Citation
         reference: Bret Stephens, New York Times, July 22 2025
       quote: equate modern Israel with Nazi Germany
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-genocide-label-silences-critics
@@ -765,7 +822,6 @@ claims:
       Labelling the genocide designation as antisemitic is itself a mechanism of intellectual
       suppression that immunises Israeli actions from legitimate scrutiny.
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-genocide-scholars-accused-of-antisemitism
@@ -783,7 +839,6 @@ claims:
       quote: >-
         showing images of Palestinian children ripped apart by U.S.-made bombs launched by Israeli
         pilots is, in this view, an antisemitic act
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-intent-inferred-from-conduct
@@ -793,7 +848,6 @@ claims:
       from the totality of acts and statements when no direct planning document is available; the
       absence of a Wannsee-style document does not foreclose a finding of intent.
     terminal: false
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-intent-derivable-from-operations
@@ -807,7 +861,6 @@ claims:
         type: Citation
         reference: Omer Bartov, New York Times, 2025, citing genocide jurisprudence
       quote: intent can also be derived from a pattern of operations on the ground
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-courts-inferred-intent-from-conduct
@@ -822,7 +875,6 @@ claims:
         reference: ICJ and ICTY genocide judgments
       quote: >-
         CITATION NEEDED
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-confinement-transforms-cleansing
@@ -833,7 +885,6 @@ claims:
       the group as such — making Gaza structurally disanalogous to cases where the displaced
       population could flee.
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-sealed-borders-make-displacement-destruction
@@ -849,7 +900,6 @@ claims:
         type: Citation
         reference: Omer Bartov, New York Times, 2025; Bret Stephens, New York Times, July 22 2025
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-holocaust-memory-universalism
@@ -859,7 +909,6 @@ claims:
       lesson; invoking that memory to shield a state from genocide charges contradicts the
       foundation of the authority being claimed.
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-holocaust-lesson-presented-as-universal
@@ -877,7 +926,6 @@ claims:
       quote: >-
         transforming its meaning from an assertion of resistance to inhumanity wherever it is
         perpetrated to an excuse
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-restraint-in-killing-not-restraint-in-destruction
@@ -888,7 +936,6 @@ claims:
       deliberately, and that selection is what a campaign against the conditions of group existence
       looks like.
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
 
@@ -965,6 +1012,15 @@ inferences:
       - c-warnings-incompatible-genocide
     note: null
     concludes: c-protective-measures-inconsistent-genocide
+  - id: i-military-aim-generalizes
+    scheme: FromGeneralization
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-military-aim-killing-not-genocide
+    warrants: []
+    note: null
+    concludes: c-military-objective-excludes-as-such
   - id: i-as-such-intent-absent
     scheme: FromDefinition
     uncertain: false
@@ -973,7 +1029,7 @@ inferences:
       - c-israel-aim-is-hamas-not-palestinians
     warrants:
       - c-legal-definition-as-such
-      - c-military-aim-killing-not-genocide
+      - c-military-objective-excludes-as-such
     note: null
     concludes: c-as-such-intent-absent
   - id: i-hamas-tactics-explain-casualties
@@ -1041,7 +1097,8 @@ inferences:
     submissionStatus: Accepted
     grounds:
       - c-herero-armenian-holocaust-began-as-expulsion
-    warrants: []
+    warrants:
+      - c-three-cases-establish-pattern
     note: null
     concludes: c-morphing-precedent-established
   - id: i-capacity-gap-reveals-intent
@@ -1156,7 +1213,8 @@ inferences:
     submissionStatus: Accepted
     grounds:
       - c-isis-and-hamas-used-same-urban-strategy
-    warrants: []
+    warrants:
+      - c-tactical-similarity-suffices-for-comparison
     note: null
     concludes: c-mosul-representativeness
   - id: i-genocide-label-antisemitism-charge
@@ -1214,7 +1272,7 @@ inferences:
     warrants:
       - c-group-existence-inviolable
     note: null
-    concludes: c-gaza-campaign-is-genocide
+    concludes: c-gaza-satisfies-as-such
   - id: i-pattern-to-prop
     scheme: null
     uncertain: false
@@ -1224,7 +1282,7 @@ inferences:
     warrants:
       - c-group-existence-inviolable
     note: null
-    concludes: c-gaza-campaign-is-genocide
+    concludes: c-gaza-satisfies-as-such
   - id: i-scholarly-consensus-to-prop
     scheme: null
     uncertain: false
@@ -1256,7 +1314,7 @@ inferences:
       - c-ethnic-cleansing-morphs-genocide
     warrants: []
     note: null
-    concludes: c-gaza-campaign-is-genocide
+    concludes: c-gaza-satisfies-as-such
   - id: i-death-toll-to-prop
     scheme: null
     uncertain: false
@@ -1284,7 +1342,65 @@ inferences:
     warrants:
       - c-legal-precision-matters
     note: null
-    contests: c-gaza-campaign-is-genocide
+    contests: c-gaza-satisfies-as-such
+  - id: i-as-such-satisfied-to-prop
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-gaza-satisfies-as-such
+    warrants:
+      - c-group-existence-inviolable
+    note: null
+    concludes: c-gaza-campaign-is-genocide
+  - id: i-confinement-satisfies-as-such
+    scheme: FromSign
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-sealed-borders-make-displacement-destruction
+    warrants: []
+    note: null
+    concludes: c-gaza-satisfies-as-such
+  - id: i-holocaust-refutes-military-exclusion
+    scheme: FromExample
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-holocaust-framed-as-defensive
+    warrants:
+      - c-holocaust-recognized-genocide
+    note: null
+    contests: c-military-objective-excludes-as-such
+  - id: i-armenian-refutes-military-exclusion
+    scheme: FromExample
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-armenian-framed-as-relocation
+    warrants:
+      - c-armenian-recognized-genocide
+    note: null
+    contests: c-military-objective-excludes-as-such
+  - id: i-srebrenica-refutes-military-exclusion
+    scheme: FromExample
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-srebrenica-carried-out-as-military-op
+    warrants:
+      - c-srebrenica-adjudicated-genocide
+    note: null
+    contests: c-military-objective-excludes-as-such
+  - id: i-confinement-rebuts-military-objective
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-confinement-transforms-cleansing
+    warrants: []
+    note: null
+    contests: c-military-objective-excludes-as-such
   - id: i-hamas-tactics-to-prop
     scheme: null
     uncertain: false
@@ -1328,6 +1444,15 @@ inferences:
       - c-mosul-representativeness
     note: null
     concludes: c-embedded-adversary-explains-casualties
+  - id: i-unbounded-defeats-embedded-adversary
+    scheme: FromConsequence
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - c-tactical-explanation-is-unbounded
+    warrants: []
+    note: null
+    contests: c-embedded-adversary-explains-casualties
   - id: i-embedded-adversary-to-hamas-tactics
     scheme: null
     uncertain: false
@@ -1385,7 +1510,7 @@ inferences:
       - c-confinement-transforms-cleansing
     warrants: []
     note: null
-    contests: c-mosul-representativeness
+    contests: c-tactical-similarity-suffices-for-comparison
   - id: i-capacity-grounds-pattern-of-ops
     scheme: FromSign
     uncertain: false

@@ -113,7 +113,7 @@ export const NODE = {
 
 // ── Color palette (all values in HSL) ────────────────────────────────────────
 // Light "living document" theme: warm paper ground, ink text. The graph's
-// cluster hues are necessarily less punchy here than on the old dark ground —
+// type-chip hues are necessarily less punchy here than on the old dark ground —
 // an accepted trade for the document feel — so fills are pale tints and the
 // legibility is carried by the darker, saturated strokes and by ink text.
 export const COLORS = {
@@ -155,7 +155,7 @@ export const COLORS = {
 
 // ── Stance colours (LCH-canonical) ────────────────────────────────────────────
 // A four-value vocabulary for the *stance* of a claim/edge — how the sides of a
-// dispute line up — kept deliberately separate from the cluster/role hues in
+// dispute line up — kept deliberately separate from the type-chip/role hues in
 // COLORS above. Nothing consumes these yet; later stages do.
 //
 // Canonical values are LCH. The sRGB hex baked here is the standard CSS Color 4

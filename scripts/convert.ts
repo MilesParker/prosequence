@@ -11,7 +11,7 @@
  *                           internal inference i-A { grounds:[g-A],
  *                           concludes: c-A, scheme: A.scheme }.
  *   Proposition           -> ordinary claim, listed in `roots`.
- *   TerminalValueNode t   -> claim { terminal: true, cluster: Terminal }.
+ *   TerminalValueNode t   -> claim { terminal: true }.
  *   Support edge S->T     -> inference { grounds:[c-S], concludes: c-T }.
  *   Attack  edge S->T     -> inference { grounds:[c-S], contests:  c-T }.
  *   Warrants edge W->A    -> c-W added to the warrants[] of A's inference:
@@ -38,7 +38,7 @@ interface OldSource { type: string; reference?: string | null }
 interface OldGrounds { text?: string; quote?: string | null; source?: OldSource }
 interface OldArgument {
   id: string; tag: string; claim: string; grounds?: OldGrounds
-  scheme?: string; cluster?: string; uncertain?: boolean; submissionStatus?: string
+  scheme?: string; uncertain?: boolean; submissionStatus?: string
 }
 interface OldTerminal { id: string; tag: string; text: string }
 interface OldProposition { id: string; tag: string; text: string }
@@ -98,7 +98,7 @@ const OVERRIDES: Record<string, Overrides> = {
 interface NewClaim {
   id: string; tag: string; text: string; terminal: boolean
   attribution?: { source: OldSource; quote: string | null }
-  cluster: string; uncertain: boolean; submissionStatus: string
+  uncertain: boolean; submissionStatus: string
 }
 interface NewInference {
   id: string; scheme: string | null; uncertain: boolean; submissionStatus: string
@@ -155,14 +155,14 @@ function convert(old: OldSpace): { id: string; title: string; definitions: unkno
   // root proposition
   claims.push({
     id: propId, tag: old.proposition.tag, text: old.proposition.text,
-    terminal: false, cluster: 'Empirical', uncertain: false, submissionStatus: 'Accepted',
+    terminal: false, uncertain: false, submissionStatus: 'Accepted',
   })
 
   // terminals
   for (const t of terminals) {
     claims.push({
       id: t.id, tag: t.tag, text: (t.text ?? '').trim(),
-      terminal: true, cluster: 'Terminal', uncertain: false, submissionStatus: 'Accepted',
+      terminal: true, uncertain: false, submissionStatus: 'Accepted',
     })
   }
 
@@ -170,7 +170,7 @@ function convert(old: OldSpace): { id: string; title: string; definitions: unkno
   for (const a of args) {
     claims.push({
       id: `c-${a.id}`, tag: a.tag, text: (a.claim ?? '').trim(),
-      terminal: false, cluster: a.cluster ?? 'Empirical',
+      terminal: false,
       uncertain: a.uncertain ?? false, submissionStatus: a.submissionStatus ?? 'Accepted',
     })
     if (groundsMeaningful(a.grounds)) {
@@ -178,7 +178,7 @@ function convert(old: OldSpace): { id: string; title: string; definitions: unkno
         id: `g-${a.id}`, tag: `${a.tag} — grounds`, text: (a.grounds!.text ?? '').trim(),
         terminal: false,
         attribution: { source: normalizeSource(a.grounds!.source), quote: a.grounds!.quote ?? null },
-        cluster: 'Empirical', uncertain: false, submissionStatus: 'Accepted',
+        uncertain: false, submissionStatus: 'Accepted',
       })
     }
   }

@@ -26,7 +26,7 @@ export function printDiscourseSpace(ds: DiscourseSpace): void {
       c.attribution ? 'attributive' : null,
       c.uncertain ? 'uncertain' : null
     ].filter(Boolean).join(', ')
-    console.log(`  [${c.tag}] (${c.cluster}${flags ? '; ' + flags : ''})`)
+    console.log(`  [${c.tag}]${flags ? ` (${flags})` : ''}`)
     console.log(`    ${c.text}`)
     if (c.attribution) {
       console.log(`    source: ${sourceLabel(c.attribution.source)}`)

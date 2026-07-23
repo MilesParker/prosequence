@@ -12,7 +12,7 @@
 **Two node types.**
 
 - **Claim** — the only content-bearing node (`id`, `tag`, `text`,
-  `terminal`, optional `attribution`, `cluster`, `uncertain`,
+  `terminal`, optional `attribution`, `uncertain`,
   `submissionStatus`). One node per distinct claim; several people asserting
   it on different evidence share the node and contribute separate inferences.
 - **Inference** — content-free. It binds specific grounds-claims and
@@ -41,7 +41,7 @@ inference's fields):
 
 **Enums.** `ArgumentScheme` (FromExample, FromGeneralization, FromAnalogy,
 FromAuthority, FromConsequence, FromSign, FromCause, FromDefinition),
-`Cluster` (Pro, Anti, Empirical, Analogy, Terminal), `SubmissionStatus`
+`SubmissionStatus`
 (Pending, Interrogating, Rejected, Accepted), `GroundsSource` (Citation,
 SelfEvident, CommonKnowledge, LogicalNecessity, None).
 
@@ -58,8 +58,8 @@ inference occupies, with two exceptions encoded as data:
 `TerminalValueNode` as node types, `Support`/`Attack`/`Warrants` as edge
 types, `Grounds` as a struct, and the `depth`/`isMediating` fields are all
 gone. Depth is computed from topology; a mediating claim is one with no
-inference from it concluding a root. `cluster` survives on `Claim` as viz
-metadata; the inference's `note` field (formerly `hint`) is a non-semantic
+inference from it concluding a root. The inference's `note` field (formerly
+`hint`) is a non-semantic
 authoring margin note — never rendered as argument content and never attackable.
 
 ## 1. The goal is completeness, not adjudication
@@ -112,7 +112,7 @@ Challenging a definition is a meta-move that redirects to a different discourse 
 
 ## 9. Terminal value nodes are bedrock
 
-Every inferential chain eventually bottoms out in a terminal claim — a `Claim` with `terminal: true` (`cluster: Terminal`) — a bedrock commitment that cannot be further justified empirically within this discourse space. Terminal claims are stated as plain value assertions (e.g. "highest utility is highest justice") without reference to named philosophical frameworks, preserving cultural neutrality.
+Every inferential chain eventually bottoms out in a terminal claim — a `Claim` with `terminal: true` — a bedrock commitment that cannot be further justified empirically within this discourse space. Terminal claims are stated as plain value assertions (e.g. "highest utility is highest justice") without reference to named philosophical frameworks, preserving cultural neutrality.
 
 Terminal claims cannot be concluded by any inference within the discourse space (invariant 2); the gatekeeper rejects any inference that concludes one. They can be made explicit, compared, and acknowledged as the source of genuine value disagreement. Two participants who follow their inferential chains all the way down and find incompatible terminal nodes have located the actual source of their disagreement.
 
@@ -168,8 +168,8 @@ unchanged in spirit; only the shapes changed.
   generalisation via an inference that `concludes` the generalisation; the
   representativeness warrant attaches to *that* inference (the generalising
   step), not to the example's internal attribution inference.
-- **Terminals as plain-language value assertions.** `terminal: true`,
-  `cluster: Terminal`, no attribution, never concluded.
+- **Terminals as plain-language value assertions.** `terminal: true`, no
+  attribution, never concluded.
 
 Validate every corpus with `python validate.py <corpus.v2.yaml> ...`, which
 enforces invariants I1–I8. I1–I4 and I6–I8 are hard errors (non-zero exit);

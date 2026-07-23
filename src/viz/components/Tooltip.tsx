@@ -1,6 +1,6 @@
 import { COLORS } from '../../config'
 import type { GraphNode, ClaimNode, InfNode, ChipKind } from '../graphData'
-import { claimChipKind, sourceLabel } from '../graphData'
+import { sourceLabel } from '../graphData'
 
 interface Props {
   node: GraphNode
@@ -64,7 +64,6 @@ export function Tooltip({ node, x, y, nodeById }: Props) {
   }
 
   const claim = node as ClaimNode
-  const kind = claimChipKind(claim)
   return (
     <div style={shell}>
       <div style={tagStyle}>{claim.tag || (claim.id as unknown as string)}</div>
@@ -81,10 +80,9 @@ export function Tooltip({ node, x, y, nodeById }: Props) {
           </div>
         </>
       )}
-      {(kind || claim.uncertain) && (
+      {claim.uncertain && (
         <div style={chips}>
-          {kind && <span style={chipStyle(kind)}>{kind}</span>}
-          {claim.uncertain && <span style={chipStyle('default')}>uncertain</span>}
+          <span style={chipStyle('default')}>uncertain</span>
         </div>
       )}
     </div>

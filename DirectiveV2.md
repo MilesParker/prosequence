@@ -28,8 +28,8 @@ New model (see parsanga.ts for the canonical definition):
   Alternative justifications for the same claim are separate inferences (OR).
   `warrants: []` means "implicit, not yet surfaced," which is a legal state.
 - **Dropped fields.** `depth` (derivable from topology), `isMediating` (expressible as
-  topology: a mediating claim has no inference from it concluding a root). `cluster`
-  survives on Claim as viz metadata. `hint` survives on Inference as a margin note.
+  topology: a mediating claim has no inference from it concluding a root), and `cluster`
+  (was viz metadata, now removed). `hint` survives on Inference as a margin note.
 
 ## 2. Tasks, in order
 
@@ -68,7 +68,7 @@ mapping, per the conversion script pattern from the design session:
   carrying quote + source as `attribution`) + inference `i-A` { grounds: [g-A],
   warrants: [c-W for each old Warrants edge W→A where W is an argument],
   concludes: c-A, scheme: A.scheme }.
-- TerminalValueNode t → claim with terminal: true, cluster: Terminal.
+- TerminalValueNode t → claim with terminal: true.
 - Proposition → ordinary claim, listed in `roots`.
 - Old Support edge S→T → inference { grounds: [c-S], concludes: c-T (or the root claim),
   warrants: [] }.

@@ -32,7 +32,6 @@ claims:
     tag: Fares should be removed
     text: Fares should be removed from public transit
     terminal: false
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-collective-obligation
@@ -41,21 +40,18 @@ claims:
       Society is collectively obligated to fund the conditions necessary for full civic and economic
       participation
     terminal: true
-    cluster: Terminal
     uncertain: false
     submissionStatus: Accepted
   - id: c-user-pays-principle
     tag: Beneficiaries should bear costs in proportion
     text: Those who benefit from a service should bear its costs in proportion to their use
     terminal: true
-    cluster: Terminal
     uncertain: false
     submissionStatus: Accepted
   - id: c-low-income-mobility-gains
     tag: Low income mobility gains
     text: Eliminating fares would improve mobility for low-income riders
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-low-income-transit-spending-and-trip-rationing
@@ -69,14 +65,12 @@ claims:
         type: Citation
         reference: Sustainable America; Dr. Destiny Thomas, Streetsblog/Freakonomics (2022)
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-emissions-reduction
     tag: Emissions reduction
     text: Fare-free transit would reduce carbon emissions
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-private-vehicles-dominate-transport-emissions
@@ -91,14 +85,12 @@ claims:
         type: Citation
         reference: Rapid Transition Alliance (2021); World Resources Institute (2023)
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-congestion-reduction
     tag: Congestion reduction
     text: Fare-free transit would reduce road congestion
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-transit-trips-substitute-for-car-trips
@@ -111,14 +103,12 @@ claims:
       source:
         type: CommonKnowledge
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-labour-market-access
     tag: Labour market access
     text: Fare-free transit improves labour market access
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-transit-expands-job-access-range
@@ -131,14 +121,12 @@ claims:
       source:
         type: CommonKnowledge
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-boarding-speed
     tag: Boarding speed
     text: Fare-free transit would speed up bus service
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-boston-boarding-time-reduction
@@ -152,14 +140,12 @@ claims:
         type: Citation
         reference: Streetsblog/Freakonomics (2022); Boston Mayor Wu, cited in Modeshift (2024)
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-collection-cost-not-justified
     tag: Collection cost not justified
     text: The administrative cost of fare collection is not justified by the revenue it generates
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-kansas-city-recovery-and-collection-overhead
@@ -174,14 +160,12 @@ claims:
         type: Citation
         reference: Streetsblog/Freakonomics (2022); Pacific Research Institute (2024)
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-collective-benefit-justifies-funding
     tag: Collective benefit justifies collective funding
     text: Transit should be funded collectively regardless of individual use
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-transit-benefits-accrue-to-non-riders
@@ -194,28 +178,24 @@ claims:
       source:
         type: CommonKnowledge
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-access-as-right
     tag: Access as right
     text: Access to public transit should not be contingent on ability to pay
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-fare-free-transit-is-just
     tag: Fare-free transit is just
     text: Fare-free transit is just
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-service-degradation
     tag: Service degradation from revenue loss
     text: Eliminating fares would degrade service quality
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-fare-revenue-share-of-infrastructure-cost
@@ -232,14 +212,12 @@ claims:
           TransitCenter, cited in Pacific Research Institute (2024); David Bragdon, Harvard/HKS
           debate
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-user-pays-as-policy
     tag: User pays as policy
     text: Riders, not all taxpayers, should bear transit costs
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-rider-benefits-direct-non-rider-benefits-diffuse
@@ -252,14 +230,12 @@ claims:
       source:
         type: CommonKnowledge
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-targeted-subsidies-more-effective
     tag: Targeted subsidies more effective
     text: Targeted subsidies for low-income riders are more effective than universal free transit
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-means-tested-passes-target-and-preserve-revenue
@@ -274,14 +250,12 @@ claims:
         type: Citation
         reference: Modeshift (2024); Nicholas Bloom (Hunter College); The Conversation (2025)
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-ridership-increase
     tag: Ridership increase
     text: Fare-free transit would increase overall ridership
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-cities-report-ridership-rise-after-fare-removal
@@ -295,14 +269,12 @@ claims:
         type: Citation
         reference: Modeshift (2024); Rapid Transition Alliance (2021)
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-racial-justice
     tag: Racial justice
     text: Fare elimination is a racial and economic justice measure
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-transit-dependence-skews-black-and-hispanic
@@ -317,14 +289,12 @@ claims:
         type: Citation
         reference: Dr. Destiny Thomas, Streetsblog (2022); Sustainable America
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-transit-utility-analogy
     tag: Transit as public utility analogy
     text: Public transit should be treated like other essential public utilities
     terminal: false
-    cluster: Analogy
     uncertain: false
     submissionStatus: Accepted
   - id: c-utilities-provided-as-public-services
@@ -337,7 +307,6 @@ claims:
       source:
         type: CommonKnowledge
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-user-pays-applied-inconsistently
@@ -346,7 +315,6 @@ claims:
       Applying the user-pays principle selectively to transit while socialising road costs is
       inconsistent
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-roads-funded-below-full-cost-recovery
@@ -361,14 +329,12 @@ claims:
         type: Citation
         reference: Gov1; Planetizen (2025)
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-fare-removal-wont-reach-needy
     tag: Fare removal won't reach those who need it
     text: Free fares would not substantially increase ridership among people who need transit most
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-surveys-rank-reliability-above-fare-cost
@@ -384,14 +350,12 @@ claims:
         reference: TransitCenter research, cited in Sustainable America; Harvard/HKS debate
           (Bragdon)
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-null-employment-effect
     tag: Null employment effect
     text: Free transit does not improve employment outcomes for low-income riders
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-king-county-rct-null-employment-result
@@ -405,14 +369,12 @@ claims:
         type: Citation
         reference: King County (Seattle) RCT, reported in Rochester Beacon (2025)
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-universal-free-transit-regressive
     tag: Universal free transit is regressive
     text: Universal free transit funded by general taxation is regressive
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-commuters-skew-middle-income-non-riders-pay-taxes
@@ -426,14 +388,12 @@ claims:
         type: Citation
         reference: Nicholas Bloom (Hunter College), cited in Sustainable America; Gov1
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-antisocial-behaviour-generalised
     tag: Antisocial behaviour (generalised)
     text: Fare elimination reliably produces increases in antisocial behaviour
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-multiple-cities-report-disorder-after-fare-removal
@@ -448,7 +408,6 @@ claims:
         type: Citation
         reference: Transportation for America (2025); The Daily Economy (2025)
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-high-farebox-recovery-viable
@@ -456,7 +415,6 @@ claims:
     text: Well-run transit systems can sustain significant fare revenue without sacrificing
       ridership
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-toronto-hong-kong-high-recovery-with-ridership
@@ -470,7 +428,6 @@ claims:
         type: Citation
         reference: Streets.mn (2013)
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-ridership-gains-plateau
@@ -479,7 +436,6 @@ claims:
       Ridership gains from fare removal are unlikely to be sustained without parallel service
       improvements
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-gains-plateau-without-service-investment
@@ -493,14 +449,12 @@ claims:
         type: Citation
         reference: Modeshift (2024); Transportation for America (2025)
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-luxembourg-viability
     tag: Luxembourg operational viability
     text: Free transit is operationally viable at scale — Luxembourg
     terminal: false
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-luxembourg-nationwide-free-transit-still-operating
@@ -514,14 +468,12 @@ claims:
         type: Citation
         reference: Sustainable America (2023)
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-kansas-city-ridership
     tag: Kansas City ridership
     text: Eliminating fares increases ridership in mid-sized U.S. cities — Kansas City
     terminal: false
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-kansas-city-sustained-growth-no-collapse
@@ -535,14 +487,12 @@ claims:
         type: Citation
         reference: Modeshift (2024); Streetsblog (2022)
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-boston-ridership-gains
     tag: Boston ridership gains
     text: Boston fare-free routes showed strong ridership gains
     terminal: false
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-boston-routes-35-percent-growth
@@ -556,14 +506,12 @@ claims:
         type: Citation
         reference: Modeshift (2024)
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-many-examples-successful-implementation
     tag: Many examples of successful implementation
     text: Many examples of successful fare-free implementation exist
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-over-100-cities-implemented-fare-free
@@ -577,14 +525,12 @@ claims:
         type: Citation
         reference: Rapid Transition Alliance (2021); Modeshift (2024)
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-antisocial-behaviour-local
     tag: Antisocial behaviour (local reports)
     text: Fare-free transit increases antisocial behaviour on the system
     terminal: false
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-vandalism-theft-and-shelter-use-reported
@@ -599,14 +545,12 @@ claims:
         type: Citation
         reference: Transportation for America (2025); The Daily Economy (2025)
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-user-composition-shift
     tag: User composition shift
     text: Removing fares changes the composition of transit users, not just their number
     terminal: false
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-disorder-reports-indicate-user-type-shift
@@ -621,21 +565,18 @@ claims:
         type: Citation
         reference: Transportation for America (2025); The Daily Economy (2025)
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-service-quality-over-fare
     tag: Service quality over fare cost
     text: Service quality matters more to riders than fare cost
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-rct-warrant-defence
     tag: King County RCT is the best evidence
     text: The King County RCT is the best available evidence on employment outcomes
     terminal: false
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-king-county-only-rct-and-rcts-isolate-cause
@@ -649,7 +590,6 @@ claims:
         type: Citation
         reference: Rochester Beacon (2025) reporting on King County study
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-driving-underpriced
@@ -658,14 +598,12 @@ claims:
       Road infrastructure is funded through general taxation — an example of socialised costs for a
       user-specific service
     terminal: false
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-utility-analogy-fails
     tag: Public utility analogy fails
     text: The public utility analogy for transit is unsound
     terminal: false
-    cluster: Analogy
     uncertain: false
     submissionStatus: Accepted
   - id: c-transit-has-private-substitutes-utilities-do-not
@@ -678,7 +616,6 @@ claims:
       source:
         type: CommonKnowledge
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-fare-cost-binding-constraint
@@ -687,7 +624,6 @@ claims:
       Fare cost is the binding constraint on low-income trip rationing, so removing it relieves that
       constraint
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-marginal-mobility-improvement
@@ -696,7 +632,6 @@ claims:
       Even where fare cost is not the sole constraint, removing it improves mobility at the margin
       for those who currently ration trips
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-trip-rationing-representative
@@ -705,7 +640,6 @@ claims:
       The pattern of fare-induced trip rationing reported by Sustainable America is representative
       of low-income transit users generally
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-sustainable-america-methodology-coverage
@@ -719,7 +653,6 @@ claims:
         type: Citation
         reference: Sustainable America
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-boston-representativeness
@@ -728,7 +661,6 @@ claims:
       Boston's experience is representative enough of other transit contexts to support a general
       conclusion about ridership response to fare elimination
     terminal: false
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-boston-network-comparable-to-peers
@@ -741,7 +673,6 @@ claims:
       source:
         type: CommonKnowledge
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-modal-shift-emissions
@@ -750,7 +681,6 @@ claims:
       A ridership increase large enough to shift modal share away from private cars would produce
       measurable emissions reductions
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-modal-shift-congestion
@@ -759,7 +689,6 @@ claims:
       Modal shift from cars to transit at sufficient scale produces measurable congestion reduction
       benefiting all road users
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-reduced-cost-expands-catchment
@@ -768,7 +697,6 @@ claims:
       Reduced travel cost and increased network use expands the effective labour market catchment
       for low-income workers
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-fare-payment-dwell-time
@@ -777,7 +705,6 @@ claims:
       Fare payment at boarding is a direct cause of dwell time; removing it reduces dwell time
       regardless of ridership levels
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-low-recovery-overhead
@@ -786,7 +713,6 @@ claims:
       Where recovery rates are very low, the overhead of collection consumes a substantial fraction
       of what is recovered, making collection economically irrational
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-non-user-benefits-justify-collective
@@ -795,7 +721,6 @@ claims:
       Benefits that accrue to non-users as well as users justify cost distribution across the whole
       population rather than individual user charges
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-systematic-burden-removal-redistributive
@@ -804,7 +729,6 @@ claims:
       When a cost burden falls systematically on already-disadvantaged groups, removing it is a
       redistributive act that advances racial and economic justice
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-transit-prerequisite-participation
@@ -813,7 +737,6 @@ claims:
       Transit access is a prerequisite for participation in economic and social life, and such
       prerequisites should be guaranteed regardless of income
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-revenue-dependency-representative
@@ -822,7 +745,6 @@ claims:
       Cities with high fare revenue dependency are representative of large transit systems
       generally, and the dependency would apply elsewhere
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-transitcenter-methodology-reliable
@@ -831,7 +753,6 @@ claims:
       TransitCenter's research methodology and independence make its survey findings reliable
       evidence about rider priorities across income levels
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-transitcenter-independent-and-peer-reviewed
@@ -844,7 +765,6 @@ claims:
       source:
         type: CommonKnowledge
       quote: null
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-fare-not-employment-constraint
@@ -853,7 +773,6 @@ claims:
       Removing the fare barrier does not address the other factors constraining employment — job
       availability, skill match, childcare
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-concentrated-benefits-bear-costs
@@ -862,7 +781,6 @@ claims:
       Those who receive concentrated benefits from a service should bear its costs proportionally;
       diffuse spillover benefits do not justify general-population funding
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-middle-income-transfer-regressive
@@ -872,7 +790,6 @@ claims:
       money in the wrong direction, but only if tax incidence on low-income non-riders is
       non-trivial
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-regressivity-quantitative-claim
@@ -881,7 +798,6 @@ claims:
       The regressivity argument requires that the tax incidence on low-income non-riders be
       non-trivial — a quantitative claim not established by the grounds alone
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-local-reports-representative
@@ -890,7 +806,6 @@ claims:
       Local reports of antisocial behaviour following fare elimination are representative of a
       general effect rather than local anomalies
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-universal-wastes-targeting-concentrates
@@ -899,7 +814,6 @@ claims:
       Universal provision wastes resources on those who do not need the subsidy; targeting
       concentrates them where they have effect
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-luxembourg-representative
@@ -908,14 +822,12 @@ claims:
       Luxembourg's operational experience is sufficiently similar to other national contexts to
       demonstrate general viability
     terminal: false
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-kansas-city-representative
     tag: Kansas City is representative
     text: Kansas City is representative of mid-sized U.S. transit contexts
     terminal: false
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-unaddressed-barriers-reassert
@@ -924,7 +836,6 @@ claims:
       Fare removal addresses only one barrier to transit use; unaddressed barriers reassert
       themselves over time and erode initial ridership gains
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-essentiality-criteria-same
@@ -933,7 +844,6 @@ claims:
       If transit meets the same criteria of essentiality as acknowledged public utilities it
       warrants the same treatment
     terminal: false
-    cluster: Analogy
     uncertain: false
     submissionStatus: Accepted
   - id: c-private-substitutes-disanalogy
@@ -942,7 +852,6 @@ claims:
       The existence of private substitutes for transit is a relevant disanalogy that undermines the
       public utility comparison
     terminal: false
-    cluster: Analogy
     uncertain: false
     submissionStatus: Accepted
   - id: c-toronto-hongkong-not-exceptional
@@ -951,7 +860,6 @@ claims:
       Toronto and Hong Kong are not so exceptional that their fare recovery experience is irrelevant
       to other systems
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-problem-character-signals-composition
@@ -960,7 +868,6 @@ claims:
       A change in the character of system problems, not just their scale, is a reliable sign of a
       change in user composition
     terminal: false
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-rct-methodological-superiority
@@ -969,7 +876,6 @@ claims:
       The methodological superiority of the RCT design makes its null finding on employment the best
       available evidence, superseding observational studies
     terminal: false
-    cluster: Empirical
     uncertain: false
     submissionStatus: Accepted
   - id: c-selective-application-requires-justification
@@ -977,7 +883,6 @@ claims:
     text: Applying user-pays to transit but not roads requires justification that has not been
       provided
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-user-pays-applies-to-transit
@@ -986,7 +891,6 @@ claims:
       The user-pays principle is applied consistently across comparable public services, so it
       legitimately governs transit funding rather than being invoked selectively.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-consistent-outcome-indicates-pattern
@@ -995,7 +899,6 @@ claims:
       Consistency of outcome across independent cases indicates a general pattern rather than
       coincidence or local factors
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
   - id: c-diverse-success-establishes-viability
@@ -1004,7 +907,6 @@ claims:
       Consistent success across diverse contexts establishes that fare-free transit is not merely
       theoretical but a proven operational model
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-fare-elimination-causes-ridership
@@ -1013,7 +915,6 @@ claims:
       Removing a direct cost barrier to transit use causes an increase in ridership among
       price-sensitive riders
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-ridership-increase-causes-modal-shift
@@ -1022,7 +923,6 @@ claims:
       A sufficiently large ridership increase produces modal shift from private cars, since new
       riders must come from somewhere
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-fare-free-meets-justice-definition
@@ -1031,7 +931,6 @@ claims:
       A policy that removes a systematically inequitable burden and expands access to civic
       participation meets the standard of justice as defined in this discourse space
     terminal: false
-    cluster: Pro
     uncertain: false
     submissionStatus: Accepted
   - id: c-ridership-raises-cost-without-revenue
@@ -1040,7 +939,6 @@ claims:
       Carrying additional riders raises operating cost, and fare removal eliminates the revenue
       stream that would otherwise fund the additional service that volume requires.
     terminal: false
-    cluster: Anti
     uncertain: false
     submissionStatus: Accepted
 

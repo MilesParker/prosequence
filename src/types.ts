@@ -34,13 +34,6 @@ export type ArgumentScheme =
     | "FromCause"
     | "FromDefinition";
 
-export type Cluster =
-    | "Pro"
-    | "Anti"
-    | "Empirical"
-    | "Analogy"
-    | "Terminal";
-
 export type SubmissionStatus =
     | "Pending"
     | "Interrogating"
@@ -89,7 +82,6 @@ export interface Claim {
     /** Present iff the claim is attributive. */
     attribution?: Attribution;
 
-    cluster: Cluster;
     uncertain: boolean;
     submissionStatus: SubmissionStatus;
 }

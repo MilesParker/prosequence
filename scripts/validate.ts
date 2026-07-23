@@ -28,7 +28,6 @@ interface RawClaim {
   text?: string
   terminal?: boolean
   attribution?: { source?: unknown; quote?: unknown } | null
-  cluster?: string
 }
 
 interface RawInference {
