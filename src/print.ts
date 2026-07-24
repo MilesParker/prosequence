@@ -48,7 +48,6 @@ export function printDiscourseSpace(ds: DiscourseSpace): void {
     console.log(`    grounds:  ${grounds}`)
     console.log(`    warrants: ${warrants}`)
     console.log(`    ${output}`)
-    if (inf.note) console.log(`    note: ${inf.note}`)
   }
 }
 

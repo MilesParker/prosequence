@@ -310,6 +310,14 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
+  - id: c-unchecked-leaders-default-to-electoral
+    tag: Unchecked leaders default to electoral logic
+    text: >-
+      When internal dissent is purged, no strategic counsel remains to check electoral incentive, so
+      decisions default to the leader's electoral interest.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
   - id: c-mukunda-both-decision-mechanisms-failed
     tag: 'Mukunda: Both decision mechanisms failed'
     text: >-
@@ -508,7 +516,6 @@ inferences:
     warrants:
       - c-leader-self-interest-legitimate
       - c-electoral-calendar
-    note: null
     concludes: c-electoral-not-strategic
   - id: i-allies-abandoned
     scheme: FromConsequence
@@ -520,7 +527,6 @@ inferences:
       - c-alliance-system-value
       - c-capability-retention
       - c-withdrawal-signal
-    note: null
     concludes: c-allies-abandoned
   - id: i-hormuz-concession
     scheme: FromConsequence
@@ -530,7 +536,6 @@ inferences:
       - c-hormuz-toll-free-60-days-only
     warrants:
       - c-hormuz-precedent
-    note: null
     concludes: c-hormuz-concession
   - id: i-nuclear-leverage-gone
     scheme: FromConsequence
@@ -540,7 +545,6 @@ inferences:
       - c-uranium-deferred-after-campaign-ended
     warrants:
       - c-leverage-expended
-    note: null
     concludes: c-nuclear-leverage-gone
   - id: i-deal-ended-economic-harm
     scheme: FromConsequence
@@ -551,7 +555,6 @@ inferences:
     warrants:
       - c-suffering-constrains-strategy
       - c-economic-harm
-    note: null
     concludes: c-deal-ended-economic-harm
   - id: i-electoral-calendar
     scheme: FromCause
@@ -560,7 +563,6 @@ inferences:
     grounds:
       - c-electoral-explanation-leaves-no-remainder
     warrants: []
-    note: null
     concludes: c-electoral-calendar
   - id: i-capability-retention
     scheme: FromConsequence
@@ -569,7 +571,6 @@ inferences:
     grounds:
       - c-force-removed-capability-remains-threat-rises
     warrants: []
-    note: null
     concludes: c-capability-retention
   - id: i-withdrawal-signal
     scheme: FromConsequence
@@ -578,7 +579,6 @@ inferences:
     grounds:
       - c-states-balance-when-patron-withdraws
     warrants: []
-    note: null
     concludes: c-withdrawal-signal
   - id: i-hormuz-precedent
     scheme: FromConsequence
@@ -587,7 +587,6 @@ inferences:
     grounds:
       - c-carve-out-implies-iran-set-default
     warrants: []
-    note: null
     concludes: c-hormuz-precedent
   - id: i-leverage-expended
     scheme: FromCause
@@ -596,7 +595,6 @@ inferences:
     grounds:
       - c-deal-short-of-objective-signals-escalation-ceiling
     warrants: []
-    note: null
     concludes: c-leverage-expended
   - id: i-economic-harm
     scheme: FromConsequence
@@ -605,7 +603,6 @@ inferences:
     grounds:
       - c-ending-harmful-war-advances-citizen-welfare
     warrants: []
-    note: null
     concludes: c-economic-harm
   - id: i-sycophancy-caused-miscalculation
     scheme: FromCause
@@ -616,7 +613,6 @@ inferences:
     warrants:
       - c-reason-over-instinct
       - c-expert-exclusion
-    note: null
     concludes: c-sycophancy-caused-miscalculation
   - id: i-obama-double-standard
     scheme: FromAnalogy
@@ -628,7 +624,6 @@ inferences:
       - c-order-depends-on-democracy
       - c-identity-evaluation
       - c-democratic-criterion-governs
-    note: null
     concludes: c-obama-double-standard
   - id: i-iranian-politics-unlocked
     scheme: FromConsequence
@@ -638,7 +633,6 @@ inferences:
       - c-removed-threat-may-prompt-iranian-questioning
     warrants:
       - c-threat-removal-unlocks-politics
-    note: null
     concludes: c-iranian-politics-unlocked
   - id: i-expert-exclusion
     scheme: FromCause
@@ -647,7 +641,6 @@ inferences:
     grounds:
       - c-removing-corrective-input-attributes-error
     warrants: []
-    note: null
     concludes: c-expert-exclusion
   - id: i-identity-evaluation
     scheme: FromAnalogy
@@ -656,7 +649,6 @@ inferences:
     grounds:
       - c-identity-selective-criterion-lacks-evidentiary-force
     warrants: []
-    note: null
     concludes: c-identity-evaluation
   - id: i-threat-removal-unlocks-politics
     scheme: FromConsequence
@@ -665,7 +657,6 @@ inferences:
     grounds:
       - c-regimes-instrumentalise-external-threats
     warrants: []
-    note: null
     concludes: c-threat-removal-unlocks-politics
   - id: i-dealmaking-skills-dont-transfer
     scheme: FromGeneralization
@@ -675,7 +666,6 @@ inferences:
       - c-negotiators-secured-only-60-days
     warrants:
       - c-dealmaking-transfer
-    note: null
     concludes: c-dealmaking-skills-dont-transfer
   - id: i-dealmaking-transfer
     scheme: FromGeneralization
@@ -684,7 +674,6 @@ inferences:
     grounds:
       - c-closing-and-foreclosing-are-distinct-objectives
     warrants: []
-    note: null
     concludes: c-dealmaking-transfer
   - id: i-witkoff-kushner-example
     scheme: FromExample
@@ -693,7 +682,6 @@ inferences:
     grounds:
       - c-negotiators-secured-only-60-days
     warrants: []
-    note: null
     concludes: c-witkoff-kushner-example
   - id: i-realism-undercuts-obama-double-standard
     scheme: null
@@ -703,7 +691,6 @@ inferences:
       - c-critique-invokes-foreign-democracy-criterion
     warrants:
       - c-realist-state-primacy
-    note: null
     contests: c-democratic-criterion-governs
   - id: i-electoral-attacks-root
     scheme: null
@@ -712,7 +699,6 @@ inferences:
     grounds:
       - c-electoral-not-strategic
     warrants: []
-    note: null
     contests: c-ceasefire-serves-us-interests
   - id: i-allies-attacks-root
     scheme: null
@@ -721,7 +707,6 @@ inferences:
     grounds:
       - c-allies-abandoned
     warrants: []
-    note: null
     contests: c-ceasefire-serves-us-interests
   - id: i-hormuz-attacks-root
     scheme: null
@@ -730,7 +715,6 @@ inferences:
     grounds:
       - c-hormuz-concession
     warrants: []
-    note: null
     contests: c-ceasefire-serves-us-interests
   - id: i-nuclear-attacks-root
     scheme: null
@@ -739,7 +723,6 @@ inferences:
     grounds:
       - c-nuclear-leverage-gone
     warrants: []
-    note: null
     contests: c-ceasefire-serves-us-interests
   - id: i-deal-supports-root
     scheme: null
@@ -748,7 +731,6 @@ inferences:
     grounds:
       - c-deal-ended-economic-harm
     warrants: []
-    note: null
     concludes: c-ceasefire-serves-us-interests
   - id: i-sycophancy-supports-electoral
     scheme: null
@@ -756,8 +738,8 @@ inferences:
     submissionStatus: Accepted
     grounds:
       - c-sycophancy-caused-miscalculation
-    warrants: []
-    note: Sycophancy explains structurally how electoral interests came to dominate strategic ones.
+    warrants:
+      - c-unchecked-leaders-default-to-electoral
     concludes: c-electoral-not-strategic
   - id: i-obama-attacks-deal
     scheme: null
@@ -766,9 +748,6 @@ inferences:
     grounds:
       - c-obama-double-standard
     warrants: []
-    note: >-
-      The double-standard attack undermines the pro warrant by showing the evaluation is not
-      principled.
     contests: c-deal-ended-economic-harm
   - id: i-iranian-politics-supports-deal
     scheme: null
@@ -777,7 +756,6 @@ inferences:
     grounds:
       - c-iranian-politics-unlocked
     warrants: []
-    note: Uncertain secondary benefit that may partially redeem the pro case.
     concludes: c-deal-ended-economic-harm
   - id: i-dealmaking-supports-sycophancy
     scheme: null
@@ -786,8 +764,6 @@ inferences:
     grounds:
       - c-dealmaking-skills-dont-transfer
     warrants: []
-    note: The generalisation about dealmaking skills supports the sycophancy/miscalculation
-      argument.
     concludes: c-sycophancy-caused-miscalculation
   - id: i-witkoff-supports-dealmaking
     scheme: null
@@ -796,5 +772,4 @@ inferences:
     grounds:
       - c-witkoff-kushner-example
     warrants: []
-    note: Witkoff-Kushner is the concrete instance supporting the generalisation.
     concludes: c-dealmaking-skills-dont-transfer

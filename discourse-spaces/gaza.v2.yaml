@@ -107,6 +107,15 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
+  - id: c-killing-rate-is-the-intent-measure
+    tag: Killing rate, not destruction, measures intent
+    text: >-
+      Genocidal intent is evidenced by the rate at which a group's members are killed relative to
+      the perpetrator's capacity, not by the rate at which its physical and institutional
+      infrastructure is destroyed.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
   - id: c-haaretz-174000-buildings-destroyed
     tag: 'Haaretz: 174,000 buildings hit'
     text: >-
@@ -948,7 +957,6 @@ inferences:
       - c-netanyahu-amalek-and-rubble-statements
     warrants:
       - c-statements-evidence-intent
-    note: null
     concludes: c-public-genocidal-statements
   - id: i-pattern-of-ops-genocidal
     scheme: FromSign
@@ -958,7 +966,6 @@ inferences:
       - c-haaretz-174000-buildings-destroyed
     warrants:
       - c-pattern-establishes-intent
-    note: null
     concludes: c-pattern-of-ops-genocidal
   - id: i-scholarly-consensus-genocide
     scheme: FromAuthority
@@ -968,7 +975,6 @@ inferences:
       - c-named-experts-concluded-genocide
     warrants:
       - c-authority-genocide-scholars
-    note: null
     concludes: c-scholarly-consensus-genocide
   - id: i-denial-damages-intl-law
     scheme: FromConsequence
@@ -979,7 +985,6 @@ inferences:
     warrants:
       - c-intl-law-obliges-designation
       - c-incorrect-application-damages-convention
-    note: null
     concludes: c-denial-damages-intl-law
   - id: i-ethnic-cleansing-morphs-genocide
     scheme: FromAnalogy
@@ -990,7 +995,6 @@ inferences:
     warrants:
       - c-morphing-precedent-established
       - c-confinement-transforms-cleansing
-    note: null
     concludes: c-ethnic-cleansing-morphs-genocide
   - id: i-death-toll-inconsistent-genocide
     scheme: FromSign
@@ -1000,7 +1004,6 @@ inferences:
       - c-israel-capacity-exceeds-deployment
     warrants:
       - c-capacity-gap-reveals-intent
-    note: null
     concludes: c-death-toll-inconsistent-genocide
   - id: i-protective-measures-inconsistent-genocide
     scheme: FromSign
@@ -1010,7 +1013,6 @@ inferences:
       - c-israel-warned-evacuations-and-risked-soldiers
     warrants:
       - c-warnings-incompatible-genocide
-    note: null
     concludes: c-protective-measures-inconsistent-genocide
   - id: i-military-aim-generalizes
     scheme: FromGeneralization
@@ -1019,7 +1021,6 @@ inferences:
     grounds:
       - c-military-aim-killing-not-genocide
     warrants: []
-    note: null
     concludes: c-military-objective-excludes-as-such
   - id: i-as-such-intent-absent
     scheme: FromDefinition
@@ -1030,7 +1031,6 @@ inferences:
     warrants:
       - c-legal-definition-as-such
       - c-military-objective-excludes-as-such
-    note: null
     concludes: c-as-such-intent-absent
   - id: i-hamas-tactics-explain-casualties
     scheme: FromCause
@@ -1040,7 +1040,6 @@ inferences:
       - c-hamas-shelters-fighters-exposes-civilians
     warrants:
       - c-proximate-cause-attribution
-    note: null
     concludes: c-hamas-tactics-explain-casualties
   - id: i-promiscuous-genocide-label-harmful
     scheme: FromConsequence
@@ -1051,7 +1050,6 @@ inferences:
     warrants:
       - c-term-inflation-undermines-law
       - c-incorrect-application-damages-convention
-    note: null
     concludes: c-promiscuous-genocide-label-harmful
   - id: i-statements-evidence-intent
     scheme: FromDefinition
@@ -1061,7 +1059,6 @@ inferences:
       - c-law-permits-intent-inferred-from-statements
     warrants:
       - c-intent-inferred-from-conduct
-    note: null
     concludes: c-statements-evidence-intent
   - id: i-pattern-establishes-intent
     scheme: FromDefinition
@@ -1071,7 +1068,6 @@ inferences:
       - c-destruction-beyond-military-necessity
     warrants:
       - c-intent-inferred-from-conduct
-    note: null
     concludes: c-pattern-establishes-intent
   - id: i-authority-genocide-scholars
     scheme: FromAuthority
@@ -1080,7 +1076,6 @@ inferences:
     grounds:
       - c-converging-scholars-are-genocide-specialists
     warrants: []
-    note: null
     concludes: c-authority-genocide-scholars
   - id: i-intl-law-obliges-designation
     scheme: FromDefinition
@@ -1089,7 +1084,6 @@ inferences:
     grounds:
       - c-convention-duties-contingent-on-designation
     warrants: []
-    note: null
     concludes: c-intl-law-obliges-designation
   - id: i-morphing-precedent-established
     scheme: FromGeneralization
@@ -1099,7 +1093,6 @@ inferences:
       - c-herero-armenian-holocaust-began-as-expulsion
     warrants:
       - c-three-cases-establish-pattern
-    note: null
     concludes: c-morphing-precedent-established
   - id: i-capacity-gap-reveals-intent
     scheme: FromSign
@@ -1108,7 +1101,6 @@ inferences:
     grounds:
       - c-israel-capacity-exceeds-deployment
     warrants: []
-    note: null
     concludes: c-capacity-gap-reveals-intent
   - id: i-warnings-incompatible-genocide
     scheme: FromSign
@@ -1117,7 +1109,6 @@ inferences:
     grounds:
       - c-warnings-create-tactical-disadvantage
     warrants: []
-    note: null
     concludes: c-warnings-incompatible-genocide
   - id: i-legal-definition-as-such
     scheme: FromDefinition
@@ -1127,7 +1118,6 @@ inferences:
       - c-convention-as-such-text
       - c-as-such-is-constitutive-not-rhetorical
     warrants: []
-    note: null
     concludes: c-legal-definition-as-such
   - id: i-military-aim-killing-not-genocide
     scheme: FromGeneralization
@@ -1136,7 +1126,6 @@ inferences:
     grounds:
       - c-allied-bombing-not-genocide
     warrants: []
-    note: null
     concludes: c-military-aim-killing-not-genocide
   - id: i-proximate-cause-attribution
     scheme: FromCause
@@ -1145,7 +1134,6 @@ inferences:
     grounds:
       - c-tunnel-strategy-is-proximate-cause
     warrants: []
-    note: null
     concludes: c-proximate-cause-attribution
   - id: i-term-inflation-undermines-law
     scheme: FromConsequence
@@ -1154,7 +1142,6 @@ inferences:
     grounds:
       - c-term-created-as-distinct-legal-category
     warrants: []
-    note: null
     concludes: c-term-inflation-undermines-law
   - id: i-incorrect-application-damages-convention
     scheme: FromDefinition
@@ -1163,7 +1150,6 @@ inferences:
     grounds:
       - c-both-sides-invoke-protective-purpose
     warrants: []
-    note: null
     concludes: c-incorrect-application-damages-convention
   - id: i-few-statements-vs-systematic-policy
     scheme: FromSign
@@ -1172,7 +1158,6 @@ inferences:
     grounds:
       - c-comments-are-not-a-wannsee-equivalent
     warrants: []
-    note: null
     concludes: c-few-statements-vs-systematic-policy
   - id: i-pattern-of-ops-genocidal-from-infrastructure
     scheme: FromSign
@@ -1182,9 +1167,6 @@ inferences:
       - c-civilian-institutions-systematically-destroyed
     warrants:
       - c-pattern-establishes-intent
-    note: >-
-      Independent route to the same claim: destruction of the institutions of group reconstitution,
-      distinct from the building-count evidence.
     concludes: c-pattern-of-ops-genocidal
   - id: i-holocaust-memory-to-denial-damages
     scheme: FromConsequence
@@ -1193,9 +1175,6 @@ inferences:
     grounds:
       - c-holocaust-memory-universalism
     warrants: []
-    note: >-
-      Independent moral route to the same claim; does not depend on the Convention's designation
-      mechanics.
     concludes: c-denial-damages-intl-law
   - id: i-mosul-analogy
     scheme: FromAnalogy
@@ -1205,7 +1184,6 @@ inferences:
       - c-mosul-campaign-11000-civilian-deaths
     warrants:
       - c-mosul-representativeness
-    note: null
     concludes: c-mosul-analogy
   - id: i-mosul-representativeness
     scheme: FromAnalogy
@@ -1215,7 +1193,6 @@ inferences:
       - c-isis-and-hamas-used-same-urban-strategy
     warrants:
       - c-tactical-similarity-suffices-for-comparison
-    note: null
     concludes: c-mosul-representativeness
   - id: i-genocide-label-antisemitism-charge
     scheme: FromConsequence
@@ -1224,7 +1201,6 @@ inferences:
     grounds:
       - c-genocide-charge-among-bogus-delegitimising-charges
     warrants: []
-    note: null
     concludes: c-genocide-label-antisemitism-charge
   - id: i-genocide-label-silences-critics
     scheme: FromConsequence
@@ -1233,7 +1209,6 @@ inferences:
     grounds:
       - c-genocide-scholars-accused-of-antisemitism
     warrants: []
-    note: null
     concludes: c-genocide-label-silences-critics
   - id: i-intent-inferred-from-conduct
     scheme: FromDefinition
@@ -1243,7 +1218,6 @@ inferences:
       - c-intent-derivable-from-operations
       - c-courts-inferred-intent-from-conduct
     warrants: []
-    note: null
     concludes: c-intent-inferred-from-conduct
   - id: i-confinement-transforms-cleansing
     scheme: FromDefinition
@@ -1252,7 +1226,6 @@ inferences:
     grounds:
       - c-sealed-borders-make-displacement-destruction
     warrants: []
-    note: null
     concludes: c-confinement-transforms-cleansing
   - id: i-holocaust-memory-universalism
     scheme: FromDefinition
@@ -1261,7 +1234,6 @@ inferences:
     grounds:
       - c-holocaust-lesson-presented-as-universal
     warrants: []
-    note: null
     concludes: c-holocaust-memory-universalism
   - id: i-public-statements-to-prop
     scheme: null
@@ -1271,7 +1243,6 @@ inferences:
       - c-public-genocidal-statements
     warrants:
       - c-group-existence-inviolable
-    note: null
     concludes: c-gaza-satisfies-as-such
   - id: i-pattern-to-prop
     scheme: null
@@ -1281,7 +1252,6 @@ inferences:
       - c-pattern-of-ops-genocidal
     warrants:
       - c-group-existence-inviolable
-    note: null
     concludes: c-gaza-satisfies-as-such
   - id: i-scholarly-consensus-to-prop
     scheme: null
@@ -1292,7 +1262,6 @@ inferences:
     warrants:
       - c-intl-law-universal
       - c-consensus-tracks-legal-facts
-    note: null
     concludes: c-gaza-campaign-is-genocide
   - id: i-denial-damages-to-prop
     scheme: null
@@ -1302,9 +1271,6 @@ inferences:
       - c-denial-damages-intl-law
     warrants:
       - c-intl-law-universal
-    note: >-
-      Supporting the proposition indirectly — denial of the designation damages the legal order,
-      which is itself a reason to apply it correctly here.
     concludes: c-gaza-campaign-is-genocide
   - id: i-ethnic-cleansing-to-prop
     scheme: null
@@ -1313,7 +1279,6 @@ inferences:
     grounds:
       - c-ethnic-cleansing-morphs-genocide
     warrants: []
-    note: null
     concludes: c-gaza-satisfies-as-such
   - id: i-death-toll-to-prop
     scheme: null
@@ -1322,7 +1287,6 @@ inferences:
     grounds:
       - c-death-toll-inconsistent-genocide
     warrants: []
-    note: null
     contests: c-gaza-campaign-is-genocide
   - id: i-protective-measures-to-prop
     scheme: null
@@ -1331,7 +1295,6 @@ inferences:
     grounds:
       - c-protective-measures-inconsistent-genocide
     warrants: []
-    note: null
     contests: c-gaza-campaign-is-genocide
   - id: i-as-such-to-prop
     scheme: null
@@ -1341,7 +1304,6 @@ inferences:
       - c-as-such-intent-absent
     warrants:
       - c-legal-precision-matters
-    note: null
     contests: c-gaza-satisfies-as-such
   - id: i-as-such-satisfied-to-prop
     scheme: null
@@ -1351,7 +1313,6 @@ inferences:
       - c-gaza-satisfies-as-such
     warrants:
       - c-group-existence-inviolable
-    note: null
     concludes: c-gaza-campaign-is-genocide
   - id: i-confinement-satisfies-as-such
     scheme: FromSign
@@ -1360,7 +1321,6 @@ inferences:
     grounds:
       - c-sealed-borders-make-displacement-destruction
     warrants: []
-    note: null
     concludes: c-gaza-satisfies-as-such
   - id: i-holocaust-refutes-military-exclusion
     scheme: FromExample
@@ -1370,7 +1330,6 @@ inferences:
       - c-holocaust-framed-as-defensive
     warrants:
       - c-holocaust-recognized-genocide
-    note: null
     contests: c-military-objective-excludes-as-such
   - id: i-armenian-refutes-military-exclusion
     scheme: FromExample
@@ -1380,7 +1339,6 @@ inferences:
       - c-armenian-framed-as-relocation
     warrants:
       - c-armenian-recognized-genocide
-    note: null
     contests: c-military-objective-excludes-as-such
   - id: i-srebrenica-refutes-military-exclusion
     scheme: FromExample
@@ -1390,7 +1348,6 @@ inferences:
       - c-srebrenica-carried-out-as-military-op
     warrants:
       - c-srebrenica-adjudicated-genocide
-    note: null
     contests: c-military-objective-excludes-as-such
   - id: i-confinement-rebuts-military-objective
     scheme: null
@@ -1399,7 +1356,6 @@ inferences:
     grounds:
       - c-confinement-transforms-cleansing
     warrants: []
-    note: null
     contests: c-military-objective-excludes-as-such
   - id: i-hamas-tactics-to-prop
     scheme: null
@@ -1409,7 +1365,6 @@ inferences:
       - c-hamas-tactics-explain-casualties
     warrants:
       - c-self-defense-legitimate
-    note: null
     contests: c-gaza-campaign-is-genocide
   - id: i-label-harmful-to-prop
     scheme: null
@@ -1419,9 +1374,6 @@ inferences:
       - c-promiscuous-genocide-label-harmful
     warrants:
       - c-legal-precision-matters
-    note: >-
-      Attacks the proposition by arguing the designation should not be applied here regardless of
-      facts, because its promiscuous application is harmful.
     contests: c-gaza-campaign-is-genocide
   - id: i-few-statements-attacks-statements-evidence
     scheme: null
@@ -1430,9 +1382,6 @@ inferences:
     grounds:
       - c-few-statements-vs-systematic-policy
     warrants: []
-    note: >-
-      Stephens concedes the statements were made; what he contests is the warrant that rhetorical
-      statements in the heat of conflict constitute evidence of state policy intent.
     contests: c-statements-evidence-intent
   - id: i-mosul-supports-embedded-adversary
     scheme: FromAnalogy
@@ -1442,7 +1391,6 @@ inferences:
       - c-mosul-analogy
     warrants:
       - c-mosul-representativeness
-    note: null
     concludes: c-embedded-adversary-explains-casualties
   - id: i-unbounded-defeats-embedded-adversary
     scheme: FromConsequence
@@ -1451,7 +1399,6 @@ inferences:
     grounds:
       - c-tactical-explanation-is-unbounded
     warrants: []
-    note: null
     contests: c-embedded-adversary-explains-casualties
   - id: i-embedded-adversary-to-hamas-tactics
     scheme: null
@@ -1461,7 +1408,6 @@ inferences:
       - c-hamas-shelters-fighters-exposes-civilians
     warrants:
       - c-embedded-adversary-explains-casualties
-    note: null
     concludes: c-hamas-tactics-explain-casualties
   - id: i-mosul-supports-military-aim
     scheme: FromAnalogy
@@ -1471,7 +1417,6 @@ inferences:
       - c-mosul-analogy
     warrants:
       - c-mosul-representativeness
-    note: null
     concludes: c-military-aim-killing-not-genocide
   - id: i-death-toll-attacks-pattern
     scheme: null
@@ -1479,10 +1424,8 @@ inferences:
     submissionStatus: Accepted
     grounds:
       - c-death-toll-inconsistent-genocide
-    warrants: []
-    note: >-
-      Both arguments read intent from scale; Stephens's counter is that the relevant scale is
-      killing rate (too low for genocide), not infrastructure destruction rate.
+    warrants:
+      - c-killing-rate-is-the-intent-measure
     contests: c-pattern-of-ops-genocidal
   - id: i-antisemitism-undercuts-scholarly-authority
     scheme: null
@@ -1491,7 +1434,6 @@ inferences:
     grounds:
       - c-genocide-label-antisemitism-charge
     warrants: []
-    note: null
     contests: c-consensus-tracks-legal-facts
   - id: i-silences-critics-attacks-antisemitism-charge
     scheme: null
@@ -1500,7 +1442,6 @@ inferences:
     grounds:
       - c-genocide-label-silences-critics
     warrants: []
-    note: null
     contests: c-genocide-label-antisemitism-charge
   - id: i-confinement-attacks-mosul
     scheme: null
@@ -1509,7 +1450,6 @@ inferences:
     grounds:
       - c-confinement-transforms-cleansing
     warrants: []
-    note: null
     contests: c-tactical-similarity-suffices-for-comparison
   - id: i-capacity-grounds-pattern-of-ops
     scheme: FromSign
@@ -1519,8 +1459,4 @@ inferences:
       - c-israel-capacity-exceeds-deployment
     warrants:
       - c-restraint-in-killing-not-restraint-in-destruction
-    note: >-
-      Bartov's route through the same capacity fact Stephens uses. It concedes the gap between
-      capacity and casualties and denies that the gap indexes intent, on the ground that the
-      destruction was directed at survival conditions rather than at maximising deaths.
     concludes: c-pattern-of-ops-genocidal

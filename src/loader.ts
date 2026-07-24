@@ -38,8 +38,7 @@ function castInference(i: any): Inference {
     uncertain: i.uncertain ?? false,
     submissionStatus: i.submissionStatus ?? 'Accepted',
     grounds: (i.grounds ?? []) as ClaimId[],
-    warrants: (i.warrants ?? []) as ClaimId[],
-    note: i.note ?? null
+    warrants: (i.warrants ?? []) as ClaimId[]
   }
   // Output arity is a discriminated union: exactly one of contests/concludes.
   return i.contests

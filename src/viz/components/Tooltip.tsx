@@ -50,11 +50,6 @@ export function Tooltip({ node, x, y, nodeById }: Props) {
         <div style={{ color: COLORS.text, marginBottom: 8, fontSize: 12.5 }}>
           {because}{given}.
         </div>
-        {inf.note && (
-          <div style={{ color: COLORS.textMuted, fontSize: 11, marginBottom: 6, borderLeft: `2px solid ${COLORS.border}`, paddingLeft: 8 }}>
-            {inf.note}
-          </div>
-        )}
         <div style={chips}>
           <span style={chipStyle('inference')}>{inf.scheme || 'no scheme'}</span>
           {warrants.length === 0 && <span style={chipStyle('default')}>implicit warrant</span>}

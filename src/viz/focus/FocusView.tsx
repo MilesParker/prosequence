@@ -118,7 +118,6 @@ function TearLine({ hops }: { hops: number }) {
 // recentres on tap (§7).
 
 type ParentEntry = { inf: Inference; out: Output; role: 'grounds' | 'warrants' }
-type Tint = { tint: string; bg: string; border: string; label: string }
 
 // A claim as an inline tap target: text + status marks, recentring on click.
 // The tile itself is never a target — only the claims inside it are (§6, §7),
@@ -138,13 +137,14 @@ function ClaimTap({ gd, id, onFocus }: { gd: GraphData; id: string; onFocus: (id
   )
 }
 
-// One paged entry, filling the reserved height as a tinted card that mirrors a
+// One paged entry, filling the reserved height as a neutral card that mirrors a
 // For/Against cell. A grounds-role entry is the destination claim alone; a
 // warrant-role entry the `{grounds} → {destination}` pair (§3) — the destination
 // alone can't say which inference C bridges. The tile carries no role label —
 // that's the column's group header (§2); the `→` is decoration, not a tap
-// target (§7).
-function ParentEntryCard({ gd, entry, tint, onFocus }: { gd: GraphData; entry: ParentEntry; tint: Tint; onFocus: (id: string) => void }) {
+// target (§7). Column tint is chrome only (headings/labels), never this
+// claim-bearing surface.
+function ParentEntryCard({ gd, entry, onFocus }: { gd: GraphData; entry: ParentEntry; onFocus: (id: string) => void }) {
   const { inf, out, role } = entry
   const grounds = (inf.grounds ?? []).map(String)
   return (
@@ -154,10 +154,9 @@ function ParentEntryCard({ gd, entry, tint, onFocus }: { gd: GraphData; entry: P
         minHeight: 0,
         display: 'flex',
         flexDirection: 'column',
-        border: `1px solid ${tint.border}`,
-        borderTop: `2px solid ${tint.tint}`,
+        border: `1px solid ${COLORS.border}`,
         borderRadius: FOCUS.cellRadius,
-        background: tint.bg,
+        background: COLORS.surface,
         overflow: 'hidden',
       }}
     >
@@ -216,7 +215,7 @@ function ParentColumn({ gd, column, entries, onFocus }: { gd: GraphData; column:
         {n > 1 && <div style={{ width: '100%' }}><Pager i={i} n={n} onPrev={() => setPage(i - 1)} onNext={() => setPage(i + 1)} /></div>}
       </div>
       <div style={{ flex: 1, minHeight: 0, display: 'flex', flexDirection: 'column' }}>
-        {current && <ParentEntryCard gd={gd} entry={current} tint={tint} onFocus={onFocus} />}
+        {current && <ParentEntryCard gd={gd} entry={current} onFocus={onFocus} />}
       </div>
     </div>
   )

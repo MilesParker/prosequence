@@ -49,7 +49,7 @@ export const PANEL_FONT = {
   base:  15,   // panel default / Output / Source body
   title: 16,   // header h2
   body:  15,   // claim statement
-  meta:  14,   // ids, quotes, list rows, grounds/warrants, notes
+  meta:  14,   // ids, quotes, list rows, grounds/warrants
   label: 12,   // uppercase section labels
   chip:  13,   // property chips
   badge: 12,   // relation badges
@@ -64,7 +64,6 @@ export const FOCUS = {
   rowFont: 14.5,         // claim-row text
   focusFont: 19,         // centred claim text
   labelFont: 11,         // uppercase role labels, pager, bedrock badge
-  pipSize: 8,            // §4 pip diameter
   pipGap: 5,
   connector: 22,         // vertical rule between bands
   cellRadius: 8,

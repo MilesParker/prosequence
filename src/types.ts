@@ -115,13 +115,6 @@ interface InferenceBase {
 
     grounds: ClaimId[];   // 1..*
     warrants: ClaimId[];  // 0..* — empty means implicit, not yet surfaced
-
-    /**
-     * Free-text authoring note. Not semantic, not attackable, not rendered
-     * as argument content. If it states an assumption the inference needs
-     * in order to hold, it belongs in `warrants` instead.
-     */
-    note: string | null;
 }
 
 /** Output arity (exactly one of concludes/contests) is type-enforced. */

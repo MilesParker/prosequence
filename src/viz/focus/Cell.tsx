@@ -1,8 +1,11 @@
 // Cell.tsx — exactly one inference. Never two; never stacked OR-siblings.
 //
-// Anatomy (§3, hint row intentionally dropped — the schema's `note` is
-// non-rendered authoring margin, not a reader-facing disambiguator):
-//   grounds rows → conjunction label → warrant rows inside a tinted bracket.
+// Anatomy (§3, hint row intentionally dropped):
+//   grounds rows → conjunction label → warrant rows inside a neutral bracket.
+//
+// Column tint is chrome only: the column heading and the conjunction label carry
+// the For/Against hue, but the tile surface and the warrant bracket — both
+// claim-bearing — stay neutral so no claim reads as intrinsically for/against.
 //
 // The tile fills its reserved column area so For and Against are always the
 // same height regardless of content; rows sit at the top and scroll *within*
@@ -29,10 +32,9 @@ export function Cell({
         minHeight: 0,
         display: 'flex',
         flexDirection: 'column',
-        border: `1px solid ${tint.border}`,
-        borderTop: `2px solid ${tint.tint}`,
+        border: `1px solid ${COLORS.border}`,
         borderRadius: FOCUS.cellRadius,
-        background: tint.bg,
+        background: COLORS.surface,
         overflow: 'hidden',
       }}
     >
@@ -54,7 +56,7 @@ export function Cell({
             >
               {warrants.length > 1 ? 'assumes, together' : 'assumes'}
             </div>
-            <div style={{ borderLeft: `${FOCUS.bracketWidth}px solid ${tint.tint}`, paddingLeft: 8, marginLeft: 8 }}>
+            <div style={{ borderLeft: `${FOCUS.bracketWidth}px solid ${COLORS.border}`, paddingLeft: 8, marginLeft: 8 }}>
               {warrants.map(w => (
                 <ClaimRow key={String(w)} gd={gd} id={String(w)} onFocus={onFocus} />
               ))}
