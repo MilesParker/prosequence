@@ -67,11 +67,22 @@ export const PANEL_FONT = {
 // ── Focus view (band-stack surface) ───────────────────────────────────────────
 // The focus view centres one claim and stacks parent band / focus band /
 // For+Against columns. Layout tokens live here alongside the graph's.
+// Feature flag: show each claim's `tag` as a mini header above its text on every
+// focus-view item (root line, parent band, focus band, For/Against cells). Flip
+// to false to hide them everywhere.
+export const SHOW_FOCUS_TAGS = true
+
+// Feature flag: show each claim's main `text` on every focus-view item. On by
+// default; flip to false to show just the tag headers (SHOW_FOCUS_TAGS). Turning
+// both off leaves items with no content, so keep at least one on.
+export const SHOW_FOCUS_TEXT = true
+
 export const FOCUS = {
   columnMaxWidth: 860,   // max width of the centred stack
   rowFont: 14.5,         // claim-row text
   focusFont: 19,         // centred claim text
   labelFont: 11,         // uppercase role labels, pager, bedrock badge
+  tagFont: 10.5,         // per-item tag mini header (see SHOW_FOCUS_TAGS)
   pipGap: 5,
   connector: 22,         // vertical rule between bands
   cellRadius: 8,

@@ -6,14 +6,14 @@
 // at rest. Page state resets on refocus via a `key` keyed to the focus id.
 
 import { useState, useEffect, useMemo, Fragment, type ReactNode } from 'react'
-import { COLORS, FOCUS, TITLE_BAR_HEIGHT } from '../../config'
+import { COLORS, FOCUS, SHOW_FOCUS_TEXT, TITLE_BAR_HEIGHT } from '../../config'
 import type { GraphData } from '../graphData'
 import type { Inference, Attribution as AttributionT } from '../../types'
 import { sourceLabel, computeStance } from '../graphData'
 import {
   getClaim, supportsOf, attacksOf, consumersOf, outputOf, roleOf, renderedClaimIds, type Output,
 } from './focusData'
-import { BedrockBadge, EmptyCell, FromHighlight, useFromHighlight, ClaimMarks, GraphIcon, LocateContext, TargetIcon, FrontierContext, StanceContext, useStance, stanceStyle } from './primitives'
+import { BedrockBadge, EmptyCell, FromHighlight, useFromHighlight, ClaimMarks, GraphIcon, LocateContext, TargetIcon, FrontierContext, StanceContext, useStance, stanceStyle, TagHeader } from './primitives'
 import { Cell } from './Cell'
 
 // Hover affordances live in CSS so rows/entries need no per-node state.
@@ -65,8 +65,13 @@ function RootLine({ gd, rootId, onFocus }: { gd: GraphData; rootId: string; onFo
       }}
     >
       <TargetIcon />
-      <span style={{ flex: 1, minWidth: 0, fontSize: FOCUS.rowFont, fontWeight: 600, color: COLORS.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-        {claim?.text ?? rootId}
+      <span style={{ flex: 1, minWidth: 0 }}>
+        <TagHeader gd={gd} id={rootId} />
+        {SHOW_FOCUS_TEXT && (
+          <span style={{ display: 'block', fontSize: FOCUS.rowFont, fontWeight: 600, color: COLORS.text, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+            {claim?.text ?? rootId}
+          </span>
+        )}
       </span>
       <span style={{ flexShrink: 0, fontSize: FOCUS.labelFont, textTransform: 'uppercase', letterSpacing: '0.08em', color: COLORS.textDim }}>
         reference root
@@ -136,7 +141,10 @@ function ClaimTap({ gd, id, onFocus }: { gd: GraphData; id: string; onFocus: (id
       onClick={() => onFocus(id)}
       style={{ display: 'inline-flex', gap: FOCUS.pipGap, alignItems: 'flex-start', cursor: 'pointer', borderRadius: 5, padding: '1px 4px', color: COLORS.text, boxSizing: 'border-box', border: '1px solid transparent', ...stance, ...hl }}
     >
-      <span>{claim?.text ?? id}</span>
+      <span style={{ display: 'inline-flex', flexDirection: 'column', minWidth: 0 }}>
+        <TagHeader gd={gd} id={id} />
+        {SHOW_FOCUS_TEXT && <span>{claim?.text ?? id}</span>}
+      </span>
       <ClaimMarks gd={gd} id={id} />
     </span>
   )
@@ -348,8 +356,13 @@ function FocusBand({ gd, focusId, fromId, showFromIcon, isReferenceRoot, onFromH
           <GraphIcon />
         </IconBtn>
       </div>
-      <div style={{ fontSize: FOCUS.focusFont, fontWeight: 600, lineHeight: 1.45, color: COLORS.text, paddingRight: showFromIcon ? 64 : 34 }}>
-        {claim?.text ?? focusId}
+      <div style={{ paddingRight: showFromIcon ? 64 : 34 }}>
+        <TagHeader gd={gd} id={focusId} />
+        {SHOW_FOCUS_TEXT && (
+          <div style={{ fontSize: FOCUS.focusFont, fontWeight: 600, lineHeight: 1.45, color: COLORS.text }}>
+            {claim?.text ?? focusId}
+          </div>
+        )}
       </div>
       {claim?.terminal && <div style={{ marginTop: 12 }}><BedrockBadge /></div>}
       {claim?.attribution && <Attribution attribution={claim.attribution} />}

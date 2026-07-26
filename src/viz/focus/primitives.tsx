@@ -5,7 +5,7 @@
 // shared pip/colour tokens; they do not reach above the primitive level.
 
 import { createContext, useContext } from 'react'
-import { COLORS, FOCUS, REF_ROOT, STANCE_FILL_OPACITY, STANCE_SELECTED_FILL_OPACITY } from '../../config'
+import { COLORS, FOCUS, REF_ROOT, SHOW_FOCUS_TAGS, SHOW_FOCUS_TEXT, STANCE_FILL_OPACITY, STANCE_SELECTED_FILL_OPACITY } from '../../config'
 import type { GraphData, StanceMap, Stance } from '../graphData'
 import { stanceColor } from '../graphData'
 import { getClaim, frontierStance } from './focusData'
@@ -189,6 +189,31 @@ export function ClaimMarks({ gd, id }: { gd: GraphData; id: string }) {
 }
 
 /**
+ * A claim's `tag` as a mini header above its text — a short handle for the claim.
+ * Gated by SHOW_FOCUS_TAGS so it can be flipped off everywhere at once; renders
+ * nothing when the flag is off or the claim carries no tag. Muted and semibold so
+ * it reads as a heading over the claim text, not as another claim.
+ */
+export function TagHeader({ gd, id }: { gd: GraphData; id: string }) {
+  if (!SHOW_FOCUS_TAGS) return null
+  const tag = getClaim(gd, id)?.tag
+  if (!tag) return null
+  return (
+    <div
+      style={{
+        fontSize: FOCUS.tagFont,
+        fontWeight: 600,
+        letterSpacing: '0.04em',
+        color: COLORS.textFaint,
+        marginBottom: 2,
+      }}
+    >
+      {tag}
+    </div>
+  )
+}
+
+/**
  * A claim as one clickable row: its text plus status marks. Clicking refocuses
  * the whole stack on that claim — the only navigation gesture in a cell.
  * Attributive claims render text only here; source/quote read in the focus
@@ -221,7 +246,10 @@ export function ClaimRow({
         ...hl,       // came-from trace overrides the wash while engaged
       }}
     >
-      <span style={{ flex: 1, minWidth: 0 }}>{claim?.text ?? id}</span>
+      <span style={{ flex: 1, minWidth: 0 }}>
+        <TagHeader gd={gd} id={id} />
+        {SHOW_FOCUS_TEXT && (claim?.text ?? id)}
+      </span>
       <ClaimMarks gd={gd} id={id} />
     </div>
   )
