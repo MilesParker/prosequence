@@ -17,6 +17,14 @@ export function resolveDataFile(): string {
 
 export const DATA_FILE = resolveDataFile()
 
+// ── Highlight accent ──────────────────────────────────────────────────────────
+// Amber — the single "attention" hue. One definition feeds both the graph's search
+// highlight and the focus view's "came from" ring/wash, so the two surfaces cannot
+// drift apart (they are meant to match). Each view previously spelled it out on its
+// own; DISCLOSURE and FOCUS both read it from here.
+const HIGHLIGHT = 'hsl(35, 95%, 48%)'
+const HIGHLIGHT_WASH = 'hsla(35, 95%, 48%, 0.13)'   // the same amber, pale wash
+
 // ── Progressive disclosure ────────────────────────────────────────────────────
 // Inferences render in one of three states (P/J/X). The master layout is frozen
 // (the fully-expanded, all-X geometry); disclosure toggles visibility only. See
@@ -30,7 +38,7 @@ export const DISCLOSURE = {
   badgeFontSize: 9,
   fanGap: 18,           // vertical drop from a J junction to its chip/badge fan
   hiddenFontSize: 9,    // persistent "something is hidden" count on a claim
-  highlightStroke: 'hsl(35, 95%, 48%)',   // amber — reads on the paper ground
+  highlightStroke: HIGHLIGHT,   // amber — reads on the paper ground
   highlightWidth: 3,
   // Persistent selection ring on the graph (the retired sidebar used to be the
   // "this is selected" signal; now the node itself carries it).
@@ -75,9 +83,10 @@ export const FOCUS = {
   parentColGap: 16,        // Supports/Contests gap (mirrors the For/Against gap)
 
   // "Came from" trace: the claim you navigated from wears this ring/wash while
-  // the focus-band icon is engaged. Amber matches the graph's search highlight.
-  fromRing: 'hsl(35, 95%, 48%)',
-  fromTint: 'hsla(35, 95%, 48%, 0.13)',
+  // the focus-band icon is engaged. Reuses the shared HIGHLIGHT accent, so it is
+  // the same amber as the graph's search highlight — one definition, both views.
+  fromRing: HIGHLIGHT,
+  fromTint: HIGHLIGHT_WASH,
 
   // Stage 4 — the reference root pinned at the top ("what's ultimately at
   // stake"), the inert "torn sheet" that stands in for the hidden chain of hops
@@ -157,10 +166,12 @@ export const COLORS = {
 // dispute line up — kept deliberately separate from the type-chip/role hues in
 // COLORS above. Nothing consumes these yet; later stages do.
 //
-// Canonical values are LCH. The sRGB hex baked here is the standard CSS Color 4
-// `lch()` / d3-color rendering (CIELAB, D50 white point), so any in-gamut triple
-// below regenerates its hex. Keep the LCH comment on each line — it is the source
-// of truth; the hex is derived.
+// Canonical values are LCH. The sRGB value baked here — now written as HSL — is the
+// standard CSS Color 4 `lch()` / d3-color rendering (CIELAB, D50 white point), so any
+// in-gamut triple below regenerates it (each HSL is round-trip-exact to that sRGB).
+// Keep the LCH comment on each pole line — it is the source of truth; the HSL is
+// derived. `divided` is the exception: it is regenerated from the two poles at load
+// (RULE 2, `deriveDivided` below), so it tracks them and is never hand-picked.
 //
 // TWO RULES — comments here so nobody "fixes" them later:
 //   1. `aligned` and `opposed` are matched on PERCEIVED weight ("loudness"), not
@@ -178,7 +189,7 @@ export const COLORS = {
 //      Do NOT raise its chroma. Its slight warmth is intended: it must not twin with
 //      the blue, and low chroma keeps it clear of the orange and of `neutral`.
 //
-// `aligned` at LCH(48, 44, 258) sits just outside the sRGB gamut; its hex is the
+// `aligned` at LCH(48, 44, 258) sits just outside the sRGB gamut; its HSL is the
 // standard gamut-clamped rendering. The LCH triple stays the source of truth.
 //
 // Poles are blue / orange on purpose: it is the canonical colour-blind-safe pair
@@ -186,11 +197,30 @@ export const COLORS = {
 // teal/magenta both collapsed toward green/red on 2–3px strokes. `aligned` is a
 // pure blue (no green to shift toward); `opposed` a warm orange that reads as a
 // team colour, not a hazard, because `aligned` carries the distinction.
+const STANCE_ALIGNED = 'hsl(201.5, 100%, 35.5%)'   // LCH(48, 44, 258) — blue (gamut-clamped)
+const STANCE_OPPOSED = 'hsl(26.9, 54.5%, 45.7%)'   // LCH(54, 50,  60) — orange, loudness-matched to blue
+
+// `divided` DERIVED from the two poles, never hand-picked (RULE 2): hue is their
+// circular midpoint flipped off the green side (so it can never twin with either
+// pole and follows them if re-tuned); saturation is crushed to a fraction of the
+// poles' — low chroma is the ONLY thing setting it apart — and lightness lifted so
+// it recedes. Lands at ~hsl(294, 8%, 62%): the dusty rose the LCH hand-pick used to
+// spell out (LCH ~339, "near red"), regenerated as a function of the poles.
+function deriveDivided(aligned: string, opposed: string): string {
+  const [ha, sa] = aligned.match(/[\d.]+/g)!.map(Number)
+  const [ho, so] = opposed.match(/[\d.]+/g)!.map(Number)
+  let h = (ha + ho) / 2                              // midpoint of the two pole hues …
+  if (Math.abs(h - 120) < 90) h = (h + 180) % 360    // … flipped away from green
+  const s = Math.min(sa, so) * 0.15                  // crushed chroma
+  const l = 62                                       // lifted to recede
+  return `hsl(${h.toFixed(1)}, ${s.toFixed(1)}%, ${l}%)`
+}
+
 export const STANCE = {
-  aligned: '#0074B5',   // LCH(48, 44, 258) — blue (gamut-clamped)
-  opposed: '#B46E35',   // LCH(54, 50,  60) — orange, loudness-matched to blue
-  divided: '#A597A7',   // LCH(64, 12, 260) — muted dusty-rose, recedes by low chroma
-  neutral: 'none',      // no fill — outline only (see STANCE_NEUTRAL_STROKE)
+  aligned: STANCE_ALIGNED,
+  opposed: STANCE_OPPOSED,
+  divided: deriveDivided(STANCE_ALIGNED, STANCE_OPPOSED),
+  neutral: 'none',                      // no fill — outline only (see STANCE_NEUTRAL_STROKE)
 } as const
 
 // Neutral stance carries no hue: an outline/stroke-only treatment on a muted

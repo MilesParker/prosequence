@@ -5,7 +5,7 @@
 > model. The principles below are unchanged in spirit; the structural
 > vocabulary has changed. Read "The v2 data model" first — it is the
 > canonical mapping between the principles and what is actually stored.
-> The canonical TypeScript schema lives in [`src/types.ts`](src/types.ts).
+> The canonical TypeScript schema lives in [`src/types.ts`](../src/types.ts).
 
 ## 0. The v2 data model (claim / inference)
 

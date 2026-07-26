@@ -5,8 +5,8 @@
 // shared pip/colour tokens; they do not reach above the primitive level.
 
 import { createContext, useContext } from 'react'
-import { COLORS, FOCUS, REF_ROOT } from '../../config'
-import type { GraphData, StanceMap } from '../graphData'
+import { COLORS, FOCUS, REF_ROOT, STANCE_FILL_OPACITY, STANCE_SELECTED_FILL_OPACITY } from '../../config'
+import type { GraphData, StanceMap, Stance } from '../graphData'
 import { stanceColor } from '../graphData'
 import { getClaim, frontierStance } from './focusData'
 
@@ -35,6 +35,53 @@ export const LocateContext = createContext<(id: string) => void>(() => {})
  * it (see `frontierStance`). Null when there's no reference root to measure from.
  */
 export const FrontierContext = createContext<{ sm: StanceMap; visible: Set<string> } | null>(null)
+
+// ── Stance fill ───────────────────────────────────────────────────────────────
+//
+// Stance is the absolute channel: where a claim sits relative to the reference
+// root. It is carried by the FILL on every claim surface (this replaces the old
+// frontier-chevron colouring), mirroring the graph's node wash so the two surfaces
+// cannot drift. POSITION (For/Against, Supports/Contests) stays a separate channel
+// carried by layout + chrome tint; the two are independent and both hues appearing
+// in one column is the expected off-root state, not an error.
+
+/** The Stage-3 stance map, provided by the focus view so every claim surface can
+ *  paint its own stance. Null when there is no reference root to measure against —
+ *  then nothing is painted (the honesty constraint: no fill without a legible root
+ *  in the frame, which the pinned root line / focus-band header guarantee). */
+export const StanceContext = createContext<StanceMap | null>(null)
+
+/** This claim's stance relative to the reference root. The root is `aligned` by
+ *  construction (it is on its own side); `computeStance` leaves it out of the map,
+ *  so we special-case it exactly as the graph does. Undefined ⇒ neutral / no root. */
+export function useStance(id: string): Stance | undefined {
+  const sm = useContext(StanceContext)
+  if (!sm) return undefined
+  return id === sm.refRootId ? 'aligned' : sm.node.get(id)
+}
+
+/** 'hsl(h, s%, l%)' → 'hsla(h, s%, l%, a)'. The pale wash is derived from the one
+ *  token definition, so there is never a second colour literal to drift. */
+function hslaFrom(hsl: string, alpha: number): string {
+  return hsl.replace('hsl(', 'hsla(').replace(/\)\s*$/, `, ${alpha})`)
+}
+
+/** The stance wash for a claim surface: a pale fill of the stance hue over a
+ *  saturated border of the same hue — the graph's node treatment ported to CSS.
+ *  `selected` uses the denser fill the graph gives its centred node. Neutral / no
+ *  stance paints nothing this pass (neutral = 0 in every corpus); callers that are
+ *  standalone cards pass a `neutral*` fallback so they keep a visible edge. */
+export function stanceStyle(
+  st: Stance | undefined,
+  { selected = false, neutralBg = 'transparent', neutralBorder = 'transparent' } = {},
+): { background: string; borderColor: string } {
+  if (!st || st === 'neutral') return { background: neutralBg, borderColor: neutralBorder }
+  const hue = stanceColor(st)
+  return {
+    background: hslaFrom(hue, selected ? STANCE_SELECTED_FILL_OPACITY : STANCE_FILL_OPACITY),
+    borderColor: hue,
+  }
+}
 
 /** The reference-root "target": a small bullseye in ink, no stance hue — it marks
  *  the origin all stance is measured from, matching the graph's ringed target. Used
@@ -85,9 +132,9 @@ export function BedrockBadge() {
   )
 }
 
-/** A small double chevron in a stance colour: "there's more this way, and here's
- *  where it leads." The only status mark in the focus view — it rides only on
- *  claims whose own support/attack is off-frame (see FrontierMark). */
+/** A small double chevron: "there's more this way." A pure frontier marker — it no
+ *  longer carries stance (that moved to the surface fill); it rides only on claims
+ *  whose own support/attack is off-frame (see FrontierMark). */
 function FrontierGlyph({ color }: { color: string }) {
   return (
     <svg width="13" height="13" viewBox="0 0 12 12" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
@@ -98,23 +145,24 @@ function FrontierGlyph({ color }: { color: string }) {
 }
 
 /**
- * The frontier mark for a claim shown as a continuation: a bedrock badge if it's
- * a dead end, otherwise a stance-coloured chevron hinting where the hidden branch
- * below it leads (aligned / opposed / divided). Nothing at all when there's no
- * reference root, or when nothing is hidden past this claim. This is the sole
- * place "status" surfaces — never on a claim whose support/attack is already in
- * frame (that claim renders no marks at all).
+ * The frontier mark for a claim shown as a continuation: a bedrock badge if it's a
+ * dead end, otherwise a de-stanced chevron that just says "there's more past here,
+ * open it to follow." Stance itself is now the surface fill, so the chevron only
+ * marks *presence* of a hidden branch — `frontierStance` is reused purely as the
+ * "is anything hidden past here" oracle (non-null), its hue discarded. Nothing at
+ * all when there's no reference root, or when nothing is hidden past this claim.
+ * Terminals keep the badge in ADDITION to their fill (the fill comes from the row).
  */
 export function FrontierMark({ gd, id }: { gd: GraphData; id: string }) {
   const claim = getClaim(gd, id)
   const ctx = useContext(FrontierContext)
   if (claim?.terminal) return <BedrockBadge />
   if (!ctx) return null
-  const st = frontierStance(gd, ctx.sm, id, ctx.visible)
-  if (!st) return null
+  const hasHidden = frontierStance(gd, ctx.sm, id, ctx.visible) != null
+  if (!hasHidden) return null
   return (
-    <span title={`Hidden past here leads: ${st}`} style={{ display: 'inline-flex', flexShrink: 0 }}>
-      <FrontierGlyph color={stanceColor(st)} />
+    <span title="More past here — open it to follow" style={{ display: 'inline-flex', flexShrink: 0 }}>
+      <FrontierGlyph color={COLORS.textDim} />
     </span>
   )
 }
@@ -151,6 +199,7 @@ export function ClaimRow({
 }: { gd: GraphData; id: string; onFocus: (id: string) => void }) {
   const claim = getClaim(gd, id)
   const hl = useFromHighlight(id)
+  const stance = stanceStyle(useStance(id))
   return (
     <div
       className="pz-row"
@@ -165,7 +214,11 @@ export function ClaimRow({
         fontSize: FOCUS.rowFont,
         lineHeight: 1.5,
         color: COLORS.text,
-        ...hl,
+        boxSizing: 'border-box',
+        border: '1px solid transparent',
+        marginBottom: 4,
+        ...stance,   // stance wash: pale fill + saturated border, by stance
+        ...hl,       // came-from trace overrides the wash while engaged
       }}
     >
       <span style={{ flex: 1, minWidth: 0 }}>{claim?.text ?? id}</span>

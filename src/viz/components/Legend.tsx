@@ -1,10 +1,11 @@
 import { COLORS, STANCE, STANCE_NEUTRAL_STROKE, STANCE_FILL_OPACITY, REF_ROOT } from '../../config'
 
-/** Full-chroma stance hex → the pale fill used on nodes (matches the graph wash). */
-function tint(hex: string, a: number): string {
-  if (!hex.startsWith('#')) return 'transparent'
-  const n = parseInt(hex.slice(1), 16)
-  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`
+/** Full-chroma stance colour → the pale fill used on nodes (matches the graph wash).
+ *  Poles are `hsl(…)`; return that same hue at opacity `a`. Non-hsl (neutral) ⇒ no fill. */
+function tint(color: string, a: number): string {
+  const m = color.match(/^hsl\((.*)\)$/)
+  if (!m) return 'transparent'
+  return `hsla(${m[1]}, ${a})`
 }
 
 // A claim-box swatch in a stance colour: pale fill under a saturated border, as on

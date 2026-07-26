@@ -6,8 +6,11 @@ kind is resolved by membership in the `claims` / `inferences` arrays — never
 inferred from an id prefix. Detects only; enthymemification is authoring work,
 so there is no auto-fix.
 
-Exit status is non-zero if any hard invariant is violated. I5 is soft (a
-warning): it is reported but does not affect exit status.
+Every invariant violation (I1–I8) is an error: exit status is non-zero if any
+error is found. GAP-6 gaps are reported as warnings — a claim that is
+non-terminal, non-attributive, not a root, and concluded by nothing is either
+an authoring gap or a claim that should be declared a root. A warning is
+reported but does not affect exit status.
 
 Usage: python validate.py <corpus.yaml> [<corpus.yaml> ...]
 """
@@ -30,8 +33,8 @@ def validate(path):
     infs   = {i['id']: i for i in d.get('inferences', [])}
     roots  = roots_of(d)
 
-    errs  = []   # hard violations -> non-zero exit
-    warns = []   # soft violations (I5) -> reported only
+    errs  = []   # errors -> non-zero exit
+    warns = []   # warnings (GAP-6 gaps) -> reported only
 
     def fail(inv, iid, target, msg):
         # file, invariant, inference id, target id — in that order.
@@ -68,9 +71,10 @@ def validate(path):
         if not grounds:
             fail("I4", iid, "-", "zero grounds (grounds must be non-empty)")
 
-        # I5 — attributive claims should not be concluded. (Soft.)
+        # I5 — attributive claims must not be concluded; they are checkable
+        #      leaves, verified against their cited source rather than derived.
         if concludes in claims and claims[concludes].get('attribution') is not None:
-            warns.append(f"{path}: I5 {iid} {concludes}  concludes an attributive (checkable-leaf) claim")
+            fail("I5", iid, concludes, "concludes an attributive (checkable-leaf) claim")
 
         # I7 — terminal claims appear only in warrants: never in grounds,
         #      never as a contests target.
@@ -122,6 +126,20 @@ def validate(path):
         if color.get(n, WHITE) == WHITE:
             dfs(n, [n])
 
+    # GAP-6 (warning) — a non-terminal, non-attributive claim that is not a
+    #     root and is concluded by nothing is either an authoring gap or a
+    #     claim that should be declared a root. Warned, never an error.
+    concluded = {i.get('concludes') for i in infs.values() if i.get('concludes')}
+    for cid, c in claims.items():
+        if c.get('terminal'):
+            continue
+        if c.get('attribution') is not None:
+            continue
+        if cid in roots:
+            continue
+        if cid not in concluded:
+            warns.append(f"{path}: GAP6 - {cid}  non-terminal, non-attributive, not a root, and concluded by nothing (GAP-6 gap, or it should be a root)")
+
     print(f"{path}: {len(claims)} claims, {len(infs)} inferences, {len(roots)} root(s)")
     for w in warns:
         print("   WARN", w)
@@ -130,8 +148,9 @@ def validate(path):
             print("   FAIL", e)
     else:
         print("   PASS  I1 one-output  I2 no-concludes-terminal  I3 refint  "
-              "I4 grounds>=1  I6 acyclic-concludes  I7 terminals-warrants-only  "
-              "I8 contests-claim-only" + ("  (I5 warnings above)" if warns else ""))
+              "I4 grounds>=1  I5 no-concludes-attributive  I6 acyclic-concludes  "
+              "I7 terminals-warrants-only  I8 contests-claim-only"
+              + ("  (GAP-6 warnings above)" if warns else ""))
     return not errs
 
 

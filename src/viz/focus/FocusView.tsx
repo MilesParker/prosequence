@@ -13,7 +13,7 @@ import { sourceLabel, computeStance } from '../graphData'
 import {
   getClaim, supportsOf, attacksOf, consumersOf, outputOf, roleOf, renderedClaimIds, type Output,
 } from './focusData'
-import { BedrockBadge, EmptyCell, FromHighlight, useFromHighlight, ClaimMarks, GraphIcon, LocateContext, TargetIcon, FrontierContext } from './primitives'
+import { BedrockBadge, EmptyCell, FromHighlight, useFromHighlight, ClaimMarks, GraphIcon, LocateContext, TargetIcon, FrontierContext, StanceContext, useStance, stanceStyle } from './primitives'
 import { Cell } from './Cell'
 
 // Hover affordances live in CSS so rows/entries need no per-node state.
@@ -44,11 +44,14 @@ function Connector() {
 // — that band carries the target itself — so the same claim never appears twice
 // with a 0-gap between (see the frame's suppression logic).
 
-// The pinned root: target icon, no stance hue (it's the origin), truncated to a
-// single banner line. Clicking it recentres the stack on the root — the
-// always-available "take me back to the top".
+// The pinned root: an ink target icon over the ALIGNED wash. The root is aligned by
+// construction (it is on its own side), so its painted surface doubles as the legend
+// for that pole and the caption for every other fill in the frame — the honesty
+// constraint made visible. Truncated to a single banner line; clicking it recentres
+// the stack on the root — the always-available "take me back to the top".
 function RootLine({ gd, rootId, onFocus }: { gd: GraphData; rootId: string; onFocus: (id: string) => void }) {
   const claim = getClaim(gd, rootId)
+  const stance = stanceStyle(useStance(rootId), { neutralBg: COLORS.surface, neutralBorder: COLORS.border })
   return (
     <div
       className="pz-row"
@@ -57,7 +60,8 @@ function RootLine({ gd, rootId, onFocus }: { gd: GraphData; rootId: string; onFo
       style={{
         display: 'flex', gap: 10, alignItems: 'center', cursor: 'pointer',
         padding: '8px 12px', borderRadius: 8,
-        border: `1px solid ${COLORS.border}`, background: COLORS.surface,
+        border: `1px solid ${COLORS.border}`,
+        ...stance,   // aligned wash + border (root is aligned); ink target icon stays
       }}
     >
       <TargetIcon />
@@ -125,11 +129,12 @@ type ParentEntry = { inf: Inference; out: Output; role: 'grounds' | 'warrants' }
 function ClaimTap({ gd, id, onFocus }: { gd: GraphData; id: string; onFocus: (id: string) => void }) {
   const claim = getClaim(gd, id)
   const hl = useFromHighlight(id)
+  const stance = stanceStyle(useStance(id))
   return (
     <span
       className="pz-row"
       onClick={() => onFocus(id)}
-      style={{ display: 'inline-flex', gap: FOCUS.pipGap, alignItems: 'flex-start', cursor: 'pointer', borderRadius: 5, padding: '1px 4px', color: COLORS.text, ...hl }}
+      style={{ display: 'inline-flex', gap: FOCUS.pipGap, alignItems: 'flex-start', cursor: 'pointer', borderRadius: 5, padding: '1px 4px', color: COLORS.text, boxSizing: 'border-box', border: '1px solid transparent', ...stance, ...hl }}
     >
       <span>{claim?.text ?? id}</span>
       <ClaimMarks gd={gd} id={id} />
@@ -301,6 +306,10 @@ function FocusBand({ gd, focusId, fromId, showFromIcon, isReferenceRoot, onFromH
   onLocate: (id: string) => void
 }) {
   const claim = getClaim(gd, focusId)
+  // The centred claim is the "you are here" surface — painted by its own stance at
+  // the denser selected opacity, mirroring the graph's selected node. At the root it
+  // reads aligned (root is aligned by construction), matching the pinned root line.
+  const stance = stanceStyle(useStance(focusId), { selected: true, neutralBg: COLORS.surface, neutralBorder: COLORS.border })
   return (
     <div
       style={{
@@ -309,8 +318,8 @@ function FocusBand({ gd, focusId, fromId, showFromIcon, isReferenceRoot, onFromH
         minHeight: FOCUS.focusMinHeight,
         border: `2px solid ${COLORS.border}`,
         borderRadius: 10,
-        background: COLORS.surface,
         padding: '16px 18px',
+        ...stance,
       }}
     >
       {/* At the root, the band carries the target itself (no separate root line). */}
@@ -441,6 +450,7 @@ export function FocusView({
       <FromHighlight.Provider value={{ id: fromVisible ? fromId : null, active: showFrom }}>
        <LocateContext.Provider value={onLocate}>
         <FrontierContext.Provider value={frontier}>
+        <StanceContext.Provider value={referenceRootId ? sm : null}>
         <div style={{ maxWidth: FOCUS.columnMaxWidth, margin: '0 auto', padding: '28px 20px 96px', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
           {/* What's ultimately at stake, then the inert tear for the hidden hops. */}
           {showRootLine && (
@@ -478,6 +488,7 @@ export function FocusView({
             </>
           )}
         </div>
+        </StanceContext.Provider>
         </FrontierContext.Provider>
        </LocateContext.Provider>
       </FromHighlight.Provider>
