@@ -226,37 +226,55 @@ the reference root, `computeStance`, and the graph's `Tooltip`.
   `FrontierContext`, and `StanceContext` contexts. `ScrollFrame` gives a region a
   fixed height with a scroll-edge fade; `RegionHeading` prints a region's name and
   count.
-- `Cell.tsx` — `InferenceBox`, one inference as a card: a stance-hue left spine
-  plus a hairline border on the other sides (`spineWidth`, `boxRadius`), a light
-  stance wash inside (`STANCE_CONTAINER_FILL_OPACITY`). Contents, top to bottom:
-  the output/destination tile and a full-width rule (`ruleWeight`) **only in the
-  Above region**; then grounds tiles; the `assumes` / `assumes, together` divider;
-  indented warrant tiles (`warrantIndent`). `omit` drops the centred claim from
-  the inputs; `output` adds the destination tile. Tiles inside a box stack
-  full-width (`Bag`). The box is tinted by the stance of the claim the inference
-  bears on (its output).
-- `primitives.tsx` — shared parts: `ClaimTile` (a claim rendered as its tag in a
-  rounded rect, stance fill, hover raises the `Tooltip` via `HoverContext`, click
-  recentres; `TileMarks` trails a frontier chevron / bedrock badge and a hover-in
-  locate button); `TagHeader` and the `TAG_STYLE` tag look; `stanceStyle` /
+- `Cell.tsx` — `InferenceBox`, one inference as a card, one template for both
+  regions: a stance-hue left spine plus a hairline border on the other sides
+  (`spineWidth`, `boxRadius`), a light stance wash inside
+  (`STANCE_CONTAINER_FILL_OPACITY`). Contents, top to bottom: the `output` tile,
+  then a bracket leader (`InputRow`) hanging every input beneath it — a solid,
+  unbroken spine (`bracketWidth`) from just below the output tile to the last
+  input, with a stub reaching to each tile: SOLID into grounds, DASHED into
+  warrants (`bracketIndent` sets the indent + stub length; `bracketRiser`,
+  `tileVPad` the spacing). The stub style is the only grounds/warrant mark — no
+  `assumes` divider, no role subhead, no full-width rule. The bracket's topmost
+  segment (the riser, just below the output tile) carries the output relation: when
+  the inference `contests` its output, `ContestTick` draws the graph's double tick
+  there — the same mark from the same builder (`contestTickSegments`), coloured by
+  the output's stance exactly as the graph paints its contest edges, oriented up the
+  vertical spine; a `concludes` inference leaves it unmarked. The mark is on the
+  spine only, never the stubs, once per box. The spine is inset from the output
+  tile's left edge (`bracketInset`) and the tick dropped (`bracketTickDrop`) to
+  clear the tile above it.
+  `centredId` marks the tile that is the centred claim C (the `output` tile in the
+  Below region, an input in the Above region). The box (spine + wash + contest tick)
+  is tinted by `combinedStance` over the inference's grounds/warrants — the side it
+  argues *from*, matching the graph's `edgeStance` — not the output claim's stance;
+  the output tile keeps its own stance. So a box contesting an aligned claim reads
+  opposed while that claim's tile stays aligned.
+- `primitives.tsx` — shared parts: `ClaimTile` (a claim rendered full-width as its
+  tag in a rounded rect, stance fill, hover raises the `Tooltip` via `HoverContext`,
+  click recentres; `TileMarks` trails a frontier chevron / bedrock badge and a
+  hover-in locate button). `centred` renders C's tile the way the focus band paints
+  the centred claim — the denser selected fill and a 2px stroke — blank inside and
+  inert (no click, tooltip only). `TagHeader` and the `TAG_STYLE` tag look;
+  `stanceStyle` /
   `useStance`; `TargetIcon`, `GraphIcon`, `BedrockBadge`, `FrontierMark`,
   `EmptyCell`; the context objects.
 - `focusData.ts` — thin derivations over `GraphData` (`supportsOf`, `attacksOf`,
-  `consumersOf`, `outputOf`, `roleOf`, `renderedClaimIds`, `frontierStance`).
+  `consumersOf`, `outputOf`, `renderedClaimIds`, `frontierStance`).
 
 **Regions.**
 
 - **Above** (`consumers`): Supports (`concludes`) left, Contests (`contests`)
-  right. One `InferenceBox` per consuming inference — its co-inputs (C omitted),
-  with the destination tile above a rule as the box's output. An inference whose
-  only input is C renders as the bare destination tile, no box. No deduping: two
+  right. One `InferenceBox` per consuming inference — the destination as the output
+  tile, with the inference's inputs bracketed beneath it; C is one of those inputs,
+  marked as the centred claim, in its grounds/warrant position. No deduping: two
   inferences into one destination are two boxes.
 - **Focus band**: the centred claim — a prominent tag (`TAG_STYLE`) over its full
   text as muted detail (`detailFont`); at the reference root it carries the target
   header; attribution, bedrock badge, and the came-from / locate icons render here.
 - **Below** (`supports`/`attacks`): For (`concludes`) left, Against (`contests`)
-  right. One `InferenceBox` per inference, no output tile — the output is C, which
-  is the focus band above.
+  right. One `InferenceBox` per inference whose output tile is C (the centred
+  claim, marked), with the inference's grounds and warrants bracketed beneath it.
 
 **Channels.** Stance (aligned / opposed / divided / neutral, from `computeStance`
 relative to the reference root) is carried by fill: claim-tile fill and the box

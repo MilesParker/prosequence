@@ -13,7 +13,7 @@ import { sourceLabel, computeStance } from '../graphData'
 import {
   getClaim, supportsOf, attacksOf, consumersOf, outputOf, renderedClaimIds,
 } from './focusData'
-import { BedrockBadge, EmptyCell, FromHighlight, ClaimTile, GraphIcon, LocateContext, HoverContext, TargetIcon, FrontierContext, StanceContext, useStance, stanceStyle, TagHeader } from './primitives'
+import { BedrockBadge, EmptyCell, FromHighlight, GraphIcon, LocateContext, HoverContext, TargetIcon, FrontierContext, StanceContext, useStance, stanceStyle, TagHeader } from './primitives'
 import { InferenceBox } from './Cell'
 import { Tooltip } from '../components/Tooltip'
 
@@ -143,25 +143,18 @@ function TearLine({ hops }: { hops: number }) {
 // ── Above region — consumers as inference boxes carrying their output ─────────
 //
 // Where the centred claim C goes: one inference box per consuming inference, the
-// same box as below, holding — top, above a full-width rule — its output/destination
-// tile, then its co-inputs (every ground and warrant EXCEPT C). Conclusion above
-// premises, like the rest of the view. C is the centre and is assumed; it never
-// renders as a tile in any region. The output tile is the only upward navigation
-// in the frame and recentres like any claim tile.
-//
-// Role is positional inside the box (grounds before the `assumes` divider, warrants
-// after); C's own role is no longer labelled. An inference whose only input is C
-// has no co-inputs to box, so it renders as the bare destination tile alone. Two
-// inferences into one destination are two boxes — no dedupe, no multiplicity badge.
-// The heading carries the fan-out count (every consumer inference of that polarity).
+// same template as below, holding its output/destination tile with the inference's
+// inputs bracketed beneath it. C is one of those inputs, and renders in its own
+// grounds/warrant position marked as the centred claim — never omitted. Role is
+// carried by the stub style (solid grounds / dashed warrant), not by a label. The
+// output tile is the only upward navigation in the frame and recentres like any
+// tile. Two inferences into one destination are two boxes — no dedupe, no
+// multiplicity badge. The heading carries the fan-out count.
 
-// One consuming inference: its box (co-inputs + output tile), or — when C is the
-// inference's only input — the bare destination tile, no box.
+// One consuming inference: its box, with the destination as the output tile and C
+// among the bracketed inputs.
 function AboveEntry({ gd, inf, focusId, onFocus }: { gd: GraphData; inf: Inference; focusId: string; onFocus: (id: string) => void }) {
-  const dest = outputOf(inf).id
-  const coInputs = [...(inf.grounds ?? []), ...(inf.warrants ?? [])].some(x => String(x) !== focusId)
-  if (!coInputs) return <ClaimTile gd={gd} id={dest} onFocus={onFocus} />
-  return <InferenceBox gd={gd} inf={inf} onFocus={onFocus} omit={focusId} output={dest} />
+  return <InferenceBox gd={gd} inf={inf} onFocus={onFocus} output={outputOf(inf).id} centredId={focusId} />
 }
 
 // One polarity half of the Above region: its consuming inferences, stacked
@@ -317,15 +310,19 @@ function FocusBand({ gd, focusId, fromId, showFromIcon, isReferenceRoot, onFromH
 // read as the same kind of thing; membership is the only assertion. Both halves
 // share one fixed-height scroll frame, so a tall box runs off the scroll edge
 // with its closed stroke intact. The heading carries the count; corpus order kept.
+//
+// C (the centred claim) is the output tile of every box here — the inference
+// concludes or contests it — marked as the centred claim; the inference's grounds
+// and warrants bracket beneath it.
 
 function BelowColumn({
-  gd, inferences, onFocus, emptyLabel,
-}: { gd: GraphData; inferences: Inference[]; onFocus: (id: string) => void; emptyLabel: string }) {
+  gd, focusId, inferences, onFocus, emptyLabel,
+}: { gd: GraphData; focusId: string; inferences: Inference[]; onFocus: (id: string) => void; emptyLabel: string }) {
   return (
     <div style={{ flex: 1, minWidth: 0, display: 'flex', flexDirection: 'column', gap: FOCUS.boxGap }}>
       {inferences.length === 0
         ? <EmptyCell label={emptyLabel} />
-        : inferences.map(inf => <InferenceBox key={inf.id} gd={gd} inf={inf} onFocus={onFocus} />)}
+        : inferences.map(inf => <InferenceBox key={inf.id} gd={gd} inf={inf} onFocus={onFocus} output={focusId} centredId={focusId} />)}
     </div>
   )
 }
@@ -341,8 +338,8 @@ function BelowRegion({ gd, focusId, onFocus }: { gd: GraphData; focusId: string;
       </div>
       <ScrollFrame height={FOCUS.columnHeight}>
         <div style={{ display: 'flex', gap: FOCUS.parentColGap, alignItems: 'flex-start' }}>
-          <BelowColumn gd={gd} inferences={supports} onFocus={onFocus} emptyLabel="no argument yet" />
-          <BelowColumn gd={gd} inferences={attacks} onFocus={onFocus} emptyLabel="no challenge yet" />
+          <BelowColumn gd={gd} focusId={focusId} inferences={supports} onFocus={onFocus} emptyLabel="no argument yet" />
+          <BelowColumn gd={gd} focusId={focusId} inferences={attacks} onFocus={onFocus} emptyLabel="no challenge yet" />
         </div>
       </ScrollFrame>
     </div>

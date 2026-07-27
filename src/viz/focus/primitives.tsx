@@ -217,46 +217,67 @@ export function TagHeader({ gd, id }: { gd: GraphData; id: string }) {
 }
 
 /**
- * A claim as a tile: a rounded rect carrying its tag and nothing else — no
- * structural words, no role name, no full text at rest. Stance owns the fill.
+ * A claim as a tile: a full-width rounded rect carrying its tag and nothing else —
+ * no structural words, no role name, no full text at rest. Stance owns the fill.
  * Hover reveals the full text (the shared graph tooltip); clicking recentres the
  * stack on the claim. Frontier chevron / bedrock and a hover-in locate button
  * trail the tag as marks, not content.
+ *
+ * `centred` marks the tile as the claim the stack is currently centred on. It wears
+ * the focus band's own treatment — the denser selected stance fill and a heavier
+ * stroke — and is left BLANK inside (no tag, no marks): the reader already sees C's
+ * full identity in the focus band, so the tile only needs to say "this position is
+ * C." It is inert (not clickable) but still raises the tooltip on hover.
  */
 export function ClaimTile({
-  gd, id, onFocus,
-}: { gd: GraphData; id: string; onFocus: (id: string) => void }) {
+  gd, id, onFocus, centred = false,
+}: { gd: GraphData; id: string; onFocus: (id: string) => void; centred?: boolean }) {
   const claim = getClaim(gd, id)
   const hl = useFromHighlight(id)
   const onHover = useContext(HoverContext)
   // Tiles are standalone surfaces, so neutral / no-root paints a plain card edge
-  // rather than nothing — stance fill takes over the moment a root is in frame.
-  const stance = stanceStyle(useStance(id), { neutralBg: COLORS.surface, neutralBorder: COLORS.border })
+  // rather than nothing — stance fill takes over the moment a root is in frame. The
+  // centred tile mirrors the focus band: the selected (denser) fill and a 2px stroke.
+  const stance = stanceStyle(useStance(id), { selected: centred, neutralBg: COLORS.surface, neutralBorder: COLORS.border })
   return (
     <span
-      className="pz-tile"
-      onClick={() => onFocus(id)}
+      // No hover-lift affordance on the inert centred tile — only ordinary tiles
+      // read as clickable (see `.pz-tile`); the tooltip still fires from the handlers.
+      className={centred ? undefined : 'pz-tile'}
+      onClick={centred ? undefined : () => onFocus(id)}
       onMouseMove={e => onHover(id, e.clientX, e.clientY)}
       onMouseLeave={() => onHover(null)}
+      title={centred ? 'The claim you are centred on' : undefined}
       style={{
-        display: 'inline-flex',
+        display: 'flex',
+        width: '100%',
         alignItems: 'center',
         gap: 6,
-        maxWidth: '100%',
-        cursor: 'pointer',
+        cursor: centred ? 'default' : 'pointer',
         borderRadius: FOCUS.tileRadius,   // rounded rect, like a graph node
         padding: '3px 4px 3px 9px',
         lineHeight: 1.3,
         boxSizing: 'border-box',
-        border: '1px solid transparent',
-        ...stance,   // stance wash: pale fill + saturated border, by stance
-        ...hl,       // came-from trace overrides the wash while engaged
+        // Longhands, NOT the `border` shorthand: `stanceStyle` supplies `borderColor`
+        // separately, and a shorthand + longhand mix makes React's style diff reset
+        // borderColor to transparent on some node-reuse updates (border vanishes).
+        borderStyle: 'solid',
+        borderWidth: centred ? 2 : 1,
+        ...stance,   // stance wash: pale fill + saturated border (denser when centred)
+        ...(centred ? null : hl),   // came-from trace only on ordinary tiles
       }}
     >
-      <span style={{ ...TAG_STYLE, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
-        {claim?.tag ?? id}
-      </span>
-      <TileMarks gd={gd} id={id} />
+      {centred ? (
+        // Blank, but reserving one text line so it stands the same height as a filled tile.
+        <span style={{ ...TAG_STYLE, flex: 1 }}>{' '}</span>
+      ) : (
+        <>
+          <span style={{ ...TAG_STYLE, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+            {claim?.tag ?? id}
+          </span>
+          <TileMarks gd={gd} id={id} />
+        </>
+      )}
     </span>
   )
 }

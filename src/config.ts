@@ -103,8 +103,18 @@ export const FOCUS = {
   boxRadius: 7,          // rounded on the right; the stance edge keeps the left square
   boxPad: 11,            // padding inside a box
   boxGap: 10,            // gap between stacked boxes within a region half
-  warrantIndent: 14,     // warrant tiles step in from grounds (both regions)
-  ruleWeight: 1.5,       // full-width input/output rule — the tuning knob (see spec)
+
+  // Bracket leader — the interior tree that hangs the inputs off the output tile.
+  // A solid unbroken spine drops from just below the output tile to the last input;
+  // one stub reaches from the spine to each input tile, SOLID into grounds and
+  // DASHED into warrants (the only mark carrying the grounds/warrant distinction).
+  // The indent is produced by the bracket, not specified separately.
+  bracketIndent: 22,     // connector width = indent + stub length
+  bracketInset: 4,       // spine sits this far in from the output tile's left edge
+  bracketWidth: 1.5,     // spine + stub stroke weight
+  bracketRiser: 6,       // spine segment above the first stub (reads "just below output")
+  bracketTickDrop: 4,    // contest tick nudged down so it clears the output tile above it
+  tileVPad: 3,           // vertical breathing room around each input tile (spine stays continuous)
 
   // Position is the layout channel (For/Supports left, Against/Contests right);
   // this gap separates the two halves in both regions.

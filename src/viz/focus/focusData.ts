@@ -28,25 +28,45 @@ export function outputOf(inf: Inference): Output {
     : { id: String(inf.contests), kind: 'contests' }
 }
 
-/** Role a claim plays in an inference: which input list it sits in. */
-export function roleOf(inf: Inference, id: string): 'grounds' | 'warrants' | null {
-  if ((inf.warrants ?? []).some(w => String(w) === id)) return 'warrants'
-  if ((inf.grounds ?? []).some(g => String(g) === id)) return 'grounds'
-  return null
+/**
+ * The combined stance of a set of input claims (an inference's grounds + warrants) —
+ * the side the inference argues *from*, which is what tints its box. This is NOT the
+ * output claim's stance: an inference that contests an aligned claim argues from the
+ * opposed side, so its box reads opposed while the contested claim's own tile stays
+ * aligned. (It matches the graph's `edgeStance`, which colours an edge by the end
+ * further from the root — the grounds' side.) One stance among the inputs ⇒ that
+ * stance; both poles present (or any `divided`) ⇒ `divided`; all neutral / no root ⇒
+ * undefined (the box falls back to a plain card). The reference root itself counts as
+ * `aligned`, mirroring `useStance`.
+ */
+export function combinedStance(sm: StanceMap | null, ids: string[]): Stance | undefined {
+  if (!sm) return undefined
+  let aligned = false, opposed = false, divided = false
+  for (const id of ids) {
+    const st = id === sm.refRootId ? 'aligned' : sm.node.get(id)
+    if (st === 'aligned') aligned = true
+    else if (st === 'opposed') opposed = true
+    else if (st === 'divided') divided = true
+  }
+  if (divided || (aligned && opposed)) return 'divided'
+  if (aligned) return 'aligned'
+  if (opposed) return 'opposed'
+  return undefined
 }
 
 /**
- * The claim ids actually rendered around `focusId`: parent-band destinations
- * (plus the grounds shown in warrant-role tiles) and every grounds/warrant in
- * the For/Against cells. Used to decide whether the claim you came *from* is on
- * screen to be highlighted — it isn't when it's a co-input hidden behind a
- * grounds-role tile, or when you entered from the graph.
+ * The claim ids actually rendered around `focusId`. Every inference box now shows
+ * a complete inference — its output tile plus all its inputs — so this is: for each
+ * consumer (Above), the destination plus every grounds/warrant (C among them); for
+ * each support/attack (Below), every grounds/warrant (the output tile is C itself).
+ * Used to decide whether the claim you came *from* is on screen to be highlighted —
+ * it isn't when you entered from the graph onto a claim no box mentions.
  */
 export function renderedClaimIds(gd: GraphData, focusId: string): Set<string> {
   const ids = new Set<string>()
   for (const inf of consumersOf(gd, focusId)) {
     ids.add(outputOf(inf).id)
-    if (roleOf(inf, focusId) === 'warrants') for (const g of inf.grounds ?? []) ids.add(String(g))
+    for (const c of [...(inf.grounds ?? []), ...(inf.warrants ?? [])]) ids.add(String(c))
   }
   for (const inf of [...supportsOf(gd, focusId), ...attacksOf(gd, focusId)]) {
     for (const c of [...(inf.grounds ?? []), ...(inf.warrants ?? [])]) ids.add(String(c))
