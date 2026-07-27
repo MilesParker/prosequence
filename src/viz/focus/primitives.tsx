@@ -5,15 +5,15 @@
 // shared pip/colour tokens; they do not reach above the primitive level.
 
 import { createContext, useContext } from 'react'
-import { COLORS, FOCUS, REF_ROOT, SHOW_FOCUS_TAGS, SHOW_FOCUS_TEXT, STANCE_FILL_OPACITY, STANCE_SELECTED_FILL_OPACITY } from '../../config'
+import { COLORS, FOCUS, REF_ROOT, SHOW_FOCUS_TAGS, STANCE_FILL_OPACITY, STANCE_SELECTED_FILL_OPACITY, TAG_TEXT } from '../../config'
 import type { GraphData, StanceMap, Stance } from '../graphData'
 import { stanceColor } from '../graphData'
 import { getClaim, frontierStance } from './focusData'
 
 /**
  * The claim you navigated *from*, plus whether the focus band's trace icon is
- * engaged. Consumed by every clickable claim — ClaimRow here and ClaimTap in the
- * parent band — so the matching one rings itself while the icon is held.
+ * engaged. Consumed by every clickable claim — the ClaimTile — so the matching
+ * one rings itself while the trace icon is held.
  */
 export const FromHighlight = createContext<{ id: string | null; active: boolean }>({ id: null, active: false })
 
@@ -28,6 +28,11 @@ export function useFromHighlight(id: string): { boxShadow: string; background: s
 /** "Show <claim> in the graph, zoomed to its neighbourhood." Provided by the
  *  focus view so every visible claim can locate itself, not just the centre. */
 export const LocateContext = createContext<(id: string) => void>(() => {})
+
+/** Tile hover, reported to the focus view so it can raise the same rich tooltip
+ *  the graph shows on a node (tag, full text, attribution, uncertain). Called with
+ *  the claim id and cursor position on move, and `null` on leave. */
+export const HoverContext = createContext<(id: string | null, x?: number, y?: number) => void>(() => {})
 
 /**
  * The Stage 3 stance map plus the claims currently on screen, provided by the
@@ -73,14 +78,14 @@ function hslaFrom(hsl: string, alpha: number): string {
  *  standalone cards pass a `neutral*` fallback so they keep a visible edge. */
 export function stanceStyle(
   st: Stance | undefined,
-  { selected = false, neutralBg = 'transparent', neutralBorder = 'transparent' } = {},
+  { selected = false, neutralBg = 'transparent', neutralBorder = 'transparent', fillOpacity }:
+    { selected?: boolean; neutralBg?: string; neutralBorder?: string; fillOpacity?: number } = {},
 ): { background: string; borderColor: string } {
   if (!st || st === 'neutral') return { background: neutralBg, borderColor: neutralBorder }
   const hue = stanceColor(st)
-  return {
-    background: hslaFrom(hue, selected ? STANCE_SELECTED_FILL_OPACITY : STANCE_FILL_OPACITY),
-    borderColor: hue,
-  }
+  // Explicit fillOpacity wins (containers wash lighter); otherwise selected vs regular.
+  const alpha = fillOpacity ?? (selected ? STANCE_SELECTED_FILL_OPACITY : STANCE_FILL_OPACITY)
+  return { background: hslaFrom(hue, alpha), borderColor: hue }
 }
 
 /** The reference-root "target": a small bullseye in ink, no stance hue — it marks
@@ -168,90 +173,91 @@ export function FrontierMark({ gd, id }: { gd: GraphData; id: string }) {
 }
 
 /**
- * The right-hand marks on any claim: its frontier hint (stance chevron / bedrock)
- * with a small "show in graph" button stacked just below. The button locates
- * *this* claim on the map; stopPropagation keeps the click off the row's
- * recentre gesture.
+ * The marks trailing a claim tile: its frontier hint (stance chevron / bedrock)
+ * and a small "show in graph" button, inline so the pill stays one line tall. The
+ * button locates *this* claim on the map; stopPropagation keeps the click off the
+ * tile's recentre gesture. The chevron is information and always shows; the locate
+ * button is chrome and rides in on tile hover (see `.pz-tile` CSS).
  */
-export function ClaimMarks({ gd, id }: { gd: GraphData; id: string }) {
+function TileMarks({ gd, id }: { gd: GraphData; id: string }) {
   const onLocate = useContext(LocateContext)
   return (
-    <span style={{ display: 'inline-flex', flexDirection: 'column', alignItems: 'center', gap: 4, flexShrink: 0 }}>
+    <span style={{ display: 'inline-flex', alignItems: 'center', gap: 3, flexShrink: 0 }}>
       <FrontierMark gd={gd} id={id} />
       <button
         type="button" className="pz-graphbtn" title="Show in graph" aria-label="Show in graph"
         onClick={e => { e.stopPropagation(); onLocate(id) }}
       >
-        <GraphIcon size={13} />
+        <GraphIcon size={12} />
       </button>
     </span>
   )
 }
 
 /**
+ * The one tag look, shared by every place a tag appears — standing alone on a tile
+ * and heading a claim whose detail is shown — so a tag reads the same either way.
+ * The tag is the primary identifier: plain, ink, prominent, the most visible text
+ * in its context; the claim's full text sits under it as muted detail. Text
+ * formatting only; layout (margins, ellipsis) stays with each caller.
+ */
+export const TAG_STYLE = { ...TAG_TEXT, fontSize: FOCUS.tagFont } as const
+
+/**
  * A claim's `tag` as a mini header above its text — a short handle for the claim.
  * Gated by SHOW_FOCUS_TAGS so it can be flipped off everywhere at once; renders
- * nothing when the flag is off or the claim carries no tag. Muted and semibold so
- * it reads as a heading over the claim text, not as another claim.
+ * nothing when the flag is off or the claim carries no tag. Wears the shared tag
+ * look (TAG_STYLE), so it matches the tag on a tile.
  */
 export function TagHeader({ gd, id }: { gd: GraphData; id: string }) {
   if (!SHOW_FOCUS_TAGS) return null
   const tag = getClaim(gd, id)?.tag
   if (!tag) return null
-  return (
-    <div
-      style={{
-        fontSize: FOCUS.tagFont,
-        fontWeight: 600,
-        letterSpacing: '0.04em',
-        color: COLORS.textFaint,
-        marginBottom: 2,
-      }}
-    >
-      {tag}
-    </div>
-  )
+  return <div style={{ ...TAG_STYLE, marginBottom: 2 }}>{tag}</div>
 }
 
 /**
- * A claim as one clickable row: its text plus status marks. Clicking refocuses
- * the whole stack on that claim — the only navigation gesture in a cell.
- * Attributive claims render text only here; source/quote read in the focus
- * band (§3a).
+ * A claim as a tile: a rounded rect carrying its tag and nothing else — no
+ * structural words, no role name, no full text at rest. Stance owns the fill.
+ * Hover reveals the full text (the shared graph tooltip); clicking recentres the
+ * stack on the claim. Frontier chevron / bedrock and a hover-in locate button
+ * trail the tag as marks, not content.
  */
-export function ClaimRow({
+export function ClaimTile({
   gd, id, onFocus,
 }: { gd: GraphData; id: string; onFocus: (id: string) => void }) {
   const claim = getClaim(gd, id)
   const hl = useFromHighlight(id)
-  const stance = stanceStyle(useStance(id))
+  const onHover = useContext(HoverContext)
+  // Tiles are standalone surfaces, so neutral / no-root paints a plain card edge
+  // rather than nothing — stance fill takes over the moment a root is in frame.
+  const stance = stanceStyle(useStance(id), { neutralBg: COLORS.surface, neutralBorder: COLORS.border })
   return (
-    <div
-      className="pz-row"
+    <span
+      className="pz-tile"
       onClick={() => onFocus(id)}
+      onMouseMove={e => onHover(id, e.clientX, e.clientY)}
+      onMouseLeave={() => onHover(null)}
       style={{
-        display: 'flex',
-        gap: 10,
-        alignItems: 'flex-start',
-        padding: '6px 8px',
-        borderRadius: 6,
+        display: 'inline-flex',
+        alignItems: 'center',
+        gap: 6,
+        maxWidth: '100%',
         cursor: 'pointer',
-        fontSize: FOCUS.rowFont,
-        lineHeight: 1.5,
-        color: COLORS.text,
+        borderRadius: FOCUS.tileRadius,   // rounded rect, like a graph node
+        padding: '3px 4px 3px 9px',
+        lineHeight: 1.3,
         boxSizing: 'border-box',
         border: '1px solid transparent',
-        marginBottom: 4,
         ...stance,   // stance wash: pale fill + saturated border, by stance
         ...hl,       // came-from trace overrides the wash while engaged
       }}
     >
-      <span style={{ flex: 1, minWidth: 0 }}>
-        <TagHeader gd={gd} id={id} />
-        {SHOW_FOCUS_TEXT && (claim?.text ?? id)}
+      <span style={{ ...TAG_STYLE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+        {claim?.tag ?? id}
       </span>
-      <ClaimMarks gd={gd} id={id} />
-    </div>
+      <TileMarks gd={gd} id={id} />
+    </span>
   )
 }
 

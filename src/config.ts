@@ -79,19 +79,34 @@ export const SHOW_FOCUS_TEXT = true
 
 export const FOCUS = {
   columnMaxWidth: 860,   // max width of the centred stack
-  rowFont: 14.5,         // claim-row text
-  focusFont: 19,         // centred claim text
-  labelFont: 11,         // uppercase role labels, pager, bedrock badge
-  tagFont: 10.5,         // per-item tag mini header (see SHOW_FOCUS_TAGS)
-  pipGap: 5,
+  rowFont: 14.5,         // attribution, empty-state text
+  labelFont: 11,         // uppercase region headings, counts, subheads, bedrock
+  // The tag is the primary identifier everywhere (tile, focus band, root line) and
+  // reads as plain, prominent text; the claim's full text is secondary DETAIL shown
+  // muted beneath it (or on dwell, on a tile). One tag look throughout — see TAG_STYLE.
+  tagFont: 15,           // the tag — primary, plain text
+  detailFont: 13,        // the claim's full text, shown as muted detail
   connector: 22,         // vertical rule between bands
-  cellRadius: 8,
-  bracketWidth: 2,       // warrant bracket rule
+  cellRadius: 8,         // dashed empty-state card
 
-  // Parent band: two fixed columns (Supports/Contests) by polarity, each paged
-  // one entry at a time like For/Against (grounds-role entries first); the role C
-  // plays is a group header above the tile, not a per-tile label.
-  parentColGap: 16,        // Supports/Contests gap (mirrors the For/Against gap)
+  // Claim tiles — a claim rendered as its tag, a rounded rect echoing the graph
+  // node and the centred claim (stance fill). The tag text shares one look with
+  // the tag header everywhere (see TAG_STYLE). Full text on dwell.
+  tileRadius: 5,         // rounded-rect corner (graph node = 4, centred claim = 10)
+  tileGap: 6,            // gap between tiles inside a bag / a box's internals
+
+  // Inference boxes — one per inference below the focus, full column width and
+  // stacked. A thick stance-hue "spine" down the left edge carries the grouping
+  // (these claims conjoin into one argument), a hairline neutral border closes the
+  // other three sides, and a light stance wash fills the interior.
+  spineWidth: 1,         // stance-hue left edge, same weight as the neutral border
+  boxRadius: 7,          // rounded on the right; the stance edge keeps the left square
+  boxPad: 11,            // padding inside a box
+  boxGap: 10,            // gap between stacked boxes within a region half
+
+  // Position is the layout channel (For/Supports left, Against/Contests right);
+  // this gap separates the two halves in both regions.
+  parentColGap: 16,
 
   // "Came from" trace: the claim you navigated from wears this ring/wash while
   // the focus-band icon is engaged. Reuses the shared HIGHLIGHT accent, so it is
@@ -107,11 +122,12 @@ export const FOCUS = {
   tearHeight: 13,        // torn-edge zigzag band height
   tearToothW: 14,        // width of one zigzag tooth (the pattern tile)
 
-  // Reserved heights that keep the landscape from shifting as you refocus
-  // (best-guess maxima; tiles scroll internally on the rare overflow).
+  // Reserved heights keep the landscape from shifting as you refocus. Both region
+  // frames are fixed and scroll internally with a scroll-edge fade — paging retired.
   focusMinHeight: 120,     // focus band floor (~3 lines)
-  columnHeight: 360,       // For/Against: equal fixed height
-  pagerHeight: 26,         // always reserved so paging never shifts the cell
+  aboveHeight: 220,        // consumers region (inference boxes → destinations) — fixed, scrolls
+  columnHeight: 360,       // For/Against region (inference boxes) — fixed, scrolls
+  scrollFade: 16,          // scroll-edge fade depth
 } as const
 
 // ── Node dimensions (half-width / half-height) ───────────────────────────────
@@ -171,6 +187,14 @@ export const COLORS = {
     against: { tint: 'hsl(2, 62%, 52%)',   bg: 'hsl(2, 66%, 97%)',   border: 'hsl(2, 52%, 86%)',   label: 'hsl(2, 56%, 43%)' },
   },
 } as const
+
+// ── Shared text look ──────────────────────────────────────────────────────────
+// The weight + colour of the two text roles, size-free so each surface picks its
+// own font-size. The tag is the primary identifier — plain, ink; the claim's full
+// text is secondary detail — muted. Shared by the focus view AND the graph tooltip
+// so a tag reads the same everywhere and its detail text the same everywhere.
+export const TAG_TEXT = { fontWeight: 500, color: COLORS.text } as const
+export const DETAIL_TEXT = { fontWeight: 400, color: COLORS.textMuted } as const
 
 // ── Stance colours (LCH-canonical) ────────────────────────────────────────────
 // A four-value vocabulary for the *stance* of a claim/edge — how the sides of a
@@ -249,6 +273,10 @@ export const STANCE_FILL_OPACITY = 0.18
 // competing ring.
 export const STANCE_SELECTED_FILL_OPACITY = 0.34
 export const STANCE_SELECTED_STROKE_BUMP = 1.4
+
+// A container (the inference box interior) washes lighter than a claim, so the
+// regular-weight tiles inside it read as sitting on top rather than blending in.
+export const STANCE_CONTAINER_FILL_OPACITY = 0.08
 
 // ── Reference root marker ─────────────────────────────────────────────────────
 // The reference root is the origin all stance is measured from (a movable viewing

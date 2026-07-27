@@ -1,4 +1,4 @@
-import { COLORS } from '../../config'
+import { COLORS, TAG_TEXT, DETAIL_TEXT } from '../../config'
 import type { GraphNode, ClaimNode, InfNode, ChipKind } from '../graphData'
 import { sourceLabel } from '../graphData'
 
@@ -33,7 +33,8 @@ export function Tooltip({ node, x, y, nodeById }: Props) {
     maxWidth: TOOLTIP_W, fontSize: 12, lineHeight: 1.5,
     pointerEvents: 'none' as const, zIndex: 100, boxShadow: '0 6px 24px rgba(0,0,0,0.12)',
   }
-  const tagStyle = { fontSize: 10, fontWeight: 600 as const, textTransform: 'uppercase' as const, letterSpacing: '0.08em', color: COLORS.textFaint, marginBottom: 5 }
+  // Same tag look as the focus view (plain, ink), at the tooltip's own compact size.
+  const tagStyle = { ...TAG_TEXT, fontSize: 13, marginBottom: 5 }
   const chips = { display: 'flex', flexWrap: 'wrap' as const, gap: 6, marginTop: 8 }
 
   if (node._kind === 'inference') {
@@ -47,7 +48,7 @@ export function Tooltip({ node, x, y, nodeById }: Props) {
     return (
       <div style={shell}>
         <div style={tagStyle}>Inference</div>
-        <div style={{ color: COLORS.text, marginBottom: 8, fontSize: 12.5 }}>
+        <div style={{ ...DETAIL_TEXT, marginBottom: 8, fontSize: 12.5 }}>
           {because}{given}.
         </div>
         <div style={chips}>
@@ -62,7 +63,7 @@ export function Tooltip({ node, x, y, nodeById }: Props) {
   return (
     <div style={shell}>
       <div style={tagStyle}>{claim.tag || (claim.id as unknown as string)}</div>
-      <div style={{ color: COLORS.text, marginBottom: 8, fontSize: 12.5 }}>{claim.text}</div>
+      <div style={{ ...DETAIL_TEXT, marginBottom: 8, fontSize: 12.5 }}>{claim.text}</div>
       {claim.attribution && (
         <>
           {claim.attribution.quote && (
