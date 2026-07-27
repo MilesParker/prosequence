@@ -231,7 +231,7 @@ export function TagHeader({ gd, id }: { gd: GraphData; id: string }) {
  */
 export function ClaimTile({
   gd, id, onFocus, centred = false,
-}: { gd: GraphData; id: string; onFocus: (id: string) => void; centred?: boolean }) {
+}: { gd: GraphData; id: string; onFocus: (id: string, source?: DOMRect) => void; centred?: boolean }) {
   const claim = getClaim(gd, id)
   const hl = useFromHighlight(id)
   const onHover = useContext(HoverContext)
@@ -244,7 +244,9 @@ export function ClaimTile({
       // No hover-lift affordance on the inert centred tile — only ordinary tiles
       // read as clickable (see `.pz-tile`); the tooltip still fires from the handlers.
       className={centred ? undefined : 'pz-tile'}
-      onClick={centred ? undefined : () => onFocus(id)}
+      // Pass the tile's own rect so the focus view can fly a ghost of it to the
+      // centre (see FocusView's refocus flight). currentTarget is this tile span.
+      onClick={centred ? undefined : e => onFocus(id, e.currentTarget.getBoundingClientRect())}
       onMouseMove={e => onHover(id, e.clientX, e.clientY)}
       onMouseLeave={() => onHover(null)}
       title={centred ? 'The claim you are centred on' : undefined}

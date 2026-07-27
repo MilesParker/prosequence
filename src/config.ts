@@ -140,6 +140,18 @@ export const FOCUS = {
   aboveHeight: 220,        // consumers region (inference boxes → destinations) — fixed, scrolls
   columnHeight: 360,       // For/Against region (inference boxes) — fixed, scrolls
   scrollFade: 16,          // scroll-edge fade depth
+
+  // Refocus flight — the "your click is travelling to the centre" hint. On a tile
+  // click the surface fades out, a ghost of the clicked box flies from where it sat
+  // to where the new focus band lands (measured after the swap), then the redrawn
+  // surface fades in under it. Three legs; the crossfade hides that the ghost is an
+  // approximation, so it never has to morph shape. Skipped under prefers-reduced-motion.
+  flight: {
+    fadeOut: 120,          // ms — old surface fades before the ghost sets off
+    move: 240,             // ms — ghost travels source → focus band
+    fadeIn: 150,           // ms — redrawn surface fades in as the ghost fades out
+    ease: 'cubic-bezier(0.4, 0, 0.2, 1)',
+  },
 } as const
 
 // ── Node dimensions (half-width / half-height) ───────────────────────────────

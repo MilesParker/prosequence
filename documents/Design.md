@@ -226,6 +226,18 @@ the reference root, `computeStance`, and the graph's `Tooltip`.
   `FrontierContext`, and `StanceContext` contexts. `ScrollFrame` gives a region a
   fixed height with a scroll-edge fade; `RegionHeading` prints a region's name and
   count.
+  A refocus click runs through `handleFocus`, which plays the **refocus flight**
+  before swapping: the whole surface crossfades to the newly centred claim while a
+  single `Ghost` (a band-styled rect carrying the target claim's tag, `position:
+  fixed` in viewport coords) flies from the clicked tile's rect to where the focus
+  band lands. Three legs keyed off a `flight` state machine — fade the surface out,
+  swap `focusId` under the fade and fly the ghost to the *measured* band
+  (`bandRef`), fade the surface back in as the ghost fades out. Only the source rect
+  is measured up front (captured from the click's `currentTarget`); the target is
+  read from `bandRef` after the swap, and the crossfade hides the seam so the ghost
+  never morphs shape. A missing source rect, `prefers-reduced-motion`, or a click
+  while a flight is already running all fall through to an instant swap. Durations /
+  easing live in `FOCUS.flight`.
 - `Cell.tsx` — `InferenceBox`, one inference as a card, one template for both
   regions: a stance-hue left spine plus a hairline border on the other sides
   (`spineWidth`, `boxRadius`), a light stance wash inside
@@ -238,9 +250,9 @@ the reference root, `computeStance`, and the graph's `Tooltip`.
   `assumes` divider, no role subhead, no full-width rule. The bracket's topmost
   segment (the riser, just below the output tile) carries the output relation: when
   the inference `contests` its output, `ContestTick` draws the graph's double tick
-  there — the same mark from the same builder (`contestTickSegments`), coloured by
-  the output's stance exactly as the graph paints its contest edges, oriented up the
-  vertical spine; a `concludes` inference leaves it unmarked. The mark is on the
+  there — the same mark from the same builder (`contestTickSegments`), in the box's
+  own stance (the inputs' side, as the graph paints its contest edges), oriented up
+  the vertical spine; a `concludes` inference leaves it unmarked. The mark is on the
   spine only, never the stubs, once per box. The spine is inset from the output
   tile's left edge (`bracketInset`) and the tick dropped (`bracketTickDrop`) to
   clear the tile above it.
@@ -260,7 +272,7 @@ the reference root, `computeStance`, and the graph's `Tooltip`.
   `useStance`; `TargetIcon`, `GraphIcon`, `BedrockBadge`, `FrontierMark`,
   `EmptyCell`; the context objects.
 - `focusData.ts` — thin derivations over `GraphData` (`supportsOf`, `attacksOf`,
-  `consumersOf`, `outputOf`, `renderedClaimIds`, `frontierStance`).
+  `consumersOf`, `outputOf`, `combinedStance`, `renderedClaimIds`, `frontierStance`).
 
 **Regions.**
 

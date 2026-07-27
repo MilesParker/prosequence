@@ -5,15 +5,15 @@
 // (chevrons, For/Against columns only). No expand/collapse; everything visible
 // at rest. Page state resets on refocus via a `key` keyed to the focus id.
 
-import { useState, useEffect, useMemo, type ReactNode } from 'react'
+import { useState, useEffect, useMemo, useRef, useCallback, type ReactNode, type RefObject } from 'react'
 import { COLORS, FOCUS, SHOW_FOCUS_TEXT, TITLE_BAR_HEIGHT, DETAIL_TEXT } from '../../config'
-import type { GraphData } from '../graphData'
+import type { GraphData, StanceMap } from '../graphData'
 import type { Inference, Attribution as AttributionT } from '../../types'
 import { sourceLabel, computeStance } from '../graphData'
 import {
   getClaim, supportsOf, attacksOf, consumersOf, outputOf, renderedClaimIds,
 } from './focusData'
-import { BedrockBadge, EmptyCell, FromHighlight, GraphIcon, LocateContext, HoverContext, TargetIcon, FrontierContext, StanceContext, useStance, stanceStyle, TagHeader } from './primitives'
+import { BedrockBadge, EmptyCell, FromHighlight, GraphIcon, LocateContext, HoverContext, TargetIcon, FrontierContext, StanceContext, useStance, stanceStyle, TagHeader, TAG_STYLE } from './primitives'
 import { InferenceBox } from './Cell'
 import { Tooltip } from '../components/Tooltip'
 
@@ -79,13 +79,13 @@ function Connector() {
 // for that pole and the caption for every other fill in the frame — the honesty
 // constraint made visible. Truncated to a single banner line; clicking it recentres
 // the stack on the root — the always-available "take me back to the top".
-function RootLine({ gd, rootId, onFocus }: { gd: GraphData; rootId: string; onFocus: (id: string) => void }) {
+function RootLine({ gd, rootId, onFocus }: { gd: GraphData; rootId: string; onFocus: (id: string, source?: DOMRect) => void }) {
   const claim = getClaim(gd, rootId)
   const stance = stanceStyle(useStance(rootId), { neutralBg: COLORS.surface, neutralBorder: COLORS.border })
   return (
     <div
       className="pz-row"
-      onClick={() => onFocus(rootId)}
+      onClick={e => onFocus(rootId, e.currentTarget.getBoundingClientRect())}
       title={claim?.text ?? rootId}
       style={{
         display: 'flex', gap: 10, alignItems: 'center', cursor: 'pointer',
@@ -236,7 +236,7 @@ function CameFromIcon() {
   )
 }
 
-function FocusBand({ gd, focusId, fromId, showFromIcon, isReferenceRoot, onFromHover, onFocus, onLocate }: {
+function FocusBand({ gd, focusId, fromId, showFromIcon, isReferenceRoot, onFromHover, onFocus, onLocate, bandRef }: {
   gd: GraphData
   focusId: string
   fromId: string | null
@@ -245,6 +245,7 @@ function FocusBand({ gd, focusId, fromId, showFromIcon, isReferenceRoot, onFromH
   onFromHover: (on: boolean) => void
   onFocus: (id: string) => void
   onLocate: (id: string) => void
+  bandRef: RefObject<HTMLDivElement>
 }) {
   const claim = getClaim(gd, focusId)
   // The centred claim is the "you are here" surface — painted by its own stance at
@@ -253,6 +254,7 @@ function FocusBand({ gd, focusId, fromId, showFromIcon, isReferenceRoot, onFromH
   const stance = stanceStyle(useStance(focusId), { selected: true, neutralBg: COLORS.surface, neutralBorder: COLORS.border })
   return (
     <div
+      ref={bandRef}
       style={{
         position: 'relative',
         width: '100%',
@@ -346,6 +348,58 @@ function BelowRegion({ gd, focusId, onFocus }: { gd: GraphData; focusId: string;
   )
 }
 
+// ── Refocus flight ────────────────────────────────────────────────────────────
+//
+// The "your click is on its way to the centre" hint. On a tile click the whole
+// surface crossfades to the newly centred claim; over that crossfade a single
+// ghost of the clicked box flies from where it sat to where the new focus band
+// lands. Three legs (§ config FOCUS.flight): fade the old surface out, fly the
+// ghost source → measured band, fade the new surface in as the ghost fades out.
+// The crossfade is what lets the ghost be an approximation — it never morphs
+// shape, it just travels. Skipped entirely under prefers-reduced-motion.
+
+type FlightPhase = 'out' | 'move' | 'in'
+type Flight = { id: string; source: DOMRect; target: DOMRect | null; phase: FlightPhase }
+
+// The flying box. A band-styled rectangle carrying the target claim's tag, pinned
+// with position:fixed in viewport coords (matching the rects we measure). It sits
+// on `source` until a `target` arrives, then the CSS transition carries it across;
+// in the final leg it fades so the redrawn band shows through beneath it.
+function Ghost({ gd, flight, sm }: { gd: GraphData; flight: Flight; sm: StanceMap | null }) {
+  const FL = FOCUS.flight
+  const st = sm ? (flight.id === sm.refRootId ? 'aligned' : sm.node.get(flight.id)) : undefined
+  const stance = stanceStyle(st, { selected: true, neutralBg: COLORS.surface, neutralBorder: COLORS.border })
+  const box = flight.target ?? flight.source
+  const tag = getClaim(gd, flight.id)?.tag ?? flight.id
+  return (
+    <div
+      aria-hidden
+      style={{
+        position: 'fixed',
+        left: box.left, top: box.top, width: box.width, height: box.height,
+        boxSizing: 'border-box',
+        display: 'flex', alignItems: 'center',
+        padding: '3px 4px 3px 9px',
+        borderRadius: FOCUS.tileRadius,
+        borderStyle: 'solid', borderWidth: 2,
+        ...stance,
+        opacity: flight.phase === 'in' ? 0 : 1,
+        pointerEvents: 'none',
+        zIndex: 40,
+        willChange: 'left, top, width, height, opacity',
+        transition:
+          `left ${FL.move}ms ${FL.ease}, top ${FL.move}ms ${FL.ease}, ` +
+          `width ${FL.move}ms ${FL.ease}, height ${FL.move}ms ${FL.ease}, ` +
+          `opacity ${FL.fadeIn}ms ${FL.ease}`,
+      }}
+    >
+      <span style={{ ...TAG_STYLE, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+        {tag}
+      </span>
+    </div>
+  )
+}
+
 // ── Frame ─────────────────────────────────────────────────────────────────────
 
 export function FocusView({
@@ -395,6 +449,63 @@ export function FocusView({
   const hoveredNode = hovered ? gd.nodeById.get(hovered.id) ?? null : null
   useEffect(() => { setShowFrom(false); setHovered(null) }, [focusId])   // reset on every refocus
 
+  // ── Refocus flight ──────────────────────────────────────────────────────────
+  // Honour the OS "reduce motion" setting — then a click is an instant swap.
+  const reduceMotion = useMemo(
+    () => typeof window !== 'undefined' && !!window.matchMedia?.('(prefers-reduced-motion: reduce)').matches,
+    [],
+  )
+  const bandRef = useRef<HTMLDivElement>(null)
+  const [flight, setFlight] = useState<Flight | null>(null)
+  const FL = FOCUS.flight
+
+  // Intercept every refocus: with a source rect (and motion allowed, and not the
+  // claim we're already on) start a flight; otherwise swap straight through. A
+  // flight already in progress swallows further clicks into a plain swap.
+  const handleFocus = useCallback((id: string, source?: DOMRect) => {
+    if (!source || reduceMotion || id === focusId || flight) { onFocus(id); return }
+    setFlight({ id, source, target: null, phase: 'out' })
+  }, [onFocus, focusId, reduceMotion, flight])
+
+  // The flight's clock. `out`: fade the old surface, then swap focusId under the
+  // fade and advance. `move`: the new band is now mounted but held invisible —
+  // measure it, hand the ghost its target (the CSS transition flies it there),
+  // then advance once the travel time is up. `in`: fade the new surface in beneath
+  // the fading ghost, then clear. The focusId swap rides inside phase `out` so the
+  // redraw happens while the surface is already dark.
+  useEffect(() => {
+    if (!flight) return
+    if (flight.phase === 'out') {
+      const t = setTimeout(() => {
+        onFocus(flight.id)
+        setFlight(f => (f ? { ...f, phase: 'move' } : f))
+      }, FL.fadeOut)
+      return () => clearTimeout(t)
+    }
+    if (flight.phase === 'move') {
+      if (flight.target == null) {
+        const rect = bandRef.current?.getBoundingClientRect()
+        // No band to fly to (shouldn't happen post-swap) — skip the travel and just
+        // crossfade, rather than re-measuring null forever into a render loop.
+        if (!rect) { setFlight(f => (f ? { ...f, phase: 'in' } : f)); return }
+        setFlight(f => (f ? { ...f, target: rect } : f))
+        return
+      }
+      const t = setTimeout(() => setFlight(f => (f ? { ...f, phase: 'in' } : f)), FL.move)
+      return () => clearTimeout(t)
+    }
+    const t = setTimeout(() => setFlight(null), FL.fadeIn)   // phase 'in'
+    return () => clearTimeout(t)
+  }, [flight, onFocus, FL.fadeOut, FL.move, FL.fadeIn])
+
+  // The surface is dark for the whole flight except the final fade-in leg; the old
+  // content shows through phase `out` (focusId hasn't swapped yet), the new through
+  // `in`. `move` holds it invisible so the freshly mounted band can't pop in early.
+  const surfaceOpacity = !flight || flight.phase === 'in' ? 1 : 0
+  const surfaceTransition = flight
+    ? `opacity ${flight.phase === 'in' ? FL.fadeIn : FL.fadeOut}ms ${FL.ease}`
+    : 'none'
+
   return (
     <div style={{ position: 'fixed', top: TITLE_BAR_HEIGHT, left: 0, right: 0, bottom: 0, overflowY: 'auto', background: COLORS.background }}>
       <style>{focusCss}</style>
@@ -403,18 +514,18 @@ export function FocusView({
        <LocateContext.Provider value={onLocate}>
         <FrontierContext.Provider value={frontier}>
         <StanceContext.Provider value={referenceRootId ? sm : null}>
-        <div style={{ maxWidth: FOCUS.columnMaxWidth, margin: '0 auto', padding: '28px 20px 96px', display: 'flex', flexDirection: 'column', alignItems: 'stretch' }}>
+        <div style={{ maxWidth: FOCUS.columnMaxWidth, margin: '0 auto', padding: '28px 20px 96px', display: 'flex', flexDirection: 'column', alignItems: 'stretch', opacity: surfaceOpacity, transition: surfaceTransition }}>
           {/* What's ultimately at stake, then the inert tear for the hidden hops. */}
           {showRootLine && (
             <>
-              <RootLine gd={gd} rootId={referenceRootId as string} onFocus={onFocus} />
+              <RootLine gd={gd} rootId={referenceRootId as string} onFocus={handleFocus} />
               <TearLine hops={hops as number} />
             </>
           )}
 
           {hasParents && (
             <>
-              <AboveRegion gd={gd} focusId={focusId} onFocus={onFocus} />
+              <AboveRegion gd={gd} focusId={focusId} onFocus={handleFocus} />
               <Connector />
             </>
           )}
@@ -424,8 +535,9 @@ export function FocusView({
             showFromIcon={fromVisible}
             isReferenceRoot={isAtRoot}
             onFromHover={setShowFrom}
-            onFocus={onFocus}
+            onFocus={handleFocus}
             onLocate={onLocate}
+            bandRef={bandRef}
           />
 
           {/* Terminals cannot be concluded or contested (I7/I8): omit the whole
@@ -433,7 +545,7 @@ export function FocusView({
           {!terminal && (
             <>
               <Connector />
-              <BelowRegion gd={gd} focusId={focusId} onFocus={onFocus} />
+              <BelowRegion gd={gd} focusId={focusId} onFocus={handleFocus} />
             </>
           )}
         </div>
@@ -442,6 +554,7 @@ export function FocusView({
        </LocateContext.Provider>
       </FromHighlight.Provider>
       </HoverContext.Provider>
+      {flight && <Ghost gd={gd} flight={flight} sm={referenceRootId ? sm : null} />}
       {hovered && hoveredNode && <Tooltip node={hoveredNode} x={hovered.x} y={hovered.y} nodeById={gd.nodeById} />}
     </div>
   )

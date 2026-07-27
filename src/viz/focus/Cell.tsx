@@ -44,11 +44,11 @@ type Input = { id: string; warrant: boolean }
 // The contest mark on the bracket's topmost (output-relation) segment: the graph's
 // double tick, from the SAME builder (`contestTickSegments`), so the two views draw
 // one mark from one definition. Only the orientation differs — here the spine runs
-// vertically, so the tick is oriented up toward the output tile. `color` matches the
-// graph, which paints the tick in the stance of the claim the edge leads into (here
-// the box's output stance); `pointer-events: none` and `overflow: visible` let it
-// sit on the thin riser without clipping. Centred on the (inset) spine and dropped a
-// little so it clears the output tile above it.
+// vertically, so the tick is oriented up toward the output tile. `color` is the box's
+// stance (the inputs' side), matching the graph, which paints a contest edge by the
+// side it leads into; `pointer-events: none` and `overflow: visible` let it sit on
+// the thin riser without clipping. Centred on the (inset) spine and dropped a little
+// so it clears the output tile above it.
 function ContestTick({ color }: { color: string }) {
   const { length, gap, count, strokeWidth } = EDGE.contestTick
   const w = length + 2
