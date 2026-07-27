@@ -253,7 +253,7 @@ export function ClaimTile({
         ...hl,       // came-from trace overrides the wash while engaged
       }}
     >
-      <span style={{ ...TAG_STYLE, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
+      <span style={{ ...TAG_STYLE, flex: 1, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', minWidth: 0 }}>
         {claim?.tag ?? id}
       </span>
       <TileMarks gd={gd} id={id} />

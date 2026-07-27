@@ -6,6 +6,7 @@ import {
   STANCE_SELECTED_FILL_OPACITY, STANCE_SELECTED_STROKE_BUMP, REF_ROOT,
 } from '../../config'
 import { fitTransform, type LayoutBounds, type GroupBox } from '../layout'
+import { loadViewport, saveViewport } from '../persist'
 import {
   nodeHW, nodeHH, isRootClaim,
   rectEdgePt, fitTag,
@@ -109,6 +110,9 @@ export function Graph({ data, graphData, bounds, groups, highlight, centerOn, ce
       .scaleExtent([VIEW.zoomMin, VIEW.zoomMax])
       .on('zoom', e => g.attr('transform',
         `translate(${e.transform.x},${e.transform.y + TITLE_BAR_HEIGHT}) scale(${e.transform.k})`))
+      // Persist the reader's "location" after each pan/zoom gesture settles so a
+      // reload (or a return from the focus view) restores it exactly.
+      .on('end', e => saveViewport({ k: e.transform.k, x: e.transform.x, y: e.transform.y }))
     svg.call(zoom)
     svg.on('dblclick.zoom', null)   // double-click is reserved for open-in-focus
 
@@ -380,22 +384,29 @@ export function Graph({ data, graphData, bounds, groups, highlight, centerOn, ce
         })
       }))
 
-    // On a fresh mount, honour a pending selection: swapping in from the focus
-    // view must reveal that claim's position (§9a-1), not just fit the whole map.
+    // Frame the scene on mount. Priority:
+    //   1. neighborhood — an explicit "locate" return wants a fixed tight zoom on
+    //      the claim, so it overrides any stored viewport.
+    //   2. stored viewport — restore the reader's last "location" exactly (reload,
+    //      or a generic return from the focus view).
+    //   3. centerOn reveal — first-ever visit swapping in a selection: reveal it.
+    //   4. fit — nothing to restore or reveal, so fit the whole map.
     const fit = fitTransform(bounds, W, H - TITLE_BAR_HEIGHT, VIEW.zoomMin, VIEW.zoomMax)
+    const stored = loadViewport()
     const target = centerOnRef.current ? gd.nodeById.get(centerOnRef.current) : null
-    if (target && target.x != null && target.y != null) {
-      let k: number
-      if (centerModeRef.current === 'neighborhood') {
-        // Return-from-focus: centre the claim at a fixed tight zoom so only its
-        // one or two immediate neighbours frame it.
-        k = Math.min(VIEW.zoomMax, Math.max(VIEW.zoomMin, VIEW.neighborhoodZoom))
-      } else {
-        k = Math.max(fit.k, Math.min(VIEW.zoomMax, 0.55))
-      }
-      const tx = W / 2 - k * target.x
-      const ty = (H - TITLE_BAR_HEIGHT) / 2 - k * target.y
+    const centerAt = (k: number) => {
+      const tx = W / 2 - k * target!.x!
+      const ty = (H - TITLE_BAR_HEIGHT) / 2 - k * target!.y!
       svg.call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(k))
+    }
+    if (centerModeRef.current === 'neighborhood' && target && target.x != null && target.y != null) {
+      // Centre the claim at a fixed tight zoom so only its one or two immediate
+      // neighbours frame it.
+      centerAt(Math.min(VIEW.zoomMax, Math.max(VIEW.zoomMin, VIEW.neighborhoodZoom)))
+    } else if (stored) {
+      svg.call(zoom.transform, d3.zoomIdentity.translate(stored.x, stored.y).scale(stored.k))
+    } else if (target && target.x != null && target.y != null) {
+      centerAt(Math.max(fit.k, Math.min(VIEW.zoomMax, 0.55)))
     } else {
       svg.call(zoom.transform, d3.zoomIdentity.translate(fit.x, fit.y).scale(fit.k))
     }

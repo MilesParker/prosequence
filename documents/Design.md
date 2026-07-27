@@ -205,3 +205,89 @@ consistency claim standing beside the user-pays warrant, leaving the policy
 claim and the terminal untouched. Likewise, in the Gaza corpus the
 *confinement* argument rebuts the surfaced warrant bridging the *Mosul-analogy*
 claim to the *Hamas-tactics* claim, rather than undercutting the inference.
+
+---
+
+## Visualization — focus view
+
+Factual description of what the focus-view code does and where it lives. The two
+views (graph, focus) swap and never coexist; they share the derived indices
+(`supports`/`attacks`/`consumers`, built once in `graphData.ts`), the selection,
+the reference root, `computeStance`, and the graph's `Tooltip`.
+
+**Files** (`src/viz/focus/`):
+
+- `FocusView.tsx` — the frame. Top to bottom it stacks: a pinned reference-root
+  line and torn-sheet hop divider (`RootLine`/`TearLine`, shown only when the
+  centred claim is off-root); the **Above** region (`consumers`); the **focus
+  band** (the centred claim); the **Below** region (`supports`/`attacks`).
+  `Connector` rules sit between bands. It holds hover state and renders the shared
+  `Tooltip`, and provides the `FromHighlight`, `LocateContext`, `HoverContext`,
+  `FrontierContext`, and `StanceContext` contexts. `ScrollFrame` gives a region a
+  fixed height with a scroll-edge fade; `RegionHeading` prints a region's name and
+  count.
+- `Cell.tsx` — `InferenceBox`, one inference as a card: a stance-hue left spine
+  plus a hairline border on the other sides (`spineWidth`, `boxRadius`), a light
+  stance wash inside (`STANCE_CONTAINER_FILL_OPACITY`). Contents, top to bottom:
+  the output/destination tile and a full-width rule (`ruleWeight`) **only in the
+  Above region**; then grounds tiles; the `assumes` / `assumes, together` divider;
+  indented warrant tiles (`warrantIndent`). `omit` drops the centred claim from
+  the inputs; `output` adds the destination tile. Tiles inside a box stack
+  full-width (`Bag`). The box is tinted by the stance of the claim the inference
+  bears on (its output).
+- `primitives.tsx` — shared parts: `ClaimTile` (a claim rendered as its tag in a
+  rounded rect, stance fill, hover raises the `Tooltip` via `HoverContext`, click
+  recentres; `TileMarks` trails a frontier chevron / bedrock badge and a hover-in
+  locate button); `TagHeader` and the `TAG_STYLE` tag look; `stanceStyle` /
+  `useStance`; `TargetIcon`, `GraphIcon`, `BedrockBadge`, `FrontierMark`,
+  `EmptyCell`; the context objects.
+- `focusData.ts` — thin derivations over `GraphData` (`supportsOf`, `attacksOf`,
+  `consumersOf`, `outputOf`, `roleOf`, `renderedClaimIds`, `frontierStance`).
+
+**Regions.**
+
+- **Above** (`consumers`): Supports (`concludes`) left, Contests (`contests`)
+  right. One `InferenceBox` per consuming inference — its co-inputs (C omitted),
+  with the destination tile above a rule as the box's output. An inference whose
+  only input is C renders as the bare destination tile, no box. No deduping: two
+  inferences into one destination are two boxes.
+- **Focus band**: the centred claim — a prominent tag (`TAG_STYLE`) over its full
+  text as muted detail (`detailFont`); at the reference root it carries the target
+  header; attribution, bedrock badge, and the came-from / locate icons render here.
+- **Below** (`supports`/`attacks`): For (`concludes`) left, Against (`contests`)
+  right. One `InferenceBox` per inference, no output tile — the output is C, which
+  is the focus band above.
+
+**Channels.** Stance (aligned / opposed / divided / neutral, from `computeStance`
+relative to the reference root) is carried by fill: claim-tile fill and the box
+spine + wash; neutral / no-root falls back to a plain surface card. Position
+(For / Supports left, Against / Contests right) is carried by layout plus the
+region-heading hue (`COLORS.column`). Both regions are fixed-height and scroll
+(`aboveHeight`, `columnHeight`); headings carry the count.
+
+**Shared text look.** `TAG_TEXT` and `DETAIL_TEXT` (`config.ts`, size-free
+weight + colour) are consumed by the focus view (`TAG_STYLE`, detail text) and by
+the graph `Tooltip`, so a tag and its detail read the same on either surface.
+
+Layout tokens live in `FOCUS` and the shared text/colour tokens in `config.ts`.
+
+## Visualization — session persistence
+
+`src/viz/persist.ts` remembers where the reader left off, across reloads, in
+`localStorage`. Every key is namespaced by the corpus file (`DATA_FILE`), so each
+`?model=` remembers its own place and switching models never restores another
+corpus's state. All access is best-effort (wrapped in try/catch) so private mode,
+quota, or disabled storage degrades to defaults rather than failing.
+
+- **Settings** (`loadSettings`/`saveSettings`) — `{ view, focusId, refRootId }`.
+  `App.tsx` seeds its `view`, `focusId`, and `refRootId` state from this at mount
+  and writes it back whenever any of the three change. Absence of `refRootId`
+  means "first visit" (the structural-root default effect runs); an explicit
+  `null` is a deliberate clear (unpainted) and is preserved. Once `data` loads, a
+  validation effect drops any restored `focusId` / `refRootId` not present in the
+  corpus (clearing `refRootId` to `undefined` re-triggers the default).
+- **Viewport** (`loadViewport`/`saveViewport`) — the graph's raw d3 zoom transform
+  `{ k, x, y }`. `Graph.tsx` saves it on each zoom `end` and, on mount, restores it
+  exactly except when a `neighborhood` locate-return asks for a fixed tight zoom
+  (which wins), falling through to centre-on-selection then fit when nothing is
+  stored.

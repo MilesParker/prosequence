@@ -7,6 +7,7 @@ import { Tooltip } from './components/Tooltip'
 import { Legend } from './components/Legend'
 import { FocusView } from './focus/FocusView'
 import { useDiscourseData } from './hooks/useDiscourseData'
+import { loadSettings, saveSettings } from './persist'
 import type { GraphNode, GraphData } from './graphData'
 
 type View = 'graph' | 'focus'
@@ -26,12 +27,16 @@ function ViewSwitch({ view, onGraph, onFocus }: { view: View; onGraph: () => voi
 export function App() {
   const { data, graphData, bounds, groups, error, loading } = useDiscourseData()
 
+  // Restore the reader's last surface, centred claim and reference root (per
+  // corpus). Read once at mount; validated against the loaded data below.
+  const persisted = useMemo(loadSettings, [])
+
   const [hovered, setHovered] = useState<{ node: GraphNode; x: number; y: number } | null>(null)
   const [search, setSearch] = useState('')
-  const [view, setView] = useState<View>('graph')
+  const [view, setView] = useState<View>(persisted.view ?? 'graph')
   // The one shared selection (§9a): always a ClaimId, owned by neither view. It
   // drives the graph's centre-on-swap and the focus view's centre alike.
-  const [focusId, setFocusId] = useState<string | null>(null)
+  const [focusId, setFocusId] = useState<string | null>(persisted.focusId ?? null)
   // The reference root — the origin all stance is measured from. A movable viewing
   // choice, not a property of the claim, and deliberately DECOUPLED from selection:
   // it defaults to the structural root and moves ONLY via the graph key's explicit
@@ -40,7 +45,11 @@ export function App() {
   // last clicked. States: undefined = pre-init (→ structural root); string = anchor;
   // null = unpainted (all neutral) — reachable only via an explicit clear, not by
   // deselecting.
-  const [refRootId, setRefRootId] = useState<string | null | undefined>(undefined)
+  // Presence of the persisted key distinguishes a stored anchor/clear (string|null)
+  // from a first visit (undefined → structural-root default effect below).
+  const [refRootId, setRefRootId] = useState<string | null | undefined>(
+    'refRootId' in persisted ? persisted.refRootId : undefined,
+  )
   // "Set reference root" mode, toggled from the key: while on, the next graph click
   // nominates that claim as the origin instead of selecting it. Keeps re-anchoring a
   // deliberate act without hanging a control off every node (which the zoom layer
@@ -63,6 +72,23 @@ export function App() {
   useEffect(() => {
     if (refRootId === undefined && rootId) setRefRootId(rootId)
   }, [refRootId, rootId])
+
+  // Persist the view settings (surface, centred claim, reference root) so a reload
+  // lands where the reader left off. Viewport ("location") is persisted separately
+  // by the graph itself.
+  useEffect(() => {
+    saveSettings({ view, focusId, refRootId })
+  }, [view, focusId, refRootId])
+
+  // Drop restored ids that no longer exist in this corpus (e.g. the YAML changed
+  // since the last visit) so a stale focus/root can't point at nothing. Clearing
+  // refRootId to undefined re-triggers the structural-root default above.
+  useEffect(() => {
+    if (!data) return
+    const ids = new Set((data.claims ?? []).map(c => String(c.id)))
+    setFocusId(f => (f && !ids.has(f) ? null : f))
+    setRefRootId(r => (typeof r === 'string' && !ids.has(r) ? undefined : r))
+  }, [data])
 
   // Search highlights matching claims on the map (no expansion — it's a static map).
   const highlight = useMemo(() => {

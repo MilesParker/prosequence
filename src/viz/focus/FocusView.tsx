@@ -140,14 +140,14 @@ function TearLine({ hops }: { hops: number }) {
   )
 }
 
-// ── Above region — consumers as inference boxes → destinations ────────────────
+// ── Above region — consumers as inference boxes carrying their output ─────────
 //
 // Where the centred claim C goes: one inference box per consuming inference, the
-// same box as below, holding that inference's co-inputs — every ground and warrant
-// EXCEPT C. C is the centre and is assumed; it never renders as a tile in any
-// region. The destination claim (the inference's output) sits as a tile ABOVE the
-// box, outside its stroke, linked by a directional mark pointing up from inputs to
-// conclusion — matching the region's altitude grammar (conclusion over premises).
+// same box as below, holding — top, above a full-width rule — its output/destination
+// tile, then its co-inputs (every ground and warrant EXCEPT C). Conclusion above
+// premises, like the rest of the view. C is the centre and is assumed; it never
+// renders as a tile in any region. The output tile is the only upward navigation
+// in the frame and recentres like any claim tile.
 //
 // Role is positional inside the box (grounds before the `assumes` divider, warrants
 // after); C's own role is no longer labelled. An inference whose only input is C
@@ -155,31 +155,13 @@ function TearLine({ hops }: { hops: number }) {
 // inferences into one destination are two boxes — no dedupe, no multiplicity badge.
 // The heading carries the fan-out count (every consumer inference of that polarity).
 
-// A short connector with an up-arrowhead: the inference concludes/contests upward,
-// from the boxed inputs to the destination tile. Polarity (concludes vs contests)
-// is carried by the column, so the mark only needs to point.
-function OutputMark() {
-  return (
-    <svg width="12" height="15" viewBox="0 0 12 15" fill="none" stroke={COLORS.textDim} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden style={{ margin: '1px 0 1px 11px' }}>
-      <path d="M6 14 L6 3" />
-      <path d="M2.5 6 L6 2.5 L9.5 6" />
-    </svg>
-  )
-}
-
-// One consuming inference: destination tile (conclusion) over the box of its
-// co-inputs, or — when C is the inference's only input — the bare destination tile.
+// One consuming inference: its box (co-inputs + output tile), or — when C is the
+// inference's only input — the bare destination tile, no box.
 function AboveEntry({ gd, inf, focusId, onFocus }: { gd: GraphData; inf: Inference; focusId: string; onFocus: (id: string) => void }) {
   const dest = outputOf(inf).id
   const coInputs = [...(inf.grounds ?? []), ...(inf.warrants ?? [])].some(x => String(x) !== focusId)
   if (!coInputs) return <ClaimTile gd={gd} id={dest} onFocus={onFocus} />
-  return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
-      <ClaimTile gd={gd} id={dest} onFocus={onFocus} />
-      <OutputMark />
-      <InferenceBox gd={gd} inf={inf} onFocus={onFocus} omit={focusId} />
-    </div>
-  )
+  return <InferenceBox gd={gd} inf={inf} onFocus={onFocus} omit={focusId} output={dest} />
 }
 
 // One polarity half of the Above region: its consuming inferences, stacked

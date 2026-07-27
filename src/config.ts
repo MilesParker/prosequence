@@ -103,6 +103,8 @@ export const FOCUS = {
   boxRadius: 7,          // rounded on the right; the stance edge keeps the left square
   boxPad: 11,            // padding inside a box
   boxGap: 10,            // gap between stacked boxes within a region half
+  warrantIndent: 14,     // warrant tiles step in from grounds (both regions)
+  ruleWeight: 1.5,       // full-width input/output rule — the tuning knob (see spec)
 
   // Position is the layout channel (For/Supports left, Against/Contests right);
   // this gap separates the two halves in both regions.
