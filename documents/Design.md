@@ -189,6 +189,32 @@ ones and `terminal` on the bedrock ones), a `roots` list, and an
 encode all the connective tissue. `scripts/convert.ts` performs exactly this
 mechanical remapping from an old-model corpus.
 
+## Canonical corpus I/O (`parsanga_io.py`, `canonicalize.py`)
+
+`parsanga_io.py` is the canonical load/serialize pair: `load(path_or_text)`
+parses a corpus with `yaml.safe_load` and casts it into frozen dataclasses
+(`Corpus`, `Definition`, `Claim`, `Inference`, `Attribution`, `GroundsSource`),
+and `serialize(corpus)` emits the corpus back to YAML. Same graph, same bytes —
+so a commit diff shows exactly the nodes that changed.
+
+- **Object model.** All dataclasses are `frozen=True`; id collections
+  (`grounds`, `warrants`, `roots`) are tuples. `Corpus.__post_init__` sorts
+  nodes and roots ascending by uuid and builds a cached `id → node` index;
+  `Inference.__post_init__` sorts `grounds`/`warrants` and enforces one
+  output. Canonical order is thus fixed at construction, so `serialize` emits
+  stored order without re-sorting.
+- **Emitter.** Hand-written — no YAML library on the write path, so the
+  canonical form depends on nothing but this file. Key order within each node
+  is schema declaration order (the `*_KEYS` constants). All string scalars are
+  double-quoted with the escape set `\ " \n \t`; booleans are `true`/`false`;
+  `null` is bare. Block style only, two-space indent, one blank line between
+  nodes, no comments, no `---`, LF endings, single trailing newline. An empty
+  `warrants` is omitted (the loader defaults it back to `()`); empty `grounds`
+  is an error. Unknown keys fail loudly on load.
+- **`canonicalize.py`** rewrites the three corpora in place through that pair.
+  Comments are not preserved. The one-time large formatting diff has been
+  applied; the pre-canonical originals are kept under `_pre-canonical/`.
+
 ## GAP 1 — resolved (enthymemification: surfaced warrant, contested as a rebut)
 
 GAP 1 was: a warrant-applicability attack (e.g. free-transit's *user-pays

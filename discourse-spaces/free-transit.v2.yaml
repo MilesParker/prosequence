@@ -1,1533 +1,1498 @@
-# Converted to the claim/inference model (v2) by scripts/convert.ts.
-# Source: discourse-spaces/free-transit.yaml. Do not hand-edit claim texts; this migration is structural.
-#
-# 2026-07 enthymemification pass (contests-to-claims collapse):
-#   - c-user-pays-applies-to-transit added as an explicit applicability warrant, surfaced on
-#     i-user-pays-attacks-root.
-#   - i-inconsistency-attacks-user-pays-policy re-pointed from the inference
-#     i-user-pays-attacks-root onto that claim. No contest now targets an inference (I8).
-id: free-transit
-title: Should fares be removed from public transit?
+id: "free-transit"
+title: "Should fares be removed from public transit?"
 definitions:
-  - term: just
-    text: >
-      For the purposes of this discourse space, a policy is just if it removes a systematically
-      inequitable burden and expands access to full civic and economic participation regardless of
-      income.
+  - term: "just"
+    text: "For the purposes of this discourse space, a policy is just if it removes a systematically inequitable burden and expands access to full civic and economic participation regardless of income.\n"
     importedFrom: null
-  - term: public good
-    text: >
-      A good whose benefits are non-excludable and accrue to users and non-users alike, such that
-      individual consumption does not diminish availability to others.
+  - term: "public good"
+    text: "A good whose benefits are non-excludable and accrue to users and non-users alike, such that individual consumption does not diminish availability to others.\n"
     importedFrom: null
-  - term: user-pays principle
-    text: >
-      The allocation principle that those who directly benefit from a service should bear its costs
-      in proportion to their use.
+  - term: "user-pays principle"
+    text: "The allocation principle that those who directly benefit from a service should bear its costs in proportion to their use.\n"
     importedFrom: null
 roots:
-  - 019fab4a-ca0c-7688-aedb-061c8dc2392c
+  - "019fab4a-ca0c-7688-aedb-061c8dc2392c"
 claims:
-  - id: 019fab4a-ca0c-7688-aedb-061c8dc2392c
-    tag: Fares should be removed
-    text: Fares should be removed from public transit
+  - id: "019fab4a-ca0c-7688-aedb-061c8dc2392c"
+    tag: "Fares should be removed"
+    text: "Fares should be removed from public transit"
     terminal: false
     uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-061d020bd64a
-    tag: Society must fund full civic participation
-    text: >-
-      Society is collectively obligated to fund the conditions necessary for full civic and economic
-      participation
-    terminal: true
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-061e288124a6
-    tag: Beneficiaries should bear costs in proportion
-    text: Those who benefit from a service should bear its costs in proportion to their use
-    terminal: true
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-061f4c80f48e
-    tag: Low income mobility gains
-    text: Eliminating fares would improve mobility for low-income riders
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06208a04f52f
-    tag: 'Sustainable America: Fares force trip rationing'
-    text: >-
-      Sustainable America and Dr. Destiny Thomas (Streetsblog, 2022) report that low-income people
-      spend a disproportionate share of income on transit and ration trips accordingly.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Sustainable America; Dr. Destiny Thomas, Streetsblog/Freakonomics (2022)
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0621021fc478
-    tag: Emissions reduction
-    text: Fare-free transit would reduce carbon emissions
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-062253fccc6d
-    tag: 'Rapid Transition Alliance: Cars dominate emissions'
-    text: >-
-      The Rapid Transition Alliance (2021) and World Resources Institute (2023) report that private
-      vehicles account for over half of transport-sector GHG emissions and that transit emits
-      substantially less per passenger-km.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Rapid Transition Alliance (2021); World Resources Institute (2023)
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06233c7b800c
-    tag: Congestion reduction
-    text: Fare-free transit would reduce road congestion
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0624e52f0f1c
-    tag: Transit trips substitute for car trips
-    text: >-
-      Increased transit ridership reduces the number of private vehicles on the road, as each
-      additional transit trip substitutes for a car trip at the margin.
-    terminal: false
-    attribution:
-      source:
-        type: CommonKnowledge
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-062507337ff4
-    tag: Labour market access
-    text: Fare-free transit improves labour market access
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0626e6cac7ec
-    tag: Transit widens the reachable job market
-    text: >-
-      Broader transit use expands the geographic range of job opportunities accessible to workers
-      without cars, particularly in cities where employment is dispersed.
-    terminal: false
-    attribution:
-      source:
-        type: CommonKnowledge
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06270a3293e0
-    tag: Boarding speed
-    text: Fare-free transit would speed up bus service
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0628d96a4e1a
-    tag: 'Streetsblog: Boston boarding time fell 6%'
-    text: >-
-      Streetsblog/Freakonomics (2022) reports Boston data showing a 6%+ reduction in boarding time
-      per passenger on fare-free routes.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Streetsblog/Freakonomics (2022); Boston Mayor Wu, cited in Modeshift (2024)
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06294d3b1699
-    tag: Collection cost not justified
-    text: The administrative cost of fare collection is not justified by the revenue it generates
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-062ac2ba5ea3
-    tag: 'Streetsblog: Kansas City farebox recovery ~10%'
-    text: >-
-      Streetsblog/Freakonomics (2022) and the Pacific Research Institute (2024) report that Kansas
-      City farebox recovery was approximately 10% and that collection infrastructure, enforcement,
-      and fare evasion management consume substantial resources.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Streetsblog/Freakonomics (2022); Pacific Research Institute (2024)
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-062b5274f529
-    tag: Collective benefit justifies collective funding
-    text: Transit should be funded collectively regardless of individual use
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-062c00d2e686
-    tag: Transit benefits reach people who never ride
-    text: >-
-      Reduced congestion, lower emissions, and broader labour market access benefit people who never
-      board a bus or train.
-    terminal: false
-    attribution:
-      source:
-        type: CommonKnowledge
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-062d03f7d180
-    tag: Access as right
-    text: Access to public transit should not be contingent on ability to pay
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-062e0be85dee
-    tag: Fare-free transit is just
-    text: Fare-free transit is just
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-062f35077c97
-    tag: Service degradation from revenue loss
-    text: Eliminating fares would degrade service quality
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-063060e8d306
-    tag: 'TransitCenter: Fare revenue funds infrastructure'
-    text: >-
-      TransitCenter, cited in the Pacific Research Institute (2024) and David Bragdon at the
-      Harvard/HKS debate, reports that fare revenue funds 40-62% of infrastructure costs in major
-      U.S. cities including New York, Chicago, and San Francisco.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: >-
-          TransitCenter, cited in Pacific Research Institute (2024); David Bragdon, Harvard/HKS
-          debate
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06312f8b44ff
-    tag: User pays as policy
-    text: Riders, not all taxpayers, should bear transit costs
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0632facf9c57
-    tag: Rider benefits are direct, others diffuse
-    text: >-
-      Transit users receive direct, immediate benefits; non-users receive only diffuse spillovers
-      such as marginally reduced congestion.
-    terminal: false
-    attribution:
-      source:
-        type: CommonKnowledge
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06336221a06b
-    tag: Targeted subsidies more effective
-    text: Targeted subsidies for low-income riders are more effective than universal free transit
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06345b172bd9
-    tag: 'Modeshift: Means-tested passes target better'
-    text: >-
-      Modeshift (2024) and Nicholas Bloom (Hunter College) report that means-tested programmes such
-      as discounted passes direct resources to those for whom cost is a binding constraint while
-      preserving revenue from those who can pay.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Modeshift (2024); Nicholas Bloom (Hunter College); The Conversation (2025)
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06350d19c65c
-    tag: Ridership increase
-    text: Fare-free transit would increase overall ridership
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0636ab817ae1
-    tag: 'Modeshift: Ridership rose after fares were cut'
-    text: >-
-      Multiple cities including Boston, Kansas City, and Luxembourg have reported substantial
-      ridership increases following fare elimination.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Modeshift (2024); Rapid Transition Alliance (2021)
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06372d9b9363
-    tag: Racial justice
-    text: Fare elimination is a racial and economic justice measure
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0638699c94c2
-    tag: 'Thomas: Riders skew Black and Hispanic'
-    text: >-
-      Dr. Destiny Thomas (Streetsblog, 2022) and Sustainable America report that Black and Hispanic
-      commuters are overrepresented among transit-dependent riders and that low-income households
-      spend disproportionately more of their budget on fares.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Dr. Destiny Thomas, Streetsblog (2022); Sustainable America
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-063973f14701
-    tag: Transit as public utility analogy
-    text: Public transit should be treated like other essential public utilities
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-063aa5941b17
-    tag: Utilities are provided as public services
-    text: >-
-      Water, electricity, and sanitation are provided as public services on the grounds that
-      universal access is essential to civic life.
-    terminal: false
-    attribution:
-      source:
-        type: CommonKnowledge
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-063b7fd556f5
-    tag: User pays applied inconsistently
-    text: >-
-      Applying the user-pays principle selectively to transit while socialising road costs is
-      inconsistent
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-063c26ddecb1
-    tag: 'Gov1: Roads are funded below cost recovery'
-    text: >-
-      Gov1 and Planetizen (2025) report that road infrastructure is funded through general taxation
-      and fuel levies that fall well short of full-cost recovery for road wear, congestion, and
-      pollution.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Gov1; Planetizen (2025)
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-063df992d99c
-    tag: Fare removal won't reach those who need it
-    text: Free fares would not substantially increase ridership among people who need transit most
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-063eee41e38b
-    tag: 'TransitCenter: Reliability outranks fare cost'
-    text: >-
-      TransitCenter rider surveys across income levels and cities, cited in Sustainable America and
-      reported by David Bragdon at the Harvard/HKS debate, consistently find reliability and frequency
-      ranked above fare cost as determinants of transit use.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: TransitCenter research, cited in Sustainable America; Harvard/HKS debate
-          (Bragdon)
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-063fa13896a1
-    tag: Null employment effect
-    text: Free transit does not improve employment outcomes for low-income riders
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-064009589f99
-    tag: 'King County RCT: No employment effect found'
-    text: >-
-      A King County RCT reported in Rochester Beacon (2025) found no statistically significant
-      effect on employment, earnings, hours worked, or job stability among free-transit recipients.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: King County (Seattle) RCT, reported in Rochester Beacon (2025)
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0641bb9e7be7
-    tag: Universal free transit is regressive
-    text: Universal free transit funded by general taxation is regressive
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0642eb7cde6f
-    tag: 'Bloom: Commuters skew middle-income'
-    text: >-
-      Nicholas Bloom (Hunter College), cited in Sustainable America, reports that transit commuters
-      skew middle-income and that low-income non-drivers and non-riders also pay general taxes.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Nicholas Bloom (Hunter College), cited in Sustainable America; Gov1
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-064348d0adbe
-    tag: Antisocial behaviour (generalised)
-    text: Fare elimination reliably produces increases in antisocial behaviour
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06449424b708
-    tag: 'Transportation for America: Disorder recurs'
-    text: >-
-      Transportation for America (2025) and The Daily Economy (2025) report that multiple
-      independent cities across different contexts have reported similar disorder effects after
-      removing fares.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Transportation for America (2025); The Daily Economy (2025)
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06452d4b1d8d
-    tag: High farebox recovery viable
-    text: Well-run transit systems can sustain significant fare revenue without sacrificing
-      ridership
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-064681721c3a
-    tag: 'Streets.mn: High recovery keeps ridership'
-    text: >-
-      Streets.mn (2013) reports that Toronto requires 75% farebox recovery as a condition of
-      provincial subsidy and has high ridership, and that Hong Kong's MTR operates profitably.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Streets.mn (2013)
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0647521cb24e
-    tag: Ridership gains fade without service investment
-    text: >-
-      Ridership gains from fare removal are unlikely to be sustained without parallel service
-      improvements
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0648d3ad2adc
-    tag: 'Modeshift: Gains fade without service investment'
-    text: >-
-      Modeshift (2024) and Transportation for America (2025) report that cities which removed fares
-      without improving frequency or coverage have seen ridership growth plateau or reverse.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Modeshift (2024); Transportation for America (2025)
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0649e0180c11
-    tag: Luxembourg operational viability
-    text: Free transit is operationally viable at scale — Luxembourg
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-064ac093797d
-    tag: 'Sustainable America: Luxembourg still fare-free'
-    text: >-
-      Sustainable America (2023) reports that Luxembourg implemented nationwide free transit in 2020
-      and the system continues to operate.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Sustainable America (2023)
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-064bd5b443b3
-    tag: Kansas City ridership
-    text: Eliminating fares increases ridership in mid-sized U.S. cities — Kansas City
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-064c49d7d556
-    tag: 'Modeshift: Kansas City growth held up'
-    text: >-
-      Modeshift (2024) and Streetsblog (2022) report that Kansas City went fare-free and reported
-      sustained ridership growth without service collapse.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Modeshift (2024); Streetsblog (2022)
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-064dc09a765b
-    tag: Boston ridership gains
-    text: Boston fare-free routes showed strong ridership gains
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-064e2053f31b
-    tag: 'Modeshift: Boston fare-free routes grew 35%'
-    text: >-
-      Modeshift (2024) reports Boston fare-free routes saw 35% ridership growth versus 15%
-      system-wide, 2021-22.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Modeshift (2024)
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-064f968a23ac
-    tag: Many examples of successful implementation
-    text: Many examples of successful fare-free implementation exist
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0650b637c62c
-    tag: 'Rapid Transition Alliance: 100+ cities went free'
-    text: >-
-      Luxembourg, Kansas City, Boston and over 100 cities globally have implemented fare-free
-      transit with positive operational outcomes.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Rapid Transition Alliance (2021); Modeshift (2024)
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06519dee5f99
-    tag: Antisocial behaviour (local reports)
-    text: Fare-free transit increases antisocial behaviour on the system
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0652e4091fc0
-    tag: 'Transportation for America: Vandalism rose'
-    text: >-
-      Transportation for America (2025) and The Daily Economy (2025) report that some fare-free
-      cities have seen increases in vandalism, theft, and use of vehicles as shelter following fare
-      elimination.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Transportation for America (2025); The Daily Economy (2025)
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0653a1d33cc3
-    tag: User composition shift
-    text: Removing fares changes the composition of transit users, not just their number
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06541c36e211
-    tag: 'Transportation for America: User mix shifted'
-    text: >-
-      Transportation for America (2025) and The Daily Economy (2025) report increased vagrancy and
-      antisocial behaviour following fare elimination, indicating a shift in user type alongside any
-      increase in volume.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Transportation for America (2025); The Daily Economy (2025)
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0655dd0964b5
-    tag: Service quality over fare cost
-    text: Service quality matters more to riders than fare cost
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06566f4e4063
-    tag: King County RCT is the best evidence
-    text: The King County RCT is the best available evidence on employment outcomes
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0657ebfd6448
-    tag: 'Rochester Beacon: Only RCT on the question'
-    text: >-
-      Rochester Beacon (2025) reports that the King County study is the only known RCT on this
-      question and that RCTs isolate causal effects better than observational studies.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Rochester Beacon (2025) reporting on King County study
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06584be8b7a7
-    tag: Driving underpriced (road costs socialised)
-    text: >-
-      Road infrastructure is funded through general taxation — an example of socialised costs for a
-      user-specific service
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0659f18e7e34
-    tag: Public utility analogy fails
-    text: The public utility analogy for transit is unsound
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-065a9a818cbd
-    tag: Transit has substitutes, water does not
-    text: >-
-      Water and sanitation have no private substitutes; transit competes directly with cars, taxis,
-      and ride-hailing services.
-    terminal: false
-    attribution:
-      source:
-        type: CommonKnowledge
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-065b6acf2a50
-    tag: Fare cost is binding constraint
-    text: >-
-      Fare cost is the binding constraint on low-income trip rationing, so removing it relieves that
-      constraint
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-065c9fda52f9
-    tag: Fare removal helps at the margin
-    text: >-
-      Even where fare cost is not the sole constraint, removing it improves mobility at the margin
-      for those who currently ration trips
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-065da6b2b0c8
-    tag: Trip rationing is representative
-    text: >-
-      The pattern of fare-induced trip rationing reported by Sustainable America is representative
-      of low-income transit users generally
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-065e56dbccc9
-    tag: 'Sustainable America: Coverage is broad'
-    text: >-
-      Sustainable America's methodology covers multiple cities and income groups, making its
-      findings broadly representative.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Sustainable America
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-065f313615dd
-    tag: Boston is representative
-    text: >-
-      Boston's experience is representative enough of other transit contexts to support a general
-      conclusion about ridership response to fare elimination
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0660d78c98dd
-    tag: Boston's network resembles its peers
-    text: >-
-      Boston's network size, density, and modal mix are comparable to many other mid-to-large
-      transit systems.
-    terminal: false
-    attribution:
-      source:
-        type: CommonKnowledge
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0661259507f9
-    tag: Modal shift produces emissions reduction
-    text: >-
-      A ridership increase large enough to shift modal share away from private cars would produce
-      measurable emissions reductions
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0662c0d63889
-    tag: Modal shift reduces congestion
-    text: >-
-      Modal shift from cars to transit at sufficient scale produces measurable congestion reduction
-      benefiting all road users
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-066342f250dd
-    tag: Reduced cost expands labour market catchment
-    text: >-
-      Reduced travel cost and increased network use expands the effective labour market catchment
-      for low-income workers
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0664b4dd096f
-    tag: Fare payment causes dwell time
-    text: >-
-      Fare payment at boarding is a direct cause of dwell time; removing it reduces dwell time
-      regardless of ridership levels
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06658f78a3b0
-    tag: Low recovery makes overhead disproportionate
-    text: >-
-      Where recovery rates are very low, the overhead of collection consumes a substantial fraction
-      of what is recovered, making collection economically irrational
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06667f30117e
-    tag: Non-user benefits justify collective funding
-    text: >-
-      Benefits that accrue to non-users as well as users justify cost distribution across the whole
-      population rather than individual user charges
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-066778e7f879
-    tag: Systematic burden removal is redistributive
-    text: >-
-      When a cost burden falls systematically on already-disadvantaged groups, removing it is a
-      redistributive act that advances racial and economic justice
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06681ec18c01
-    tag: Transit is prerequisite for participation
-    text: >-
-      Transit access is a prerequisite for participation in economic and social life, and such
-      prerequisites should be guaranteed regardless of income
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0669bf88f992
-    tag: Revenue dependency is representative
-    text: >-
-      Cities with high fare revenue dependency are representative of large transit systems
-      generally, and the dependency would apply elsewhere
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-066acae14dbe
-    tag: TransitCenter methodology reliable
-    text: >-
-      TransitCenter's research methodology and independence make its survey findings reliable
-      evidence about rider priorities across income levels
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-066b25daf385
-    tag: TransitCenter is independent and peer-reviewed
-    text: >-
-      TransitCenter is an independent research organisation with a track record of peer-reviewed
-      transit research.
-    terminal: false
-    attribution:
-      source:
-        type: CommonKnowledge
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-066c78627076
-    tag: Fare not employment constraint
-    text: >-
-      Removing the fare barrier does not address the other factors constraining employment — job
-      availability, skill match, childcare
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-066d96350989
-    tag: Concentrated benefits justify bearing costs
-    text: >-
-      Those who receive concentrated benefits from a service should bear its costs proportionally;
-      diffuse spillover benefits do not justify general-population funding
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-066e0cd2205b
-    tag: Middle income transfer is regressive
-    text: >-
-      A subsidy transferring resources from the general tax base to middle-income commuters moves
-      money in the wrong direction, but only if tax incidence on low-income non-riders is
-      non-trivial
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-066f65c19606
-    tag: Regressivity requires quantitative support
-    text: >-
-      The regressivity argument requires that the tax incidence on low-income non-riders be
-      non-trivial — a quantitative claim not established by the grounds alone
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0670e5365138
-    tag: Local antisocial reports are representative
-    text: >-
-      Local reports of antisocial behaviour following fare elimination are representative of a
-      general effect rather than local anomalies
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06715a028c39
-    tag: Universal wastes, targeting concentrates
-    text: >-
-      Universal provision wastes resources on those who do not need the subsidy; targeting
-      concentrates them where they have effect
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-067291c458e5
-    tag: Luxembourg is representative
-    text: >-
-      Luxembourg's operational experience is sufficiently similar to other national contexts to
-      demonstrate general viability
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-067366af093a
-    tag: Kansas City is representative
-    text: Kansas City is representative of mid-sized U.S. transit contexts
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06740782cae1
-    tag: Unaddressed barriers reassert
-    text: >-
-      Fare removal addresses only one barrier to transit use; unaddressed barriers reassert
-      themselves over time and erode initial ridership gains
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-067529d0b1a5
-    tag: Transit meets essentiality criteria
-    text: >-
-      If transit meets the same criteria of essentiality as acknowledged public utilities it
-      warrants the same treatment
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0676b05d5198
-    tag: Private substitutes are relevant disanalogy
-    text: >-
-      The existence of private substitutes for transit is a relevant disanalogy that undermines the
-      public utility comparison
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0677e74ce270
-    tag: Toronto and Hong Kong not exceptional
-    text: >-
-      Toronto and Hong Kong are not so exceptional that their fare recovery experience is irrelevant
-      to other systems
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-06788bc303c7
-    tag: Problem character signals composition change
-    text: >-
-      A change in the character of system problems, not just their scale, is a reliable sign of a
-      change in user composition
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-067908653179
-    tag: RCT supersedes observational studies
-    text: >-
-      The methodological superiority of the RCT design makes its null finding on employment the best
-      available evidence, superseding observational studies
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-067a0aad35d4
-    tag: Selective user-pays needs justification
-    text: Applying user-pays to transit but not roads requires justification that has not been
-      provided
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-067b6445489a
-    tag: User-pays legitimately applies to transit
-    text: >-
-      The user-pays principle is applied consistently across comparable public services, so it
-      legitimately governs transit funding rather than being invoked selectively.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-067ca82c53ee
-    tag: Consistent outcome indicates general pattern
-    text: >-
-      Consistency of outcome across independent cases indicates a general pattern rather than
-      coincidence or local factors
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-067dc76bd541
-    tag: Diverse success establishes viability
-    text: >-
-      Consistent success across diverse contexts establishes that fare-free transit is not merely
-      theoretical but a proven operational model
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-067e5d3629e7
-    tag: Fare elimination causes ridership increase
-    text: >-
-      Removing a direct cost barrier to transit use causes an increase in ridership among
-      price-sensitive riders
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-067f2922b058
-    tag: Ridership increase causes modal shift
-    text: >-
-      A sufficiently large ridership increase produces modal shift from private cars, since new
-      riders must come from somewhere
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0680f19bfd36
-    tag: Fare-free meets justice definition
-    text: >-
-      A policy that removes a systematically inequitable burden and expands access to civic
-      participation meets the standard of justice as defined in this discourse space
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca0c-7688-aedb-0681a97002bf
-    tag: Ridership raises cost without revenue
-    text: >-
-      Carrying additional riders raises operating cost, and fare removal eliminates the revenue
-      stream that would otherwise fund the additional service that volume requires.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
 
+  - id: "019fab4a-ca0c-7688-aedb-061d020bd64a"
+    tag: "Society must fund full civic participation"
+    text: "Society is collectively obligated to fund the conditions necessary for full civic and economic participation"
+    terminal: true
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-061e288124a6"
+    tag: "Beneficiaries should bear costs in proportion"
+    text: "Those who benefit from a service should bear its costs in proportion to their use"
+    terminal: true
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-061f4c80f48e"
+    tag: "Low income mobility gains"
+    text: "Eliminating fares would improve mobility for low-income riders"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06208a04f52f"
+    tag: "Sustainable America: Fares force trip rationing"
+    text: "Sustainable America and Dr. Destiny Thomas (Streetsblog, 2022) report that low-income people spend a disproportionate share of income on transit and ration trips accordingly."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Sustainable America; Dr. Destiny Thomas, Streetsblog/Freakonomics (2022)"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0621021fc478"
+    tag: "Emissions reduction"
+    text: "Fare-free transit would reduce carbon emissions"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-062253fccc6d"
+    tag: "Rapid Transition Alliance: Cars dominate emissions"
+    text: "The Rapid Transition Alliance (2021) and World Resources Institute (2023) report that private vehicles account for over half of transport-sector GHG emissions and that transit emits substantially less per passenger-km."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Rapid Transition Alliance (2021); World Resources Institute (2023)"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06233c7b800c"
+    tag: "Congestion reduction"
+    text: "Fare-free transit would reduce road congestion"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0624e52f0f1c"
+    tag: "Transit trips substitute for car trips"
+    text: "Increased transit ridership reduces the number of private vehicles on the road, as each additional transit trip substitutes for a car trip at the margin."
+    terminal: false
+    attribution:
+      source:
+        type: "CommonKnowledge"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-062507337ff4"
+    tag: "Labour market access"
+    text: "Fare-free transit improves labour market access"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0626e6cac7ec"
+    tag: "Transit widens the reachable job market"
+    text: "Broader transit use expands the geographic range of job opportunities accessible to workers without cars, particularly in cities where employment is dispersed."
+    terminal: false
+    attribution:
+      source:
+        type: "CommonKnowledge"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06270a3293e0"
+    tag: "Boarding speed"
+    text: "Fare-free transit would speed up bus service"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0628d96a4e1a"
+    tag: "Streetsblog: Boston boarding time fell 6%"
+    text: "Streetsblog/Freakonomics (2022) reports Boston data showing a 6%+ reduction in boarding time per passenger on fare-free routes."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Streetsblog/Freakonomics (2022); Boston Mayor Wu, cited in Modeshift (2024)"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06294d3b1699"
+    tag: "Collection cost not justified"
+    text: "The administrative cost of fare collection is not justified by the revenue it generates"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-062ac2ba5ea3"
+    tag: "Streetsblog: Kansas City farebox recovery ~10%"
+    text: "Streetsblog/Freakonomics (2022) and the Pacific Research Institute (2024) report that Kansas City farebox recovery was approximately 10% and that collection infrastructure, enforcement, and fare evasion management consume substantial resources."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Streetsblog/Freakonomics (2022); Pacific Research Institute (2024)"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-062b5274f529"
+    tag: "Collective benefit justifies collective funding"
+    text: "Transit should be funded collectively regardless of individual use"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-062c00d2e686"
+    tag: "Transit benefits reach people who never ride"
+    text: "Reduced congestion, lower emissions, and broader labour market access benefit people who never board a bus or train."
+    terminal: false
+    attribution:
+      source:
+        type: "CommonKnowledge"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-062d03f7d180"
+    tag: "Access as right"
+    text: "Access to public transit should not be contingent on ability to pay"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-062e0be85dee"
+    tag: "Fare-free transit is just"
+    text: "Fare-free transit is just"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-062f35077c97"
+    tag: "Service degradation from revenue loss"
+    text: "Eliminating fares would degrade service quality"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-063060e8d306"
+    tag: "TransitCenter: Fare revenue funds infrastructure"
+    text: "TransitCenter, cited in the Pacific Research Institute (2024) and David Bragdon at the Harvard/HKS debate, reports that fare revenue funds 40-62% of infrastructure costs in major U.S. cities including New York, Chicago, and San Francisco."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "TransitCenter, cited in Pacific Research Institute (2024); David Bragdon, Harvard/HKS debate"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06312f8b44ff"
+    tag: "User pays as policy"
+    text: "Riders, not all taxpayers, should bear transit costs"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0632facf9c57"
+    tag: "Rider benefits are direct, others diffuse"
+    text: "Transit users receive direct, immediate benefits; non-users receive only diffuse spillovers such as marginally reduced congestion."
+    terminal: false
+    attribution:
+      source:
+        type: "CommonKnowledge"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06336221a06b"
+    tag: "Targeted subsidies more effective"
+    text: "Targeted subsidies for low-income riders are more effective than universal free transit"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06345b172bd9"
+    tag: "Modeshift: Means-tested passes target better"
+    text: "Modeshift (2024) and Nicholas Bloom (Hunter College) report that means-tested programmes such as discounted passes direct resources to those for whom cost is a binding constraint while preserving revenue from those who can pay."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Modeshift (2024); Nicholas Bloom (Hunter College); The Conversation (2025)"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06350d19c65c"
+    tag: "Ridership increase"
+    text: "Fare-free transit would increase overall ridership"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0636ab817ae1"
+    tag: "Modeshift: Ridership rose after fares were cut"
+    text: "Multiple cities including Boston, Kansas City, and Luxembourg have reported substantial ridership increases following fare elimination."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Modeshift (2024); Rapid Transition Alliance (2021)"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06372d9b9363"
+    tag: "Racial justice"
+    text: "Fare elimination is a racial and economic justice measure"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0638699c94c2"
+    tag: "Thomas: Riders skew Black and Hispanic"
+    text: "Dr. Destiny Thomas (Streetsblog, 2022) and Sustainable America report that Black and Hispanic commuters are overrepresented among transit-dependent riders and that low-income households spend disproportionately more of their budget on fares."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Dr. Destiny Thomas, Streetsblog (2022); Sustainable America"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-063973f14701"
+    tag: "Transit as public utility analogy"
+    text: "Public transit should be treated like other essential public utilities"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-063aa5941b17"
+    tag: "Utilities are provided as public services"
+    text: "Water, electricity, and sanitation are provided as public services on the grounds that universal access is essential to civic life."
+    terminal: false
+    attribution:
+      source:
+        type: "CommonKnowledge"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-063b7fd556f5"
+    tag: "User pays applied inconsistently"
+    text: "Applying the user-pays principle selectively to transit while socialising road costs is inconsistent"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-063c26ddecb1"
+    tag: "Gov1: Roads are funded below cost recovery"
+    text: "Gov1 and Planetizen (2025) report that road infrastructure is funded through general taxation and fuel levies that fall well short of full-cost recovery for road wear, congestion, and pollution."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Gov1; Planetizen (2025)"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-063df992d99c"
+    tag: "Fare removal won't reach those who need it"
+    text: "Free fares would not substantially increase ridership among people who need transit most"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-063eee41e38b"
+    tag: "TransitCenter: Reliability outranks fare cost"
+    text: "TransitCenter rider surveys across income levels and cities, cited in Sustainable America and reported by David Bragdon at the Harvard/HKS debate, consistently find reliability and frequency ranked above fare cost as determinants of transit use."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "TransitCenter research, cited in Sustainable America; Harvard/HKS debate (Bragdon)"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-063fa13896a1"
+    tag: "Null employment effect"
+    text: "Free transit does not improve employment outcomes for low-income riders"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-064009589f99"
+    tag: "King County RCT: No employment effect found"
+    text: "A King County RCT reported in Rochester Beacon (2025) found no statistically significant effect on employment, earnings, hours worked, or job stability among free-transit recipients."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "King County (Seattle) RCT, reported in Rochester Beacon (2025)"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0641bb9e7be7"
+    tag: "Universal free transit is regressive"
+    text: "Universal free transit funded by general taxation is regressive"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0642eb7cde6f"
+    tag: "Bloom: Commuters skew middle-income"
+    text: "Nicholas Bloom (Hunter College), cited in Sustainable America, reports that transit commuters skew middle-income and that low-income non-drivers and non-riders also pay general taxes."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Nicholas Bloom (Hunter College), cited in Sustainable America; Gov1"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-064348d0adbe"
+    tag: "Antisocial behaviour (generalised)"
+    text: "Fare elimination reliably produces increases in antisocial behaviour"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06449424b708"
+    tag: "Transportation for America: Disorder recurs"
+    text: "Transportation for America (2025) and The Daily Economy (2025) report that multiple independent cities across different contexts have reported similar disorder effects after removing fares."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Transportation for America (2025); The Daily Economy (2025)"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06452d4b1d8d"
+    tag: "High farebox recovery viable"
+    text: "Well-run transit systems can sustain significant fare revenue without sacrificing ridership"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-064681721c3a"
+    tag: "Streets.mn: High recovery keeps ridership"
+    text: "Streets.mn (2013) reports that Toronto requires 75% farebox recovery as a condition of provincial subsidy and has high ridership, and that Hong Kong's MTR operates profitably."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Streets.mn (2013)"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0647521cb24e"
+    tag: "Ridership gains fade without service investment"
+    text: "Ridership gains from fare removal are unlikely to be sustained without parallel service improvements"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0648d3ad2adc"
+    tag: "Modeshift: Gains fade without service investment"
+    text: "Modeshift (2024) and Transportation for America (2025) report that cities which removed fares without improving frequency or coverage have seen ridership growth plateau or reverse."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Modeshift (2024); Transportation for America (2025)"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0649e0180c11"
+    tag: "Luxembourg operational viability"
+    text: "Free transit is operationally viable at scale — Luxembourg"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-064ac093797d"
+    tag: "Sustainable America: Luxembourg still fare-free"
+    text: "Sustainable America (2023) reports that Luxembourg implemented nationwide free transit in 2020 and the system continues to operate."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Sustainable America (2023)"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-064bd5b443b3"
+    tag: "Kansas City ridership"
+    text: "Eliminating fares increases ridership in mid-sized U.S. cities — Kansas City"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-064c49d7d556"
+    tag: "Modeshift: Kansas City growth held up"
+    text: "Modeshift (2024) and Streetsblog (2022) report that Kansas City went fare-free and reported sustained ridership growth without service collapse."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Modeshift (2024); Streetsblog (2022)"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-064dc09a765b"
+    tag: "Boston ridership gains"
+    text: "Boston fare-free routes showed strong ridership gains"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-064e2053f31b"
+    tag: "Modeshift: Boston fare-free routes grew 35%"
+    text: "Modeshift (2024) reports Boston fare-free routes saw 35% ridership growth versus 15% system-wide, 2021-22."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Modeshift (2024)"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-064f968a23ac"
+    tag: "Many examples of successful implementation"
+    text: "Many examples of successful fare-free implementation exist"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0650b637c62c"
+    tag: "Rapid Transition Alliance: 100+ cities went free"
+    text: "Luxembourg, Kansas City, Boston and over 100 cities globally have implemented fare-free transit with positive operational outcomes."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Rapid Transition Alliance (2021); Modeshift (2024)"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06519dee5f99"
+    tag: "Antisocial behaviour (local reports)"
+    text: "Fare-free transit increases antisocial behaviour on the system"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0652e4091fc0"
+    tag: "Transportation for America: Vandalism rose"
+    text: "Transportation for America (2025) and The Daily Economy (2025) report that some fare-free cities have seen increases in vandalism, theft, and use of vehicles as shelter following fare elimination."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Transportation for America (2025); The Daily Economy (2025)"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0653a1d33cc3"
+    tag: "User composition shift"
+    text: "Removing fares changes the composition of transit users, not just their number"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06541c36e211"
+    tag: "Transportation for America: User mix shifted"
+    text: "Transportation for America (2025) and The Daily Economy (2025) report increased vagrancy and antisocial behaviour following fare elimination, indicating a shift in user type alongside any increase in volume."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Transportation for America (2025); The Daily Economy (2025)"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0655dd0964b5"
+    tag: "Service quality over fare cost"
+    text: "Service quality matters more to riders than fare cost"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06566f4e4063"
+    tag: "King County RCT is the best evidence"
+    text: "The King County RCT is the best available evidence on employment outcomes"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0657ebfd6448"
+    tag: "Rochester Beacon: Only RCT on the question"
+    text: "Rochester Beacon (2025) reports that the King County study is the only known RCT on this question and that RCTs isolate causal effects better than observational studies."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Rochester Beacon (2025) reporting on King County study"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06584be8b7a7"
+    tag: "Driving underpriced (road costs socialised)"
+    text: "Road infrastructure is funded through general taxation — an example of socialised costs for a user-specific service"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0659f18e7e34"
+    tag: "Public utility analogy fails"
+    text: "The public utility analogy for transit is unsound"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-065a9a818cbd"
+    tag: "Transit has substitutes, water does not"
+    text: "Water and sanitation have no private substitutes; transit competes directly with cars, taxis, and ride-hailing services."
+    terminal: false
+    attribution:
+      source:
+        type: "CommonKnowledge"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-065b6acf2a50"
+    tag: "Fare cost is binding constraint"
+    text: "Fare cost is the binding constraint on low-income trip rationing, so removing it relieves that constraint"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-065c9fda52f9"
+    tag: "Fare removal helps at the margin"
+    text: "Even where fare cost is not the sole constraint, removing it improves mobility at the margin for those who currently ration trips"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-065da6b2b0c8"
+    tag: "Trip rationing is representative"
+    text: "The pattern of fare-induced trip rationing reported by Sustainable America is representative of low-income transit users generally"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-065e56dbccc9"
+    tag: "Sustainable America: Coverage is broad"
+    text: "Sustainable America's methodology covers multiple cities and income groups, making its findings broadly representative."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Sustainable America"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-065f313615dd"
+    tag: "Boston is representative"
+    text: "Boston's experience is representative enough of other transit contexts to support a general conclusion about ridership response to fare elimination"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0660d78c98dd"
+    tag: "Boston's network resembles its peers"
+    text: "Boston's network size, density, and modal mix are comparable to many other mid-to-large transit systems."
+    terminal: false
+    attribution:
+      source:
+        type: "CommonKnowledge"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0661259507f9"
+    tag: "Modal shift produces emissions reduction"
+    text: "A ridership increase large enough to shift modal share away from private cars would produce measurable emissions reductions"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0662c0d63889"
+    tag: "Modal shift reduces congestion"
+    text: "Modal shift from cars to transit at sufficient scale produces measurable congestion reduction benefiting all road users"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-066342f250dd"
+    tag: "Reduced cost expands labour market catchment"
+    text: "Reduced travel cost and increased network use expands the effective labour market catchment for low-income workers"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0664b4dd096f"
+    tag: "Fare payment causes dwell time"
+    text: "Fare payment at boarding is a direct cause of dwell time; removing it reduces dwell time regardless of ridership levels"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06658f78a3b0"
+    tag: "Low recovery makes overhead disproportionate"
+    text: "Where recovery rates are very low, the overhead of collection consumes a substantial fraction of what is recovered, making collection economically irrational"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06667f30117e"
+    tag: "Non-user benefits justify collective funding"
+    text: "Benefits that accrue to non-users as well as users justify cost distribution across the whole population rather than individual user charges"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-066778e7f879"
+    tag: "Systematic burden removal is redistributive"
+    text: "When a cost burden falls systematically on already-disadvantaged groups, removing it is a redistributive act that advances racial and economic justice"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06681ec18c01"
+    tag: "Transit is prerequisite for participation"
+    text: "Transit access is a prerequisite for participation in economic and social life, and such prerequisites should be guaranteed regardless of income"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0669bf88f992"
+    tag: "Revenue dependency is representative"
+    text: "Cities with high fare revenue dependency are representative of large transit systems generally, and the dependency would apply elsewhere"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-066acae14dbe"
+    tag: "TransitCenter methodology reliable"
+    text: "TransitCenter's research methodology and independence make its survey findings reliable evidence about rider priorities across income levels"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-066b25daf385"
+    tag: "TransitCenter is independent and peer-reviewed"
+    text: "TransitCenter is an independent research organisation with a track record of peer-reviewed transit research."
+    terminal: false
+    attribution:
+      source:
+        type: "CommonKnowledge"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-066c78627076"
+    tag: "Fare not employment constraint"
+    text: "Removing the fare barrier does not address the other factors constraining employment — job availability, skill match, childcare"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-066d96350989"
+    tag: "Concentrated benefits justify bearing costs"
+    text: "Those who receive concentrated benefits from a service should bear its costs proportionally; diffuse spillover benefits do not justify general-population funding"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-066e0cd2205b"
+    tag: "Middle income transfer is regressive"
+    text: "A subsidy transferring resources from the general tax base to middle-income commuters moves money in the wrong direction, but only if tax incidence on low-income non-riders is non-trivial"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-066f65c19606"
+    tag: "Regressivity requires quantitative support"
+    text: "The regressivity argument requires that the tax incidence on low-income non-riders be non-trivial — a quantitative claim not established by the grounds alone"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0670e5365138"
+    tag: "Local antisocial reports are representative"
+    text: "Local reports of antisocial behaviour following fare elimination are representative of a general effect rather than local anomalies"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06715a028c39"
+    tag: "Universal wastes, targeting concentrates"
+    text: "Universal provision wastes resources on those who do not need the subsidy; targeting concentrates them where they have effect"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-067291c458e5"
+    tag: "Luxembourg is representative"
+    text: "Luxembourg's operational experience is sufficiently similar to other national contexts to demonstrate general viability"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-067366af093a"
+    tag: "Kansas City is representative"
+    text: "Kansas City is representative of mid-sized U.S. transit contexts"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06740782cae1"
+    tag: "Unaddressed barriers reassert"
+    text: "Fare removal addresses only one barrier to transit use; unaddressed barriers reassert themselves over time and erode initial ridership gains"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-067529d0b1a5"
+    tag: "Transit meets essentiality criteria"
+    text: "If transit meets the same criteria of essentiality as acknowledged public utilities it warrants the same treatment"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0676b05d5198"
+    tag: "Private substitutes are relevant disanalogy"
+    text: "The existence of private substitutes for transit is a relevant disanalogy that undermines the public utility comparison"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0677e74ce270"
+    tag: "Toronto and Hong Kong not exceptional"
+    text: "Toronto and Hong Kong are not so exceptional that their fare recovery experience is irrelevant to other systems"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-06788bc303c7"
+    tag: "Problem character signals composition change"
+    text: "A change in the character of system problems, not just their scale, is a reliable sign of a change in user composition"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-067908653179"
+    tag: "RCT supersedes observational studies"
+    text: "The methodological superiority of the RCT design makes its null finding on employment the best available evidence, superseding observational studies"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-067a0aad35d4"
+    tag: "Selective user-pays needs justification"
+    text: "Applying user-pays to transit but not roads requires justification that has not been provided"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-067b6445489a"
+    tag: "User-pays legitimately applies to transit"
+    text: "The user-pays principle is applied consistently across comparable public services, so it legitimately governs transit funding rather than being invoked selectively."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-067ca82c53ee"
+    tag: "Consistent outcome indicates general pattern"
+    text: "Consistency of outcome across independent cases indicates a general pattern rather than coincidence or local factors"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-067dc76bd541"
+    tag: "Diverse success establishes viability"
+    text: "Consistent success across diverse contexts establishes that fare-free transit is not merely theoretical but a proven operational model"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-067e5d3629e7"
+    tag: "Fare elimination causes ridership increase"
+    text: "Removing a direct cost barrier to transit use causes an increase in ridership among price-sensitive riders"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-067f2922b058"
+    tag: "Ridership increase causes modal shift"
+    text: "A sufficiently large ridership increase produces modal shift from private cars, since new riders must come from somewhere"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0680f19bfd36"
+    tag: "Fare-free meets justice definition"
+    text: "A policy that removes a systematically inequitable burden and expands access to civic participation meets the standard of justice as defined in this discourse space"
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca0c-7688-aedb-0681a97002bf"
+    tag: "Ridership raises cost without revenue"
+    text: "Carrying additional riders raises operating cost, and fare removal eliminates the revenue stream that would otherwise fund the additional service that volume requires."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
 inferences:
-  - id: 019fab4a-ca0c-7688-aedb-068293d3c883
-    scheme: FromExample
+  - id: "019fab4a-ca0c-7688-aedb-068293d3c883"
+    scheme: "FromExample"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-06208a04f52f
+      - "019fab4a-ca0c-7688-aedb-06208a04f52f"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-065b6acf2a50
-      - 019fab4a-ca0c-7688-aedb-065c9fda52f9
-      - 019fab4a-ca0c-7688-aedb-065da6b2b0c8
-    concludes: 019fab4a-ca0c-7688-aedb-061f4c80f48e
-  - id: 019fab4a-ca0c-7688-aedb-0683a9b98429
-    scheme: FromCause
+      - "019fab4a-ca0c-7688-aedb-065b6acf2a50"
+      - "019fab4a-ca0c-7688-aedb-065c9fda52f9"
+      - "019fab4a-ca0c-7688-aedb-065da6b2b0c8"
+    concludes: "019fab4a-ca0c-7688-aedb-061f4c80f48e"
+
+  - id: "019fab4a-ca0c-7688-aedb-0683a9b98429"
+    scheme: "FromCause"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-062253fccc6d
+      - "019fab4a-ca0c-7688-aedb-062253fccc6d"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-0661259507f9
-      - 019fab4a-ca0c-7688-aedb-067f2922b058
-      - 019fab4a-ca0c-7688-aedb-06350d19c65c
-    concludes: 019fab4a-ca0c-7688-aedb-0621021fc478
-  - id: 019fab4a-ca0c-7688-aedb-0684b871fe61
-    scheme: FromCause
+      - "019fab4a-ca0c-7688-aedb-06350d19c65c"
+      - "019fab4a-ca0c-7688-aedb-0661259507f9"
+      - "019fab4a-ca0c-7688-aedb-067f2922b058"
+    concludes: "019fab4a-ca0c-7688-aedb-0621021fc478"
+
+  - id: "019fab4a-ca0c-7688-aedb-0684b871fe61"
+    scheme: "FromCause"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-0624e52f0f1c
+      - "019fab4a-ca0c-7688-aedb-0624e52f0f1c"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-0662c0d63889
-      - 019fab4a-ca0c-7688-aedb-06350d19c65c
-    concludes: 019fab4a-ca0c-7688-aedb-06233c7b800c
-  - id: 019fab4a-ca0c-7688-aedb-06855e26d483
-    scheme: FromConsequence
+      - "019fab4a-ca0c-7688-aedb-06350d19c65c"
+      - "019fab4a-ca0c-7688-aedb-0662c0d63889"
+    concludes: "019fab4a-ca0c-7688-aedb-06233c7b800c"
+
+  - id: "019fab4a-ca0c-7688-aedb-06855e26d483"
+    scheme: "FromConsequence"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-0626e6cac7ec
+      - "019fab4a-ca0c-7688-aedb-0626e6cac7ec"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-066342f250dd
-      - 019fab4a-ca0c-7688-aedb-06350d19c65c
-    concludes: 019fab4a-ca0c-7688-aedb-062507337ff4
-  - id: 019fab4a-ca0c-7688-aedb-0686baff169a
-    scheme: FromCause
+      - "019fab4a-ca0c-7688-aedb-06350d19c65c"
+      - "019fab4a-ca0c-7688-aedb-066342f250dd"
+    concludes: "019fab4a-ca0c-7688-aedb-062507337ff4"
+
+  - id: "019fab4a-ca0c-7688-aedb-0686baff169a"
+    scheme: "FromCause"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-0628d96a4e1a
+      - "019fab4a-ca0c-7688-aedb-0628d96a4e1a"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-0664b4dd096f
-    concludes: 019fab4a-ca0c-7688-aedb-06270a3293e0
-  - id: 019fab4a-ca0c-7688-aedb-06873b395958
-    scheme: FromConsequence
+      - "019fab4a-ca0c-7688-aedb-0664b4dd096f"
+    concludes: "019fab4a-ca0c-7688-aedb-06270a3293e0"
+
+  - id: "019fab4a-ca0c-7688-aedb-06873b395958"
+    scheme: "FromConsequence"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-062ac2ba5ea3
+      - "019fab4a-ca0c-7688-aedb-062ac2ba5ea3"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-06658f78a3b0
-    concludes: 019fab4a-ca0c-7688-aedb-06294d3b1699
-  - id: 019fab4a-ca0c-7688-aedb-0688db8ac2be
-    scheme: FromConsequence
+      - "019fab4a-ca0c-7688-aedb-06658f78a3b0"
+    concludes: "019fab4a-ca0c-7688-aedb-06294d3b1699"
+
+  - id: "019fab4a-ca0c-7688-aedb-0688db8ac2be"
+    scheme: "FromConsequence"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-062c00d2e686
+      - "019fab4a-ca0c-7688-aedb-062c00d2e686"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-06667f30117e
-    concludes: 019fab4a-ca0c-7688-aedb-062b5274f529
-  - id: 019fab4a-ca0c-7688-aedb-0689e364f1f3
-    scheme: FromExample
+      - "019fab4a-ca0c-7688-aedb-06667f30117e"
+    concludes: "019fab4a-ca0c-7688-aedb-062b5274f529"
+
+  - id: "019fab4a-ca0c-7688-aedb-0689e364f1f3"
+    scheme: "FromExample"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-063060e8d306
+      - "019fab4a-ca0c-7688-aedb-063060e8d306"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-0669bf88f992
-    concludes: 019fab4a-ca0c-7688-aedb-062f35077c97
-  - id: 019fab4a-ca0c-7688-aedb-068a92f750db
-    scheme: FromConsequence
+      - "019fab4a-ca0c-7688-aedb-0669bf88f992"
+    concludes: "019fab4a-ca0c-7688-aedb-062f35077c97"
+
+  - id: "019fab4a-ca0c-7688-aedb-068a92f750db"
+    scheme: "FromConsequence"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-0632facf9c57
+      - "019fab4a-ca0c-7688-aedb-0632facf9c57"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-066d96350989
-    concludes: 019fab4a-ca0c-7688-aedb-06312f8b44ff
-  - id: 019fab4a-ca0c-7688-aedb-068bc168a8b6
-    scheme: FromConsequence
+      - "019fab4a-ca0c-7688-aedb-066d96350989"
+    concludes: "019fab4a-ca0c-7688-aedb-06312f8b44ff"
+
+  - id: "019fab4a-ca0c-7688-aedb-068bc168a8b6"
+    scheme: "FromConsequence"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-06345b172bd9
+      - "019fab4a-ca0c-7688-aedb-06345b172bd9"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-06715a028c39
-    concludes: 019fab4a-ca0c-7688-aedb-06336221a06b
-  - id: 019fab4a-ca0c-7688-aedb-068c8a18fec4
-    scheme: FromGeneralization
+      - "019fab4a-ca0c-7688-aedb-06715a028c39"
+    concludes: "019fab4a-ca0c-7688-aedb-06336221a06b"
+
+  - id: "019fab4a-ca0c-7688-aedb-068c8a18fec4"
+    scheme: "FromGeneralization"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-0636ab817ae1
+      - "019fab4a-ca0c-7688-aedb-0636ab817ae1"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-067e5d3629e7
-    concludes: 019fab4a-ca0c-7688-aedb-06350d19c65c
-  - id: 019fab4a-ca0d-7577-afd4-1159836328c1
-    scheme: FromConsequence
+      - "019fab4a-ca0c-7688-aedb-067e5d3629e7"
+    concludes: "019fab4a-ca0c-7688-aedb-06350d19c65c"
+
+  - id: "019fab4a-ca0d-7577-afd4-1159836328c1"
+    scheme: "FromConsequence"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-0638699c94c2
+      - "019fab4a-ca0c-7688-aedb-0638699c94c2"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-066778e7f879
-    concludes: 019fab4a-ca0c-7688-aedb-06372d9b9363
-  - id: 019fab4a-ca0d-7577-afd4-115ae190dae0
-    scheme: FromAnalogy
+      - "019fab4a-ca0c-7688-aedb-066778e7f879"
+    concludes: "019fab4a-ca0c-7688-aedb-06372d9b9363"
+
+  - id: "019fab4a-ca0d-7577-afd4-115ae190dae0"
+    scheme: "FromAnalogy"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-063aa5941b17
+      - "019fab4a-ca0c-7688-aedb-063aa5941b17"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-067529d0b1a5
-    concludes: 019fab4a-ca0c-7688-aedb-063973f14701
-  - id: 019fab4a-ca0d-7577-afd4-115bf21da579
-    scheme: FromAnalogy
+      - "019fab4a-ca0c-7688-aedb-067529d0b1a5"
+    concludes: "019fab4a-ca0c-7688-aedb-063973f14701"
+
+  - id: "019fab4a-ca0d-7577-afd4-115bf21da579"
+    scheme: "FromAnalogy"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-063c26ddecb1
+      - "019fab4a-ca0c-7688-aedb-063c26ddecb1"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-067a0aad35d4
-    concludes: 019fab4a-ca0c-7688-aedb-063b7fd556f5
-  - id: 019fab4a-ca0d-7577-afd4-115c7c436c19
-    scheme: FromAuthority
+      - "019fab4a-ca0c-7688-aedb-067a0aad35d4"
+    concludes: "019fab4a-ca0c-7688-aedb-063b7fd556f5"
+
+  - id: "019fab4a-ca0d-7577-afd4-115c7c436c19"
+    scheme: "FromAuthority"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-063eee41e38b
+      - "019fab4a-ca0c-7688-aedb-063eee41e38b"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-066acae14dbe
-    concludes: 019fab4a-ca0c-7688-aedb-063df992d99c
-  - id: 019fab4a-ca0d-7577-afd4-115dcab92a61
-    scheme: FromCause
+      - "019fab4a-ca0c-7688-aedb-066acae14dbe"
+    concludes: "019fab4a-ca0c-7688-aedb-063df992d99c"
+
+  - id: "019fab4a-ca0d-7577-afd4-115dcab92a61"
+    scheme: "FromCause"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-064009589f99
+      - "019fab4a-ca0c-7688-aedb-064009589f99"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-066c78627076
-    concludes: 019fab4a-ca0c-7688-aedb-063fa13896a1
-  - id: 019fab4a-ca0d-7577-afd4-115ee5596cd9
-    scheme: FromConsequence
+      - "019fab4a-ca0c-7688-aedb-066c78627076"
+    concludes: "019fab4a-ca0c-7688-aedb-063fa13896a1"
+
+  - id: "019fab4a-ca0d-7577-afd4-115ee5596cd9"
+    scheme: "FromConsequence"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-0642eb7cde6f
+      - "019fab4a-ca0c-7688-aedb-0642eb7cde6f"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-066e0cd2205b
-      - 019fab4a-ca0c-7688-aedb-066f65c19606
-    concludes: 019fab4a-ca0c-7688-aedb-0641bb9e7be7
-  - id: 019fab4a-ca0d-7577-afd4-115fae8bc5bf
-    scheme: FromGeneralization
+      - "019fab4a-ca0c-7688-aedb-066e0cd2205b"
+      - "019fab4a-ca0c-7688-aedb-066f65c19606"
+    concludes: "019fab4a-ca0c-7688-aedb-0641bb9e7be7"
+
+  - id: "019fab4a-ca0d-7577-afd4-115fae8bc5bf"
+    scheme: "FromGeneralization"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-06449424b708
+      - "019fab4a-ca0c-7688-aedb-06449424b708"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-067ca82c53ee
-    concludes: 019fab4a-ca0c-7688-aedb-064348d0adbe
-  - id: 019fab4a-ca0d-7577-afd4-11609793fe64
-    scheme: FromExample
+      - "019fab4a-ca0c-7688-aedb-067ca82c53ee"
+    concludes: "019fab4a-ca0c-7688-aedb-064348d0adbe"
+
+  - id: "019fab4a-ca0d-7577-afd4-11609793fe64"
+    scheme: "FromExample"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-064681721c3a
+      - "019fab4a-ca0c-7688-aedb-064681721c3a"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-0677e74ce270
-    concludes: 019fab4a-ca0c-7688-aedb-06452d4b1d8d
-  - id: 019fab4a-ca0d-7577-afd4-1161184e58ce
-    scheme: FromGeneralization
+      - "019fab4a-ca0c-7688-aedb-0677e74ce270"
+    concludes: "019fab4a-ca0c-7688-aedb-06452d4b1d8d"
+
+  - id: "019fab4a-ca0d-7577-afd4-1161184e58ce"
+    scheme: "FromGeneralization"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-0648d3ad2adc
+      - "019fab4a-ca0c-7688-aedb-0648d3ad2adc"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-06740782cae1
-    concludes: 019fab4a-ca0c-7688-aedb-0647521cb24e
-  - id: 019fab4a-ca0d-7577-afd4-116283319fed
-    scheme: FromExample
+      - "019fab4a-ca0c-7688-aedb-06740782cae1"
+    concludes: "019fab4a-ca0c-7688-aedb-0647521cb24e"
+
+  - id: "019fab4a-ca0d-7577-afd4-116283319fed"
+    scheme: "FromExample"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-064ac093797d
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-0649e0180c11
-  - id: 019fab4a-ca0d-7577-afd4-11634ee61a00
-    scheme: FromExample
+      - "019fab4a-ca0c-7688-aedb-064ac093797d"
+    concludes: "019fab4a-ca0c-7688-aedb-0649e0180c11"
+
+  - id: "019fab4a-ca0d-7577-afd4-11634ee61a00"
+    scheme: "FromExample"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-064c49d7d556
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-064bd5b443b3
-  - id: 019fab4a-ca0d-7577-afd4-1164737ef1bc
-    scheme: FromExample
+      - "019fab4a-ca0c-7688-aedb-064c49d7d556"
+    concludes: "019fab4a-ca0c-7688-aedb-064bd5b443b3"
+
+  - id: "019fab4a-ca0d-7577-afd4-1164737ef1bc"
+    scheme: "FromExample"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-064e2053f31b
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-064dc09a765b
-  - id: 019fab4a-ca0d-7577-afd4-116566f95dcd
-    scheme: FromGeneralization
+      - "019fab4a-ca0c-7688-aedb-064e2053f31b"
+    concludes: "019fab4a-ca0c-7688-aedb-064dc09a765b"
+
+  - id: "019fab4a-ca0d-7577-afd4-116566f95dcd"
+    scheme: "FromGeneralization"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-0650b637c62c
+      - "019fab4a-ca0c-7688-aedb-0650b637c62c"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-067dc76bd541
-    concludes: 019fab4a-ca0c-7688-aedb-064f968a23ac
-  - id: 019fab4a-ca0d-7577-afd4-116627800162
-    scheme: FromExample
+      - "019fab4a-ca0c-7688-aedb-067dc76bd541"
+    concludes: "019fab4a-ca0c-7688-aedb-064f968a23ac"
+
+  - id: "019fab4a-ca0d-7577-afd4-116627800162"
+    scheme: "FromExample"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-0652e4091fc0
+      - "019fab4a-ca0c-7688-aedb-0652e4091fc0"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-0670e5365138
-    concludes: 019fab4a-ca0c-7688-aedb-06519dee5f99
-  - id: 019fab4a-ca0d-7577-afd4-11675946337f
-    scheme: FromSign
+      - "019fab4a-ca0c-7688-aedb-0670e5365138"
+    concludes: "019fab4a-ca0c-7688-aedb-06519dee5f99"
+
+  - id: "019fab4a-ca0d-7577-afd4-11675946337f"
+    scheme: "FromSign"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-06541c36e211
+      - "019fab4a-ca0c-7688-aedb-06541c36e211"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-06788bc303c7
-    concludes: 019fab4a-ca0c-7688-aedb-0653a1d33cc3
-  - id: 019fab4a-ca0d-7577-afd4-1168cae0fc08
-    scheme: FromAuthority
+      - "019fab4a-ca0c-7688-aedb-06788bc303c7"
+    concludes: "019fab4a-ca0c-7688-aedb-0653a1d33cc3"
+
+  - id: "019fab4a-ca0d-7577-afd4-1168cae0fc08"
+    scheme: "FromAuthority"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-063eee41e38b
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-0655dd0964b5
-  - id: 019fab4a-ca0d-7577-afd4-1169e3fabe55
-    scheme: FromAuthority
+      - "019fab4a-ca0c-7688-aedb-063eee41e38b"
+    concludes: "019fab4a-ca0c-7688-aedb-0655dd0964b5"
+
+  - id: "019fab4a-ca0d-7577-afd4-1169e3fabe55"
+    scheme: "FromAuthority"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-0657ebfd6448
+      - "019fab4a-ca0c-7688-aedb-0657ebfd6448"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-067908653179
-    concludes: 019fab4a-ca0c-7688-aedb-06566f4e4063
-  - id: 019fab4a-ca0d-7577-afd4-116ab1af0bef
-    scheme: FromExample
+      - "019fab4a-ca0c-7688-aedb-067908653179"
+    concludes: "019fab4a-ca0c-7688-aedb-06566f4e4063"
+
+  - id: "019fab4a-ca0d-7577-afd4-116ab1af0bef"
+    scheme: "FromExample"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-063c26ddecb1
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-06584be8b7a7
-  - id: 019fab4a-ca0d-7577-afd4-116b488d913d
-    scheme: FromAnalogy
+      - "019fab4a-ca0c-7688-aedb-063c26ddecb1"
+    concludes: "019fab4a-ca0c-7688-aedb-06584be8b7a7"
+
+  - id: "019fab4a-ca0d-7577-afd4-116b488d913d"
+    scheme: "FromAnalogy"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-065a9a818cbd
+      - "019fab4a-ca0c-7688-aedb-065a9a818cbd"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-0676b05d5198
-    concludes: 019fab4a-ca0c-7688-aedb-0659f18e7e34
-  - id: 019fab4a-ca0d-7577-afd4-116cf09672f5
-    scheme: FromGeneralization
+      - "019fab4a-ca0c-7688-aedb-0676b05d5198"
+    concludes: "019fab4a-ca0c-7688-aedb-0659f18e7e34"
+
+  - id: "019fab4a-ca0d-7577-afd4-116cf09672f5"
+    scheme: "FromGeneralization"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-065e56dbccc9
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-065da6b2b0c8
-  - id: 019fab4a-ca0d-7577-afd4-116de731752c
-    scheme: FromAnalogy
+      - "019fab4a-ca0c-7688-aedb-065e56dbccc9"
+    concludes: "019fab4a-ca0c-7688-aedb-065da6b2b0c8"
+
+  - id: "019fab4a-ca0d-7577-afd4-116de731752c"
+    scheme: "FromAnalogy"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-0660d78c98dd
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-065f313615dd
-  - id: 019fab4a-ca0d-7577-afd4-116ee2455756
-    scheme: FromAuthority
+      - "019fab4a-ca0c-7688-aedb-0660d78c98dd"
+    concludes: "019fab4a-ca0c-7688-aedb-065f313615dd"
+
+  - id: "019fab4a-ca0d-7577-afd4-116ee2455756"
+    scheme: "FromAuthority"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-066b25daf385
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-066acae14dbe
-  - id: 019fab4a-ca0d-7577-afd4-116fefef4992
+      - "019fab4a-ca0c-7688-aedb-066b25daf385"
+    concludes: "019fab4a-ca0c-7688-aedb-066acae14dbe"
+
+  - id: "019fab4a-ca0d-7577-afd4-116fefef4992"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-061f4c80f48e
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-061c8dc2392c
-  - id: 019fab4a-ca0d-7577-afd4-1170400a2413
+      - "019fab4a-ca0c-7688-aedb-061f4c80f48e"
+    concludes: "019fab4a-ca0c-7688-aedb-061c8dc2392c"
+
+  - id: "019fab4a-ca0d-7577-afd4-1170400a2413"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-0621021fc478
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-061c8dc2392c
-  - id: 019fab4a-ca0d-7577-afd4-11713b131e5b
+      - "019fab4a-ca0c-7688-aedb-0621021fc478"
+    concludes: "019fab4a-ca0c-7688-aedb-061c8dc2392c"
+
+  - id: "019fab4a-ca0d-7577-afd4-11713b131e5b"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-06233c7b800c
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-061c8dc2392c
-  - id: 019fab4a-ca0d-7577-afd4-117278b4bcbd
+      - "019fab4a-ca0c-7688-aedb-06233c7b800c"
+    concludes: "019fab4a-ca0c-7688-aedb-061c8dc2392c"
+
+  - id: "019fab4a-ca0d-7577-afd4-117278b4bcbd"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-062507337ff4
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-061c8dc2392c
-  - id: 019fab4a-ca0d-7577-afd4-11734809ecde
+      - "019fab4a-ca0c-7688-aedb-062507337ff4"
+    concludes: "019fab4a-ca0c-7688-aedb-061c8dc2392c"
+
+  - id: "019fab4a-ca0d-7577-afd4-11734809ecde"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-06270a3293e0
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-061c8dc2392c
-  - id: 019fab4a-ca0d-7577-afd4-11747fcfcdfe
+      - "019fab4a-ca0c-7688-aedb-06270a3293e0"
+    concludes: "019fab4a-ca0c-7688-aedb-061c8dc2392c"
+
+  - id: "019fab4a-ca0d-7577-afd4-11747fcfcdfe"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-06294d3b1699
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-061c8dc2392c
-  - id: 019fab4a-ca0d-7577-afd4-11755a11f8ac
+      - "019fab4a-ca0c-7688-aedb-06294d3b1699"
+    concludes: "019fab4a-ca0c-7688-aedb-061c8dc2392c"
+
+  - id: "019fab4a-ca0d-7577-afd4-11755a11f8ac"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-062b5274f529
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-061c8dc2392c
-  - id: 019fab4a-ca0d-7577-afd4-1176083fac8b
+      - "019fab4a-ca0c-7688-aedb-062b5274f529"
+    concludes: "019fab4a-ca0c-7688-aedb-061c8dc2392c"
+
+  - id: "019fab4a-ca0d-7577-afd4-1176083fac8b"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-062d03f7d180
+      - "019fab4a-ca0c-7688-aedb-062d03f7d180"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-06681ec18c01
-      - 019fab4a-ca0c-7688-aedb-061d020bd64a
-    concludes: 019fab4a-ca0c-7688-aedb-061c8dc2392c
-  - id: 019fab4a-ca0d-7577-afd4-117791ab380b
+      - "019fab4a-ca0c-7688-aedb-061d020bd64a"
+      - "019fab4a-ca0c-7688-aedb-06681ec18c01"
+    concludes: "019fab4a-ca0c-7688-aedb-061c8dc2392c"
+
+  - id: "019fab4a-ca0d-7577-afd4-117791ab380b"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-062e0be85dee
+      - "019fab4a-ca0c-7688-aedb-062e0be85dee"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-0680f19bfd36
-    concludes: 019fab4a-ca0c-7688-aedb-061c8dc2392c
-  - id: 019fab4a-ca0d-7577-afd4-1178c3fabea9
+      - "019fab4a-ca0c-7688-aedb-0680f19bfd36"
+    concludes: "019fab4a-ca0c-7688-aedb-061c8dc2392c"
+
+  - id: "019fab4a-ca0d-7577-afd4-1178c3fabea9"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-062f35077c97
+      - "019fab4a-ca0c-7688-aedb-062f35077c97"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-061e288124a6
-    contests: 019fab4a-ca0c-7688-aedb-061c8dc2392c
-  - id: 019fab4a-ca0d-7577-afd4-1179861a34bf
+      - "019fab4a-ca0c-7688-aedb-061e288124a6"
+    contests: "019fab4a-ca0c-7688-aedb-061c8dc2392c"
+
+  - id: "019fab4a-ca0d-7577-afd4-1179861a34bf"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-06312f8b44ff
+      - "019fab4a-ca0c-7688-aedb-06312f8b44ff"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-061e288124a6
-      - 019fab4a-ca0c-7688-aedb-067b6445489a
-    contests: 019fab4a-ca0c-7688-aedb-061c8dc2392c
-  - id: 019fab4a-ca0d-7577-afd4-117a4f424ba0
+      - "019fab4a-ca0c-7688-aedb-061e288124a6"
+      - "019fab4a-ca0c-7688-aedb-067b6445489a"
+    contests: "019fab4a-ca0c-7688-aedb-061c8dc2392c"
+
+  - id: "019fab4a-ca0d-7577-afd4-117a4f424ba0"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-06336221a06b
-    warrants: []
-    contests: 019fab4a-ca0c-7688-aedb-061c8dc2392c
-  - id: 019fab4a-ca0d-7577-afd4-117b1251befb
+      - "019fab4a-ca0c-7688-aedb-06336221a06b"
+    contests: "019fab4a-ca0c-7688-aedb-061c8dc2392c"
+
+  - id: "019fab4a-ca0d-7577-afd4-117b1251befb"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-06372d9b9363
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-061f4c80f48e
-  - id: 019fab4a-ca0d-7577-afd4-117c85cc46b9
+      - "019fab4a-ca0c-7688-aedb-06372d9b9363"
+    concludes: "019fab4a-ca0c-7688-aedb-061f4c80f48e"
+
+  - id: "019fab4a-ca0d-7577-afd4-117c85cc46b9"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-06372d9b9363
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-062e0be85dee
-  - id: 019fab4a-ca0d-7577-afd4-117d60507bc4
+      - "019fab4a-ca0c-7688-aedb-06372d9b9363"
+    concludes: "019fab4a-ca0c-7688-aedb-062e0be85dee"
+
+  - id: "019fab4a-ca0d-7577-afd4-117d60507bc4"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-063973f14701
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-062b5274f529
-  - id: 019fab4a-ca0d-7577-afd4-117efd17483d
+      - "019fab4a-ca0c-7688-aedb-063973f14701"
+    concludes: "019fab4a-ca0c-7688-aedb-062b5274f529"
+
+  - id: "019fab4a-ca0d-7577-afd4-117efd17483d"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-06584be8b7a7
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-063b7fd556f5
-  - id: 019fab4a-ca0d-7577-afd4-117fc4bbc685
+      - "019fab4a-ca0c-7688-aedb-06584be8b7a7"
+    concludes: "019fab4a-ca0c-7688-aedb-063b7fd556f5"
+
+  - id: "019fab4a-ca0d-7577-afd4-117fc4bbc685"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-0655dd0964b5
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-063df992d99c
-  - id: 019fab4a-ca0d-7577-afd4-118023f8d0df
+      - "019fab4a-ca0c-7688-aedb-0655dd0964b5"
+    concludes: "019fab4a-ca0c-7688-aedb-063df992d99c"
+
+  - id: "019fab4a-ca0d-7577-afd4-118023f8d0df"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-06566f4e4063
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-063fa13896a1
-  - id: 019fab4a-ca0d-7577-afd4-118192753245
+      - "019fab4a-ca0c-7688-aedb-06566f4e4063"
+    concludes: "019fab4a-ca0c-7688-aedb-063fa13896a1"
+
+  - id: "019fab4a-ca0d-7577-afd4-118192753245"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-0641bb9e7be7
-    warrants: []
-    contests: 019fab4a-ca0c-7688-aedb-062e0be85dee
-  - id: 019fab4a-ca0d-7577-afd4-1182bd56dfd7
+      - "019fab4a-ca0c-7688-aedb-0641bb9e7be7"
+    contests: "019fab4a-ca0c-7688-aedb-062e0be85dee"
+
+  - id: "019fab4a-ca0d-7577-afd4-1182bd56dfd7"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-06519dee5f99
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-064348d0adbe
-  - id: 019fab4a-ca0d-7577-afd4-1183b8c85272
+      - "019fab4a-ca0c-7688-aedb-06519dee5f99"
+    concludes: "019fab4a-ca0c-7688-aedb-064348d0adbe"
+
+  - id: "019fab4a-ca0d-7577-afd4-1183b8c85272"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-0653a1d33cc3
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-064348d0adbe
-  - id: 019fab4a-ca0d-7577-afd4-1184b22f71cd
+      - "019fab4a-ca0c-7688-aedb-0653a1d33cc3"
+    concludes: "019fab4a-ca0c-7688-aedb-064348d0adbe"
+
+  - id: "019fab4a-ca0d-7577-afd4-1184b22f71cd"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-06452d4b1d8d
-    warrants: []
-    contests: 019fab4a-ca0c-7688-aedb-06294d3b1699
-  - id: 019fab4a-ca0d-7577-afd4-11857bb1118b
+      - "019fab4a-ca0c-7688-aedb-06452d4b1d8d"
+    contests: "019fab4a-ca0c-7688-aedb-06294d3b1699"
+
+  - id: "019fab4a-ca0d-7577-afd4-11857bb1118b"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-0647521cb24e
-    warrants: []
-    contests: 019fab4a-ca0c-7688-aedb-06350d19c65c
-  - id: 019fab4a-ca0d-7577-afd4-11862f86e27e
+      - "019fab4a-ca0c-7688-aedb-0647521cb24e"
+    contests: "019fab4a-ca0c-7688-aedb-06350d19c65c"
+
+  - id: "019fab4a-ca0d-7577-afd4-11862f86e27e"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-0649e0180c11
+      - "019fab4a-ca0c-7688-aedb-0649e0180c11"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-067291c458e5
-    concludes: 019fab4a-ca0c-7688-aedb-064f968a23ac
-  - id: 019fab4a-ca0d-7577-afd4-118730f47334
+      - "019fab4a-ca0c-7688-aedb-067291c458e5"
+    concludes: "019fab4a-ca0c-7688-aedb-064f968a23ac"
+
+  - id: "019fab4a-ca0d-7577-afd4-118730f47334"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-064bd5b443b3
+      - "019fab4a-ca0c-7688-aedb-064bd5b443b3"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-067366af093a
-    concludes: 019fab4a-ca0c-7688-aedb-064f968a23ac
-  - id: 019fab4a-ca0d-7577-afd4-1188dd78a692
+      - "019fab4a-ca0c-7688-aedb-067366af093a"
+    concludes: "019fab4a-ca0c-7688-aedb-064f968a23ac"
+
+  - id: "019fab4a-ca0d-7577-afd4-1188dd78a692"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-064dc09a765b
+      - "019fab4a-ca0c-7688-aedb-064dc09a765b"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-065f313615dd
-    concludes: 019fab4a-ca0c-7688-aedb-064f968a23ac
-  - id: 019fab4a-ca0d-7577-afd4-11894e07390a
+      - "019fab4a-ca0c-7688-aedb-065f313615dd"
+    concludes: "019fab4a-ca0c-7688-aedb-064f968a23ac"
+
+  - id: "019fab4a-ca0d-7577-afd4-11894e07390a"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-064f968a23ac
-    warrants: []
-    concludes: 019fab4a-ca0c-7688-aedb-06350d19c65c
-  - id: 019fab4a-ca0d-7577-afd4-118a782fb3cc
+      - "019fab4a-ca0c-7688-aedb-064f968a23ac"
+    concludes: "019fab4a-ca0c-7688-aedb-06350d19c65c"
+
+  - id: "019fab4a-ca0d-7577-afd4-118a782fb3cc"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-0659f18e7e34
-    warrants: []
-    contests: 019fab4a-ca0c-7688-aedb-063973f14701
-  - id: 019fab4a-ca0d-7577-afd4-118b63187536
+      - "019fab4a-ca0c-7688-aedb-0659f18e7e34"
+    contests: "019fab4a-ca0c-7688-aedb-063973f14701"
+
+  - id: "019fab4a-ca0d-7577-afd4-118b63187536"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-063b7fd556f5
-    warrants: []
-    contests: 019fab4a-ca0c-7688-aedb-067b6445489a
-  - id: 019fab4a-ca0d-7577-afd4-118cf88f900d
+      - "019fab4a-ca0c-7688-aedb-063b7fd556f5"
+    contests: "019fab4a-ca0c-7688-aedb-067b6445489a"
+
+  - id: "019fab4a-ca0d-7577-afd4-118cf88f900d"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-06312f8b44ff
+      - "019fab4a-ca0c-7688-aedb-06312f8b44ff"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-061e288124a6
-    concludes: 019fab4a-ca0c-7688-aedb-06336221a06b
-  - id: 019fab4a-ca0d-7577-afd4-118dacc44053
+      - "019fab4a-ca0c-7688-aedb-061e288124a6"
+    concludes: "019fab4a-ca0c-7688-aedb-06336221a06b"
+
+  - id: "019fab4a-ca0d-7577-afd4-118dacc44053"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-06312f8b44ff
+      - "019fab4a-ca0c-7688-aedb-06312f8b44ff"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-061e288124a6
-    concludes: 019fab4a-ca0c-7688-aedb-0641bb9e7be7
-  - id: 019fab4a-ca0d-7577-afd4-118ec34fdeaf
+      - "019fab4a-ca0c-7688-aedb-061e288124a6"
+    concludes: "019fab4a-ca0c-7688-aedb-0641bb9e7be7"
+
+  - id: "019fab4a-ca0d-7577-afd4-118ec34fdeaf"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-064348d0adbe
-    warrants: []
-    contests: 019fab4a-ca0c-7688-aedb-061c8dc2392c
-  - id: 019fab4a-ca0d-7577-afd4-118f92154e65
+      - "019fab4a-ca0c-7688-aedb-064348d0adbe"
+    contests: "019fab4a-ca0c-7688-aedb-061c8dc2392c"
+
+  - id: "019fab4a-ca0d-7577-afd4-118f92154e65"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-063df992d99c
-    warrants: []
-    contests: 019fab4a-ca0c-7688-aedb-061c8dc2392c
-  - id: 019fab4a-ca0d-7577-afd4-1190ed28b175
+      - "019fab4a-ca0c-7688-aedb-063df992d99c"
+    contests: "019fab4a-ca0c-7688-aedb-061c8dc2392c"
+
+  - id: "019fab4a-ca0d-7577-afd4-1190ed28b175"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-063fa13896a1
-    warrants: []
-    contests: 019fab4a-ca0c-7688-aedb-061c8dc2392c
-  - id: 019fab4a-ca0d-7577-afd4-11914535a800
-    scheme: FromCause
+      - "019fab4a-ca0c-7688-aedb-063fa13896a1"
+    contests: "019fab4a-ca0c-7688-aedb-061c8dc2392c"
+
+  - id: "019fab4a-ca0d-7577-afd4-11914535a800"
+    scheme: "FromCause"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca0c-7688-aedb-06350d19c65c
+      - "019fab4a-ca0c-7688-aedb-06350d19c65c"
     warrants:
-      - 019fab4a-ca0c-7688-aedb-0681a97002bf
-    concludes: 019fab4a-ca0c-7688-aedb-062f35077c97
+      - "019fab4a-ca0c-7688-aedb-0681a97002bf"
+    concludes: "019fab4a-ca0c-7688-aedb-062f35077c97"

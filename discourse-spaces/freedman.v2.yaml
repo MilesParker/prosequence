@@ -1,775 +1,723 @@
-# Converted to the claim/inference model (v2) by scripts/convert.ts.
-# Source: discourse-spaces/freedman.yaml. Do not hand-edit claim texts; this migration is structural.
-#
-# 2026-07 enthymemification pass (contests-to-claims collapse):
-#   - c-democratic-criterion-governs added as an explicit criterion-applicability warrant,
-#     surfaced on i-obama-double-standard.
-#   - i-realism-undercuts-obama-double-standard re-pointed from the inference
-#     i-obama-double-standard onto that claim. No contest now targets an inference (I8).
-id: us-iran-ceasefire-2026
-title: US-Iran Ceasefire Agreement 2026
+id: "us-iran-ceasefire-2026"
+title: "US-Iran Ceasefire Agreement 2026"
 definitions:
-  - term: strategic interests
-    text: >
-      US strategic interests include: security of regional allies, freedom of navigation through
-      international waterways, non-proliferation of nuclear weapons and long-range missiles, and
-      credibility of US security commitments.
+  - term: "strategic interests"
+    text: "US strategic interests include: security of regional allies, freedom of navigation through international waterways, non-proliferation of nuclear weapons and long-range missiles, and credibility of US security commitments.\n"
     importedFrom: null
-  - term: ceasefire agreement
-    text: >
-      The preliminary memorandum of understanding of June 2026 between the US and Iran, covering
-      cessation of hostilities, 60-day toll-free Hormuz passage, and a framework for subsequent
-      nuclear negotiations contingent on Israel halting operations in Lebanon.
+  - term: "ceasefire agreement"
+    text: "The preliminary memorandum of understanding of June 2026 between the US and Iran, covering cessation of hostilities, 60-day toll-free Hormuz passage, and a framework for subsequent nuclear negotiations contingent on Israel halting operations in Lebanon.\n"
     importedFrom: null
-  - term: military leverage
-    text: >
-      The capacity to credibly threaten or apply military force to extract concessions. Leverage is
-      expended when a campaign has ended without achieving its objective and renewed escalation is
-      not credible.
+  - term: "military leverage"
+    text: "The capacity to credibly threaten or apply military force to extract concessions. Leverage is expended when a campaign has ended without achieving its objective and renewed escalation is not credible.\n"
     importedFrom: null
 roots:
-  - 019fab4a-ca74-7736-a2ea-1ab39c7cb0c2
+  - "019fab4a-ca74-7736-a2ea-1ab39c7cb0c2"
 claims:
-  - id: 019fab4a-ca74-7736-a2ea-1ab39c7cb0c2
-    tag: Deal serves US strategic interests
-    text: The US-Iran ceasefire agreement of June 2026 serves US strategic interests.
+  - id: "019fab4a-ca74-7736-a2ea-1ab39c7cb0c2"
+    tag: "Deal serves US strategic interests"
+    text: "The US-Iran ceasefire agreement of June 2026 serves US strategic interests."
     terminal: false
     uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ab465a30983
-    tag: Alliances make states more secure
-    text: States are more secure inside a reliable alliance system than they can ever be acting
-      alone.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ab531c6feaa
-    tag: Political survival is a legitimate criterion
-    text: A leader's personal political survival is a legitimate criterion in state decisions.
-    terminal: true
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ab6621761d5
-    tag: Suffering constrains strategy
-    text: >-
-      Minimising human suffering is a supreme obligation that constrains permissible strategic
-      action.
-    terminal: true
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ab7d0116e03
-    tag: Reason is a more reliable guide than instinct
-    text: >-
-      Human reason carefully applied and subject to correction is a more reliable guide to action
-      than instinct or intuition.
-    terminal: true
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ab86fba430b
-    tag: Security depends on democratic survival
-    text: >-
-      A state's long-run security depends on the survival of democratic governance in the
-      international order it inhabits.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ab978fef3b2
-    tag: A state owes obligations only to its citizens
-    text: >-
-      A state owes obligations only to its own citizens; the political character of other states is
-      not a legitimate basis for foreign policy.
-    terminal: true
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1aba7b345f92
-    tag: Electoral not strategic
-    text: The deal was shaped by Trump's electoral interests, not US strategic interests.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1abbaf1e5363
-    tag: Trump saw the war as a midterm liability
-    text: >-
-      Friedman reports Trump assessed the war's inflation and gasoline price effects as a
-      prescription for Republican midterm losses, and publicly pre-assigned credit and blame to
-      Vance along personal political lines.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Thomas L. Friedman, New York Times, June 19 2026
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1abc8dcfad61
-    tag: Allies abandoned
-    text: The deal leaves US allies more exposed than before the war began.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1abd186bebde
-    tag: Deal is silent on missiles and proxies
-    text: >-
-      Friedman reports the deal is silent on Iran's missiles and proxy networks, makes nuclear talks
-      contingent on Israeli concessions in Lebanon, and signals to Gulf Arab states that the US is
-      withdrawing its security guarantee.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Thomas L. Friedman, New York Times, June 19 2026
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1abe80bd4909
-    tag: Hormuz toll concession
-    text: >-
-      The deal concedes Iran a potential future right to toll commercial shipping through the Strait
-      of Hormuz.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1abfa41b3a58
-    tag: 'US-Iran MOU: Toll-free passage for 60 days'
-    text: >-
-      The memorandum of understanding states Iran will ensure toll-free Hormuz passage "for 60 days
-      only," as quoted by Friedman.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: US-Iran MOU June 2026, as quoted by Friedman, New York Times, June 19 2026
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ac0029cdf6e
-    tag: Nuclear leverage expended
-    text: >-
-      The deal defers the nuclear question into a negotiation where the US has already expended its
-      military leverage.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ac1328d17de
-    tag: Uranium deferred after the campaign ended
-    text: >-
-      Friedman reports the deal leaves Iran's near-bomb-grade uranium for future negotiations after
-      the military campaign ended without achieving that objective.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Thomas L. Friedman, New York Times, June 19 2026
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ac2afe99fd8
-    tag: Deal ended economic harm
-    text: >-
-      The deal serves US interests by ending a war that was driving inflation and energy price
-      increases.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ac3ee171b51
-    tag: War drove inflation that hurt households
-    text: >-
-      Friedman acknowledges Trump assessed the war as causing food inflation and high gasoline
-      prices harmful to American households.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Thomas L. Friedman, New York Times, June 19 2026
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ac4ed82133d
-    tag: Electoral calendar proximate cause
-    text: >-
-      When a negotiating outcome tracks the leader's electoral calendar rather than strategic logic,
-      electoral pressure is the proximate cause.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ac595748028
-    tag: Electoral timing leaves no remainder
-    text: >-
-      An outcome explicable by electoral timing without remainder requires no additional strategic
-      explanation.
-    terminal: false
-    attribution:
-      source:
-        type: SelfEvident
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ac6b629f084
-    tag: Capability retention increases exposure
-    text: >-
-      Removing US military pressure while leaving Iran's threatening capabilities intact increases
-      allies' net threat exposure.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ac7457b63d9
-    tag: Remove the force, the threat rises
-    text: >-
-      If the constraining force is removed and the constrained capability remains, the net threat to
-      those the force was protecting increases.
-    terminal: false
-    attribution:
-      source:
-        type: LogicalNecessity
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ac8fb8b41f3
-    tag: Withdrawal signal forces accommodation
-    text: >-
-      Allies who receive credible signals of US withdrawal must independently accommodate the rising
-      regional power, shifting the balance against the US.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ac96ac74945
-    tag: States balance when a patron withdraws
-    text: States balance against threats when patron protection is withdrawn.
-    terminal: false
-    attribution:
-      source:
-        type: CommonKnowledge
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1acaada4718e
-    tag: Time-limited carve-out sets a precedent
-    text: >-
-      A time-limited toll-free commitment without a permanent successor establishes the precedent
-      that Iran holds authority to charge for Hormuz passage.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1acb3c530913
-    tag: A carve-out implies Iran sets the default
-    text: >-
-      A 60-day carve-out implies a default state to which passage reverts — a default in which Iran
-      determines the terms.
-    terminal: false
-    attribution:
-      source:
-        type: LogicalNecessity
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1acc9e599214
-    tag: Ended campaign signals escalation ceiling
-    text: >-
-      Once a military campaign ends without achieving its core objective, the threat of renewed
-      force becomes less credible, weakening the position for deferred objectives.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1acd2148b3ad
-    tag: Settling short signals an escalation ceiling
-    text: >-
-      A state that has struck and accepted a deal short of its objective signals a ceiling on its
-      willingness to escalate.
-    terminal: false
-    attribution:
-      source:
-        type: CommonKnowledge
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1aceb5a5bd44
-    tag: Citizen welfare is national interest
-    text: >-
-      Ending a war causing domestic inflation serves the material interests of US citizens, which
-      are a component of US national interests.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1acf761cb44c
-    tag: Ending a harmful war advances welfare
-    text: >-
-      If citizen material welfare is a component of national interests, and the war was harming that
-      welfare, ending it advances national interests on that dimension.
-    terminal: false
-    attribution:
-      source:
-        type: LogicalNecessity
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ad0f0fd0633
-    tag: Sycophancy caused miscalculation
-    text: >-
-      Trump and Netanyahu's purge of internal dissent caused the strategic miscalculation about
-      Iran's likely response.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ad1cf98e66a
-    tag: Unchecked leaders default to electoral logic
-    text: >-
-      When internal dissent is purged, no strategic counsel remains to check electoral incentive, so
-      decisions default to the leader's electoral interest.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ad2ffb233f5
-    tag: 'Mukunda: Both decision mechanisms failed'
-    text: >-
-      Mukunda told Friedman that America and Israel "failed at both" mechanisms for good executive
-      decisions, and that "experts had predicted everything that went wrong in the war."
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Gautam Mukunda, as quoted by Friedman, New York Times, June 19 2026
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ad39be66a80
-    tag: Obama double standard
-    text: >-
-      The deal's terms are worse than what the same actors condemned as unacceptable under Obama, so
-      partisan praise carries no evidentiary weight.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ad4cc6483a5
-    tag: Critique invokes foreign democratic survival
-    text: >-
-      The double-standard critique evaluates the deal against the survival of democratic
-      governance in other states rather than against the interests of US citizens.
-    terminal: false
-    attribution:
-      source:
-        type: LogicalNecessity
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ad5468c9705
-    tag: Obama would have been denounced for this
-    text: >-
-      Friedman notes the deal makes nuclear talks contingent on Israeli military concessions in
-      Lebanon, and states Obama would have been denounced for agreeing to such terms.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Thomas L. Friedman, New York Times, June 19 2026
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ad62d287e96
-    tag: Democratic survival is a valid yardstick
-    text: >-
-      Evaluating this deal by its effect on the survival of democratic governance in the
-      international order is a legitimate and applicable standard for judging US strategic
-      interest, not an illegitimate substitution for the interests of US citizens.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ad7d43f9432
-    tag: Iranian domestic politics unlocked
-    text: A diminished external threat may create space for internal Iranian pressure for regime
-      reform.
-    terminal: false
-    uncertain: true
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ad836213ff2
-    tag: Iranians may question theocratic rule
-    text: >-
-      Friedman speculates that without an external threat to justify repression, Iranians may ask
-      what 47 years of theocratic rule has produced besides nuclear spending and proxy funding.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Thomas L. Friedman, New York Times, June 19 2026
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ad9c7133f2b
-    tag: Expert exclusion causes predictive failure
-    text: >-
-      When decision-makers exclude expert challenge, predictive failures that experts would have
-      flagged are structurally caused by that exclusion.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ada93360942
-    tag: Removing the corrective attributes the error
-    text: >-
-      Removing the input that would have corrected an error makes that error attributable to the
-      removal.
-    terminal: false
-    attribution:
-      source:
-        type: LogicalNecessity
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1adba88fa0c5
-    tag: Partisan evaluation lacks evidentiary weight
-    text: >-
-      When the same outcome is condemned under one administration and praised under another with no
-      change in strategic logic, the evaluation is partisan and carries no independent evidentiary
-      weight.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1adc2f6402db
-    tag: Identity-selective criteria lack force
-    text: >-
-      An evaluation criterion applied selectively by identity rather than consistently by logic
-      cannot serve as independent evidence of merit.
-    terminal: false
-    attribution:
-      source:
-        type: SelfEvident
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1addcf0d484d
-    tag: External threat removal unlocks internal politics
-    text: >-
-      Regimes that use external threat narratives to suppress dissent lose that justification when
-      the threat recedes, potentially enabling domestic opposition to organise.
-    terminal: false
-    uncertain: true
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ade52ed9150
-    tag: Regimes instrumentalise external threats
-    text: >-
-      It is common knowledge that authoritarian regimes instrumentalise external threats to justify
-      internal repression.
-    terminal: false
-    attribution:
-      source:
-        type: CommonKnowledge
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1adf85dd8a56
-    tag: Dealmaking skills don't transfer
-    text: >-
-      Transactional deal-making skills do not transfer to geopolitical negotiations involving
-      military leverage and alliance management.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ae0814b3a76
-    tag: Negotiators secured only 60 days
-    text: >-
-      Friedman reports that real-estate negotiators Witkoff and Kushner, after billions spent in
-      military action, secured only 60 days of toll-free Hormuz passage, with no constraints on
-      missiles or proxies and no resolution of Iran's nuclear material.
-    terminal: false
-    attribution:
-      source:
-        type: Citation
-        reference: Thomas L. Friedman, New York Times, June 19 2026
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ae1bc5674f3
-    tag: Dealmaking skills are not geopolitical skills
-    text: >-
-      Real-estate negotiation optimises for closing a transaction; geopolitical negotiation requires
-      preserving leverage and foreclosing future coercion options — these are not extensions of the
-      same skill.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ae2a800c170
-    tag: Closing and foreclosing are distinct
-    text: >-
-      Closing a deal and foreclosing an adversary's future coercion options are structurally
-      distinct objectives requiring distinct competencies.
-    terminal: false
-    attribution:
-      source:
-        type: SelfEvident
-      quote: null
-    uncertain: false
-    submissionStatus: Accepted
-  - id: 019fab4a-ca74-7736-a2ea-1ae39a54c735
-    tag: Witkoff-Kushner Hormuz outcome
-    text: >-
-      The Witkoff-Kushner Hormuz negotiation is a concrete instance of transactional logic producing
-      a strategically deficient outcome.
-    terminal: false
-    uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
 
+  - id: "019fab4a-ca74-7736-a2ea-1ab465a30983"
+    tag: "Alliances make states more secure"
+    text: "States are more secure inside a reliable alliance system than they can ever be acting alone."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ab531c6feaa"
+    tag: "Political survival is a legitimate criterion"
+    text: "A leader's personal political survival is a legitimate criterion in state decisions."
+    terminal: true
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ab6621761d5"
+    tag: "Suffering constrains strategy"
+    text: "Minimising human suffering is a supreme obligation that constrains permissible strategic action."
+    terminal: true
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ab7d0116e03"
+    tag: "Reason is a more reliable guide than instinct"
+    text: "Human reason carefully applied and subject to correction is a more reliable guide to action than instinct or intuition."
+    terminal: true
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ab86fba430b"
+    tag: "Security depends on democratic survival"
+    text: "A state's long-run security depends on the survival of democratic governance in the international order it inhabits."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ab978fef3b2"
+    tag: "A state owes obligations only to its citizens"
+    text: "A state owes obligations only to its own citizens; the political character of other states is not a legitimate basis for foreign policy."
+    terminal: true
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1aba7b345f92"
+    tag: "Electoral not strategic"
+    text: "The deal was shaped by Trump's electoral interests, not US strategic interests."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1abbaf1e5363"
+    tag: "Trump saw the war as a midterm liability"
+    text: "Friedman reports Trump assessed the war's inflation and gasoline price effects as a prescription for Republican midterm losses, and publicly pre-assigned credit and blame to Vance along personal political lines."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Thomas L. Friedman, New York Times, June 19 2026"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1abc8dcfad61"
+    tag: "Allies abandoned"
+    text: "The deal leaves US allies more exposed than before the war began."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1abd186bebde"
+    tag: "Deal is silent on missiles and proxies"
+    text: "Friedman reports the deal is silent on Iran's missiles and proxy networks, makes nuclear talks contingent on Israeli concessions in Lebanon, and signals to Gulf Arab states that the US is withdrawing its security guarantee."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Thomas L. Friedman, New York Times, June 19 2026"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1abe80bd4909"
+    tag: "Hormuz toll concession"
+    text: "The deal concedes Iran a potential future right to toll commercial shipping through the Strait of Hormuz."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1abfa41b3a58"
+    tag: "US-Iran MOU: Toll-free passage for 60 days"
+    text: "The memorandum of understanding states Iran will ensure toll-free Hormuz passage \"for 60 days only,\" as quoted by Friedman."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "US-Iran MOU June 2026, as quoted by Friedman, New York Times, June 19 2026"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ac0029cdf6e"
+    tag: "Nuclear leverage expended"
+    text: "The deal defers the nuclear question into a negotiation where the US has already expended its military leverage."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ac1328d17de"
+    tag: "Uranium deferred after the campaign ended"
+    text: "Friedman reports the deal leaves Iran's near-bomb-grade uranium for future negotiations after the military campaign ended without achieving that objective."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Thomas L. Friedman, New York Times, June 19 2026"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ac2afe99fd8"
+    tag: "Deal ended economic harm"
+    text: "The deal serves US interests by ending a war that was driving inflation and energy price increases."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ac3ee171b51"
+    tag: "War drove inflation that hurt households"
+    text: "Friedman acknowledges Trump assessed the war as causing food inflation and high gasoline prices harmful to American households."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Thomas L. Friedman, New York Times, June 19 2026"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ac4ed82133d"
+    tag: "Electoral calendar proximate cause"
+    text: "When a negotiating outcome tracks the leader's electoral calendar rather than strategic logic, electoral pressure is the proximate cause."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ac595748028"
+    tag: "Electoral timing leaves no remainder"
+    text: "An outcome explicable by electoral timing without remainder requires no additional strategic explanation."
+    terminal: false
+    attribution:
+      source:
+        type: "SelfEvident"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ac6b629f084"
+    tag: "Capability retention increases exposure"
+    text: "Removing US military pressure while leaving Iran's threatening capabilities intact increases allies' net threat exposure."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ac7457b63d9"
+    tag: "Remove the force, the threat rises"
+    text: "If the constraining force is removed and the constrained capability remains, the net threat to those the force was protecting increases."
+    terminal: false
+    attribution:
+      source:
+        type: "LogicalNecessity"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ac8fb8b41f3"
+    tag: "Withdrawal signal forces accommodation"
+    text: "Allies who receive credible signals of US withdrawal must independently accommodate the rising regional power, shifting the balance against the US."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ac96ac74945"
+    tag: "States balance when a patron withdraws"
+    text: "States balance against threats when patron protection is withdrawn."
+    terminal: false
+    attribution:
+      source:
+        type: "CommonKnowledge"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1acaada4718e"
+    tag: "Time-limited carve-out sets a precedent"
+    text: "A time-limited toll-free commitment without a permanent successor establishes the precedent that Iran holds authority to charge for Hormuz passage."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1acb3c530913"
+    tag: "A carve-out implies Iran sets the default"
+    text: "A 60-day carve-out implies a default state to which passage reverts — a default in which Iran determines the terms."
+    terminal: false
+    attribution:
+      source:
+        type: "LogicalNecessity"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1acc9e599214"
+    tag: "Ended campaign signals escalation ceiling"
+    text: "Once a military campaign ends without achieving its core objective, the threat of renewed force becomes less credible, weakening the position for deferred objectives."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1acd2148b3ad"
+    tag: "Settling short signals an escalation ceiling"
+    text: "A state that has struck and accepted a deal short of its objective signals a ceiling on its willingness to escalate."
+    terminal: false
+    attribution:
+      source:
+        type: "CommonKnowledge"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1aceb5a5bd44"
+    tag: "Citizen welfare is national interest"
+    text: "Ending a war causing domestic inflation serves the material interests of US citizens, which are a component of US national interests."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1acf761cb44c"
+    tag: "Ending a harmful war advances welfare"
+    text: "If citizen material welfare is a component of national interests, and the war was harming that welfare, ending it advances national interests on that dimension."
+    terminal: false
+    attribution:
+      source:
+        type: "LogicalNecessity"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ad0f0fd0633"
+    tag: "Sycophancy caused miscalculation"
+    text: "Trump and Netanyahu's purge of internal dissent caused the strategic miscalculation about Iran's likely response."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ad1cf98e66a"
+    tag: "Unchecked leaders default to electoral logic"
+    text: "When internal dissent is purged, no strategic counsel remains to check electoral incentive, so decisions default to the leader's electoral interest."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ad2ffb233f5"
+    tag: "Mukunda: Both decision mechanisms failed"
+    text: "Mukunda told Friedman that America and Israel \"failed at both\" mechanisms for good executive decisions, and that \"experts had predicted everything that went wrong in the war.\""
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Gautam Mukunda, as quoted by Friedman, New York Times, June 19 2026"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ad39be66a80"
+    tag: "Obama double standard"
+    text: "The deal's terms are worse than what the same actors condemned as unacceptable under Obama, so partisan praise carries no evidentiary weight."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ad4cc6483a5"
+    tag: "Critique invokes foreign democratic survival"
+    text: "The double-standard critique evaluates the deal against the survival of democratic governance in other states rather than against the interests of US citizens."
+    terminal: false
+    attribution:
+      source:
+        type: "LogicalNecessity"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ad5468c9705"
+    tag: "Obama would have been denounced for this"
+    text: "Friedman notes the deal makes nuclear talks contingent on Israeli military concessions in Lebanon, and states Obama would have been denounced for agreeing to such terms."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Thomas L. Friedman, New York Times, June 19 2026"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ad62d287e96"
+    tag: "Democratic survival is a valid yardstick"
+    text: "Evaluating this deal by its effect on the survival of democratic governance in the international order is a legitimate and applicable standard for judging US strategic interest, not an illegitimate substitution for the interests of US citizens."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ad7d43f9432"
+    tag: "Iranian domestic politics unlocked"
+    text: "A diminished external threat may create space for internal Iranian pressure for regime reform."
+    terminal: false
+    uncertain: true
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ad836213ff2"
+    tag: "Iranians may question theocratic rule"
+    text: "Friedman speculates that without an external threat to justify repression, Iranians may ask what 47 years of theocratic rule has produced besides nuclear spending and proxy funding."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Thomas L. Friedman, New York Times, June 19 2026"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ad9c7133f2b"
+    tag: "Expert exclusion causes predictive failure"
+    text: "When decision-makers exclude expert challenge, predictive failures that experts would have flagged are structurally caused by that exclusion."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ada93360942"
+    tag: "Removing the corrective attributes the error"
+    text: "Removing the input that would have corrected an error makes that error attributable to the removal."
+    terminal: false
+    attribution:
+      source:
+        type: "LogicalNecessity"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1adba88fa0c5"
+    tag: "Partisan evaluation lacks evidentiary weight"
+    text: "When the same outcome is condemned under one administration and praised under another with no change in strategic logic, the evaluation is partisan and carries no independent evidentiary weight."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1adc2f6402db"
+    tag: "Identity-selective criteria lack force"
+    text: "An evaluation criterion applied selectively by identity rather than consistently by logic cannot serve as independent evidence of merit."
+    terminal: false
+    attribution:
+      source:
+        type: "SelfEvident"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1addcf0d484d"
+    tag: "External threat removal unlocks internal politics"
+    text: "Regimes that use external threat narratives to suppress dissent lose that justification when the threat recedes, potentially enabling domestic opposition to organise."
+    terminal: false
+    uncertain: true
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ade52ed9150"
+    tag: "Regimes instrumentalise external threats"
+    text: "It is common knowledge that authoritarian regimes instrumentalise external threats to justify internal repression."
+    terminal: false
+    attribution:
+      source:
+        type: "CommonKnowledge"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1adf85dd8a56"
+    tag: "Dealmaking skills don't transfer"
+    text: "Transactional deal-making skills do not transfer to geopolitical negotiations involving military leverage and alliance management."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ae0814b3a76"
+    tag: "Negotiators secured only 60 days"
+    text: "Friedman reports that real-estate negotiators Witkoff and Kushner, after billions spent in military action, secured only 60 days of toll-free Hormuz passage, with no constraints on missiles or proxies and no resolution of Iran's nuclear material."
+    terminal: false
+    attribution:
+      source:
+        type: "Citation"
+        reference: "Thomas L. Friedman, New York Times, June 19 2026"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ae1bc5674f3"
+    tag: "Dealmaking skills are not geopolitical skills"
+    text: "Real-estate negotiation optimises for closing a transaction; geopolitical negotiation requires preserving leverage and foreclosing future coercion options — these are not extensions of the same skill."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ae2a800c170"
+    tag: "Closing and foreclosing are distinct"
+    text: "Closing a deal and foreclosing an adversary's future coercion options are structurally distinct objectives requiring distinct competencies."
+    terminal: false
+    attribution:
+      source:
+        type: "SelfEvident"
+      quote: null
+    uncertain: false
+    submissionStatus: "Accepted"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ae39a54c735"
+    tag: "Witkoff-Kushner Hormuz outcome"
+    text: "The Witkoff-Kushner Hormuz negotiation is a concrete instance of transactional logic producing a strategically deficient outcome."
+    terminal: false
+    uncertain: false
+    submissionStatus: "Accepted"
 inferences:
-  - id: 019fab4a-ca74-7736-a2ea-1ae4d5335a39
-    scheme: FromCause
+  - id: "019fab4a-ca74-7736-a2ea-1ae4d5335a39"
+    scheme: "FromCause"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1abbaf1e5363
+      - "019fab4a-ca74-7736-a2ea-1abbaf1e5363"
     warrants:
-      - 019fab4a-ca74-7736-a2ea-1ab531c6feaa
-      - 019fab4a-ca74-7736-a2ea-1ac4ed82133d
-    concludes: 019fab4a-ca74-7736-a2ea-1aba7b345f92
-  - id: 019fab4a-ca74-7736-a2ea-1ae584e35101
-    scheme: FromConsequence
+      - "019fab4a-ca74-7736-a2ea-1ab531c6feaa"
+      - "019fab4a-ca74-7736-a2ea-1ac4ed82133d"
+    concludes: "019fab4a-ca74-7736-a2ea-1aba7b345f92"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ae584e35101"
+    scheme: "FromConsequence"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1abd186bebde
+      - "019fab4a-ca74-7736-a2ea-1abd186bebde"
     warrants:
-      - 019fab4a-ca74-7736-a2ea-1ab465a30983
-      - 019fab4a-ca74-7736-a2ea-1ac6b629f084
-      - 019fab4a-ca74-7736-a2ea-1ac8fb8b41f3
-    concludes: 019fab4a-ca74-7736-a2ea-1abc8dcfad61
-  - id: 019fab4a-ca74-7736-a2ea-1ae64a7b776b
-    scheme: FromConsequence
+      - "019fab4a-ca74-7736-a2ea-1ab465a30983"
+      - "019fab4a-ca74-7736-a2ea-1ac6b629f084"
+      - "019fab4a-ca74-7736-a2ea-1ac8fb8b41f3"
+    concludes: "019fab4a-ca74-7736-a2ea-1abc8dcfad61"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ae64a7b776b"
+    scheme: "FromConsequence"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1abfa41b3a58
+      - "019fab4a-ca74-7736-a2ea-1abfa41b3a58"
     warrants:
-      - 019fab4a-ca74-7736-a2ea-1acaada4718e
-    concludes: 019fab4a-ca74-7736-a2ea-1abe80bd4909
-  - id: 019fab4a-ca74-7736-a2ea-1ae795e6f54f
-    scheme: FromConsequence
+      - "019fab4a-ca74-7736-a2ea-1acaada4718e"
+    concludes: "019fab4a-ca74-7736-a2ea-1abe80bd4909"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ae795e6f54f"
+    scheme: "FromConsequence"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ac1328d17de
+      - "019fab4a-ca74-7736-a2ea-1ac1328d17de"
     warrants:
-      - 019fab4a-ca74-7736-a2ea-1acc9e599214
-    concludes: 019fab4a-ca74-7736-a2ea-1ac0029cdf6e
-  - id: 019fab4a-ca74-7736-a2ea-1ae81fb74cf0
-    scheme: FromConsequence
+      - "019fab4a-ca74-7736-a2ea-1acc9e599214"
+    concludes: "019fab4a-ca74-7736-a2ea-1ac0029cdf6e"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ae81fb74cf0"
+    scheme: "FromConsequence"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ac3ee171b51
+      - "019fab4a-ca74-7736-a2ea-1ac3ee171b51"
     warrants:
-      - 019fab4a-ca74-7736-a2ea-1ab6621761d5
-      - 019fab4a-ca74-7736-a2ea-1aceb5a5bd44
-    concludes: 019fab4a-ca74-7736-a2ea-1ac2afe99fd8
-  - id: 019fab4a-ca74-7736-a2ea-1ae9774dafd4
-    scheme: FromCause
+      - "019fab4a-ca74-7736-a2ea-1ab6621761d5"
+      - "019fab4a-ca74-7736-a2ea-1aceb5a5bd44"
+    concludes: "019fab4a-ca74-7736-a2ea-1ac2afe99fd8"
+
+  - id: "019fab4a-ca74-7736-a2ea-1ae9774dafd4"
+    scheme: "FromCause"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ac595748028
-    warrants: []
-    concludes: 019fab4a-ca74-7736-a2ea-1ac4ed82133d
-  - id: 019fab4a-ca74-7736-a2ea-1aea376d40ba
-    scheme: FromConsequence
+      - "019fab4a-ca74-7736-a2ea-1ac595748028"
+    concludes: "019fab4a-ca74-7736-a2ea-1ac4ed82133d"
+
+  - id: "019fab4a-ca74-7736-a2ea-1aea376d40ba"
+    scheme: "FromConsequence"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ac7457b63d9
-    warrants: []
-    concludes: 019fab4a-ca74-7736-a2ea-1ac6b629f084
-  - id: 019fab4a-ca74-7736-a2ea-1aeb51f1a7fb
-    scheme: FromConsequence
+      - "019fab4a-ca74-7736-a2ea-1ac7457b63d9"
+    concludes: "019fab4a-ca74-7736-a2ea-1ac6b629f084"
+
+  - id: "019fab4a-ca74-7736-a2ea-1aeb51f1a7fb"
+    scheme: "FromConsequence"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ac96ac74945
-    warrants: []
-    concludes: 019fab4a-ca74-7736-a2ea-1ac8fb8b41f3
-  - id: 019fab4a-ca74-7736-a2ea-1aecc9387944
-    scheme: FromConsequence
+      - "019fab4a-ca74-7736-a2ea-1ac96ac74945"
+    concludes: "019fab4a-ca74-7736-a2ea-1ac8fb8b41f3"
+
+  - id: "019fab4a-ca74-7736-a2ea-1aecc9387944"
+    scheme: "FromConsequence"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1acb3c530913
-    warrants: []
-    concludes: 019fab4a-ca74-7736-a2ea-1acaada4718e
-  - id: 019fab4a-ca74-7736-a2ea-1aed8b31d44b
-    scheme: FromCause
+      - "019fab4a-ca74-7736-a2ea-1acb3c530913"
+    concludes: "019fab4a-ca74-7736-a2ea-1acaada4718e"
+
+  - id: "019fab4a-ca74-7736-a2ea-1aed8b31d44b"
+    scheme: "FromCause"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1acd2148b3ad
-    warrants: []
-    concludes: 019fab4a-ca74-7736-a2ea-1acc9e599214
-  - id: 019fab4a-ca74-7736-a2ea-1aee11744273
-    scheme: FromConsequence
+      - "019fab4a-ca74-7736-a2ea-1acd2148b3ad"
+    concludes: "019fab4a-ca74-7736-a2ea-1acc9e599214"
+
+  - id: "019fab4a-ca74-7736-a2ea-1aee11744273"
+    scheme: "FromConsequence"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1acf761cb44c
-    warrants: []
-    concludes: 019fab4a-ca74-7736-a2ea-1aceb5a5bd44
-  - id: 019fab4a-ca74-7736-a2ea-1aef55bbd33b
-    scheme: FromCause
+      - "019fab4a-ca74-7736-a2ea-1acf761cb44c"
+    concludes: "019fab4a-ca74-7736-a2ea-1aceb5a5bd44"
+
+  - id: "019fab4a-ca74-7736-a2ea-1aef55bbd33b"
+    scheme: "FromCause"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ad2ffb233f5
+      - "019fab4a-ca74-7736-a2ea-1ad2ffb233f5"
     warrants:
-      - 019fab4a-ca74-7736-a2ea-1ab7d0116e03
-      - 019fab4a-ca74-7736-a2ea-1ad9c7133f2b
-    concludes: 019fab4a-ca74-7736-a2ea-1ad0f0fd0633
-  - id: 019fab4a-ca74-7736-a2ea-1af07df2f98b
-    scheme: FromAnalogy
+      - "019fab4a-ca74-7736-a2ea-1ab7d0116e03"
+      - "019fab4a-ca74-7736-a2ea-1ad9c7133f2b"
+    concludes: "019fab4a-ca74-7736-a2ea-1ad0f0fd0633"
+
+  - id: "019fab4a-ca74-7736-a2ea-1af07df2f98b"
+    scheme: "FromAnalogy"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ad5468c9705
+      - "019fab4a-ca74-7736-a2ea-1ad5468c9705"
     warrants:
-      - 019fab4a-ca74-7736-a2ea-1ab86fba430b
-      - 019fab4a-ca74-7736-a2ea-1adba88fa0c5
-      - 019fab4a-ca74-7736-a2ea-1ad62d287e96
-    concludes: 019fab4a-ca74-7736-a2ea-1ad39be66a80
-  - id: 019fab4a-ca74-7736-a2ea-1af1ab344251
-    scheme: FromConsequence
+      - "019fab4a-ca74-7736-a2ea-1ab86fba430b"
+      - "019fab4a-ca74-7736-a2ea-1ad62d287e96"
+      - "019fab4a-ca74-7736-a2ea-1adba88fa0c5"
+    concludes: "019fab4a-ca74-7736-a2ea-1ad39be66a80"
+
+  - id: "019fab4a-ca74-7736-a2ea-1af1ab344251"
+    scheme: "FromConsequence"
     uncertain: true
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ad836213ff2
+      - "019fab4a-ca74-7736-a2ea-1ad836213ff2"
     warrants:
-      - 019fab4a-ca74-7736-a2ea-1addcf0d484d
-    concludes: 019fab4a-ca74-7736-a2ea-1ad7d43f9432
-  - id: 019fab4a-ca74-7736-a2ea-1af2ea039852
-    scheme: FromCause
+      - "019fab4a-ca74-7736-a2ea-1addcf0d484d"
+    concludes: "019fab4a-ca74-7736-a2ea-1ad7d43f9432"
+
+  - id: "019fab4a-ca74-7736-a2ea-1af2ea039852"
+    scheme: "FromCause"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ada93360942
-    warrants: []
-    concludes: 019fab4a-ca74-7736-a2ea-1ad9c7133f2b
-  - id: 019fab4a-ca74-7736-a2ea-1af34ea87d1f
-    scheme: FromAnalogy
+      - "019fab4a-ca74-7736-a2ea-1ada93360942"
+    concludes: "019fab4a-ca74-7736-a2ea-1ad9c7133f2b"
+
+  - id: "019fab4a-ca74-7736-a2ea-1af34ea87d1f"
+    scheme: "FromAnalogy"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1adc2f6402db
-    warrants: []
-    concludes: 019fab4a-ca74-7736-a2ea-1adba88fa0c5
-  - id: 019fab4a-ca74-7736-a2ea-1af4674c9a1a
-    scheme: FromConsequence
+      - "019fab4a-ca74-7736-a2ea-1adc2f6402db"
+    concludes: "019fab4a-ca74-7736-a2ea-1adba88fa0c5"
+
+  - id: "019fab4a-ca74-7736-a2ea-1af4674c9a1a"
+    scheme: "FromConsequence"
     uncertain: true
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ade52ed9150
-    warrants: []
-    concludes: 019fab4a-ca74-7736-a2ea-1addcf0d484d
-  - id: 019fab4a-ca74-7736-a2ea-1af57adb1a80
-    scheme: FromGeneralization
+      - "019fab4a-ca74-7736-a2ea-1ade52ed9150"
+    concludes: "019fab4a-ca74-7736-a2ea-1addcf0d484d"
+
+  - id: "019fab4a-ca74-7736-a2ea-1af57adb1a80"
+    scheme: "FromGeneralization"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ae0814b3a76
+      - "019fab4a-ca74-7736-a2ea-1ae0814b3a76"
     warrants:
-      - 019fab4a-ca74-7736-a2ea-1ae1bc5674f3
-    concludes: 019fab4a-ca74-7736-a2ea-1adf85dd8a56
-  - id: 019fab4a-ca74-7736-a2ea-1af6c7393325
-    scheme: FromGeneralization
+      - "019fab4a-ca74-7736-a2ea-1ae1bc5674f3"
+    concludes: "019fab4a-ca74-7736-a2ea-1adf85dd8a56"
+
+  - id: "019fab4a-ca74-7736-a2ea-1af6c7393325"
+    scheme: "FromGeneralization"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ae2a800c170
-    warrants: []
-    concludes: 019fab4a-ca74-7736-a2ea-1ae1bc5674f3
-  - id: 019fab4a-ca74-7736-a2ea-1af734ac2cf7
-    scheme: FromExample
+      - "019fab4a-ca74-7736-a2ea-1ae2a800c170"
+    concludes: "019fab4a-ca74-7736-a2ea-1ae1bc5674f3"
+
+  - id: "019fab4a-ca74-7736-a2ea-1af734ac2cf7"
+    scheme: "FromExample"
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ae0814b3a76
-    warrants: []
-    concludes: 019fab4a-ca74-7736-a2ea-1ae39a54c735
-  - id: 019fab4a-ca74-7736-a2ea-1af8dbf60e2d
+      - "019fab4a-ca74-7736-a2ea-1ae0814b3a76"
+    concludes: "019fab4a-ca74-7736-a2ea-1ae39a54c735"
+
+  - id: "019fab4a-ca74-7736-a2ea-1af8dbf60e2d"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ad4cc6483a5
+      - "019fab4a-ca74-7736-a2ea-1ad4cc6483a5"
     warrants:
-      - 019fab4a-ca74-7736-a2ea-1ab978fef3b2
-    contests: 019fab4a-ca74-7736-a2ea-1ad62d287e96
-  - id: 019fab4a-ca74-7736-a2ea-1af9a0a1661c
+      - "019fab4a-ca74-7736-a2ea-1ab978fef3b2"
+    contests: "019fab4a-ca74-7736-a2ea-1ad62d287e96"
+
+  - id: "019fab4a-ca74-7736-a2ea-1af9a0a1661c"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1aba7b345f92
-    warrants: []
-    contests: 019fab4a-ca74-7736-a2ea-1ab39c7cb0c2
-  - id: 019fab4a-ca74-7736-a2ea-1afab956ae00
+      - "019fab4a-ca74-7736-a2ea-1aba7b345f92"
+    contests: "019fab4a-ca74-7736-a2ea-1ab39c7cb0c2"
+
+  - id: "019fab4a-ca74-7736-a2ea-1afab956ae00"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1abc8dcfad61
-    warrants: []
-    contests: 019fab4a-ca74-7736-a2ea-1ab39c7cb0c2
-  - id: 019fab4a-ca74-7736-a2ea-1afb2a413b9a
+      - "019fab4a-ca74-7736-a2ea-1abc8dcfad61"
+    contests: "019fab4a-ca74-7736-a2ea-1ab39c7cb0c2"
+
+  - id: "019fab4a-ca74-7736-a2ea-1afb2a413b9a"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1abe80bd4909
-    warrants: []
-    contests: 019fab4a-ca74-7736-a2ea-1ab39c7cb0c2
-  - id: 019fab4a-ca74-7736-a2ea-1afc491cdee6
+      - "019fab4a-ca74-7736-a2ea-1abe80bd4909"
+    contests: "019fab4a-ca74-7736-a2ea-1ab39c7cb0c2"
+
+  - id: "019fab4a-ca74-7736-a2ea-1afc491cdee6"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ac0029cdf6e
-    warrants: []
-    contests: 019fab4a-ca74-7736-a2ea-1ab39c7cb0c2
-  - id: 019fab4a-ca74-7736-a2ea-1afdbce87b46
+      - "019fab4a-ca74-7736-a2ea-1ac0029cdf6e"
+    contests: "019fab4a-ca74-7736-a2ea-1ab39c7cb0c2"
+
+  - id: "019fab4a-ca74-7736-a2ea-1afdbce87b46"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ac2afe99fd8
-    warrants: []
-    concludes: 019fab4a-ca74-7736-a2ea-1ab39c7cb0c2
-  - id: 019fab4a-ca74-7736-a2ea-1afe288d045e
+      - "019fab4a-ca74-7736-a2ea-1ac2afe99fd8"
+    concludes: "019fab4a-ca74-7736-a2ea-1ab39c7cb0c2"
+
+  - id: "019fab4a-ca74-7736-a2ea-1afe288d045e"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ad0f0fd0633
+      - "019fab4a-ca74-7736-a2ea-1ad0f0fd0633"
     warrants:
-      - 019fab4a-ca74-7736-a2ea-1ad1cf98e66a
-    concludes: 019fab4a-ca74-7736-a2ea-1aba7b345f92
-  - id: 019fab4a-ca74-7736-a2ea-1affc3e6dc81
+      - "019fab4a-ca74-7736-a2ea-1ad1cf98e66a"
+    concludes: "019fab4a-ca74-7736-a2ea-1aba7b345f92"
+
+  - id: "019fab4a-ca74-7736-a2ea-1affc3e6dc81"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ad39be66a80
-    warrants: []
-    contests: 019fab4a-ca74-7736-a2ea-1ac2afe99fd8
-  - id: 019fab4a-ca74-7736-a2ea-1b00bcf91458
+      - "019fab4a-ca74-7736-a2ea-1ad39be66a80"
+    contests: "019fab4a-ca74-7736-a2ea-1ac2afe99fd8"
+
+  - id: "019fab4a-ca74-7736-a2ea-1b00bcf91458"
     scheme: null
     uncertain: true
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ad7d43f9432
-    warrants: []
-    concludes: 019fab4a-ca74-7736-a2ea-1ac2afe99fd8
-  - id: 019fab4a-ca74-7736-a2ea-1b0191e90b50
+      - "019fab4a-ca74-7736-a2ea-1ad7d43f9432"
+    concludes: "019fab4a-ca74-7736-a2ea-1ac2afe99fd8"
+
+  - id: "019fab4a-ca74-7736-a2ea-1b0191e90b50"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1adf85dd8a56
-    warrants: []
-    concludes: 019fab4a-ca74-7736-a2ea-1ad0f0fd0633
-  - id: 019fab4a-ca74-7736-a2ea-1b0218db2a2d
+      - "019fab4a-ca74-7736-a2ea-1adf85dd8a56"
+    concludes: "019fab4a-ca74-7736-a2ea-1ad0f0fd0633"
+
+  - id: "019fab4a-ca74-7736-a2ea-1b0218db2a2d"
     scheme: null
     uncertain: false
-    submissionStatus: Accepted
+    submissionStatus: "Accepted"
     grounds:
-      - 019fab4a-ca74-7736-a2ea-1ae39a54c735
-    warrants: []
-    concludes: 019fab4a-ca74-7736-a2ea-1adf85dd8a56
+      - "019fab4a-ca74-7736-a2ea-1ae39a54c735"
+    concludes: "019fab4a-ca74-7736-a2ea-1adf85dd8a56"
