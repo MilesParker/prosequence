@@ -177,12 +177,20 @@ function AboveRegion({ gd, focusId, onFocus }: { gd: GraphData; focusId: string;
         <RegionHeading text="Supports" count={supports.length} color={COLORS.column.for.label} />
         <RegionHeading text="Contests" count={contests.length} color={COLORS.column.against.label} />
       </div>
-      <ScrollFrame height={FOCUS.aboveHeight}>
-        <div style={{ display: 'flex', gap: FOCUS.parentColGap, alignItems: 'flex-start' }}>
-          <AboveColumn gd={gd} focusId={focusId} inferences={supports} onFocus={onFocus} />
-          <AboveColumn gd={gd} focusId={focusId} inferences={contests} onFocus={onFocus} />
+      {/* Each polarity half scrolls on its own so a long For side never drags the
+          Against side out of view. */}
+      <div style={{ display: 'flex', gap: FOCUS.parentColGap, alignItems: 'flex-start' }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <ScrollFrame height={FOCUS.aboveHeight}>
+            <AboveColumn gd={gd} focusId={focusId} inferences={supports} onFocus={onFocus} />
+          </ScrollFrame>
         </div>
-      </ScrollFrame>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <ScrollFrame height={FOCUS.aboveHeight}>
+            <AboveColumn gd={gd} focusId={focusId} inferences={contests} onFocus={onFocus} />
+          </ScrollFrame>
+        </div>
+      </div>
     </div>
   )
 }
@@ -255,6 +263,11 @@ function FocusBand({ gd, focusId, fromId, showFromIcon, isReferenceRoot, onFromH
   return (
     <div
       ref={bandRef}
+      // Double-click the centred claim to drop back to the graph zoomed onto it —
+      // the mirror of the graph's double-click-into-focus, so the two surfaces
+      // toggle on the same claim. Single-click does nothing here (this is where you
+      // already are), leaving the gesture unambiguous.
+      onDoubleClick={() => onLocate(focusId)}
       style={{
         position: 'relative',
         width: '100%',
@@ -262,6 +275,7 @@ function FocusBand({ gd, focusId, fromId, showFromIcon, isReferenceRoot, onFromH
         border: `2px solid ${COLORS.border}`,
         borderRadius: 10,
         padding: '16px 18px',
+        cursor: 'pointer',
         ...stance,
       }}
     >
@@ -338,12 +352,19 @@ function BelowRegion({ gd, focusId, onFocus }: { gd: GraphData; focusId: string;
         <RegionHeading text="For" count={supports.length} color={COLORS.column.for.label} />
         <RegionHeading text="Against" count={attacks.length} color={COLORS.column.against.label} />
       </div>
-      <ScrollFrame height={FOCUS.columnHeight}>
-        <div style={{ display: 'flex', gap: FOCUS.parentColGap, alignItems: 'flex-start' }}>
-          <BelowColumn gd={gd} focusId={focusId} inferences={supports} onFocus={onFocus} emptyLabel="no argument yet" />
-          <BelowColumn gd={gd} focusId={focusId} inferences={attacks} onFocus={onFocus} emptyLabel="no challenge yet" />
+      {/* One scroll frame per column, so For and Against page independently. */}
+      <div style={{ display: 'flex', gap: FOCUS.parentColGap, alignItems: 'flex-start' }}>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <ScrollFrame height={FOCUS.columnHeight}>
+            <BelowColumn gd={gd} focusId={focusId} inferences={supports} onFocus={onFocus} emptyLabel="no argument yet" />
+          </ScrollFrame>
         </div>
-      </ScrollFrame>
+        <div style={{ flex: 1, minWidth: 0 }}>
+          <ScrollFrame height={FOCUS.columnHeight}>
+            <BelowColumn gd={gd} focusId={focusId} inferences={attacks} onFocus={onFocus} emptyLabel="no challenge yet" />
+          </ScrollFrame>
+        </div>
+      </div>
     </div>
   )
 }

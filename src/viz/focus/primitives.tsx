@@ -235,6 +235,7 @@ export function ClaimTile({
   const claim = getClaim(gd, id)
   const hl = useFromHighlight(id)
   const onHover = useContext(HoverContext)
+  const onLocate = useContext(LocateContext)
   // Tiles are standalone surfaces, so neutral / no-root paints a plain card edge
   // rather than nothing — stance fill takes over the moment a root is in frame. The
   // centred tile mirrors the focus band: the selected (denser) fill and a 2px stroke.
@@ -247,6 +248,9 @@ export function ClaimTile({
       // Pass the tile's own rect so the focus view can fly a ghost of it to the
       // centre (see FocusView's refocus flight). currentTarget is this tile span.
       onClick={centred ? undefined : e => onFocus(id, e.currentTarget.getBoundingClientRect())}
+      // Double-click any tile to leave the stack and open the graph zoomed onto this
+      // claim — the same toggle the focus band offers, from any visible claim.
+      onDoubleClick={e => { e.stopPropagation(); onLocate(id) }}
       onMouseMove={e => onHover(id, e.clientX, e.clientY)}
       onMouseLeave={() => onHover(null)}
       title={centred ? 'The claim you are centred on' : undefined}
