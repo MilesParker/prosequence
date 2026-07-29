@@ -32,15 +32,15 @@ definitions:
       can overlap or morph into each other.
     importedFrom: null
 roots:
-  - c-gaza-campaign-is-genocide
+  - 019fab4a-ca4e-71a1-8c58-daf398eea136
 claims:
-  - id: c-gaza-campaign-is-genocide
+  - id: 019fab4a-ca4e-71a1-8c58-daf398eea136
     tag: Gaza genocide
     text: Israel's military campaign in Gaza constitutes genocide.
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-group-existence-inviolable
+  - id: 019fab4a-ca4e-71a1-8c58-daf407dcbbcc
     tag: Every group has a right to continued existence
     text: >-
       Every distinct human group has an inviolable right to continued existence as a group, and acts
@@ -49,7 +49,7 @@ claims:
     terminal: true
     uncertain: false
     submissionStatus: Accepted
-  - id: c-legal-precision-matters
+  - id: 019fab4a-ca4e-71a1-8c58-daf5ae3b2e9c
     tag: Legal precision matters
     text: >-
       Legal terms that carry grave moral weight must be applied with strict precision; promiscuous
@@ -57,7 +57,7 @@ claims:
     terminal: true
     uncertain: false
     submissionStatus: Accepted
-  - id: c-self-defense-legitimate
+  - id: 019fab4a-ca4e-71a1-8c58-daf605b20516
     tag: States may use force to eliminate a threat
     text: >-
       A state subjected to violent attack has a legitimate right to use military force to eliminate
@@ -66,7 +66,7 @@ claims:
     terminal: true
     uncertain: false
     submissionStatus: Accepted
-  - id: c-intl-law-universal
+  - id: 019fab4a-ca4e-71a1-8c58-daf796c05e23
     tag: International law is universal
     text: >-
       International humanitarian law and the Genocide Convention apply universally, without
@@ -74,7 +74,7 @@ claims:
     terminal: true
     uncertain: false
     submissionStatus: Accepted
-  - id: c-public-genocidal-statements
+  - id: 019fab4a-ca4e-71a1-8c58-daf8f66d45b1
     tag: Public genocidal statements by leaders
     text: >-
       Israeli political and military leaders publicly expressed intent consistent with genocide in
@@ -82,7 +82,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-netanyahu-amalek-and-rubble-statements
+  - id: 019fab4a-ca4e-71a1-8c58-daf949d4215e
     tag: 'Bartov: Officials called for annihilation'
     text: >-
       Bartov reports that Netanyahu invoked the biblical Amalek passage widely interpreted as
@@ -98,7 +98,7 @@ claims:
       quote: turning parts of Gaza, where Hamas was operating, 'into rubble'
     uncertain: false
     submissionStatus: Accepted
-  - id: c-pattern-of-ops-genocidal
+  - id: 019fab4a-ca4e-71a1-8c58-dafaa708400a
     tag: Pattern of operations consistent with genocide
     text: >-
       The pattern of IDF operations — systematic destruction of housing, infrastructure, and
@@ -107,7 +107,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-killing-rate-is-the-intent-measure
+  - id: 019fab4a-ca4e-71a1-8c58-dafb57dc2399
     tag: Killing rate, not destruction, measures intent
     text: >-
       Genocidal intent is evidenced by the rate at which a group's members are killed relative to
@@ -116,7 +116,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-haaretz-174000-buildings-destroyed
+  - id: 019fab4a-ca4e-71a1-8c58-dafc422fd036
     tag: 'Haaretz: 174,000 buildings hit'
     text: >-
       Bartov reports that a Haaretz investigation found approximately 174,000 buildings destroyed or
@@ -133,7 +133,7 @@ claims:
         percent of all structures in the Strip
     uncertain: false
     submissionStatus: Accepted
-  - id: c-scholarly-consensus-genocide
+  - id: 019fab4a-ca4e-71a1-8c58-dafd217dd835
     tag: Growing scholarly and legal consensus
     text: >-
       A significant and growing body of genocide scholars and international law experts has
@@ -141,7 +141,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-named-experts-concluded-genocide
+  - id: 019fab4a-ca4e-71a1-8c58-dafeb2b9effc
     tag: 'Bartov: Experts converge on genocide'
     text: >-
       Bartov reports that experts including the UN Special Rapporteur Francesca Albanese, Amnesty
@@ -156,7 +156,7 @@ claims:
       quote: null
     uncertain: false
     submissionStatus: Accepted
-  - id: c-denial-damages-intl-law
+  - id: 019fab4a-ca4e-71a1-8c58-daffd5c3a653
     tag: Denial damages international legal order
     text: >-
       Continued denial of the genocide designation by states and institutions damages the system of
@@ -164,7 +164,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-convention-obliges-prevention-on-designation
+  - id: 019fab4a-ca4e-71a1-8c58-db005e5dec21
     tag: 'Bartov: Convention obliges states to prevent'
     text: >-
       Bartov argues that the Genocide Convention was designed to obligate all signatory states to
@@ -178,7 +178,7 @@ claims:
       quote: null
     uncertain: false
     submissionStatus: Accepted
-  - id: c-ethnic-cleansing-morphs-genocide
+  - id: 019fab4a-ca4e-71a1-8c58-db0121ee0fec
     tag: Ethnic cleansing morphing into genocide
     text: >-
       When a population has nowhere to flee and is continuously displaced, bombed, and starved,
@@ -186,7 +186,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-herero-armenian-holocaust-began-as-expulsion
+  - id: 019fab4a-ca4e-71a1-8c58-db0259c28da3
     tag: 'Bartov: Three expulsions became extermination'
     text: >-
       Bartov cites three cases in which expulsion campaigns became genocidal extermination once the
@@ -200,7 +200,7 @@ claims:
       quote: null
     uncertain: false
     submissionStatus: Accepted
-  - id: c-death-toll-inconsistent-genocide
+  - id: 019fab4a-ca4e-71a1-8c58-db03ce530257
     tag: Death toll inconsistent with genocidal intent
     text: >-
       The scale of Palestinian deaths is far below what a state with Israel's military capacity
@@ -208,7 +208,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-protective-measures-inconsistent-genocide
+  - id: 019fab4a-ca4e-71a1-8c58-db0411ae3dd1
     tag: Protective measures inconsistent with genocide
     text: >-
       Israel has taken protective measures — advance warnings, targeted strikes, acceptance of risk
@@ -216,7 +216,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-israel-warned-evacuations-and-risked-soldiers
+  - id: 019fab4a-ca4e-71a1-8c58-db05d6b44c65
     tag: 'Stephens: Israel warned and risked soldiers'
     text: >-
       Stephens reports that Israel routinely warned Gazans to evacuate areas before striking, risked
@@ -231,7 +231,7 @@ claims:
       quote: routinely warning Gazans to evacuate areas it intended to strike
     uncertain: false
     submissionStatus: Accepted
-  - id: c-as-such-intent-absent
+  - id: 019fab4a-ca4e-71a1-8c58-db06fe4416b8
     tag: "\"As such\" intent is absent"
     text: >-
       Israel is fighting to defeat Hamas as a military-political force, not to destroy Palestinians
@@ -239,7 +239,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-israel-aim-is-hamas-not-palestinians
+  - id: 019fab4a-ca4e-71a1-8c58-db077f353dfb
     tag: 'Stephens: War aim is Hamas, not Palestinians'
     text: >-
       Stephens argues that Israel's war aim is the defeat of Hamas as a military-political force rather
@@ -253,7 +253,7 @@ claims:
         CITATION NEEDED
     uncertain: false
     submissionStatus: Accepted
-  - id: c-allied-bombing-not-genocide
+  - id: 019fab4a-ca4e-71a1-8c58-db08c184e290
     tag: 'Stephens: Allied bombing of Germany not genocide'
     text: >-
       Stephens cites the Allied bombing of German cities in the Second World War as killing Germans without
@@ -266,7 +266,7 @@ claims:
       quote: null
     uncertain: false
     submissionStatus: Accepted
-  - id: c-military-aim-killing-not-genocide
+  - id: 019fab4a-ca4e-71a1-8c58-db096fa819e1
     tag: Military-aim killing is not genocide
     text: >-
       Mass civilian death inflicted in pursuit of a military objective does not constitute genocide where
@@ -274,7 +274,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-hamas-tactics-explain-casualties
+  - id: 019fab4a-ca4e-71a1-8c58-db0ab12c7510
     tag: Hamas tactics explain civilian casualties
     text: >-
       Hamas's use of civilians as human shields and its tunnel infrastructure, rather than Israeli
@@ -282,7 +282,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-hamas-shelters-fighters-exposes-civilians
+  - id: 019fab4a-ca4e-71a1-8c58-db0b1b6dd4f6
     tag: 'Stephens: Hamas shelters below, civilians above'
     text: >-
       Stephens describes Hamas's practice of sheltering its fighters and command infrastructure in
@@ -300,7 +300,7 @@ claims:
         them to civilians for protection
     uncertain: false
     submissionStatus: Accepted
-  - id: c-promiscuous-genocide-label-harmful
+  - id: 019fab4a-ca4e-71a1-8c58-db0cc68f7a7e
     tag: Promiscuous genocide label is harmful
     text: >-
       Applying the genocide label outside its strict legal meaning dilutes its force and ultimately
@@ -308,7 +308,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-genocide-term-coined-for-a-specific-crime
+  - id: 019fab4a-ca4e-71a1-8c58-db0df525a661
     tag: 'Stephens: Genocide names a specific crime'
     text: >-
       Stephens argues that "genocide" was coined only in the 1940s and has a specific meaning
@@ -324,7 +324,7 @@ claims:
         they unfold
     uncertain: false
     submissionStatus: Accepted
-  - id: c-statements-evidence-intent
+  - id: 019fab4a-ca4e-71a1-8c58-db0e7fb6fe73
     tag: Public statements evidence specific intent
     text: >-
       When senior political and military leaders publicly articulate objectives that match the legal
@@ -333,7 +333,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-law-permits-intent-inferred-from-statements
+  - id: 019fab4a-ca4e-71a1-8c58-db0f5ca3622f
     tag: 'Bartov: Intent inferable from statements'
     text: >-
       Genocide law, as Bartov notes, permits intent to be inferred from a pattern of statements and
@@ -348,7 +348,7 @@ claims:
       quote: null
     uncertain: false
     submissionStatus: Accepted
-  - id: c-pattern-establishes-intent
+  - id: 019fab4a-ca4e-71a1-8c58-db100e3ec590
     tag: Systematic destruction pattern establishes intent
     text: >-
       When the scope and nature of destruction systematically targets the conditions for group
@@ -357,7 +357,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-destruction-beyond-military-necessity
+  - id: 019fab4a-ca4e-71a1-8c58-db1142915fd5
     tag: 'Bartov: Destruction beyond military necessity'
     text: >-
       Bartov argues that destruction of civilian infrastructure beyond any plausible military necessity
@@ -370,7 +370,7 @@ claims:
       quote: CITATION NEEDED
     uncertain: false
     submissionStatus: Accepted
-  - id: c-authority-genocide-scholars
+  - id: 019fab4a-ca4e-71a1-8c58-db12ad54afe2
     tag: Genocide scholars are the relevant authority
     text: >-
       Scholars who specialise in genocide studies and comparative genocide are better positioned
@@ -379,7 +379,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-converging-scholars-are-genocide-specialists
+  - id: 019fab4a-ca4e-71a1-8c58-db1353ccd637
     tag: 'Bartov: Converging scholars are specialists'
     text: >-
       Bartov, citing his own quarter-century of teaching genocide, notes that most scholars now
@@ -395,7 +395,7 @@ claims:
         when I see one.
     uncertain: false
     submissionStatus: Accepted
-  - id: c-consensus-tracks-legal-facts
+  - id: 019fab4a-ca4e-71a1-8c58-db14336eb36d
     tag: Consensus tracks facts, not politics
     text: >-
       The scholars' convergence on the genocide designation reflects disinterested legal and
@@ -404,7 +404,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-intl-law-obliges-designation
+  - id: 019fab4a-ca4e-71a1-8c58-db152e7934c4
     tag: Designation triggers prevention duties
     text: >-
       The Genocide Convention's prevention and punishment obligations are only triggered when the
@@ -413,7 +413,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-convention-duties-contingent-on-designation
+  - id: 019fab4a-ca4e-71a1-8c58-db166ecf1fbd
     tag: 'Bartov: Duties depend on the designation'
     text: >-
       Bartov notes that the Convention obliges all signatories to prevent genocide while it is
@@ -427,7 +427,7 @@ claims:
       quote: null
     uncertain: false
     submissionStatus: Accepted
-  - id: c-morphing-precedent-established
+  - id: 019fab4a-ca4e-71a1-8c58-db1760b21fcd
     tag: 'Precedent: confined cleansing becomes genocide'
     text: >-
       When a population cannot flee expulsion and is subjected to ongoing destruction of survival
@@ -435,7 +435,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-three-cases-establish-pattern
+  - id: 019fab4a-ca4e-71a1-8c58-db18b7092c53
     tag: Three cases establish a reliable pattern
     text: >-
       Three cases separated by period, region, and perpetrating state are sufficient to establish confinement-to-extermination
@@ -443,7 +443,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-capacity-gap-reveals-intent
+  - id: 019fab4a-ca4e-71a1-8c58-db197dcee5a2
     tag: Gap between capacity and action reveals intent
     text: >-
       When a state has demonstrably greater destructive capacity than it is deploying, the gap
@@ -452,7 +452,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-israel-capacity-exceeds-deployment
+  - id: 019fab4a-ca4e-71a1-8c58-db1a4b978cf3
     tag: Capacity exceeds deployment
     text: >-
       Stephens observes that Israel is the leading military power of its region — it decimated
@@ -466,7 +466,7 @@ claims:
       quote: why hasn't it been more methodical and vastly more deadly?
     uncertain: false
     submissionStatus: Accepted
-  - id: c-warnings-incompatible-genocide
+  - id: 019fab4a-ca4e-71a1-8c58-db1b2ac3e82d
     tag: Evacuation warnings contradict genocidal intent
     text: >-
       An actor intending to destroy a population as such has no rational motive to systematically
@@ -475,7 +475,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-warnings-create-tactical-disadvantage
+  - id: 019fab4a-ca4e-71a1-8c58-db1c182198fe
     tag: 'Stephens: Warnings cost tactical advantage'
     text: >-
       Stephens notes that Israel routinely issued advance warnings to civilians to evacuate areas
@@ -489,7 +489,7 @@ claims:
       quote: null
     uncertain: false
     submissionStatus: Accepted
-  - id: c-legal-definition-as-such
+  - id: 019fab4a-ca4e-71a1-8c58-db1d5c5132b7
     tag: '"As such" distinguishes genocide from war crimes'
     text: >-
       The UN Genocide Convention's requirement that killing be directed at people "as such" — solely
@@ -498,7 +498,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-gaza-satisfies-as-such
+  - id: 019fab4a-ca4e-71a1-8c58-db1ee7ca4214
     tag: Gaza satisfies the as such element
     text: >-
       The Gaza campaign is conducted with intent to destroy Palestinians as a national group as such,
@@ -506,7 +506,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-military-objective-excludes-as-such
+  - id: 019fab4a-ca4e-71a1-8c58-db1f4d3b8a9e
     tag: Any military objective excludes as such
     text: >-
       Killing carried out in pursuit of a stated military or security objective cannot satisfy the "as
@@ -514,7 +514,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-holocaust-framed-as-defensive
+  - id: 019fab4a-ca4e-71a1-8c58-db201f2c90c9
     tag: Holocaust framed as defence against an enemy
     text: >-
       The Nazi extermination of European Jews was cast by its perpetrators as a defensive necessity against
@@ -526,7 +526,7 @@ claims:
       quote: null
     uncertain: false
     submissionStatus: Accepted
-  - id: c-armenian-framed-as-relocation
+  - id: 019fab4a-ca4e-71a1-8c58-db215f963ade
     tag: Armenian genocide framed as wartime relocation
     text: >-
       The Armenian genocide was cast by the Ottoman authorities as a wartime security relocation of a
@@ -538,7 +538,7 @@ claims:
       quote: null
     uncertain: false
     submissionStatus: Accepted
-  - id: c-srebrenica-carried-out-as-military-op
+  - id: 019fab4a-ca4e-71a1-8c58-db22bb5188aa
     tag: Srebrenica carried out as a military operation
     text: >-
       The killing of Bosniak men and boys at Srebrenica was carried out in the course of a declared military
@@ -550,7 +550,7 @@ claims:
       quote: null
     uncertain: false
     submissionStatus: Accepted
-  - id: c-holocaust-recognized-genocide
+  - id: 019fab4a-ca4e-71a1-8c58-db231ed8358a
     tag: Holocaust is universally recognized genocide
     text: >-
       The Holocaust is universally recognized as genocide.
@@ -561,7 +561,7 @@ claims:
       quote: null
     uncertain: false
     submissionStatus: Accepted
-  - id: c-armenian-recognized-genocide
+  - id: 019fab4a-ca4e-71a1-8c58-db24afcbb342
     tag: Armenian genocide is widely recognized
     text: >-
       The Armenian genocide is widely recognized as genocide by historians and many states.
@@ -572,7 +572,7 @@ claims:
       quote: null
     uncertain: false
     submissionStatus: Accepted
-  - id: c-srebrenica-adjudicated-genocide
+  - id: 019fab4a-ca4e-71a1-8c58-db25896cf4ee
     tag: 'ICTY/ICJ: Srebrenica adjudicated genocide'
     text: >-
       The ICTY and the ICJ adjudicated the Srebrenica massacre as genocide.
@@ -584,7 +584,7 @@ claims:
       quote: null
     uncertain: false
     submissionStatus: Accepted
-  - id: c-as-such-is-constitutive-not-rhetorical
+  - id: 019fab4a-ca4e-71a1-8c58-db2611fb8e76
     tag: 'Stephens: As such is constitutive, not rhetorical'
     text: >-
       Stephens notes that the Convention's text specifies "as such" as a constitutive element, not
@@ -598,7 +598,7 @@ claims:
       quote: Note the words 'intent' and 'as such.'
     uncertain: false
     submissionStatus: Accepted
-  - id: c-convention-as-such-text
+  - id: 019fab4a-ca4e-71a1-8c58-db2701b467a9
     tag: 'Genocide Convention: Intent to destroy as such'
     text: >-
       The UN Genocide Convention defines genocide as acts committed with intent to destroy a national,
@@ -612,7 +612,7 @@ claims:
         intent to destroy, in whole or in part, a national, ethnical, racial or religious group, as such
     uncertain: false
     submissionStatus: Accepted
-  - id: c-proximate-cause-attribution
+  - id: 019fab4a-ca4e-71a1-8c58-db289a1ecc2d
     tag: Human shielding shifts responsibility
     text: >-
       When an armed group deliberately uses civilians as human shields, the moral and legal
@@ -621,7 +621,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-tunnel-strategy-is-proximate-cause
+  - id: 019fab4a-ca4e-71a1-8c58-db29b6c43f58
     tag: 'Stephens: Tunnels are the proximate cause'
     text: >-
       Stephens argues that Hamas's tunnel strategy — sheltering combatants underground while
@@ -635,7 +635,7 @@ claims:
       quote: null
     uncertain: false
     submissionStatus: Accepted
-  - id: c-term-inflation-undermines-law
+  - id: 019fab4a-ca4e-71a1-8c58-db2aa2a02f6e
     tag: Term inflation destroys legal function
     text: >-
       A legal term whose application is not governed by precise criteria loses its capacity to
@@ -644,7 +644,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-term-created-as-distinct-legal-category
+  - id: 019fab4a-ca4e-71a1-8c58-db2b1405b347
     tag: 'Stephens: Term created as a distinct category'
     text: >-
       Stephens draws on the history of "genocide" as a term coined in the 1940s precisely to create
@@ -658,7 +658,7 @@ claims:
       quote: null
     uncertain: false
     submissionStatus: Accepted
-  - id: c-incorrect-application-damages-convention
+  - id: 019fab4a-ca4e-71a1-8c58-db2c868e149c
     tag: Error in either direction damages the Convention
     text: >-
       The Genocide Convention's protective function depends on the designation being applied neither
@@ -667,7 +667,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-both-sides-invoke-protective-purpose
+  - id: 019fab4a-ca4e-71a1-8c58-db2dcc14b6e4
     tag: >-
       Both sides invoke the protective purpose
     text: >-
@@ -682,7 +682,7 @@ claims:
       quote: null
     uncertain: false
     submissionStatus: Accepted
-  - id: c-few-statements-vs-systematic-policy
+  - id: 019fab4a-ca4e-71a1-8c58-db2e25b89f4c
     tag: Isolated statements vs. systematic policy
     text: >-
       Inflammatory statements by individual officials do not constitute evidence of a systematic
@@ -691,7 +691,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-comments-are-not-a-wannsee-equivalent
+  - id: 019fab4a-ca4e-71a1-8c58-db2faacc4ae4
     tag: 'Stephens: Comments are no Wannsee equivalent'
     text: >-
       Stephens acknowledges the statements made by Israeli officials but notes that furious comments
@@ -708,7 +708,7 @@ claims:
         conference
     uncertain: false
     submissionStatus: Accepted
-  - id: c-civilian-institutions-systematically-destroyed
+  - id: 019fab4a-ca4e-71a1-8c58-db30462f70d1
     tag: 'Bartov: Civilian institutions destroyed'
     text: >-
       Bartov reports systematic destruction not only of housing but of all institutions necessary
@@ -724,7 +724,7 @@ claims:
       quote: the systematic destruction in Gaza not only of housing but also of other infrastructure
     uncertain: false
     submissionStatus: Accepted
-  - id: c-mosul-analogy
+  - id: 019fab4a-ca4e-71a1-8c58-db3124fcc5bb
     tag: Mosul drew no genocide charge
     text: >-
       The US-backed Mosul campaign against ISIS used comparable tactics to Israel's Gaza campaign
@@ -733,7 +733,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-embedded-adversary-explains-casualties
+  - id: 019fab4a-ca4e-71a1-8c58-db32b39e8695
     tag: Embedded adversary explains casualty rate
     text: >-
       Where an armed group embeds itself in dense urban terrain and uses the civilian population as cover,
@@ -742,7 +742,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-tactical-explanation-is-unbounded
+  - id: 019fab4a-ca4e-71a1-8c58-db338fd00b86
     tag: Tactical explanation admits no upper limit
     text: >-
       An explanation that attributes civilian casualties to an adversary's embedding admits no upper limit:
@@ -755,7 +755,7 @@ claims:
       quote: null
     uncertain: false
     submissionStatus: Accepted
-  - id: c-mosul-campaign-11000-civilian-deaths
+  - id: 019fab4a-ca4e-71a1-8c58-db34cccf004a
     tag: 'Stephens: Mosul killed up to 11,000 civilians'
     text: >-
       Stephens cites the 2016–17 Mosul campaign, in which American airstrikes leveled entire blocks
@@ -770,7 +770,7 @@ claims:
       quote: American airstrikes have at times leveled entire blocks
     uncertain: false
     submissionStatus: Accepted
-  - id: c-mosul-representativeness
+  - id: 019fab4a-ca4e-71a1-8c58-db35912414c2
     tag: Mosul analogy is structurally comparable to Gaza
     text: >-
       The Mosul campaign is a structurally comparable case — a state military operating in dense
@@ -779,7 +779,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-tactical-similarity-suffices-for-comparison
+  - id: 019fab4a-ca4e-71a1-8c58-db36b57d681c
     tag: Tactical similarity licenses the comparison
     text: >-
       Where two campaigns share tactical structure — dense urban terrain, an adversary using tunnel infrastructure
@@ -788,7 +788,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-isis-and-hamas-used-same-urban-strategy
+  - id: 019fab4a-ca4e-71a1-8c58-db37748dbb49
     tag: 'Stephens: ISIS and Hamas used one strategy'
     text: >-
       Stephens notes that ISIS, like Hamas, used a booby-trapped underground fortress strategy in a
@@ -802,7 +802,7 @@ claims:
       quote: booby-trapped, underground fortress
     uncertain: false
     submissionStatus: Accepted
-  - id: c-genocide-label-antisemitism-charge
+  - id: 019fab4a-ca4e-71a1-8c58-db3894846895
     tag: Genocide label serves antisemitic function
     text: >-
       The genocide charge against Israel is used by anti-Zionists to equate Israel with Nazi
@@ -810,7 +810,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-genocide-charge-among-bogus-delegitimising-charges
+  - id: 019fab4a-ca4e-71a1-8c58-db39abbcfa43
     tag: 'Stephens: Charge delegitimises the state'
     text: >-
       Stephens argues the genocide charge is part of a pattern of "inflated or bogus charges"
@@ -825,7 +825,7 @@ claims:
       quote: equate modern Israel with Nazi Germany
     uncertain: false
     submissionStatus: Accepted
-  - id: c-genocide-label-silences-critics
+  - id: 019fab4a-ca4e-71a1-8c58-db3ae056ff79
     tag: Antisemitism charge silences legitimate critique
     text: >-
       Labelling the genocide designation as antisemitic is itself a mechanism of intellectual
@@ -833,7 +833,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-genocide-scholars-accused-of-antisemitism
+  - id: 019fab4a-ca4e-71a1-8c58-db3b21079d0d
     tag: 'Bartov: Scholars accused of antisemitism'
     text: >-
       Bartov reports that genocide scholars who apply the designation to Gaza have been accused by
@@ -850,7 +850,7 @@ claims:
         pilots is, in this view, an antisemitic act
     uncertain: false
     submissionStatus: Accepted
-  - id: c-intent-inferred-from-conduct
+  - id: 019fab4a-ca4e-71a1-8c58-db3c8b169c48
     tag: Intent inferable without a planning document
     text: >-
       In genocide adjudication, specific intent (dolus specialis) may be established by inference
@@ -859,7 +859,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-intent-derivable-from-operations
+  - id: 019fab4a-ca4e-71a1-8c58-db3d657a408e
     tag: >-
       Bartov: Intent derivable from operations pattern
     text: >-
@@ -872,7 +872,7 @@ claims:
       quote: intent can also be derived from a pattern of operations on the ground
     uncertain: false
     submissionStatus: Accepted
-  - id: c-courts-inferred-intent-from-conduct
+  - id: 019fab4a-ca4e-71a1-8c58-db3eec3e68d7
     tag: 'ICJ/ICTY: Intent inferred from conduct'
     text: >-
       Courts including the ICJ and the ICTY have found genocidal intent by inference from conduct in the
@@ -886,7 +886,7 @@ claims:
         CITATION NEEDED
     uncertain: false
     submissionStatus: Accepted
-  - id: c-confinement-transforms-cleansing
+  - id: 019fab4a-ca4e-71a1-8c58-db3ff5c1ebf6
     tag: No receiving territory makes expulsion destruction
     text: >-
       When a target population has no adjacent territory to receive them, expulsion orders combined
@@ -896,7 +896,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-sealed-borders-make-displacement-destruction
+  - id: 019fab4a-ca4e-71a1-8c58-db40b37ee269
     tag: 'Bartov: Sealed borders make flight impossible'
     text: >-
       Bartov argues that Gaza's borders are sealed by Egypt and Israel, so displacement orders
@@ -911,7 +911,7 @@ claims:
       quote: null
     uncertain: false
     submissionStatus: Accepted
-  - id: c-holocaust-memory-universalism
+  - id: 019fab4a-ca4e-71a1-8c58-db41dfb93ef3
     tag: Holocaust's lesson is universal, not particular
     text: >-
       The moral authority Holocaust remembrance generates is premised on the universality of its
@@ -920,7 +920,7 @@ claims:
     terminal: false
     uncertain: false
     submissionStatus: Accepted
-  - id: c-holocaust-lesson-presented-as-universal
+  - id: 019fab4a-ca4e-71a1-8c58-db422d930f48
     tag: 'Bartov: Holocaust lesson framed as universal'
     text: >-
       Bartov argues that Holocaust commemoration succeeded in finding a universal audience precisely
@@ -937,7 +937,7 @@ claims:
         perpetrated to an excuse
     uncertain: false
     submissionStatus: Accepted
-  - id: c-restraint-in-killing-not-restraint-in-destruction
+  - id: 019fab4a-ca4e-71a1-8c58-db438ded3ec8
     tag: Restraint in killing, not in destruction
     text: >-
       A state that deploys far less than its capacity to kill while deploying near its full capacity
@@ -949,514 +949,514 @@ claims:
     submissionStatus: Accepted
 
 inferences:
-  - id: i-public-genocidal-statements
+  - id: 019fab4a-ca4e-71a1-8c58-db44d05f1748
     scheme: FromSign
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-netanyahu-amalek-and-rubble-statements
+      - 019fab4a-ca4e-71a1-8c58-daf949d4215e
     warrants:
-      - c-statements-evidence-intent
-    concludes: c-public-genocidal-statements
-  - id: i-pattern-of-ops-genocidal
+      - 019fab4a-ca4e-71a1-8c58-db0e7fb6fe73
+    concludes: 019fab4a-ca4e-71a1-8c58-daf8f66d45b1
+  - id: 019fab4a-ca4e-71a1-8c58-db453f18d1b1
     scheme: FromSign
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-haaretz-174000-buildings-destroyed
+      - 019fab4a-ca4e-71a1-8c58-dafc422fd036
     warrants:
-      - c-pattern-establishes-intent
-    concludes: c-pattern-of-ops-genocidal
-  - id: i-scholarly-consensus-genocide
+      - 019fab4a-ca4e-71a1-8c58-db100e3ec590
+    concludes: 019fab4a-ca4e-71a1-8c58-dafaa708400a
+  - id: 019fab4a-ca4e-71a1-8c58-db463818bc8b
     scheme: FromAuthority
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-named-experts-concluded-genocide
+      - 019fab4a-ca4e-71a1-8c58-dafeb2b9effc
     warrants:
-      - c-authority-genocide-scholars
-    concludes: c-scholarly-consensus-genocide
-  - id: i-denial-damages-intl-law
+      - 019fab4a-ca4e-71a1-8c58-db12ad54afe2
+    concludes: 019fab4a-ca4e-71a1-8c58-dafd217dd835
+  - id: 019fab4a-ca4e-71a1-8c58-db476d91c1a7
     scheme: FromConsequence
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-convention-obliges-prevention-on-designation
+      - 019fab4a-ca4e-71a1-8c58-db005e5dec21
     warrants:
-      - c-intl-law-obliges-designation
-      - c-incorrect-application-damages-convention
-    concludes: c-denial-damages-intl-law
-  - id: i-ethnic-cleansing-morphs-genocide
+      - 019fab4a-ca4e-71a1-8c58-db152e7934c4
+      - 019fab4a-ca4e-71a1-8c58-db2c868e149c
+    concludes: 019fab4a-ca4e-71a1-8c58-daffd5c3a653
+  - id: 019fab4a-ca4e-71a1-8c58-db484819c647
     scheme: FromAnalogy
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-herero-armenian-holocaust-began-as-expulsion
+      - 019fab4a-ca4e-71a1-8c58-db0259c28da3
     warrants:
-      - c-morphing-precedent-established
-      - c-confinement-transforms-cleansing
-    concludes: c-ethnic-cleansing-morphs-genocide
-  - id: i-death-toll-inconsistent-genocide
+      - 019fab4a-ca4e-71a1-8c58-db1760b21fcd
+      - 019fab4a-ca4e-71a1-8c58-db3ff5c1ebf6
+    concludes: 019fab4a-ca4e-71a1-8c58-db0121ee0fec
+  - id: 019fab4a-ca4e-71a1-8c58-db49174d962d
     scheme: FromSign
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-israel-capacity-exceeds-deployment
+      - 019fab4a-ca4e-71a1-8c58-db1a4b978cf3
     warrants:
-      - c-capacity-gap-reveals-intent
-    concludes: c-death-toll-inconsistent-genocide
-  - id: i-protective-measures-inconsistent-genocide
+      - 019fab4a-ca4e-71a1-8c58-db197dcee5a2
+    concludes: 019fab4a-ca4e-71a1-8c58-db03ce530257
+  - id: 019fab4a-ca4e-71a1-8c58-db4a129938b7
     scheme: FromSign
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-israel-warned-evacuations-and-risked-soldiers
+      - 019fab4a-ca4e-71a1-8c58-db05d6b44c65
     warrants:
-      - c-warnings-incompatible-genocide
-    concludes: c-protective-measures-inconsistent-genocide
-  - id: i-military-aim-generalizes
+      - 019fab4a-ca4e-71a1-8c58-db1b2ac3e82d
+    concludes: 019fab4a-ca4e-71a1-8c58-db0411ae3dd1
+  - id: 019fab4a-ca4e-71a1-8c58-db4bb8f24b17
     scheme: FromGeneralization
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-military-aim-killing-not-genocide
+      - 019fab4a-ca4e-71a1-8c58-db096fa819e1
     warrants: []
-    concludes: c-military-objective-excludes-as-such
-  - id: i-as-such-intent-absent
+    concludes: 019fab4a-ca4e-71a1-8c58-db1f4d3b8a9e
+  - id: 019fab4a-ca4e-71a1-8c58-db4ccdbddf44
     scheme: FromDefinition
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-israel-aim-is-hamas-not-palestinians
+      - 019fab4a-ca4e-71a1-8c58-db077f353dfb
     warrants:
-      - c-legal-definition-as-such
-      - c-military-objective-excludes-as-such
-    concludes: c-as-such-intent-absent
-  - id: i-hamas-tactics-explain-casualties
+      - 019fab4a-ca4e-71a1-8c58-db1d5c5132b7
+      - 019fab4a-ca4e-71a1-8c58-db1f4d3b8a9e
+    concludes: 019fab4a-ca4e-71a1-8c58-db06fe4416b8
+  - id: 019fab4a-ca4e-71a1-8c58-db4d2ac23d43
     scheme: FromCause
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-hamas-shelters-fighters-exposes-civilians
+      - 019fab4a-ca4e-71a1-8c58-db0b1b6dd4f6
     warrants:
-      - c-proximate-cause-attribution
-    concludes: c-hamas-tactics-explain-casualties
-  - id: i-promiscuous-genocide-label-harmful
+      - 019fab4a-ca4e-71a1-8c58-db289a1ecc2d
+    concludes: 019fab4a-ca4e-71a1-8c58-db0ab12c7510
+  - id: 019fab4a-ca4e-71a1-8c58-db4eda36558e
     scheme: FromConsequence
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-genocide-term-coined-for-a-specific-crime
+      - 019fab4a-ca4e-71a1-8c58-db0df525a661
     warrants:
-      - c-term-inflation-undermines-law
-      - c-incorrect-application-damages-convention
-    concludes: c-promiscuous-genocide-label-harmful
-  - id: i-statements-evidence-intent
+      - 019fab4a-ca4e-71a1-8c58-db2aa2a02f6e
+      - 019fab4a-ca4e-71a1-8c58-db2c868e149c
+    concludes: 019fab4a-ca4e-71a1-8c58-db0cc68f7a7e
+  - id: 019fab4a-ca4e-71a1-8c58-db4f80c2f3ce
     scheme: FromDefinition
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-law-permits-intent-inferred-from-statements
+      - 019fab4a-ca4e-71a1-8c58-db0f5ca3622f
     warrants:
-      - c-intent-inferred-from-conduct
-    concludes: c-statements-evidence-intent
-  - id: i-pattern-establishes-intent
+      - 019fab4a-ca4e-71a1-8c58-db3c8b169c48
+    concludes: 019fab4a-ca4e-71a1-8c58-db0e7fb6fe73
+  - id: 019fab4a-ca4e-71a1-8c58-db50c822ce1f
     scheme: FromDefinition
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-destruction-beyond-military-necessity
+      - 019fab4a-ca4e-71a1-8c58-db1142915fd5
     warrants:
-      - c-intent-inferred-from-conduct
-    concludes: c-pattern-establishes-intent
-  - id: i-authority-genocide-scholars
+      - 019fab4a-ca4e-71a1-8c58-db3c8b169c48
+    concludes: 019fab4a-ca4e-71a1-8c58-db100e3ec590
+  - id: 019fab4a-ca4e-71a1-8c58-db51ca21c8df
     scheme: FromAuthority
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-converging-scholars-are-genocide-specialists
+      - 019fab4a-ca4e-71a1-8c58-db1353ccd637
     warrants: []
-    concludes: c-authority-genocide-scholars
-  - id: i-intl-law-obliges-designation
+    concludes: 019fab4a-ca4e-71a1-8c58-db12ad54afe2
+  - id: 019fab4a-ca4e-71a1-8c58-db52ec3778b0
     scheme: FromDefinition
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-convention-duties-contingent-on-designation
+      - 019fab4a-ca4e-71a1-8c58-db166ecf1fbd
     warrants: []
-    concludes: c-intl-law-obliges-designation
-  - id: i-morphing-precedent-established
+    concludes: 019fab4a-ca4e-71a1-8c58-db152e7934c4
+  - id: 019fab4a-ca4e-71a1-8c58-db5348340a2a
     scheme: FromGeneralization
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-herero-armenian-holocaust-began-as-expulsion
+      - 019fab4a-ca4e-71a1-8c58-db0259c28da3
     warrants:
-      - c-three-cases-establish-pattern
-    concludes: c-morphing-precedent-established
-  - id: i-capacity-gap-reveals-intent
+      - 019fab4a-ca4e-71a1-8c58-db18b7092c53
+    concludes: 019fab4a-ca4e-71a1-8c58-db1760b21fcd
+  - id: 019fab4a-ca4e-71a1-8c58-db54067bc1b2
     scheme: FromSign
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-israel-capacity-exceeds-deployment
+      - 019fab4a-ca4e-71a1-8c58-db1a4b978cf3
     warrants: []
-    concludes: c-capacity-gap-reveals-intent
-  - id: i-warnings-incompatible-genocide
+    concludes: 019fab4a-ca4e-71a1-8c58-db197dcee5a2
+  - id: 019fab4a-ca4e-71a1-8c58-db5559c85db7
     scheme: FromSign
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-warnings-create-tactical-disadvantage
+      - 019fab4a-ca4e-71a1-8c58-db1c182198fe
     warrants: []
-    concludes: c-warnings-incompatible-genocide
-  - id: i-legal-definition-as-such
+    concludes: 019fab4a-ca4e-71a1-8c58-db1b2ac3e82d
+  - id: 019fab4a-ca4e-71a1-8c58-db56f3c9639a
     scheme: FromDefinition
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-convention-as-such-text
-      - c-as-such-is-constitutive-not-rhetorical
+      - 019fab4a-ca4e-71a1-8c58-db2701b467a9
+      - 019fab4a-ca4e-71a1-8c58-db2611fb8e76
     warrants: []
-    concludes: c-legal-definition-as-such
-  - id: i-military-aim-killing-not-genocide
+    concludes: 019fab4a-ca4e-71a1-8c58-db1d5c5132b7
+  - id: 019fab4a-ca4e-71a1-8c58-db5790444000
     scheme: FromGeneralization
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-allied-bombing-not-genocide
+      - 019fab4a-ca4e-71a1-8c58-db08c184e290
     warrants: []
-    concludes: c-military-aim-killing-not-genocide
-  - id: i-proximate-cause-attribution
+    concludes: 019fab4a-ca4e-71a1-8c58-db096fa819e1
+  - id: 019fab4a-ca4e-71a1-8c58-db58b4292eaf
     scheme: FromCause
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-tunnel-strategy-is-proximate-cause
+      - 019fab4a-ca4e-71a1-8c58-db29b6c43f58
     warrants: []
-    concludes: c-proximate-cause-attribution
-  - id: i-term-inflation-undermines-law
+    concludes: 019fab4a-ca4e-71a1-8c58-db289a1ecc2d
+  - id: 019fab4a-ca4e-71a1-8c58-db5941a10123
     scheme: FromConsequence
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-term-created-as-distinct-legal-category
+      - 019fab4a-ca4e-71a1-8c58-db2b1405b347
     warrants: []
-    concludes: c-term-inflation-undermines-law
-  - id: i-incorrect-application-damages-convention
+    concludes: 019fab4a-ca4e-71a1-8c58-db2aa2a02f6e
+  - id: 019fab4a-ca4e-71a1-8c58-db5a85d92a1e
     scheme: FromDefinition
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-both-sides-invoke-protective-purpose
+      - 019fab4a-ca4e-71a1-8c58-db2dcc14b6e4
     warrants: []
-    concludes: c-incorrect-application-damages-convention
-  - id: i-few-statements-vs-systematic-policy
+    concludes: 019fab4a-ca4e-71a1-8c58-db2c868e149c
+  - id: 019fab4a-ca4e-71a1-8c58-db5b11fedb49
     scheme: FromSign
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-comments-are-not-a-wannsee-equivalent
+      - 019fab4a-ca4e-71a1-8c58-db2faacc4ae4
     warrants: []
-    concludes: c-few-statements-vs-systematic-policy
-  - id: i-pattern-of-ops-genocidal-from-infrastructure
+    concludes: 019fab4a-ca4e-71a1-8c58-db2e25b89f4c
+  - id: 019fab4a-ca4e-71a1-8c58-db5c76d08d88
     scheme: FromSign
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-civilian-institutions-systematically-destroyed
+      - 019fab4a-ca4e-71a1-8c58-db30462f70d1
     warrants:
-      - c-pattern-establishes-intent
-    concludes: c-pattern-of-ops-genocidal
-  - id: i-holocaust-memory-to-denial-damages
+      - 019fab4a-ca4e-71a1-8c58-db100e3ec590
+    concludes: 019fab4a-ca4e-71a1-8c58-dafaa708400a
+  - id: 019fab4a-ca4e-71a1-8c58-db5d9f282cc9
     scheme: FromConsequence
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-holocaust-memory-universalism
+      - 019fab4a-ca4e-71a1-8c58-db41dfb93ef3
     warrants: []
-    concludes: c-denial-damages-intl-law
-  - id: i-mosul-analogy
+    concludes: 019fab4a-ca4e-71a1-8c58-daffd5c3a653
+  - id: 019fab4a-ca4e-71a1-8c58-db5e51c74cfb
     scheme: FromAnalogy
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-mosul-campaign-11000-civilian-deaths
+      - 019fab4a-ca4e-71a1-8c58-db34cccf004a
     warrants:
-      - c-mosul-representativeness
-    concludes: c-mosul-analogy
-  - id: i-mosul-representativeness
+      - 019fab4a-ca4e-71a1-8c58-db35912414c2
+    concludes: 019fab4a-ca4e-71a1-8c58-db3124fcc5bb
+  - id: 019fab4a-ca4e-71a1-8c58-db5fac5f41d6
     scheme: FromAnalogy
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-isis-and-hamas-used-same-urban-strategy
+      - 019fab4a-ca4e-71a1-8c58-db37748dbb49
     warrants:
-      - c-tactical-similarity-suffices-for-comparison
-    concludes: c-mosul-representativeness
-  - id: i-genocide-label-antisemitism-charge
+      - 019fab4a-ca4e-71a1-8c58-db36b57d681c
+    concludes: 019fab4a-ca4e-71a1-8c58-db35912414c2
+  - id: 019fab4a-ca4e-71a1-8c58-db60f1b6118f
     scheme: FromConsequence
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-genocide-charge-among-bogus-delegitimising-charges
+      - 019fab4a-ca4e-71a1-8c58-db39abbcfa43
     warrants: []
-    concludes: c-genocide-label-antisemitism-charge
-  - id: i-genocide-label-silences-critics
+    concludes: 019fab4a-ca4e-71a1-8c58-db3894846895
+  - id: 019fab4a-ca4e-71a1-8c58-db616458a8c9
     scheme: FromConsequence
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-genocide-scholars-accused-of-antisemitism
+      - 019fab4a-ca4e-71a1-8c58-db3b21079d0d
     warrants: []
-    concludes: c-genocide-label-silences-critics
-  - id: i-intent-inferred-from-conduct
+    concludes: 019fab4a-ca4e-71a1-8c58-db3ae056ff79
+  - id: 019fab4a-ca4e-71a1-8c58-db62e5c76690
     scheme: FromDefinition
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-intent-derivable-from-operations
-      - c-courts-inferred-intent-from-conduct
+      - 019fab4a-ca4e-71a1-8c58-db3d657a408e
+      - 019fab4a-ca4e-71a1-8c58-db3eec3e68d7
     warrants: []
-    concludes: c-intent-inferred-from-conduct
-  - id: i-confinement-transforms-cleansing
+    concludes: 019fab4a-ca4e-71a1-8c58-db3c8b169c48
+  - id: 019fab4a-ca4f-7004-a1a9-ca641e020b08
     scheme: FromDefinition
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-sealed-borders-make-displacement-destruction
+      - 019fab4a-ca4e-71a1-8c58-db40b37ee269
     warrants: []
-    concludes: c-confinement-transforms-cleansing
-  - id: i-holocaust-memory-universalism
+    concludes: 019fab4a-ca4e-71a1-8c58-db3ff5c1ebf6
+  - id: 019fab4a-ca4f-7004-a1a9-ca65b3446392
     scheme: FromDefinition
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-holocaust-lesson-presented-as-universal
+      - 019fab4a-ca4e-71a1-8c58-db422d930f48
     warrants: []
-    concludes: c-holocaust-memory-universalism
-  - id: i-public-statements-to-prop
+    concludes: 019fab4a-ca4e-71a1-8c58-db41dfb93ef3
+  - id: 019fab4a-ca4f-7004-a1a9-ca664a4d34b8
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-public-genocidal-statements
+      - 019fab4a-ca4e-71a1-8c58-daf8f66d45b1
     warrants:
-      - c-group-existence-inviolable
-    concludes: c-gaza-satisfies-as-such
-  - id: i-pattern-to-prop
+      - 019fab4a-ca4e-71a1-8c58-daf407dcbbcc
+    concludes: 019fab4a-ca4e-71a1-8c58-db1ee7ca4214
+  - id: 019fab4a-ca4f-7004-a1a9-ca6737867e79
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-pattern-of-ops-genocidal
+      - 019fab4a-ca4e-71a1-8c58-dafaa708400a
     warrants:
-      - c-group-existence-inviolable
-    concludes: c-gaza-satisfies-as-such
-  - id: i-scholarly-consensus-to-prop
+      - 019fab4a-ca4e-71a1-8c58-daf407dcbbcc
+    concludes: 019fab4a-ca4e-71a1-8c58-db1ee7ca4214
+  - id: 019fab4a-ca4f-7004-a1a9-ca684ece86ae
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-scholarly-consensus-genocide
+      - 019fab4a-ca4e-71a1-8c58-dafd217dd835
     warrants:
-      - c-intl-law-universal
-      - c-consensus-tracks-legal-facts
-    concludes: c-gaza-campaign-is-genocide
-  - id: i-denial-damages-to-prop
+      - 019fab4a-ca4e-71a1-8c58-daf796c05e23
+      - 019fab4a-ca4e-71a1-8c58-db14336eb36d
+    concludes: 019fab4a-ca4e-71a1-8c58-daf398eea136
+  - id: 019fab4a-ca4f-7004-a1a9-ca6945ac4268
     scheme: null
     uncertain: true
     submissionStatus: Accepted
     grounds:
-      - c-denial-damages-intl-law
+      - 019fab4a-ca4e-71a1-8c58-daffd5c3a653
     warrants:
-      - c-intl-law-universal
-    concludes: c-gaza-campaign-is-genocide
-  - id: i-ethnic-cleansing-to-prop
+      - 019fab4a-ca4e-71a1-8c58-daf796c05e23
+    concludes: 019fab4a-ca4e-71a1-8c58-daf398eea136
+  - id: 019fab4a-ca4f-7004-a1a9-ca6a89b649d6
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-ethnic-cleansing-morphs-genocide
+      - 019fab4a-ca4e-71a1-8c58-db0121ee0fec
     warrants: []
-    concludes: c-gaza-satisfies-as-such
-  - id: i-death-toll-to-prop
+    concludes: 019fab4a-ca4e-71a1-8c58-db1ee7ca4214
+  - id: 019fab4a-ca4f-7004-a1a9-ca6bf014eb22
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-death-toll-inconsistent-genocide
+      - 019fab4a-ca4e-71a1-8c58-db03ce530257
     warrants: []
-    contests: c-gaza-campaign-is-genocide
-  - id: i-protective-measures-to-prop
+    contests: 019fab4a-ca4e-71a1-8c58-daf398eea136
+  - id: 019fab4a-ca4f-7004-a1a9-ca6c268fbac5
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-protective-measures-inconsistent-genocide
+      - 019fab4a-ca4e-71a1-8c58-db0411ae3dd1
     warrants: []
-    contests: c-gaza-campaign-is-genocide
-  - id: i-as-such-to-prop
+    contests: 019fab4a-ca4e-71a1-8c58-daf398eea136
+  - id: 019fab4a-ca4f-7004-a1a9-ca6d31cb110b
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-as-such-intent-absent
+      - 019fab4a-ca4e-71a1-8c58-db06fe4416b8
     warrants:
-      - c-legal-precision-matters
-    contests: c-gaza-satisfies-as-such
-  - id: i-as-such-satisfied-to-prop
+      - 019fab4a-ca4e-71a1-8c58-daf5ae3b2e9c
+    contests: 019fab4a-ca4e-71a1-8c58-db1ee7ca4214
+  - id: 019fab4a-ca4f-7004-a1a9-ca6e123a7857
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-gaza-satisfies-as-such
+      - 019fab4a-ca4e-71a1-8c58-db1ee7ca4214
     warrants:
-      - c-group-existence-inviolable
-    concludes: c-gaza-campaign-is-genocide
-  - id: i-confinement-satisfies-as-such
+      - 019fab4a-ca4e-71a1-8c58-daf407dcbbcc
+    concludes: 019fab4a-ca4e-71a1-8c58-daf398eea136
+  - id: 019fab4a-ca4f-7004-a1a9-ca6fb83a2959
     scheme: FromSign
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-sealed-borders-make-displacement-destruction
+      - 019fab4a-ca4e-71a1-8c58-db40b37ee269
     warrants: []
-    concludes: c-gaza-satisfies-as-such
-  - id: i-holocaust-refutes-military-exclusion
+    concludes: 019fab4a-ca4e-71a1-8c58-db1ee7ca4214
+  - id: 019fab4a-ca4f-7004-a1a9-ca7031c54114
     scheme: FromExample
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-holocaust-framed-as-defensive
+      - 019fab4a-ca4e-71a1-8c58-db201f2c90c9
     warrants:
-      - c-holocaust-recognized-genocide
-    contests: c-military-objective-excludes-as-such
-  - id: i-armenian-refutes-military-exclusion
+      - 019fab4a-ca4e-71a1-8c58-db231ed8358a
+    contests: 019fab4a-ca4e-71a1-8c58-db1f4d3b8a9e
+  - id: 019fab4a-ca4f-7004-a1a9-ca7185101ab1
     scheme: FromExample
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-armenian-framed-as-relocation
+      - 019fab4a-ca4e-71a1-8c58-db215f963ade
     warrants:
-      - c-armenian-recognized-genocide
-    contests: c-military-objective-excludes-as-such
-  - id: i-srebrenica-refutes-military-exclusion
+      - 019fab4a-ca4e-71a1-8c58-db24afcbb342
+    contests: 019fab4a-ca4e-71a1-8c58-db1f4d3b8a9e
+  - id: 019fab4a-ca4f-7004-a1a9-ca729dc1acab
     scheme: FromExample
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-srebrenica-carried-out-as-military-op
+      - 019fab4a-ca4e-71a1-8c58-db22bb5188aa
     warrants:
-      - c-srebrenica-adjudicated-genocide
-    contests: c-military-objective-excludes-as-such
-  - id: i-confinement-rebuts-military-objective
+      - 019fab4a-ca4e-71a1-8c58-db25896cf4ee
+    contests: 019fab4a-ca4e-71a1-8c58-db1f4d3b8a9e
+  - id: 019fab4a-ca4f-7004-a1a9-ca7396051fe2
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-confinement-transforms-cleansing
+      - 019fab4a-ca4e-71a1-8c58-db3ff5c1ebf6
     warrants: []
-    contests: c-military-objective-excludes-as-such
-  - id: i-hamas-tactics-to-prop
+    contests: 019fab4a-ca4e-71a1-8c58-db1f4d3b8a9e
+  - id: 019fab4a-ca4f-7004-a1a9-ca74994f2622
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-hamas-tactics-explain-casualties
+      - 019fab4a-ca4e-71a1-8c58-db0ab12c7510
     warrants:
-      - c-self-defense-legitimate
-    contests: c-gaza-campaign-is-genocide
-  - id: i-label-harmful-to-prop
+      - 019fab4a-ca4e-71a1-8c58-daf605b20516
+    contests: 019fab4a-ca4e-71a1-8c58-daf398eea136
+  - id: 019fab4a-ca4f-7004-a1a9-ca75c959b29e
     scheme: null
     uncertain: true
     submissionStatus: Accepted
     grounds:
-      - c-promiscuous-genocide-label-harmful
+      - 019fab4a-ca4e-71a1-8c58-db0cc68f7a7e
     warrants:
-      - c-legal-precision-matters
-    contests: c-gaza-campaign-is-genocide
-  - id: i-few-statements-attacks-statements-evidence
+      - 019fab4a-ca4e-71a1-8c58-daf5ae3b2e9c
+    contests: 019fab4a-ca4e-71a1-8c58-daf398eea136
+  - id: 019fab4a-ca4f-7004-a1a9-ca7691c71245
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-few-statements-vs-systematic-policy
+      - 019fab4a-ca4e-71a1-8c58-db2e25b89f4c
     warrants: []
-    contests: c-statements-evidence-intent
-  - id: i-mosul-supports-embedded-adversary
+    contests: 019fab4a-ca4e-71a1-8c58-db0e7fb6fe73
+  - id: 019fab4a-ca4f-7004-a1a9-ca7710ad4c65
     scheme: FromAnalogy
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-mosul-analogy
+      - 019fab4a-ca4e-71a1-8c58-db3124fcc5bb
     warrants:
-      - c-mosul-representativeness
-    concludes: c-embedded-adversary-explains-casualties
-  - id: i-unbounded-defeats-embedded-adversary
+      - 019fab4a-ca4e-71a1-8c58-db35912414c2
+    concludes: 019fab4a-ca4e-71a1-8c58-db32b39e8695
+  - id: 019fab4a-ca4f-7004-a1a9-ca78b7479252
     scheme: FromConsequence
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-tactical-explanation-is-unbounded
+      - 019fab4a-ca4e-71a1-8c58-db338fd00b86
     warrants: []
-    contests: c-embedded-adversary-explains-casualties
-  - id: i-embedded-adversary-to-hamas-tactics
+    contests: 019fab4a-ca4e-71a1-8c58-db32b39e8695
+  - id: 019fab4a-ca4f-7004-a1a9-ca7994296de2
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-hamas-shelters-fighters-exposes-civilians
+      - 019fab4a-ca4e-71a1-8c58-db0b1b6dd4f6
     warrants:
-      - c-embedded-adversary-explains-casualties
-    concludes: c-hamas-tactics-explain-casualties
-  - id: i-mosul-supports-military-aim
+      - 019fab4a-ca4e-71a1-8c58-db32b39e8695
+    concludes: 019fab4a-ca4e-71a1-8c58-db0ab12c7510
+  - id: 019fab4a-ca4f-7004-a1a9-ca7afdaf5fbf
     scheme: FromAnalogy
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-mosul-analogy
+      - 019fab4a-ca4e-71a1-8c58-db3124fcc5bb
     warrants:
-      - c-mosul-representativeness
-    concludes: c-military-aim-killing-not-genocide
-  - id: i-death-toll-attacks-pattern
+      - 019fab4a-ca4e-71a1-8c58-db35912414c2
+    concludes: 019fab4a-ca4e-71a1-8c58-db096fa819e1
+  - id: 019fab4a-ca4f-7004-a1a9-ca7b2343b9d7
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-death-toll-inconsistent-genocide
+      - 019fab4a-ca4e-71a1-8c58-db03ce530257
     warrants:
-      - c-killing-rate-is-the-intent-measure
-    contests: c-pattern-of-ops-genocidal
-  - id: i-antisemitism-undercuts-scholarly-authority
+      - 019fab4a-ca4e-71a1-8c58-dafb57dc2399
+    contests: 019fab4a-ca4e-71a1-8c58-dafaa708400a
+  - id: 019fab4a-ca4f-7004-a1a9-ca7c9b44ece1
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-genocide-label-antisemitism-charge
+      - 019fab4a-ca4e-71a1-8c58-db3894846895
     warrants: []
-    contests: c-consensus-tracks-legal-facts
-  - id: i-silences-critics-attacks-antisemitism-charge
+    contests: 019fab4a-ca4e-71a1-8c58-db14336eb36d
+  - id: 019fab4a-ca4f-7004-a1a9-ca7dcf484577
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-genocide-label-silences-critics
+      - 019fab4a-ca4e-71a1-8c58-db3ae056ff79
     warrants: []
-    contests: c-genocide-label-antisemitism-charge
-  - id: i-confinement-attacks-mosul
+    contests: 019fab4a-ca4e-71a1-8c58-db3894846895
+  - id: 019fab4a-ca4f-7004-a1a9-ca7e2c666001
     scheme: null
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-confinement-transforms-cleansing
+      - 019fab4a-ca4e-71a1-8c58-db3ff5c1ebf6
     warrants: []
-    contests: c-tactical-similarity-suffices-for-comparison
-  - id: i-capacity-grounds-pattern-of-ops
+    contests: 019fab4a-ca4e-71a1-8c58-db36b57d681c
+  - id: 019fab4a-ca4f-7004-a1a9-ca7faf42a82a
     scheme: FromSign
     uncertain: false
     submissionStatus: Accepted
     grounds:
-      - c-israel-capacity-exceeds-deployment
+      - 019fab4a-ca4e-71a1-8c58-db1a4b978cf3
     warrants:
-      - c-restraint-in-killing-not-restraint-in-destruction
-    concludes: c-pattern-of-ops-genocidal
+      - 019fab4a-ca4e-71a1-8c58-db438ded3ec8
+    concludes: 019fab4a-ca4e-71a1-8c58-dafaa708400a
