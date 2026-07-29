@@ -1,6 +1,10 @@
 /tmp
 /out-tsc
 
+# Corpus store: its own nested git repo (Directive 1c). Kept out of the outer
+# tree so git never records a gitlink / phantom submodule for it.
+/discourse-spaces/
+
 /node_modules
 npm-debug.log*
 yarn-debug.log*

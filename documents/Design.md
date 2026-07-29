@@ -215,6 +215,45 @@ so a commit diff shows exactly the nodes that changed.
   Comments are not preserved. The one-time large formatting diff has been
   applied; the pre-canonical originals are kept under `_pre-canonical/`.
 
+## Corpus store (`corpus_store.py`)
+
+The three corpora live in their own **nested git repository** at
+`discourse-spaces/` (branch `main`, genesis commit holding the three canonical
+`*.v2.yaml` and `migrations/`). It is a repository distinct from the outer code
+tree — `discourse-spaces/` is in the outer `.gitignore` so git never records a
+gitlink for it — and every commit in it is one graph change. `corpus_store.py`
+is the object-layer read/write pair the writer (1d) sits on; it does not
+validate, diff, or implement any patch/agent logic.
+
+`CorpusStore(repo_path)` opens that repository (via `pygit2`, no subprocess) and
+exposes:
+
+- **`head()`** — current head commit sha.
+- **`read(name, sha=None)`** — a corpus's text at `sha` (defaults to head),
+  decoded straight from `repo[sha].tree[name]`; no checkout.
+- **`list_corpora(sha=None)`** — the top-level `*.v2.yaml` blobs (the
+  `migrations/` subtree is excluded).
+- **`commit(name, text, message, parent_sha)`** — writes a new graph state,
+  returning the new sha.
+- **`log(name)`** — `(sha, message, timestamp)` for every commit that touched
+  `name`, walking from head.
+
+Machine commits are stamped `parsanga-harness <harness@parsanga.local>`; human
+commits (genesis, hand-edits committed by the operator) use the normal git
+config and are made outside this module.
+
+**`commit` — guards then three writes.** Two guards run before anything is
+written: `HeadMoved` if `parent_sha` is not the current head (the whole conflict
+check — 1d turns it into a result type), and `WorkingTreeDirty` if the on-disk
+file differs from HEAD's blob (an uncommitted hand-edit a blind commit would
+discard). On success it writes the same bytes three ways so they cannot diverge:
+the blob into the object database (a new tree built from HEAD's with `name`
+replaced, committed onto `refs/heads/main`), those bytes to the working-tree file
+(the viz reads it, the operator hand-edits it), and the index reconciled to the
+new tree so `git status` stays clean and reports only the operator's own later
+hand-edits. The commit is built purely at the object layer; the index is never a
+source, only reconciled after the fact.
+
 ## GAP 1 — resolved (enthymemification: surfaced warrant, contested as a rebut)
 
 GAP 1 was: a warrant-applicability attack (e.g. free-transit's *user-pays

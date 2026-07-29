@@ -1,0 +1,1462 @@
+# Converted to the claim/inference model (v2) by scripts/convert.ts.
+# Source: discourse-spaces/gaza.yaml. Do not hand-edit claim texts; this migration is structural.
+#
+# 2026-07 enthymemification pass (contests-to-claims collapse):
+#   - i-confinement-attacks-mosul re-pointed from i-mosul-attacks-hamas-tactics
+#     to the claim c-mosul-representativeness (pure re-point; warrant already existed).
+#   - c-consensus-tracks-legal-facts added as an explicit good-faith warrant, surfaced on
+#     i-scholarly-consensus-to-prop; i-antisemitism-undercuts-scholarly-authority
+#     re-pointed onto it. No contest now targets an inference (I8).
+id: gaza-genocide
+title: Is Israel's military campaign in Gaza genocide?
+definitions:
+  - term: genocide
+    text: >
+      The intentional destruction, in whole or in part, of a national, ethnic, racial, or religious
+      group as such, as defined by the 1948 UN Convention on the Prevention and Punishment of the
+      Crime of Genocide. Requires both specific intent (dolus specialis) and acts carried out in
+      pursuance of that intent.
+    importedFrom: null
+  - term: genocidal intent
+    text: >
+      The specific intent to destroy a protected group as such — not merely to cause civilian harm
+      incidental to a military objective. Distinct from general malice, recklessness, or
+      disproportionate force. Can be inferred from a pattern of acts when direct evidence of intent
+      is unavailable.
+    importedFrom: null
+  - term: ethnic cleansing
+    text: >
+      The forced displacement of an ethnic or religious group from a territory, whether by
+      expulsion, intimidation, or destruction of conditions for habitation. Distinct from genocide
+      in that it aims at removal rather than destruction of the group as such, though the two crimes
+      can overlap or morph into each other.
+    importedFrom: null
+roots:
+  - 019fab4a-ca4e-71a1-8c58-daf398eea136
+claims:
+  - id: 019fab4a-ca4e-71a1-8c58-daf398eea136
+    tag: Gaza genocide
+    text: Israel's military campaign in Gaza constitutes genocide.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-daf407dcbbcc
+    tag: Every group has a right to continued existence
+    text: >-
+      Every distinct human group has an inviolable right to continued existence as a group, and acts
+      that destroy the conditions for that existence are wrong regardless of the perpetrator's other
+      justifications.
+    terminal: true
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-daf5ae3b2e9c
+    tag: Legal precision matters
+    text: >-
+      Legal terms that carry grave moral weight must be applied with strict precision; promiscuous
+      application destroys the protective function the term was designed to serve.
+    terminal: true
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-daf605b20516
+    tag: States may use force to eliminate a threat
+    text: >-
+      A state subjected to violent attack has a legitimate right to use military force to eliminate
+      the threat, including force that causes substantial civilian harm when the attacking force
+      uses civilians as cover.
+    terminal: true
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-daf796c05e23
+    tag: International law is universal
+    text: >-
+      International humanitarian law and the Genocide Convention apply universally, without
+      exception for any state's history, security situation, or political alliances.
+    terminal: true
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-daf8f66d45b1
+    tag: Public genocidal statements by leaders
+    text: >-
+      Israeli political and military leaders publicly expressed intent consistent with genocide in
+      the days and months after October 7.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-daf949d4215e
+    tag: 'Bartov: Officials called for annihilation'
+    text: >-
+      Bartov reports that Netanyahu invoked the biblical Amalek passage widely interpreted as
+      demanding total destruction of the enemy, promised to turn parts of Gaza "into rubble," called
+      residents to leave because the IDF would "operate forcefully everywhere," and that officials
+      called Gazans "human animals" and called for "total annihilation"; the deputy speaker of
+      parliament called for "erasing the Gaza Strip from the face of the earth."
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Omer Bartov, New York Times, 2025
+      quote: turning parts of Gaza, where Hamas was operating, 'into rubble'
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-dafaa708400a
+    tag: Pattern of operations consistent with genocide
+    text: >-
+      The pattern of IDF operations — systematic destruction of housing, infrastructure, and
+      civilian institutions across the entire Strip — is consistent with intent to make Palestinian
+      life in Gaza non-reconstitutable.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-dafb57dc2399
+    tag: Killing rate, not destruction, measures intent
+    text: >-
+      Genocidal intent is evidenced by the rate at which a group's members are killed relative to
+      the perpetrator's capacity, not by the rate at which its physical and institutional
+      infrastructure is destroyed.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-dafc422fd036
+    tag: 'Haaretz: 174,000 buildings hit'
+    text: >-
+      Bartov reports that a Haaretz investigation found approximately 174,000 buildings destroyed or
+      damaged, up to 70 percent of all structures in the Strip, along with systematic destruction of
+      hospitals, universities, schools, mosques, cultural heritage sites, water treatment plants,
+      agricultural areas, and parks.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Omer Bartov, New York Times, 2025, citing Haaretz investigation
+      quote: >-
+        an estimated 174,000 buildings have been destroyed or damaged, accounting for up to 70
+        percent of all structures in the Strip
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-dafd217dd835
+    tag: Growing scholarly and legal consensus
+    text: >-
+      A significant and growing body of genocide scholars and international law experts has
+      concluded that Israel's actions in Gaza meet the definition of genocide.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-dafeb2b9effc
+    tag: 'Bartov: Experts converge on genocide'
+    text: >-
+      Bartov reports that experts including the UN Special Rapporteur Francesca Albanese, Amnesty
+      International, genocide scholars Shmuel Lederman, William Schabas, Melanie O'Brien, Martin
+      Shaw, A. Dirk Moses, and Uğur Ümit Üngör have reached or are converging on the conclusion that
+      events in Gaza constitute genocide; South Africa has brought a genocide case at the ICJ.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Omer Bartov, New York Times, 2025
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-daffd5c3a653
+    tag: Denial damages international legal order
+    text: >-
+      Continued denial of the genocide designation by states and institutions damages the system of
+      international humanitarian law established after the Holocaust.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db005e5dec21
+    tag: 'Bartov: Convention obliges states to prevent'
+    text: >-
+      Bartov argues that the Genocide Convention was designed to obligate all signatory states to
+      prevent, stop, and punish genocide wherever it occurs, and that failure to apply the
+      designation when warranted erodes that obligation and the legal architecture it supports.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Omer Bartov, New York Times, 2025
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db0121ee0fec
+    tag: Ethnic cleansing morphing into genocide
+    text: >-
+      When a population has nowhere to flee and is continuously displaced, bombed, and starved,
+      ethnic cleansing morphs into genocide.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db0259c28da3
+    tag: 'Bartov: Three expulsions became extermination'
+    text: >-
+      Bartov cites three cases in which expulsion campaigns became genocidal extermination once the
+      target population had no escape: the Herero and Nama in German South West Africa (1904), the
+      Armenians in World War I, and the Jews of Europe in the Holocaust.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Omer Bartov, New York Times, 2025
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db03ce530257
+    tag: Death toll inconsistent with genocidal intent
+    text: >-
+      The scale of Palestinian deaths is far below what a state with Israel's military capacity
+      would produce if its intent were genuinely genocidal.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db0411ae3dd1
+    tag: Protective measures inconsistent with genocide
+    text: >-
+      Israel has taken protective measures — advance warnings, targeted strikes, acceptance of risk
+      to its own soldiers — that are inconsistent with genocidal intent.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db05d6b44c65
+    tag: 'Stephens: Israel warned and risked soldiers'
+    text: >-
+      Stephens reports that Israel routinely warned Gazans to evacuate areas before striking, risked
+      and lost hundreds of its own soldiers in ground combat rather than bombing without restraint,
+      and that Israeli intelligence tracked hostage locations with precision, demonstrating
+      discriminate targeting capacity.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Bret Stephens, New York Times, July 22 2025
+      quote: routinely warning Gazans to evacuate areas it intended to strike
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db06fe4416b8
+    tag: "\"As such\" intent is absent"
+    text: >-
+      Israel is fighting to defeat Hamas as a military-political force, not to destroy Palestinians
+      as a group; this fails the legal "as such" requirement for genocide.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db077f353dfb
+    tag: 'Stephens: War aim is Hamas, not Palestinians'
+    text: >-
+      Stephens argues that Israel's war aim is the defeat of Hamas as a military-political force rather
+      than the destruction of Palestinians as a group.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Bret Stephens, New York Times, July 22 2025
+      quote: >-
+        CITATION NEEDED
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db08c184e290
+    tag: 'Stephens: Allied bombing of Germany not genocide'
+    text: >-
+      Stephens cites the Allied bombing of German cities in the Second World War as killing Germans without
+      constituting genocide, because the aim was to defeat Nazism rather than to destroy Germans as Germans.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Bret Stephens, New York Times, July 22 2025
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db096fa819e1
+    tag: Military-aim killing is not genocide
+    text: >-
+      Mass civilian death inflicted in pursuit of a military objective does not constitute genocide where
+      the objective is the defeat of an adversary rather than the destruction of the group as such.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db0ab12c7510
+    tag: Hamas tactics explain civilian casualties
+    text: >-
+      Hamas's use of civilians as human shields and its tunnel infrastructure, rather than Israeli
+      genocidal intent, is the primary explanation for the high civilian casualty rate.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db0b1b6dd4f6
+    tag: 'Stephens: Hamas shelters below, civilians above'
+    text: >-
+      Stephens describes Hamas's practice of sheltering its fighters and command infrastructure in
+      tunnels while leaving civilians exposed above ground, contrasting this with Ukrainian practice
+      where civilians shelter underground while the military fights above ground; he also cites the
+      US-backed Mosul campaign against ISIS, which used comparable tactics and produced comparable
+      civilian casualties with broad bipartisan support.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Bret Stephens, New York Times, July 22 2025
+      quote: >-
+        Hamas hides and feeds and preserves itself in its vast warren of tunnels rather than open
+        them to civilians for protection
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db0cc68f7a7e
+    tag: Promiscuous genocide label is harmful
+    text: >-
+      Applying the genocide label outside its strict legal meaning dilutes its force and ultimately
+      blinds the world to real genocides when they occur.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db0df525a661
+    tag: 'Stephens: Genocide names a specific crime'
+    text: >-
+      Stephens argues that "genocide" was coined only in the 1940s and has a specific meaning
+      designed to identify a uniquely horrific crime; applying it to any military situation one
+      opposes risks normalising the term and destroying its protective function.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Bret Stephens, New York Times, July 22 2025
+      quote: >-
+        the abuse of the term 'genocide' runs the risk of ultimately blinding us to real ones when
+        they unfold
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db0e7fb6fe73
+    tag: Public statements evidence specific intent
+    text: >-
+      When senior political and military leaders publicly articulate objectives that match the legal
+      definition of genocidal intent, those statements constitute evidence of specific intent, not
+      mere rhetorical excess.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db0f5ca3622f
+    tag: 'Bartov: Intent inferable from statements'
+    text: >-
+      Genocide law, as Bartov notes, permits intent to be inferred from a pattern of statements and
+      acts; the Genocide Convention requires dolus specialis — specific intent — which courts have
+      found can be established through official statements when they are systematic and consistent
+      with the acts carried out.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Omer Bartov, New York Times, 2025, citing genocide legal scholarship
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db100e3ec590
+    tag: Systematic destruction pattern establishes intent
+    text: >-
+      When the scope and nature of destruction systematically targets the conditions for group
+      existence — not just military infrastructure — the pattern itself establishes genocidal intent
+      in the absence of direct documentary evidence.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db1142915fd5
+    tag: 'Bartov: Destruction beyond military necessity'
+    text: >-
+      Bartov argues that destruction of civilian infrastructure beyond any plausible military necessity
+      is the standard evidentiary basis for inferring genocidal intent.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Omer Bartov, New York Times, 2025
+      quote: CITATION NEEDED
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db12ad54afe2
+    tag: Genocide scholars are the relevant authority
+    text: >-
+      Scholars who specialise in genocide studies and comparative genocide are better positioned
+      than general historians or political commentators to apply the genocide definition to
+      contemporary events.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db1353ccd637
+    tag: 'Bartov: Converging scholars are specialists'
+    text: >-
+      Bartov, citing his own quarter-century of teaching genocide, notes that most scholars now
+      converging on the genocide conclusion are genocide specialists, while those resisting it are
+      primarily Holocaust historians with no comparative genocide background.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Omer Bartov, New York Times, 2025
+      quote: >-
+        I have been teaching classes on genocide for a quarter of a century. I can recognize one
+        when I see one.
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db14336eb36d
+    tag: Consensus tracks facts, not politics
+    text: >-
+      The scholars' convergence on the genocide designation reflects disinterested legal and
+      scholarly judgment of the facts rather than a politically delegitimising function, so their
+      consensus is evidence that the designation is correct.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db152e7934c4
+    tag: Designation triggers prevention duties
+    text: >-
+      The Genocide Convention's prevention and punishment obligations are only triggered when the
+      genocide designation is applied; failure to designate events as genocide disables the legal
+      mechanism designed to stop it.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db166ecf1fbd
+    tag: 'Bartov: Duties depend on the designation'
+    text: >-
+      Bartov notes that the Convention obliges all signatories to prevent genocide while it is
+      occurring and to punish perpetrators afterward; these duties are contingent on the designation
+      being made, so refusing to apply the term forecloses the Convention's protective function.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Omer Bartov, New York Times, 2025
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db1760b21fcd
+    tag: 'Precedent: confined cleansing becomes genocide'
+    text: >-
+      When a population cannot flee expulsion and is subjected to ongoing destruction of survival
+      conditions, the historical record shows that ethnic cleansing reliably escalates to genocide.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db18b7092c53
+    tag: Three cases establish a reliable pattern
+    text: >-
+      Three cases separated by period, region, and perpetrating state are sufficient to establish confinement-to-extermination
+      as a reliable pattern rather than a coincidence of particular circumstances.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db197dcee5a2
+    tag: Gap between capacity and action reveals intent
+    text: >-
+      When a state has demonstrably greater destructive capacity than it is deploying, the gap
+      between capacity and action is evidence against the hypothesis that its intent is total
+      destruction of the target population.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db1a4b978cf3
+    tag: Capacity exceeds deployment
+    text: >-
+      Stephens observes that Israel is the leading military power of its region — it decimated
+      Hezbollah and degraded Iranian capability — and could have produced far higher casualties and
+      far greater destruction than the roughly 60,000 deaths recorded in nearly two years of war.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Bret Stephens, New York Times, July 22 2025
+      quote: why hasn't it been more methodical and vastly more deadly?
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db1b2ac3e82d
+    tag: Evacuation warnings contradict genocidal intent
+    text: >-
+      An actor intending to destroy a population as such has no rational motive to systematically
+      warn that population to evacuate before attacks; the practice of issuing such warnings is
+      structurally incompatible with genocidal intent.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db1c182198fe
+    tag: 'Stephens: Warnings cost tactical advantage'
+    text: >-
+      Stephens notes that Israel routinely issued advance warnings to civilians to evacuate areas
+      before striking, a practice that creates tactical disadvantage (alerting the enemy) and is
+      explicable only if reducing civilian casualties is a genuine objective, not a pretense.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Bret Stephens, New York Times, July 22 2025
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db1d5c5132b7
+    tag: '"As such" distinguishes genocide from war crimes'
+    text: >-
+      The UN Genocide Convention's requirement that killing be directed at people "as such" — solely
+      because of their group membership — is a necessary and legally operative condition that
+      distinguishes genocide from other grave crimes under international humanitarian law.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db1ee7ca4214
+    tag: Gaza satisfies the as such element
+    text: >-
+      The Gaza campaign is conducted with intent to destroy Palestinians as a national group as such,
+      satisfying the constitutive element that distinguishes genocide from other grave crimes.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db1f4d3b8a9e
+    tag: Any military objective excludes as such
+    text: >-
+      Killing carried out in pursuit of a stated military or security objective cannot satisfy the "as
+      such" requirement, whatever its scale or foreseeable effect on the group.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db201f2c90c9
+    tag: Holocaust framed as defence against an enemy
+    text: >-
+      The Nazi extermination of European Jews was cast by its perpetrators as a defensive necessity against
+      an internal and existential enemy.
+    terminal: false
+    attribution:
+      source:
+        type: CommonKnowledge
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db215f963ade
+    tag: Armenian genocide framed as wartime relocation
+    text: >-
+      The Armenian genocide was cast by the Ottoman authorities as a wartime security relocation of a
+      population alleged to be disloyal.
+    terminal: false
+    attribution:
+      source:
+        type: CommonKnowledge
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db22bb5188aa
+    tag: Srebrenica carried out as a military operation
+    text: >-
+      The killing of Bosniak men and boys at Srebrenica was carried out in the course of a declared military
+      operation.
+    terminal: false
+    attribution:
+      source:
+        type: CommonKnowledge
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db231ed8358a
+    tag: Holocaust is universally recognized genocide
+    text: >-
+      The Holocaust is universally recognized as genocide.
+    terminal: false
+    attribution:
+      source:
+        type: CommonKnowledge
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db24afcbb342
+    tag: Armenian genocide is widely recognized
+    text: >-
+      The Armenian genocide is widely recognized as genocide by historians and many states.
+    terminal: false
+    attribution:
+      source:
+        type: CommonKnowledge
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db25896cf4ee
+    tag: 'ICTY/ICJ: Srebrenica adjudicated genocide'
+    text: >-
+      The ICTY and the ICJ adjudicated the Srebrenica massacre as genocide.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: ICTY Prosecutor v. Krstic (2004); ICJ Bosnia v. Serbia (2007)
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db2611fb8e76
+    tag: 'Stephens: As such is constitutive, not rhetorical'
+    text: >-
+      Stephens notes that the Convention's text specifies "as such" as a constitutive element, not
+      rhetorical emphasis; the purpose was to distinguish the attempt to destroy a group from the
+      incidental killing of group members while pursuing other military or political objectives.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Bret Stephens, New York Times, July 22 2025
+      quote: Note the words 'intent' and 'as such.'
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db2701b467a9
+    tag: 'Genocide Convention: Intent to destroy as such'
+    text: >-
+      The UN Genocide Convention defines genocide as acts committed with intent to destroy a national,
+      ethnical, racial or religious group as such.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: UN Genocide Convention (1948), Article II
+      quote: >-
+        intent to destroy, in whole or in part, a national, ethnical, racial or religious group, as such
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db289a1ecc2d
+    tag: Human shielding shifts responsibility
+    text: >-
+      When an armed group deliberately uses civilians as human shields, the moral and legal
+      responsibility for resulting civilian deaths shifts substantially to the shielding party, not
+      the attacking force acting within the laws of war.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db29b6c43f58
+    tag: 'Stephens: Tunnels are the proximate cause'
+    text: >-
+      Stephens argues that Hamas's tunnel strategy — sheltering combatants underground while
+      civilians remain exposed above ground — constitutes a war crime in itself and is the proximate
+      cause of the civilian death rate, not Israeli genocidal intent.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Bret Stephens, New York Times, July 22 2025
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db2aa2a02f6e
+    tag: Term inflation destroys legal function
+    text: >-
+      A legal term whose application is not governed by precise criteria loses its capacity to
+      trigger the legal consequences — sanctions, prosecutions, prevention duties — it was designed
+      to produce.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db2b1405b347
+    tag: 'Stephens: Term created as a distinct category'
+    text: >-
+      Stephens draws on the history of "genocide" as a term coined in the 1940s precisely to create
+      a distinct, higher category of crime with distinct legal consequences; that function depends
+      on the term being applied only when its specific criteria are met.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Bret Stephens, New York Times, July 22 2025
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db2c868e149c
+    tag: Error in either direction damages the Convention
+    text: >-
+      The Genocide Convention's protective function depends on the designation being applied neither
+      too liberally nor too narrowly; systematic error in either direction erodes the legal
+      mechanism the Convention was designed to create.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db2dcc14b6e4
+    tag: >-
+      Both sides invoke the protective purpose
+    text: >-
+      Both Bartov and Stephens invoke the Convention's protective purpose — Bartov arguing that
+      under-application disables prevention duties, Stephens arguing that over-application dilutes
+      the term's gravity — thereby sharing the premise that the Convention's efficacy is
+      calibration-dependent.
+    terminal: false
+    attribution:
+      source:
+        type: CommonKnowledge
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db2e25b89f4c
+    tag: Isolated statements vs. systematic policy
+    text: >-
+      Inflammatory statements by individual officials do not constitute evidence of a systematic
+      state policy of genocide; the relevant question is official policy, not rhetorical excess in
+      the heat of conflict.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db2faacc4ae4
+    tag: 'Stephens: Comments are no Wannsee equivalent'
+    text: >-
+      Stephens acknowledges the statements made by Israeli officials but notes that furious comments
+      in the immediate aftermath of a mass atrocity do not constitute the equivalent of the Wannsee
+      Conference — a systematic state-level planning document — and that he is aware of no evidence
+      of an Israeli plan to deliberately target and kill Gazan civilians.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Bret Stephens, New York Times, July 22 2025
+      quote: >-
+        furious comments in the wake of Hamas's Oct. 7 atrocities hardly amount to a Wannsee
+        conference
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db30462f70d1
+    tag: 'Bartov: Civilian institutions destroyed'
+    text: >-
+      Bartov reports systematic destruction not only of housing but of all institutions necessary
+      for civilian life and for the reconstitution of the group: hospitals, universities, schools,
+      mosques, cultural heritage sites, water treatment plants, and agricultural areas — a pattern
+      his former IDF chief of staff Moshe Yaalon publicly described as ethnic cleansing aimed at
+      clearing northern Gaza of its population.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Omer Bartov, New York Times, 2025
+      quote: the systematic destruction in Gaza not only of housing but also of other infrastructure
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db3124fcc5bb
+    tag: Mosul drew no genocide charge
+    text: >-
+      The US-backed Mosul campaign against ISIS used comparable tactics to Israel's Gaza campaign
+      and produced comparable civilian casualties, yet no credible genocide charge was made against
+      the US or Iraq.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db32b39e8695
+    tag: Embedded adversary explains casualty rate
+    text: >-
+      Where an armed group embeds itself in dense urban terrain and uses the civilian population as cover,
+      the resulting civilian casualty rate is explained by the tactical situation rather than by the attacking
+      state's intent.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db338fd00b86
+    tag: Tactical explanation admits no upper limit
+    text: >-
+      An explanation that attributes civilian casualties to an adversary's embedding admits no upper limit:
+      it is equally available at any level of destruction, up to the elimination of the entire built environment.
+      A defence consistent with every outcome constrains none of them.
+    terminal: false
+    attribution:
+      source:
+        type: LogicalNecessity
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db34cccf004a
+    tag: 'Stephens: Mosul killed up to 11,000 civilians'
+    text: >-
+      Stephens cites the 2016–17 Mosul campaign, in which American airstrikes leveled entire blocks
+      and as many as 11,000 civilians died over nine months as ISIS used civilians as human shields,
+      and notes the campaign had broad bipartisan and international support with no campus protests
+      or genocide charges.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Bret Stephens, New York Times, July 22 2025
+      quote: American airstrikes have at times leveled entire blocks
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db35912414c2
+    tag: Mosul analogy is structurally comparable to Gaza
+    text: >-
+      The Mosul campaign is a structurally comparable case — a state military operating in dense
+      urban terrain against an armed group using human shields and tunnel infrastructure — making
+      the absence of a genocide charge in that case evidentially relevant to Gaza.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db36b57d681c
+    tag: Tactical similarity licenses the comparison
+    text: >-
+      Where two campaigns share tactical structure — dense urban terrain, an adversary using tunnel infrastructure
+      and human shields — that similarity is sufficient to make the legal characterisation of one evidentially
+      relevant to the other.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db37748dbb49
+    tag: 'Stephens: ISIS and Hamas used one strategy'
+    text: >-
+      Stephens notes that ISIS, like Hamas, used a booby-trapped underground fortress strategy in a
+      dense urban environment, with the same dynamic of combatants below ground and civilians above
+      ground that characterises the Gaza campaign.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Bret Stephens, New York Times, July 22 2025
+      quote: booby-trapped, underground fortress
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db3894846895
+    tag: Genocide label serves antisemitic function
+    text: >-
+      The genocide charge against Israel is used by anti-Zionists to equate Israel with Nazi
+      Germany, licensing Jew-hatred and targeting diaspora Jews who support Israel.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db39abbcfa43
+    tag: 'Stephens: Charge delegitimises the state'
+    text: >-
+      Stephens argues the genocide charge is part of a pattern of "inflated or bogus charges"
+      deployed by Israel's opponents to delegitimise the state and generate hatred not only of
+      Israeli policy but of Jews who support Israel's existence, making supporters of a
+      genocide-committing state guilty of genocide by association.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Bret Stephens, New York Times, July 22 2025
+      quote: equate modern Israel with Nazi Germany
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db3ae056ff79
+    tag: Antisemitism charge silences legitimate critique
+    text: >-
+      Labelling the genocide designation as antisemitic is itself a mechanism of intellectual
+      suppression that immunises Israeli actions from legitimate scrutiny.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db3b21079d0d
+    tag: 'Bartov: Scholars accused of antisemitism'
+    text: >-
+      Bartov reports that genocide scholars who apply the designation to Gaza have been accused by
+      Holocaust historians of "well-poisoning" and antisemitism, and specifically that Norman Goda
+      characterised showing images of Palestinian children killed by Israeli bombs as an antisemitic
+      act — a position Bartov treats as demonstrably untenable.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Omer Bartov, New York Times, 2025
+      quote: >-
+        showing images of Palestinian children ripped apart by U.S.-made bombs launched by Israeli
+        pilots is, in this view, an antisemitic act
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db3c8b169c48
+    tag: Intent inferable without a planning document
+    text: >-
+      In genocide adjudication, specific intent (dolus specialis) may be established by inference
+      from the totality of acts and statements when no direct planning document is available; the
+      absence of a Wannsee-style document does not foreclose a finding of intent.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db3d657a408e
+    tag: >-
+      Bartov: Intent derivable from operations pattern
+    text: >-
+      Bartov states that genocidal intent can also be derived from a pattern of operations on the ground.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Omer Bartov, New York Times, 2025, citing genocide jurisprudence
+      quote: intent can also be derived from a pattern of operations on the ground
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db3eec3e68d7
+    tag: 'ICJ/ICTY: Intent inferred from conduct'
+    text: >-
+      Courts including the ICJ and the ICTY have found genocidal intent by inference from conduct in the
+      absence of direct documentary evidence.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: ICJ and ICTY genocide judgments
+      quote: >-
+        CITATION NEEDED
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db3ff5c1ebf6
+    tag: No receiving territory makes expulsion destruction
+    text: >-
+      When a target population has no adjacent territory to receive them, expulsion orders combined
+      with ongoing destruction of survival conditions are functionally equivalent to destruction of
+      the group as such — making Gaza structurally disanalogous to cases where the displaced
+      population could flee.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db40b37ee269
+    tag: 'Bartov: Sealed borders make flight impossible'
+    text: >-
+      Bartov argues that Gaza's borders are sealed by Egypt and Israel, so displacement orders
+      combined with bombardment are equivalent to an order to cease to exist as a group; Stephens's
+      Mosul analogy is undermined by this structural difference, since Mosul's civilian population
+      could and did flee the city whereas Gazans have no receiving territory.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Omer Bartov, New York Times, 2025; Bret Stephens, New York Times, July 22 2025
+      quote: null
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db41dfb93ef3
+    tag: Holocaust's lesson is universal, not particular
+    text: >-
+      The moral authority Holocaust remembrance generates is premised on the universality of its
+      lesson; invoking that memory to shield a state from genocide charges contradicts the
+      foundation of the authority being claimed.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db422d930f48
+    tag: 'Bartov: Holocaust lesson framed as universal'
+    text: >-
+      Bartov argues that Holocaust commemoration succeeded in finding a universal audience precisely
+      by presenting its lesson as a warning for all humanity; using Holocaust victimhood as a
+      justification for inhumanity toward others transforms the lesson into its opposite and
+      destroys the moral credit it generates.
+    terminal: false
+    attribution:
+      source:
+        type: Citation
+        reference: Omer Bartov, New York Times, 2025
+      quote: >-
+        transforming its meaning from an assertion of resistance to inhumanity wherever it is
+        perpetrated to an excuse
+    uncertain: false
+    submissionStatus: Accepted
+  - id: 019fab4a-ca4e-71a1-8c58-db438ded3ec8
+    tag: Restraint in killing, not in destruction
+    text: >-
+      A state that deploys far less than its capacity to kill while deploying near its full capacity
+      to destroy housing, infrastructure, and civilian institutions has selected those targets
+      deliberately, and that selection is what a campaign against the conditions of group existence
+      looks like.
+    terminal: false
+    uncertain: false
+    submissionStatus: Accepted
+
+inferences:
+  - id: 019fab4a-ca4e-71a1-8c58-db44d05f1748
+    scheme: FromSign
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-daf949d4215e
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db0e7fb6fe73
+    concludes: 019fab4a-ca4e-71a1-8c58-daf8f66d45b1
+  - id: 019fab4a-ca4e-71a1-8c58-db453f18d1b1
+    scheme: FromSign
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-dafc422fd036
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db100e3ec590
+    concludes: 019fab4a-ca4e-71a1-8c58-dafaa708400a
+  - id: 019fab4a-ca4e-71a1-8c58-db463818bc8b
+    scheme: FromAuthority
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-dafeb2b9effc
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db12ad54afe2
+    concludes: 019fab4a-ca4e-71a1-8c58-dafd217dd835
+  - id: 019fab4a-ca4e-71a1-8c58-db476d91c1a7
+    scheme: FromConsequence
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db005e5dec21
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db152e7934c4
+      - 019fab4a-ca4e-71a1-8c58-db2c868e149c
+    concludes: 019fab4a-ca4e-71a1-8c58-daffd5c3a653
+  - id: 019fab4a-ca4e-71a1-8c58-db484819c647
+    scheme: FromAnalogy
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db0259c28da3
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db1760b21fcd
+      - 019fab4a-ca4e-71a1-8c58-db3ff5c1ebf6
+    concludes: 019fab4a-ca4e-71a1-8c58-db0121ee0fec
+  - id: 019fab4a-ca4e-71a1-8c58-db49174d962d
+    scheme: FromSign
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db1a4b978cf3
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db197dcee5a2
+    concludes: 019fab4a-ca4e-71a1-8c58-db03ce530257
+  - id: 019fab4a-ca4e-71a1-8c58-db4a129938b7
+    scheme: FromSign
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db05d6b44c65
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db1b2ac3e82d
+    concludes: 019fab4a-ca4e-71a1-8c58-db0411ae3dd1
+  - id: 019fab4a-ca4e-71a1-8c58-db4bb8f24b17
+    scheme: FromGeneralization
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db096fa819e1
+    warrants: []
+    concludes: 019fab4a-ca4e-71a1-8c58-db1f4d3b8a9e
+  - id: 019fab4a-ca4e-71a1-8c58-db4ccdbddf44
+    scheme: FromDefinition
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db077f353dfb
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db1d5c5132b7
+      - 019fab4a-ca4e-71a1-8c58-db1f4d3b8a9e
+    concludes: 019fab4a-ca4e-71a1-8c58-db06fe4416b8
+  - id: 019fab4a-ca4e-71a1-8c58-db4d2ac23d43
+    scheme: FromCause
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db0b1b6dd4f6
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db289a1ecc2d
+    concludes: 019fab4a-ca4e-71a1-8c58-db0ab12c7510
+  - id: 019fab4a-ca4e-71a1-8c58-db4eda36558e
+    scheme: FromConsequence
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db0df525a661
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db2aa2a02f6e
+      - 019fab4a-ca4e-71a1-8c58-db2c868e149c
+    concludes: 019fab4a-ca4e-71a1-8c58-db0cc68f7a7e
+  - id: 019fab4a-ca4e-71a1-8c58-db4f80c2f3ce
+    scheme: FromDefinition
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db0f5ca3622f
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db3c8b169c48
+    concludes: 019fab4a-ca4e-71a1-8c58-db0e7fb6fe73
+  - id: 019fab4a-ca4e-71a1-8c58-db50c822ce1f
+    scheme: FromDefinition
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db1142915fd5
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db3c8b169c48
+    concludes: 019fab4a-ca4e-71a1-8c58-db100e3ec590
+  - id: 019fab4a-ca4e-71a1-8c58-db51ca21c8df
+    scheme: FromAuthority
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db1353ccd637
+    warrants: []
+    concludes: 019fab4a-ca4e-71a1-8c58-db12ad54afe2
+  - id: 019fab4a-ca4e-71a1-8c58-db52ec3778b0
+    scheme: FromDefinition
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db166ecf1fbd
+    warrants: []
+    concludes: 019fab4a-ca4e-71a1-8c58-db152e7934c4
+  - id: 019fab4a-ca4e-71a1-8c58-db5348340a2a
+    scheme: FromGeneralization
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db0259c28da3
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db18b7092c53
+    concludes: 019fab4a-ca4e-71a1-8c58-db1760b21fcd
+  - id: 019fab4a-ca4e-71a1-8c58-db54067bc1b2
+    scheme: FromSign
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db1a4b978cf3
+    warrants: []
+    concludes: 019fab4a-ca4e-71a1-8c58-db197dcee5a2
+  - id: 019fab4a-ca4e-71a1-8c58-db5559c85db7
+    scheme: FromSign
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db1c182198fe
+    warrants: []
+    concludes: 019fab4a-ca4e-71a1-8c58-db1b2ac3e82d
+  - id: 019fab4a-ca4e-71a1-8c58-db56f3c9639a
+    scheme: FromDefinition
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db2701b467a9
+      - 019fab4a-ca4e-71a1-8c58-db2611fb8e76
+    warrants: []
+    concludes: 019fab4a-ca4e-71a1-8c58-db1d5c5132b7
+  - id: 019fab4a-ca4e-71a1-8c58-db5790444000
+    scheme: FromGeneralization
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db08c184e290
+    warrants: []
+    concludes: 019fab4a-ca4e-71a1-8c58-db096fa819e1
+  - id: 019fab4a-ca4e-71a1-8c58-db58b4292eaf
+    scheme: FromCause
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db29b6c43f58
+    warrants: []
+    concludes: 019fab4a-ca4e-71a1-8c58-db289a1ecc2d
+  - id: 019fab4a-ca4e-71a1-8c58-db5941a10123
+    scheme: FromConsequence
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db2b1405b347
+    warrants: []
+    concludes: 019fab4a-ca4e-71a1-8c58-db2aa2a02f6e
+  - id: 019fab4a-ca4e-71a1-8c58-db5a85d92a1e
+    scheme: FromDefinition
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db2dcc14b6e4
+    warrants: []
+    concludes: 019fab4a-ca4e-71a1-8c58-db2c868e149c
+  - id: 019fab4a-ca4e-71a1-8c58-db5b11fedb49
+    scheme: FromSign
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db2faacc4ae4
+    warrants: []
+    concludes: 019fab4a-ca4e-71a1-8c58-db2e25b89f4c
+  - id: 019fab4a-ca4e-71a1-8c58-db5c76d08d88
+    scheme: FromSign
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db30462f70d1
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db100e3ec590
+    concludes: 019fab4a-ca4e-71a1-8c58-dafaa708400a
+  - id: 019fab4a-ca4e-71a1-8c58-db5d9f282cc9
+    scheme: FromConsequence
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db41dfb93ef3
+    warrants: []
+    concludes: 019fab4a-ca4e-71a1-8c58-daffd5c3a653
+  - id: 019fab4a-ca4e-71a1-8c58-db5e51c74cfb
+    scheme: FromAnalogy
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db34cccf004a
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db35912414c2
+    concludes: 019fab4a-ca4e-71a1-8c58-db3124fcc5bb
+  - id: 019fab4a-ca4e-71a1-8c58-db5fac5f41d6
+    scheme: FromAnalogy
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db37748dbb49
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db36b57d681c
+    concludes: 019fab4a-ca4e-71a1-8c58-db35912414c2
+  - id: 019fab4a-ca4e-71a1-8c58-db60f1b6118f
+    scheme: FromConsequence
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db39abbcfa43
+    warrants: []
+    concludes: 019fab4a-ca4e-71a1-8c58-db3894846895
+  - id: 019fab4a-ca4e-71a1-8c58-db616458a8c9
+    scheme: FromConsequence
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db3b21079d0d
+    warrants: []
+    concludes: 019fab4a-ca4e-71a1-8c58-db3ae056ff79
+  - id: 019fab4a-ca4e-71a1-8c58-db62e5c76690
+    scheme: FromDefinition
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db3d657a408e
+      - 019fab4a-ca4e-71a1-8c58-db3eec3e68d7
+    warrants: []
+    concludes: 019fab4a-ca4e-71a1-8c58-db3c8b169c48
+  - id: 019fab4a-ca4f-7004-a1a9-ca641e020b08
+    scheme: FromDefinition
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db40b37ee269
+    warrants: []
+    concludes: 019fab4a-ca4e-71a1-8c58-db3ff5c1ebf6
+  - id: 019fab4a-ca4f-7004-a1a9-ca65b3446392
+    scheme: FromDefinition
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db422d930f48
+    warrants: []
+    concludes: 019fab4a-ca4e-71a1-8c58-db41dfb93ef3
+  - id: 019fab4a-ca4f-7004-a1a9-ca664a4d34b8
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-daf8f66d45b1
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-daf407dcbbcc
+    concludes: 019fab4a-ca4e-71a1-8c58-db1ee7ca4214
+  - id: 019fab4a-ca4f-7004-a1a9-ca6737867e79
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-dafaa708400a
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-daf407dcbbcc
+    concludes: 019fab4a-ca4e-71a1-8c58-db1ee7ca4214
+  - id: 019fab4a-ca4f-7004-a1a9-ca684ece86ae
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-dafd217dd835
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-daf796c05e23
+      - 019fab4a-ca4e-71a1-8c58-db14336eb36d
+    concludes: 019fab4a-ca4e-71a1-8c58-daf398eea136
+  - id: 019fab4a-ca4f-7004-a1a9-ca6945ac4268
+    scheme: null
+    uncertain: true
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-daffd5c3a653
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-daf796c05e23
+    concludes: 019fab4a-ca4e-71a1-8c58-daf398eea136
+  - id: 019fab4a-ca4f-7004-a1a9-ca6a89b649d6
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db0121ee0fec
+    warrants: []
+    concludes: 019fab4a-ca4e-71a1-8c58-db1ee7ca4214
+  - id: 019fab4a-ca4f-7004-a1a9-ca6bf014eb22
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db03ce530257
+    warrants: []
+    contests: 019fab4a-ca4e-71a1-8c58-daf398eea136
+  - id: 019fab4a-ca4f-7004-a1a9-ca6c268fbac5
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db0411ae3dd1
+    warrants: []
+    contests: 019fab4a-ca4e-71a1-8c58-daf398eea136
+  - id: 019fab4a-ca4f-7004-a1a9-ca6d31cb110b
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db06fe4416b8
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-daf5ae3b2e9c
+    contests: 019fab4a-ca4e-71a1-8c58-db1ee7ca4214
+  - id: 019fab4a-ca4f-7004-a1a9-ca6e123a7857
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db1ee7ca4214
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-daf407dcbbcc
+    concludes: 019fab4a-ca4e-71a1-8c58-daf398eea136
+  - id: 019fab4a-ca4f-7004-a1a9-ca6fb83a2959
+    scheme: FromSign
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db40b37ee269
+    warrants: []
+    concludes: 019fab4a-ca4e-71a1-8c58-db1ee7ca4214
+  - id: 019fab4a-ca4f-7004-a1a9-ca7031c54114
+    scheme: FromExample
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db201f2c90c9
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db231ed8358a
+    contests: 019fab4a-ca4e-71a1-8c58-db1f4d3b8a9e
+  - id: 019fab4a-ca4f-7004-a1a9-ca7185101ab1
+    scheme: FromExample
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db215f963ade
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db24afcbb342
+    contests: 019fab4a-ca4e-71a1-8c58-db1f4d3b8a9e
+  - id: 019fab4a-ca4f-7004-a1a9-ca729dc1acab
+    scheme: FromExample
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db22bb5188aa
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db25896cf4ee
+    contests: 019fab4a-ca4e-71a1-8c58-db1f4d3b8a9e
+  - id: 019fab4a-ca4f-7004-a1a9-ca7396051fe2
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db3ff5c1ebf6
+    warrants: []
+    contests: 019fab4a-ca4e-71a1-8c58-db1f4d3b8a9e
+  - id: 019fab4a-ca4f-7004-a1a9-ca74994f2622
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db0ab12c7510
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-daf605b20516
+    contests: 019fab4a-ca4e-71a1-8c58-daf398eea136
+  - id: 019fab4a-ca4f-7004-a1a9-ca75c959b29e
+    scheme: null
+    uncertain: true
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db0cc68f7a7e
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-daf5ae3b2e9c
+    contests: 019fab4a-ca4e-71a1-8c58-daf398eea136
+  - id: 019fab4a-ca4f-7004-a1a9-ca7691c71245
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db2e25b89f4c
+    warrants: []
+    contests: 019fab4a-ca4e-71a1-8c58-db0e7fb6fe73
+  - id: 019fab4a-ca4f-7004-a1a9-ca7710ad4c65
+    scheme: FromAnalogy
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db3124fcc5bb
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db35912414c2
+    concludes: 019fab4a-ca4e-71a1-8c58-db32b39e8695
+  - id: 019fab4a-ca4f-7004-a1a9-ca78b7479252
+    scheme: FromConsequence
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db338fd00b86
+    warrants: []
+    contests: 019fab4a-ca4e-71a1-8c58-db32b39e8695
+  - id: 019fab4a-ca4f-7004-a1a9-ca7994296de2
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db0b1b6dd4f6
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db32b39e8695
+    concludes: 019fab4a-ca4e-71a1-8c58-db0ab12c7510
+  - id: 019fab4a-ca4f-7004-a1a9-ca7afdaf5fbf
+    scheme: FromAnalogy
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db3124fcc5bb
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db35912414c2
+    concludes: 019fab4a-ca4e-71a1-8c58-db096fa819e1
+  - id: 019fab4a-ca4f-7004-a1a9-ca7b2343b9d7
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db03ce530257
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-dafb57dc2399
+    contests: 019fab4a-ca4e-71a1-8c58-dafaa708400a
+  - id: 019fab4a-ca4f-7004-a1a9-ca7c9b44ece1
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db3894846895
+    warrants: []
+    contests: 019fab4a-ca4e-71a1-8c58-db14336eb36d
+  - id: 019fab4a-ca4f-7004-a1a9-ca7dcf484577
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db3ae056ff79
+    warrants: []
+    contests: 019fab4a-ca4e-71a1-8c58-db3894846895
+  - id: 019fab4a-ca4f-7004-a1a9-ca7e2c666001
+    scheme: null
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db3ff5c1ebf6
+    warrants: []
+    contests: 019fab4a-ca4e-71a1-8c58-db36b57d681c
+  - id: 019fab4a-ca4f-7004-a1a9-ca7faf42a82a
+    scheme: FromSign
+    uncertain: false
+    submissionStatus: Accepted
+    grounds:
+      - 019fab4a-ca4e-71a1-8c58-db1a4b978cf3
+    warrants:
+      - 019fab4a-ca4e-71a1-8c58-db438ded3ec8
+    concludes: 019fab4a-ca4e-71a1-8c58-dafaa708400a
