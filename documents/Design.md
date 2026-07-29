@@ -39,6 +39,10 @@ inference's fields):
   No separate attack taxonomy is stored — rebut vs. undermine is read off
   whether the target claim is attributive.
 
+Concludes and Contests are not separate fields: an inference carries one
+`target` claim and a `relation` in {`concludes`, `contests`} saying how it
+bears on that target.
+
 **Enums.** `ArgumentScheme` (FromExample, FromGeneralization, FromAnalogy,
 FromAuthority, FromConsequence, FromSign, FromCause, FromDefinition),
 `SubmissionStatus`
@@ -68,7 +72,7 @@ The framework does not determine whether arguments are correct or which side win
 
 ## 2. The atomic unit is the claim, joined by inferences
 
-An assertion decomposes into: a **claim** (the assertable conclusion), its **grounds** (the attributed factual basis, itself a claim carrying `attribution`), and an **inference** that binds the grounds to the claim (`concludes`). The bridging assumptions that make the grounds count as evidence — **warrants** — are themselves claim nodes, listed in the inference's `warrants`. All elements must be explicit before the inference enters the graph.
+An assertion decomposes into: a **claim** (the assertable conclusion), its **grounds** (the attributed factual basis, itself a claim carrying `attribution`), and an **inference** that binds the grounds to the claim (`target` with `relation: concludes`). The bridging assumptions that make the grounds count as evidence — **warrants** — are themselves claim nodes, listed in the inference's `warrants`. All elements must be explicit before the inference enters the graph.
 
 When making an argument, a participant must state: (a) what they believe — the claim; (b) why they believe it — the grounds-claim; and (c) the assumptions that make b imply a — warrant claims on the inference. Warrants are not sub-fields; they are first-class claims, bound to a specific inference via its `warrants` list. A support and an attack are not different kinds of thing from an inference — a support *is* an inference that `concludes`, an attack *is* an inference that `contests`.
 
@@ -158,8 +162,8 @@ unchanged in spirit; only the shapes changed.
   `warrants`. Conjoint warrants (all required for one step) go on **one**
   inference; genuinely **alternative** justifications are **separate**
   inferences concluding the same claim.
-- **Contests for attacks.** An attack is an inference with `contests`, and it
-  may only target a **claim**. Contest a non-attributive claim to **rebut** it;
+- **Contests for attacks.** An attack is an inference with `relation: contests`,
+  and it may only target a **claim**. Contest a non-attributive claim to **rebut** it;
   contest an attributive claim to **undermine** it. There is no inference-
   targeting attack: an applicability challenge ("that warrant does not license
   this step") is handled by surfacing the implicit warrant as its own claim on
@@ -185,24 +189,33 @@ implicit warrants). **Step 4 — emit YAML — changes shape only:** instead of
 `arguments` (claim + embedded grounds), `terminalValueNodes`, and typed
 `edges`, emit a flat `claims` list (with `attribution` on the attributive
 ones and `terminal` on the bedrock ones), a `roots` list, and an
-`inferences` list whose `grounds`/`warrants`/`concludes`/`contests` fields
-encode all the connective tissue. `scripts/convert.ts` performs exactly this
-mechanical remapping from an old-model corpus.
+`inferences` list whose `grounds`/`warrants`/`target`/`relation` fields
+encode all the connective tissue.
 
-## Canonical corpus I/O (`parsanga_io.py`, `canonicalize.py`)
+## Canonical corpus I/O (`yaml_io.py`, `canonicalize.py`)
 
-`parsanga_io.py` is the canonical load/serialize pair: `load(path_or_text)`
+`yaml_io.py` is the canonical load/serialize pair: `load(path_or_text)`
 parses a corpus with `yaml.safe_load` and casts it into frozen dataclasses
 (`Corpus`, `Definition`, `Claim`, `Inference`, `Attribution`, `GroundsSource`),
 and `serialize(corpus)` emits the corpus back to YAML. Same graph, same bytes —
-so a commit diff shows exactly the nodes that changed.
+so a commit diff shows exactly the nodes that changed. (The module is named
+`yaml_io.py`, not `io.py`, which would shadow the stdlib `io` whenever the
+package directory lands on `sys.path`.)
 
 - **Object model.** All dataclasses are `frozen=True`; id collections
   (`grounds`, `warrants`, `roots`) are tuples. `Corpus.__post_init__` sorts
   nodes and roots ascending by uuid and builds a cached `id → node` index;
-  `Inference.__post_init__` sorts `grounds`/`warrants` and enforces one
-  output. Canonical order is thus fixed at construction, so `serialize` emits
+  `Inference.__post_init__` sorts `grounds`/`warrants` and requires `target`
+  plus a `relation` that is a `Relation` enum member (never a bare string).
+  Canonical order is thus fixed at construction, so `serialize` emits
   stored order without re-sorting.
+- **`Relation` is a plain `Enum`** (`CONCLUDES`/`CONTESTS`, values the wire
+  strings), deliberately not a `str`-mixin: a str-enum compares equal to its
+  own wire string, so bare `"concludes"` would sail through every call site
+  that should have adopted the enum and a typo would reach validation instead
+  of the boundary. The loader constructs `Relation(raw)` (raising on anything
+  else), the serializer emits `relation.value`; that is the whole cost, and
+  canonical bytes are unchanged.
 - **Emitter.** Hand-written — no YAML library on the write path, so the
   canonical form depends on nothing but this file. Key order within each node
   is schema declaration order (the `*_KEYS` constants). All string scalars are
@@ -219,11 +232,18 @@ so a commit diff shows exactly the nodes that changed.
 
 The three corpora live in their own **nested git repository** at
 `discourse-spaces/` (branch `main`, genesis commit holding the three canonical
-`*.v2.yaml` and `migrations/`). It is a repository distinct from the outer code
+`*.v2.yaml` and `migrations/`). The genesis commit is
+`genesis: three corpora at canonical form, uuid ids, target/relation` — an
+orphan root rebuilt (Directive 1d2) so that every corpus at every commit parses
+under the current loader; the old pre-1a2 root (whose `concludes`/`contests`
+schema the current loader cannot read) was dropped and pruned, with a full copy
+kept at `_pre-genesis-rebuild/`. It is a repository distinct from the outer code
 tree — `discourse-spaces/` is in the outer `.gitignore` so git never records a
 gitlink for it — and every commit in it is one graph change. `corpus_store.py`
 is the object-layer read/write pair the writer (1d) sits on; it does not
-validate, diff, or implement any patch/agent logic.
+validate, diff, or implement any patch/agent logic. The store's test suite
+(`test_1d.py`) includes the guard that keeps genesis readable: a walk of every
+commit reachable from `main` that loads and validates every corpus at each.
 
 `CorpusStore(repo_path)` opens that repository (via `pygit2`, no subprocess) and
 exposes:
@@ -253,6 +273,98 @@ replaced, committed onto `refs/heads/main`), those bytes to the working-tree fil
 new tree so `git status` stays clean and reports only the operator's own later
 hand-edits. The commit is built purely at the object layer; the index is never a
 source, only reconciled after the fact.
+
+## The writer session (`session.py`, `ops.py`)
+
+The session is what an agent constructs a graph *through*. It sits on the
+serializer (`yaml_io.py`), the validator (`validate.py`), and the store
+(`corpus_store.py`). Patches are not inputs: the agent calls ops and, once,
+`commit()`.
+
+- **`ops.py`** — pure transforms, `(corpus, args) -> corpus`. `add_claim`,
+  `add_inference`, `revise_claim`. No io, no uuid generation, no validation. A
+  transform never mutates the corpus or a node; it builds a new `Corpus`
+  (`dataclasses.replace`) that shares every unchanged frozen node. Polarity is
+  the `relation` argument to `add_inference` (`Relation.CONCLUDES` /
+  `Relation.CONTESTS`) — there is no separate contest transform. The id is
+  supplied by the caller; ops never touch a clock or the uuid module.
+- **`Session(store, corpus)`** — binds current head (the whole "open"); loads
+  that version through the serializer. State is one reference to the current
+  corpus version; every write op rebinds it. **Ids are minted here** (UUIDv7 — a
+  clock prefix plus a monotonic counter, matching the migration), passed into
+  the pure op, returned to the agent. **Reads see uncommitted writes**: `get`,
+  `neighborhood`, `find_by_tag`, `concludes`/`contesting`,
+  `grounds_citing`/`warrants_citing` all read the in-progress version, so
+  `add_claim` → `add_inference` → `neighborhood` composes during construction.
+  `concludes` and `contesting` are separate polarity queries, not one query with
+  a flag.
+- **No incremental validation.** Mid-construction states legitimately violate
+  invariants (an inference whose target is not added yet). Validation runs only
+  at commit.
+- **`commit(summary)`** — serialize the current version, validate invariants
+  I1–I8 (`validate.check`), write through `CorpusStore.commit` bound to the
+  session's parent sha, return the sha. Every failure is terminal and creates no
+  commit: `ValidationFailed` (carries the specific violations, for the log),
+  `HeadMoved` (the bound version is stale), `WorkingTreeDirty` (an uncommitted
+  hand-edit is present). **One session, one commit** — the session closes the
+  moment `commit()` is entered, so any op afterward (and a second commit) raises
+  `SessionClosed`, whatever the outcome. There is no retry or repair path.
+- **Commit message** is generated from the recorded ops (only the one-line
+  summary is the agent's), and is the change record until Stage 2: a header
+  (`<corpus>: <n> ops — <summary>`), the bound sha, then one line per op with its
+  uuid, relation word, and tag — readability back after uuids.
+- **`diff()`** returns the recorded op lines plus a unified diff of the bound
+  version against the current version. Output only — nothing executes a diff.
+
+`validate.py` exposes `check(data, path="") -> (errs, warns)` (the pure invariant
+pass the session calls at commit); `validate(path)` wraps it for the CLI,
+unchanged. It reads raw YAML, so it string-compares relations against
+`{r.value for r in Relation}` (reporting a bad one as I1) rather than
+constructing the enum and raising. `Relation` (the `concludes`/`contests` enum
+mirroring `src/types.ts`) lives with the model in `yaml_io.py`; ops, the
+session, and the validator import it rather than redefine it.
+
+## Stop controls (`guarded_client.py`, `guard_config.toml`, token log)
+
+Bounded spend and an external stop switch. Every model call goes through
+`GuardedClient`; a run opens a session and uses the client directly (no run
+wrapper, no harness object). The stop controls are wholly separate from the
+writer — they touch neither the session, ops, serializer, store, nor the
+invariants.
+
+- **The underlying client is a constructor parameter** (`GuardedClient(client,
+  config, corpus, ...)`), never a module-level singleton, so a test substitutes
+  a stub returning scripted `usage` and exercises commit paths without the API,
+  network, or a key. The API key is never handled here: the caller builds
+  `anthropic.Anthropic()` (which reads `ANTHROPIC_API_KEY` from the environment)
+  and passes it in.
+- **Pre-flight runs before every call** (`create()` → `_preflight()` → the API),
+  three gates in order: (1) the **kill file** — if the configured path exists,
+  refuse; presence is the signal, contents ignored; checked every call. (2) the
+  **per-run cap** — tokens spent so far this run plus this call's projected cost
+  (`estimated input + max_tokens`, the output ceiling). (3) the **cumulative
+  cap** — tokens over a rolling window, summed from the token log **on disk**, so
+  it bounds a crash-loop of separate processes, not just calls in one. Any gate
+  raises a `Refused` subclass (`KillFilePresent`, `RunCapExceeded`,
+  `CumulativeCapExceeded`) — terminal, no wait/backoff/retry/loop. A run commits
+  once at the very end, so a refusal at any point leaves the corpus repo
+  untouched.
+- **Token log** — append-only JSONL, one line per API call written after it
+  returns: `timestamp, run_id, corpus, model, input_tokens, output_tokens,
+  committed`. No cost figure — the model and counts are recorded and a price
+  table is applied retroactively; a price never sits in the pre-flight path. The
+  cumulative counters derive from this file (no separate counter to reconcile).
+  Append mode, one `write` per line, `flush` + `fsync`, so an append survives a
+  crash mid-write. Default path `token_log.jsonl` in the code tree, **gitignored
+  and outside the corpus repo** (every corpus-repo commit is a graph change,
+  nothing else); the path is a constructor argument, not a config key.
+- **Config** (`guard_config.toml`, committed — caps set invisibly get set wrong)
+  holds exactly: `per_run_token_cap`, `cumulative_token_cap`,
+  `cumulative_window_seconds`, `kill_file`, `model`. `GuardConfig.load` rejects
+  any price- or key-like key so neither can enter the guard through config drift.
+  No prices, no API key.
+- Reporting helpers (`read_log`, `cumulative_tokens`) live apart from the
+  pre-flight path — cost/reporting is deliberately kept out of the gate.
 
 ## GAP 1 — resolved (enthymemification: surfaced warrant, contested as a rebut)
 

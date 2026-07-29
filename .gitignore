@@ -5,6 +5,12 @@
 # tree so git never records a gitlink / phantom submodule for it.
 /discourse-spaces/
 
+# Stop controls (Directive 1e). The token log is runtime spend data, and the
+# kill file is a runtime signal — neither is committed, and neither belongs in
+# the corpus repo. The guard config (guard_config.toml) IS committed.
+/token_log.jsonl
+/STOP
+
 /node_modules
 npm-debug.log*
 yarn-debug.log*

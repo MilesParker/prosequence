@@ -10,7 +10,7 @@ will be destroyed.
 """
 import sys
 
-from parsanga_io import load, serialize
+from yaml_io import load, serialize
 
 CORPORA = (
     "discourse-spaces/free-transit.v2.yaml",

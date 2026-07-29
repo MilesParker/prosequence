@@ -36,11 +36,7 @@ export function printDiscourseSpace(ds: DiscourseSpace): void {
 
   console.log(`INFERENCES (${ds.inferences.length})`)
   for (const inf of ds.inferences) {
-    const output = inf.concludes
-      ? `concludes → ${tagOf(inf.concludes)}`
-      : inf.contests
-        ? `contests → ${tagOf(inf.contests)}`
-        : '(no output!)'
+    const output = `${inf.relation} → ${tagOf(inf.target)}`
     const grounds = inf.grounds.map(g => tagOf(g)).join(', ')
     const warrants = inf.warrants.length ? inf.warrants.map(w => tagOf(w)).join(', ') : '(implicit)'
     const scheme = inf.scheme ? ` [${inf.scheme}]` : ''

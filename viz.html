@@ -190,8 +190,8 @@ function buildGraph(data) {
   for (const inf of inferences) {
     (inf.grounds || []).forEach(g => links.push({ id: `${inf.id}:g:${g}`, source: g, target: inf.id, role: 'Grounds', uncertain: !!inf.uncertain }));
     (inf.warrants || []).forEach(w => links.push({ id: `${inf.id}:w:${w}`, source: w, target: inf.id, role: 'Warrants', uncertain: !!inf.uncertain }));
-    if (inf.concludes) links.push({ id: `${inf.id}:concludes`, source: inf.id, target: inf.concludes, role: 'Concludes', uncertain: !!inf.uncertain });
-    if (inf.contests) links.push({ id: `${inf.id}:contests`, source: inf.id, target: inf.contests, role: 'Contests', toInf: infIds.has(inf.contests), uncertain: !!inf.uncertain });
+    if (inf.relation === 'concludes') links.push({ id: `${inf.id}:concludes`, source: inf.id, target: inf.target, role: 'Concludes', uncertain: !!inf.uncertain });
+    else links.push({ id: `${inf.id}:contests`, source: inf.id, target: inf.target, role: 'Contests', toInf: infIds.has(inf.target), uncertain: !!inf.uncertain });
   }
 
   const depth = computeDepth(claims, inferences, roots, infIds);
@@ -216,9 +216,9 @@ function computeDepth(claims, inferences, roots, infIds) {
   const push = (m, k, v) => { (m[k] = m[k] || []).push(v); };
   for (const inf of inferences) {
     inputsOf[inf.id] = [...(inf.grounds || []), ...(inf.warrants || [])].map(String);
-    if (inf.concludes) push(outputsToClaim, String(inf.concludes), inf.id);
-    if (inf.contests) {
-      const t = String(inf.contests);
+    if (inf.relation === 'concludes') push(outputsToClaim, String(inf.target), inf.id);
+    else {
+      const t = String(inf.target);
       if (infIds.has(t)) push(contestersOf, t, inf.id); else push(outputsToClaim, t, inf.id);
     }
   }
@@ -315,7 +315,7 @@ async function main() {
     let html = '';
     if (isInf(d)) {
       html += `<div class="tt-tag">Inference</div>`;
-      html += `<div class="tt-text">${d.concludes ? 'Concludes a claim' : 'Contests a claim or inference'}</div>`;
+      html += `<div class="tt-text">${d.relation === 'concludes' ? 'Concludes a claim' : 'Contests a claim or inference'}</div>`;
       if (d.hint) html += `<div class="tt-quote">${d.hint}</div>`;
       const ws = (d.warrants || []).map(w => (nodeById.get(w) || {}).tag || w);
       if (ws.length) html += `<div class="tt-sub"><span style="color:#777">warrants: </span>${ws.join('; ')}</div>`;
@@ -365,7 +365,7 @@ async function main() {
     let html = `<div class="p-section"><div class="p-label">ID</div><div class="p-value" style="font-family:monospace;font-size:12px;color:#666">${d.id}</div></div>`;
 
     if (isInf(d)) {
-      const out = d.concludes ? `concludes → <strong>${tagOf(d.concludes)}</strong>` : d.contests ? `contests → <strong>${tagOf(d.contests)}</strong>` : '—';
+      const out = d.target ? `${d.relation} → <strong>${tagOf(d.target)}</strong>` : '—';
       html += `<div class="p-section"><div class="p-label">Output</div><div class="p-value">${out}</div></div>`;
       if (d.hint) html += `<div class="p-section"><div class="p-label">Hint</div><div class="p-value" style="font-size:12px">${d.hint}</div></div>`;
       html += `<div class="p-section"><div class="p-label">Grounds (${(d.grounds || []).length})</div><div class="p-value" style="font-size:12px">${(d.grounds || []).map(tagOf).join('; ') || '—'}</div></div>`;

@@ -1,0 +1,30 @@
+# Stop controls (Directive 1e). Committed on purpose: caps set invisibly are
+# caps that get set wrong, so they live here in the open, not in environment
+# variables.
+#
+# NOT here, ever:
+#   * the API key — it comes from the environment (ANTHROPIC_API_KEY) only;
+#   * any price / cost figure — dollars are a reporting concern, applied to the
+#     token log retroactively, never in the pre-flight path where a stale table
+#     would make a cap silently wrong;
+#   * the token-log path — a constructor argument, so it is not set from here.
+
+# Per-run token cap: tokens spent so far this run + this call's projected cost.
+per_run_token_cap = 200000
+
+# Cumulative token cap over the rolling window below, summed from the token log
+# on disk. This is the only thing that stops a crash-loop from spending all
+# night, so it is read from disk, not process memory.
+cumulative_token_cap = 5000000
+
+# Rolling window for the cumulative cap, in seconds (86400 = 24h).
+cumulative_window_seconds = 86400
+
+# Kill file. If this path exists, every call refuses — presence is the signal,
+# contents are ignored. Halt everything from outside the process with:
+#   touch STOP
+# Resolved relative to the process working directory.
+kill_file = "STOP"
+
+# Model name used when a call does not specify one.
+model = "claude-sonnet-5"

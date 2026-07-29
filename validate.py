@@ -17,6 +17,16 @@ Usage: python validate.py <corpus.yaml> [<corpus.yaml> ...]
 import sys, glob
 import yaml
 
+from yaml_io import Relation
+
+# The valid relation wire strings, sourced from the model enum rather than
+# spelled out here. The validator reads raw YAML (untrusted, possibly
+# malformed), so it string-compares against these values and reports a bad
+# relation as an I1 error — it must not construct Relation() and raise.
+_CONCLUDES = Relation.CONCLUDES.value
+_CONTESTS = Relation.CONTESTS.value
+_RELATIONS = {r.value for r in Relation}
+
 
 def roots_of(d):
     if 'roots' in d:
@@ -27,8 +37,13 @@ def roots_of(d):
     return []
 
 
-def validate(path):
-    d = yaml.safe_load(open(path))
+def check(d, path=""):
+    """Run invariants I1-I8 (+ GAP-6) over a parsed corpus dict.
+
+    Pure: returns (errs, warns) as lists of formatted strings, no printing
+    and no exit. `validate(path)` wraps this for the CLI; the 1d session
+    calls it at commit and raises ValidationFailed carrying `errs`.
+    """
     claims = {c['id']: c for c in d.get('claims', [])}
     infs   = {i['id']: i for i in d.get('inferences', [])}
     roots  = roots_of(d)
@@ -41,15 +56,22 @@ def validate(path):
         errs.append(f"{path}: {inv} {iid} {target}  {msg}")
 
     for iid, i in infs.items():
-        concludes = i.get('concludes')
-        contests  = i.get('contests')
+        target    = i.get('target')
+        relation  = i.get('relation')
         grounds   = i.get('grounds') or []
         warrants  = i.get('warrants') or []
 
-        # I1 — exactly one of {concludes, contests}. (Type-enforced in TS.)
-        n_out = (1 if concludes else 0) + (1 if contests else 0)
-        if n_out != 1:
-            fail("I1", iid, "-", f"has {n_out} outputs (need exactly one of concludes/contests)")
+        # I1 — a single target plus a relation in {concludes, contests}.
+        #      (Structurally enforced in TS; checked here against YAML.)
+        if not target:
+            fail("I1", iid, "-", "missing target")
+        if relation not in _RELATIONS:
+            fail("I1", iid, "-", f"relation is {relation!r} (need one of concludes/contests)")
+
+        # A concluding target must be a claim; a contesting target must be a
+        # claim or an inference (I8 further restricts contests to claims).
+        concludes = target if relation == _CONCLUDES else None
+        contests  = target if relation == _CONTESTS else None
 
         # I3 — every referenced id resolves within the space.
         for g in grounds:
@@ -59,9 +81,9 @@ def validate(path):
             if w not in claims:
                 fail("I3", iid, w, "warrant id does not resolve to a claim")
         if concludes and concludes not in claims:
-            fail("I3", iid, concludes, "concludes id does not resolve to a claim")
+            fail("I3", iid, concludes, "concludes target does not resolve to a claim")
         if contests and contests not in claims and contests not in infs:
-            fail("I3", iid, contests, "contests id does not resolve to any node")
+            fail("I3", iid, contests, "contests target does not resolve to any node")
 
         # I2 — no inference concludes a terminal claim.
         if concludes in claims and claims[concludes].get('terminal'):
@@ -77,12 +99,12 @@ def validate(path):
             fail("I5", iid, concludes, "concludes an attributive (checkable-leaf) claim")
 
         # I7 — terminal claims appear only in warrants: never in grounds,
-        #      never as a contests target.
+        #      never as the target of a contesting inference.
         for g in grounds:
             if g in claims and claims[g].get('terminal'):
                 fail("I7", iid, g, "terminal claim used as grounds (terminals belong only in warrants)")
         if contests in claims and claims[contests].get('terminal'):
-            fail("I7", iid, contests, "terminal claim used as a contests target")
+            fail("I7", iid, contests, "terminal claim used as the target of a contesting inference")
 
         # I8 — a contests target resolves to a member of `claims`, never an
         #      inference. Undercuts (inference-targeting attacks) are not
@@ -103,9 +125,8 @@ def validate(path):
         adj.setdefault(iid, [])
         for c in (i.get('grounds') or []) + (i.get('warrants') or []):
             adj.setdefault(c, []).append(iid)     # claim -> inference
-        concludes = i.get('concludes')
-        if concludes:
-            adj[iid].append(concludes)            # inference -> concluded claim
+        if i.get('relation') == _CONCLUDES:
+            adj[iid].append(i.get('target'))      # inference -> concluded claim
     WHITE, GREY, BLACK = 0, 1, 2
     color = {n: WHITE for n in adj}
     reported = set()
@@ -129,7 +150,7 @@ def validate(path):
     # GAP-6 (warning) — a non-terminal, non-attributive claim that is not a
     #     root and is concluded by nothing is either an authoring gap or a
     #     claim that should be declared a root. Warned, never an error.
-    concluded = {i.get('concludes') for i in infs.values() if i.get('concludes')}
+    concluded = {i.get('target') for i in infs.values() if i.get('relation') == _CONCLUDES}
     for cid, c in claims.items():
         if c.get('terminal'):
             continue
@@ -140,6 +161,16 @@ def validate(path):
         if cid not in concluded:
             warns.append(f"{path}: GAP6 - {cid}  non-terminal, non-attributive, not a root, and concluded by nothing (GAP-6 gap, or it should be a root)")
 
+    return errs, warns
+
+
+def validate(path):
+    d = yaml.safe_load(open(path))
+    errs, warns = check(d, path)
+    claims = d.get('claims', [])
+    infs = d.get('inferences', [])
+    roots = roots_of(d)
+
     print(f"{path}: {len(claims)} claims, {len(infs)} inferences, {len(roots)} root(s)")
     for w in warns:
         print("   WARN", w)
@@ -147,7 +178,7 @@ def validate(path):
         for e in errs:
             print("   FAIL", e)
     else:
-        print("   PASS  I1 one-output  I2 no-concludes-terminal  I3 refint  "
+        print("   PASS  I1 target+relation  I2 no-concludes-terminal  I3 refint  "
               "I4 grounds>=1  I5 no-concludes-attributive  I6 acyclic-concludes  "
               "I7 terminals-warrants-only  I8 contests-claim-only"
               + ("  (GAP-6 warnings above)" if warns else ""))

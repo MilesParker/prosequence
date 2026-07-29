@@ -18,9 +18,27 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from enum import Enum
 from typing import Optional, Tuple
 
 import yaml
+
+
+# --------------------------------------------------------------------------
+# Relation — mirrors the `Relation` type in src/types.ts ("concludes" |
+# "contests"). Lives with the model so ops/session import it rather than
+# redefining the two polarities. A PLAIN Enum, deliberately not a str-mixin: a
+# str-enum compares equal to its own wire string, which lets bare "concludes"
+# sail through every call site that should have adopted the enum (and lets a
+# typo like "concludez" reach validation instead of being rejected at the
+# boundary). Members keep their wire strings as values; the serializer emits
+# `relation.value`, the loader constructs `Relation(raw)` and raises on anything
+# else, so `Inference.relation` is always a Relation, never a bare string.
+# --------------------------------------------------------------------------
+
+class Relation(Enum):
+    CONCLUDES = "concludes"
+    CONTESTS = "contests"
 
 
 # --------------------------------------------------------------------------
@@ -33,7 +51,7 @@ DEFINITION_KEYS = ("term", "text", "importedFrom")
 CLAIM_KEYS = ("id", "tag", "text", "terminal", "attribution",
               "uncertain", "submissionStatus")
 INFERENCE_KEYS = ("id", "scheme", "uncertain", "submissionStatus",
-                  "grounds", "warrants", "concludes", "contests")
+                  "grounds", "warrants", "target", "relation")
 ATTRIBUTION_KEYS = ("source", "quote")
 SOURCE_KEYS = ("type", "reference")
 
@@ -42,10 +60,9 @@ SOURCE_KEYS = ("type", "reference")
 # Object model — frozen dataclasses mirroring src/types.ts.
 #
 # Reference collections are tuples (a list field would make the dataclass
-# unhashable). Optional fields (`attribution`) and the output pair
-# (`concludes`/`contests`) carry None defaults and so are declared last, after
-# the required fields; the emitter uses the *_KEYS constants above for order,
-# not dataclass field order.
+# unhashable). The optional field (`attribution`) carries a None default and
+# so is declared last, after the required fields; the emitter uses the *_KEYS
+# constants above for order, not dataclass field order.
 # --------------------------------------------------------------------------
 
 @dataclass(frozen=True)
@@ -86,18 +103,23 @@ class Inference:
     submissionStatus: str
     grounds: Tuple[str, ...]
     warrants: Tuple[str, ...]
-    concludes: Optional[str] = None
-    contests: Optional[str] = None
+    target: str
+    relation: Relation
 
     def __post_init__(self):
-        # I1 — exactly one output. I4 — grounds non-empty (empty required
-        # list is a validation error, never something to emit). Reference
-        # lists are stored ascending by uuid so serialize() need not re-sort.
-        n_out = (self.concludes is not None) + (self.contests is not None)
-        if n_out != 1:
+        # I1 — a single target and a relation in {concludes, contests}.
+        # I4 — grounds non-empty (empty required list is a validation error,
+        # never something to emit). Reference lists are stored ascending by
+        # uuid so serialize() need not re-sort.
+        if not self.target:
+            raise ValueError(f"inference {self.id!r} has no target")
+        # relation is the enum, never a bare string: a plain str (even the
+        # correct "concludes") is a call site that skipped the type, and is
+        # rejected here rather than serialised or compared as text.
+        if not isinstance(self.relation, Relation):
             raise ValueError(
-                f"inference {self.id!r} has {n_out} outputs "
-                f"(need exactly one of concludes/contests)")
+                f"inference {self.id!r} relation must be a Relation, got "
+                f"{self.relation!r} (pass Relation.CONCLUDES/CONTESTS)")
         if not self.grounds:
             raise ValueError(f"inference {self.id!r} has empty grounds")
         object.__setattr__(self, "grounds", tuple(sorted(self.grounds)))
@@ -179,6 +201,17 @@ def _load_claim(raw) -> Claim:
     )
 
 
+def _load_relation(raw_id, value) -> Relation:
+    """Construct the Relation enum from a wire string, raising on anything else
+    (the parse boundary is where a bad relation dies)."""
+    try:
+        return Relation(value)
+    except ValueError:
+        raise ValueError(
+            f"inference {raw_id!r} has relation {value!r} "
+            f"(need one of concludes/contests)")
+
+
 def _load_inference(raw) -> Inference:
     _reject_unknown(f"inference {raw.get('id')!r}", raw, INFERENCE_KEYS)
     return Inference(
@@ -188,8 +221,8 @@ def _load_inference(raw) -> Inference:
         submissionStatus=raw.get("submissionStatus", "Accepted"),
         grounds=tuple(raw.get("grounds") or ()),
         warrants=tuple(raw.get("warrants") or ()),
-        concludes=raw.get("concludes"),
-        contests=raw.get("contests"),
+        target=raw.get("target"),
+        relation=_load_relation(raw.get("id"), raw.get("relation")),
     )
 
 
@@ -308,10 +341,9 @@ def _emit_inference(inf: Inference, indent, out):
     # defaults a missing warrants back to ().
     if inf.warrants:
         _emit_id_list("warrants", inf.warrants, inner, out)
-    if inf.concludes is not None:
-        out.append(_kv(inner, "concludes", inf.concludes))
-    else:
-        out.append(_kv(inner, "contests", inf.contests))
+    out.append(_kv(inner, "target", inf.target))
+    # Emit the wire string; relation is the Relation enum, not a str scalar.
+    out.append(_kv(inner, "relation", inf.relation.value))
 
 
 def serialize(corpus: Corpus) -> str:

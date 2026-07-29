@@ -40,6 +40,13 @@ export type SubmissionStatus =
     | "Rejected"
     | "Accepted";
 
+/**
+ * How an inference relates to its single target claim.
+ *   - concludes: the inference derives the target
+ *   - contests: the inference attacks the target
+ */
+export type Relation = "concludes" | "contests";
+
 // ---------- Attribution (for claims that report what a source says) ----------
 
 export type GroundsSource =
@@ -88,9 +95,10 @@ export interface Claim {
 
 /**
  * A single inferential act. Carries no content — it binds specific
- * grounds-claims and warrant-claims to exactly one output.
+ * grounds-claims and warrant-claims to exactly one target claim.
  *
- * Output is exactly one of:
+ * The target is a single claim; `relation` says how the inference bears
+ * on it:
  *   - concludes: this inference derives the target claim
  *   - contests: this inference attacks the target claim
  *       attributive target = undermine; any other target = rebut
@@ -107,7 +115,7 @@ export interface Claim {
  * Multiple warrants on one inference are conjoint (all required).
  * Alternative warrants are alternative inferences.
  */
-interface InferenceBase {
+export interface Inference {
     id: InferenceId;
     scheme: ArgumentScheme | null;
     uncertain: boolean;
@@ -115,14 +123,13 @@ interface InferenceBase {
 
     grounds: ClaimId[];   // 1..*
     warrants: ClaimId[];  // 0..* — empty means implicit, not yet surfaced
-}
 
-/** Output arity (exactly one of concludes/contests) is type-enforced. */
-export type Inference = InferenceBase &
-    (
-        | { concludes: ClaimId; contests?: never }
-        | { contests: ClaimId; concludes?: never }
-        );
+    // Exactly one target claim, and how this inference bears on it. One
+    // value carrying a role replaces the former concludes/contests pair,
+    // which admitted two malformed states (both set, neither set).
+    target: ClaimId;
+    relation: Relation;
+}
 
 // ---------- Discourse space ----------
 
@@ -148,8 +155,9 @@ export interface DiscourseSpace {
 
 // ---------- Structural invariants ----------
 //
-// I1. Inference has exactly one of {concludes, contests}.  [type-enforced]
-// I2. No inference concludes a claim with terminal: true.
+// I1. Inference has a `target` and a `relation` in {concludes, contests}.
+//     [target/relation both required — type-enforced]
+// I2. No inference with relation "concludes" targets a terminal claim.
 // I3. All ClaimId / InferenceId references resolve within the space.
 // I4. grounds is non-empty.
 // I5. Attributive claims (attribution present) should not be concluded by
@@ -157,8 +165,10 @@ export interface DiscourseSpace {
 //     can migrate from contested to attributive as a debate settles.)
 // I6. The graph of Concludes edges is acyclic.
 // I7. Terminal claims appear only in `warrants` — never in `grounds`,
-//     never as a `contests` target.
-// I8. No `contests` target is an InferenceId.  [type-enforced]
+//     never as the target of a contesting inference.
+// I8. A contesting inference's target is a ClaimId, never an InferenceId.
+//     [type-enforced: target is ClaimId]
 //
-// I1 and I8 are compile errors in TypeScript. They still require runtime
+// I1 and I8 are structurally enforced in TypeScript (target is a single
+// required ClaimId, relation a required enum). They still require runtime
 // assertions in validate.py, which reads YAML and has no compiler.

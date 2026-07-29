@@ -5,7 +5,7 @@
 // computes once on load — neither view recomputes them.
 
 import type { GraphData, ClaimNode, Stance, StanceMap } from '../graphData'
-import type { Inference } from '../../types'
+import type { Inference, Relation } from '../../types'
 
 export function getClaim(gd: GraphData, id: string): ClaimNode | null {
   const n = gd.nodeById.get(id)
@@ -19,13 +19,11 @@ export const attacksOf = (gd: GraphData, id: string): Inference[] => gd.attacks.
 /** Inferences that use `id` as grounds or warrant — the parent band. */
 export const consumersOf = (gd: GraphData, id: string): Inference[] => gd.consumers.get(id) ?? []
 
-export type Output = { id: string; kind: 'concludes' | 'contests' }
+export type Output = { id: string; kind: Relation }
 
-/** The claim an inference outputs to (its concludes or contests target). */
+/** The claim an inference outputs to (its target), and how it bears on it. */
 export function outputOf(inf: Inference): Output {
-  return inf.concludes
-    ? { id: String(inf.concludes), kind: 'concludes' }
-    : { id: String(inf.contests), kind: 'contests' }
+  return { id: String(inf.target), kind: inf.relation }
 }
 
 /**

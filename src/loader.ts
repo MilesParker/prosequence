@@ -7,6 +7,7 @@ import {
   InferenceId,
   Claim,
   Inference,
+  Relation,
   Attribution,
   Definition
 } from './types'
@@ -32,18 +33,16 @@ function castClaim(c: any): Claim {
 }
 
 function castInference(i: any): Inference {
-  const base = {
+  return {
     id: i.id as InferenceId,
     scheme: i.scheme ?? null,
     uncertain: i.uncertain ?? false,
     submissionStatus: i.submissionStatus ?? 'Accepted',
     grounds: (i.grounds ?? []) as ClaimId[],
-    warrants: (i.warrants ?? []) as ClaimId[]
+    warrants: (i.warrants ?? []) as ClaimId[],
+    target: i.target as ClaimId,
+    relation: i.relation as Relation
   }
-  // Output arity is a discriminated union: exactly one of contests/concludes.
-  return i.contests
-    ? { ...base, contests: i.contests as ClaimId }
-    : { ...base, concludes: i.concludes as ClaimId }
 }
 
 function castDefinition(d: any): Definition {

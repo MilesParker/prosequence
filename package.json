@@ -7,8 +7,7 @@
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview",
-    "build:cli": "tsc -p tsconfig.node.json",
-    "convert": "node --loader ts-node/esm scripts/convert.ts"
+    "build:cli": "tsc -p tsconfig.node.json"
   },
   "dependencies": {
     "@dagrejs/dagre": "^1.1.8",

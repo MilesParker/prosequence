@@ -78,11 +78,10 @@ export function buildGraphData(ds: DiscourseSpace): GraphData {
     for (const w of inf.warrants ?? []) {
       links.push({ id: `${infId}:w:${w}`, source: w as unknown as GraphNode, target: infId as unknown as GraphNode, role: 'Warrants', toInference: true, uncertain: inf.uncertain })
     }
-    if (inf.concludes) {
-      links.push({ id: `${infId}:concludes`, source: infId as unknown as GraphNode, target: inf.concludes as unknown as GraphNode, role: 'Concludes', toInference: false, uncertain: inf.uncertain })
-    }
-    if (inf.contests) {
-      const target = inf.contests as unknown as string
+    if (inf.relation === 'concludes') {
+      links.push({ id: `${infId}:concludes`, source: infId as unknown as GraphNode, target: inf.target as unknown as GraphNode, role: 'Concludes', toInference: false, uncertain: inf.uncertain })
+    } else {
+      const target = inf.target as unknown as string
       links.push({ id: `${infId}:contests`, source: infId as unknown as GraphNode, target: target as unknown as GraphNode, role: 'Contests', toInference: infIds.has(target), uncertain: inf.uncertain })
     }
   }
@@ -126,9 +125,9 @@ export function buildGraphData(ds: DiscourseSpace): GraphData {
   const consumerSeen = new Map<string, Set<string>>()
   for (const inf of inferences) {
     const iid = inf.id as unknown as string
-    if (inf.concludes) push(supports, String(inf.concludes), inf)
+    if (inf.relation === 'concludes') push(supports, String(inf.target), inf)
     // A contest always targets a claim (I8); guard defensively all the same.
-    if (inf.contests && claimIds.has(String(inf.contests))) push(attacks, String(inf.contests), inf)
+    else if (claimIds.has(String(inf.target))) push(attacks, String(inf.target), inf)
     // Grounds ∪ warrants — dedupe if a claim is both on the same inference.
     for (const c of [...(inf.grounds ?? []), ...(inf.warrants ?? [])].map(String)) {
       let seen = consumerSeen.get(c)
@@ -153,9 +152,9 @@ function computeDepth(claims: Claim[], inferences: Inference[], roots: Set<strin
   for (const inf of inferences) {
     const infId = inf.id as unknown as string
     inputsOf.set(infId, [...(inf.grounds ?? []), ...(inf.warrants ?? [])].map(String))
-    if (inf.concludes) push(outputsToClaim, String(inf.concludes), infId)
-    if (inf.contests) {
-      const t = String(inf.contests)
+    if (inf.relation === 'concludes') push(outputsToClaim, String(inf.target), infId)
+    else {
+      const t = String(inf.target)
       if (inferences.some(i => (i.id as unknown as string) === t)) push(contestersOf, t, infId)
       else push(outputsToClaim, t, infId)
     }
@@ -444,7 +443,7 @@ export function sourceLabel(src: { type: string; reference?: string } | undefine
 export function nodeMainText(n: GraphNode): string {
   if (n._kind === 'inference') {
     const inf = n as InfNode
-    return inf.concludes ? 'inference → concludes' : 'inference → contests'
+    return `inference → ${inf.relation}`
   }
   return (n as ClaimNode).text ?? ''
 }
