@@ -327,10 +327,8 @@ session, and the validator import it rather than redefine it.
 ## Stop controls (`guarded_client.py`, `guard_config.toml`, token log)
 
 Bounded spend and an external stop switch. Every model call goes through
-`GuardedClient`; a run opens a session and uses the client directly (no run
-wrapper, no harness object). The stop controls are wholly separate from the
-writer — they touch neither the session, ops, serializer, store, nor the
-invariants.
+`GuardedClient`. The stop controls are wholly separate from the writer — they
+touch neither the session, ops, serializer, store, nor the invariants.
 
 - **The underlying client is a constructor parameter** (`GuardedClient(client,
   config, corpus, ...)`), never a module-level singleton, so a test substitutes
@@ -359,12 +357,51 @@ invariants.
   and outside the corpus repo** (every corpus-repo commit is a graph change,
   nothing else); the path is a constructor argument, not a config key.
 - **Config** (`guard_config.toml`, committed — caps set invisibly get set wrong)
-  holds exactly: `per_run_token_cap`, `cumulative_token_cap`,
-  `cumulative_window_seconds`, `kill_file`, `model`. `GuardConfig.load` rejects
-  any price- or key-like key so neither can enter the guard through config drift.
+  holds: `per_run_token_cap`, `cumulative_token_cap`, `cumulative_window_seconds`,
+  `kill_file`, `model`, `iteration_cap`. The last two are read by the ingestion
+  role, not the guard (`iteration_cap` bounds a role's traversal loop); they live
+  here so every run bound sits in one open file. `GuardConfig.load` rejects any
+  price- or key-like key so neither can enter the guard through config drift.
   No prices, no API key.
 - Reporting helpers (`read_log`, `cumulative_tokens`) live apart from the
   pre-flight path — cost/reporting is deliberately kept out of the gate.
+
+## Roles (`roles/`)
+
+A role drives one model loop over the writer session and commits the result.
+`role.Role` is the base class; `ingestion.IngestionRole` is the only concrete
+role so far (promoted from the round-trip spike).
+
+- **`Role` base** (`role.py`) — everything not specific to one role: the graph
+  (`START → call → (tools → call)* → apply → END`, no checkpointer), the
+  conditional edge (enforces `iteration_cap`, then routes on whether the model
+  asked for tools), message accumulation, tool binding, capability enforcement,
+  and the apply/commit boundary (`_execute` invokes the graph, then calls
+  `session.commit()` **outside** the graph — the graph has no path to a store
+  write). Two class attributes **declare** a role: `capability` (the write ops it
+  holds) and `objective` (mission prose for the system prompt).
+- **`IngestionRole`** (`ingestion.py`) — the ingestion-specific parts: its read
+  tools, system prompt, finding parser, finding-to-ops application, and its
+  `run(url, document_text)` parameter (the reference `url` is supplied by the
+  harness, never inferred — no fetch tool is bound). Capability is
+  `(add_claim, add_inference)`.
+- **Capability** (`capability.py`) — `CapabilityGuardedSession` wraps the writer
+  session so the apply step may call only the role's `capability` write ops; any
+  other write raises `CapabilityError` at the call site. Reads pass through
+  ungated. Enforcement is at apply, never by prompt instruction.
+- **Supporting modules** — `state.py` (the graph state: a frozen dataclass with
+  an `add_messages` reducer), `bridge.py` (LangChain ↔ Anthropic message
+  translation, since the guard wraps the raw SDK), `read_tools.py` (the read-only
+  tool surface over session queries), `prompt.py` (objective + YAML generation
+  rules + finding contract), `apply.py` (finding parse + session writes).
+- **Harness entry** (`run.py`) — wires config → guard + session → the role and
+  hands it `(url, document_text)`; `main` is a thin CLI. Model and iteration cap
+  come from `guard_config.toml`. The role commits onto main (the store's only
+  ref); the harness then **lands that commit on its own branch** (`ingest/<sha>`)
+  and rewinds main (`_land_on_branch`) — the store is left hard-coded to
+  `refs/heads/main`, so "on a branch, not main" is honoured here, in the
+  injection's own git. Tracing is the observability layer (`observability.py`,
+  Phoenix/OpenTelemetry), which never gates a run.
 
 ## GAP 1 — resolved (enthymemification: surfaced warrant, contested as a rebut)
 

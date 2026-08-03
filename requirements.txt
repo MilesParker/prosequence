@@ -1,0 +1,23 @@
+# Python dependencies for the harness (roles + the store/session/guard).
+#
+# Top-level deps only; pip resolves the transitive set. Derived from the actual
+# imports across roles/, guarded_client, corpus_store, session, yaml_io,
+# canonicalize, ops, validate. (The repo previously tracked no Python manifest —
+# only JS deps, in package.json.)
+
+# --- harness runtime ---
+anthropic==0.120.2
+langchain-core==1.5.2
+langgraph==1.2.10
+pygit2==1.19.3
+PyYAML==6.0.3
+
+# --- trace observability: HARNESS side only (emits OTLP to localhost:4317) ---
+# These three are light — just the OpenTelemetry SDK/exporter + instrumentors.
+# The Phoenix *server*/UI (arize-phoenix) is deliberately NOT here: it drags in
+# fastapi, strawberry, scipy, scikit-learn, pandas, pyarrow, boto3, ... which the
+# harness never touches. Run the viewer from a separate environment instead:
+#   pipx install arize-phoenix    (then: phoenix serve  ->  http://localhost:6006)
+arize-phoenix-otel==0.16.1
+openinference-instrumentation-anthropic==1.1.0
+openinference-instrumentation-langchain==0.1.68

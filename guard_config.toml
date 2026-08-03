@@ -28,3 +28,9 @@ kill_file = "STOP"
 
 # Model name used when a call does not specify one.
 model = "claude-sonnet-5"
+
+# Iteration cap: the number of model turns a role's traversal may take before the
+# graph is forced to apply. A hard run bound, kept here with the token caps so
+# every bound on a run is set in one open file. The guard does not read it; the
+# role does.
+iteration_cap = 15

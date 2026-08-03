@@ -80,6 +80,11 @@ class GuardConfig:
     cumulative_window_seconds: int
     kill_file: str
     model: str
+    # Hard cap on a role's traversal loop — the number of model turns before the
+    # graph is forced to apply. A run bound, like the token caps above; the guard
+    # itself never reads it (the role does), it lives here so every run bound is
+    # set in one open file. Defaulted so configs predating it still load.
+    iteration_cap: int = 15
 
     @classmethod
     def load(cls, path: str) -> "GuardConfig":
@@ -100,6 +105,7 @@ class GuardConfig:
             cumulative_window_seconds=int(data["cumulative_window_seconds"]),
             kill_file=str(data["kill_file"]),
             model=str(data["model"]),
+            iteration_cap=int(data.get("iteration_cap", 15)),
         )
 
 
