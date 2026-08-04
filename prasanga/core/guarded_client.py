@@ -42,10 +42,12 @@ from dataclasses import dataclass
 from typing import Any, Callable, Optional, Sequence
 
 
-# Default token-log path: code tree, gitignored, outside the corpus repo. Not a
-# config key (the config enumerates caps/window/kill-file/model only); it is a
-# constructor parameter so a test can point it at a temp file.
-DEFAULT_TOKEN_LOG = os.path.join(os.path.dirname(os.path.abspath(__file__)), "token_log.jsonl")
+# Default token-log path: the repo-root `logs/` dir, gitignored, outside the
+# corpus repo. Not a config key (the config enumerates caps/window/kill-file/
+# model only); it is a constructor parameter so a test can point it at a temp
+# file. The dir is created on demand at write time (see _append_log).
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+DEFAULT_TOKEN_LOG = os.path.join(_REPO_ROOT, "logs", "token_log.jsonl")
 
 
 # --------------------------------------------------------------------------
@@ -264,6 +266,7 @@ class GuardedClient:
             "committed": committed,
         }
         line = json.dumps(rec, separators=(",", ":")) + "\n"
+        os.makedirs(os.path.dirname(self._log_path) or ".", exist_ok=True)
         with open(self._log_path, "a", encoding="utf-8") as fh:
             fh.write(line)
             fh.flush()

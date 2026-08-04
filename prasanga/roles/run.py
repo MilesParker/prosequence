@@ -25,16 +25,17 @@ import sys
 import anthropic
 import pygit2
 
-from corpus_store import CorpusStore
-from guarded_client import GuardConfig, GuardedClient
-from session import Session
+from ..core.corpus_store import CorpusStore
+from ..core.guarded_client import GuardConfig, GuardedClient
+from ..core.session import Session
 
 from .ingestion import IngestionRole
 from .observability import init_tracing
 
-REPO_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+PKG_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # prasanga/
+REPO_ROOT = os.path.dirname(PKG_DIR)                                   # outer repo root
 CORPUS_DIR = os.path.join(REPO_ROOT, "discourse-spaces")
-GUARD_CONFIG = os.path.join(REPO_ROOT, "guard_config.toml")
+GUARD_CONFIG = os.path.join(PKG_DIR, "guard_config.toml")
 
 
 def _land_on_branch(store: CorpusStore, head0: str, new_sha: str,
@@ -101,7 +102,7 @@ def run(url: str, document_text: str, *, corpus_name: str = "free-transit",
 
 def main(argv: list[str]) -> int:
     if len(argv) < 2:
-        print("usage: python -m roles.run <reference_url> <document_file>",
+        print("usage: python -m prasanga.roles.run <reference_url> <document_file>",
               file=sys.stderr)
         return 2
     reference, doc_path = argv[0], argv[1]

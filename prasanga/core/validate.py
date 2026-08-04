@@ -17,7 +17,7 @@ Usage: python validate.py <corpus.yaml> [<corpus.yaml> ...]
 import sys, glob
 import yaml
 
-from yaml_io import Relation
+from .yaml_io import Relation
 
 # The valid relation wire strings, sourced from the model enum rather than
 # spelled out here. The validator reads raw YAML (untrusted, possibly
@@ -190,9 +190,13 @@ def main(argv):
     for a in argv:
         paths.extend(sorted(glob.glob(a)) or [a])
     if not paths:
-        paths = sorted(glob.glob('discourse-spaces/*.v2.yaml'))
+        # Default to the repo's corpora regardless of cwd (this module lives at
+        # prasanga/core/validate.py, so the repo root is three dirs up).
+        import os
+        repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+        paths = sorted(glob.glob(os.path.join(repo_root, 'discourse-spaces', '*.v2.yaml')))
     if not paths:
-        print("usage: python validate.py <corpus.yaml> [<corpus.yaml> ...]", file=sys.stderr)
+        print("usage: python -m prasanga.core.validate <corpus.yaml> [<corpus.yaml> ...]", file=sys.stderr)
         return 2
     ok = all([validate(p) for p in paths])
     return 0 if ok else 1

@@ -31,9 +31,9 @@ from typing import Dict, List, Optional, Sequence
 
 import yaml
 
-import ops as _ops
-from corpus_store import CorpusStore, HeadMoved, WorkingTreeDirty
-from yaml_io import (
+from . import ops as _ops
+from .corpus_store import CorpusStore, HeadMoved, WorkingTreeDirty
+from .yaml_io import (
     Attribution,
     Claim,
     Corpus,
@@ -42,7 +42,7 @@ from yaml_io import (
     load,
     serialize,
 )
-from validate import check
+from .validate import check
 
 
 # --------------------------------------------------------------------------

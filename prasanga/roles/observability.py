@@ -3,7 +3,7 @@
 
 Orthogonal to the commit path. This wires OpenTelemetry tracing for the
 harness's two spines — the raw Anthropic SDK call (guarded_client.create) and
-the LangGraph role protocol (roles.role) — and exports spans to a local
+the LangGraph role protocol (prasanga.roles.role) — and exports spans to a local
 Phoenix collector (localhost:6006 by default; SQLite-backed, no egress). It
 touches neither validate.py, the writer, nor the store.
 

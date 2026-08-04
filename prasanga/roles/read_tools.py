@@ -24,7 +24,7 @@ from typing import Any, Callable
 
 from langchain_core.tools import tool
 
-from yaml_io import Claim, Inference
+from ..core.yaml_io import Claim, Inference
 
 
 # --------------------------------------------------------------------------

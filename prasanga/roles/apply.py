@@ -24,7 +24,7 @@ import json
 import re
 from typing import Tuple
 
-from yaml_io import Attribution, GroundsSource, Relation
+from ..core.yaml_io import Attribution, GroundsSource, Relation
 
 
 _FENCE = re.compile(r"```(?:json)?\s*(\{.*?\})\s*```", re.DOTALL)

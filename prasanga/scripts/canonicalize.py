@@ -8,14 +8,17 @@ Comments are NOT preserved — the emitter neither reads nor writes them. Run
 `grep -n '#' discourse-spaces/*.v2.yaml` before canonicalizing; anything found
 will be destroyed.
 """
+import os
 import sys
 
-from yaml_io import load, serialize
+from ..core.yaml_io import load, serialize
 
-CORPORA = (
-    "discourse-spaces/free-transit.v2.yaml",
-    "discourse-spaces/gaza.v2.yaml",
-    "discourse-spaces/freedman.v2.yaml",
+# Repo root is three dirs up (prasanga/scripts/canonicalize.py), so the corpora
+# resolve regardless of the process working directory.
+_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+CORPORA = tuple(
+    os.path.join(_REPO_ROOT, "discourse-spaces", name)
+    for name in ("free-transit.v2.yaml", "gaza.v2.yaml", "freedman.v2.yaml")
 )
 
 

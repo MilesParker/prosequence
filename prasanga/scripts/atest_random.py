@@ -1,7 +1,7 @@
 import random
 import anthropic
 
-from anthropic_key import KEY
+from .anthropic_key import KEY
 
 client = anthropic.Anthropic(api_key=KEY)  # reads ANTHROPIC_API_KEY from env
 

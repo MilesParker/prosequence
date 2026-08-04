@@ -175,7 +175,7 @@ unchanged in spirit; only the shapes changed.
 - **Terminals as plain-language value assertions.** `terminal: true`, no
   attribution, never concluded.
 
-Validate every corpus with `python validate.py <corpus.v2.yaml> ...`, which
+Validate every corpus with `python -m prasanga.core.validate <corpus.v2.yaml> ...`, which
 enforces invariants I1–I8. I1–I4 and I6–I8 are hard errors (non-zero exit);
 I5 (attributive claims should not be concluded) is a soft warning. I7 keeps
 terminal claims in `warrants` only — never in grounds, never as a `contests`
@@ -192,7 +192,7 @@ ones and `terminal` on the bedrock ones), a `roots` list, and an
 `inferences` list whose `grounds`/`warrants`/`target`/`relation` fields
 encode all the connective tissue.
 
-## Canonical corpus I/O (`yaml_io.py`, `canonicalize.py`)
+## Canonical corpus I/O (`prasanga/core/yaml_io.py`, `prasanga/scripts/canonicalize.py`)
 
 `yaml_io.py` is the canonical load/serialize pair: `load(path_or_text)`
 parses a corpus with `yaml.safe_load` and casts it into frozen dataclasses
@@ -228,7 +228,7 @@ package directory lands on `sys.path`.)
   Comments are not preserved. The one-time large formatting diff has been
   applied; the pre-canonical originals are kept under `_pre-canonical/`.
 
-## Corpus store (`corpus_store.py`)
+## Corpus store (`prasanga/core/corpus_store.py`)
 
 The three corpora live in their own **nested git repository** at
 `discourse-spaces/` (branch `main`, genesis commit holding the three canonical
@@ -274,7 +274,7 @@ new tree so `git status` stays clean and reports only the operator's own later
 hand-edits. The commit is built purely at the object layer; the index is never a
 source, only reconciled after the fact.
 
-## The writer session (`session.py`, `ops.py`)
+## The writer session (`prasanga/core/session.py`, `prasanga/core/ops.py`)
 
 The session is what an agent constructs a graph *through*. It sits on the
 serializer (`yaml_io.py`), the validator (`validate.py`), and the store
@@ -324,7 +324,7 @@ constructing the enum and raising. `Relation` (the `concludes`/`contests` enum
 mirroring `src/types.ts`) lives with the model in `yaml_io.py`; ops, the
 session, and the validator import it rather than redefine it.
 
-## Stop controls (`guarded_client.py`, `guard_config.toml`, token log)
+## Stop controls (`prasanga/core/guarded_client.py`, `prasanga/guard_config.toml`, token log)
 
 Bounded spend and an external stop switch. Every model call goes through
 `GuardedClient`. The stop controls are wholly separate from the writer — they
@@ -353,10 +353,11 @@ touch neither the session, ops, serializer, store, nor the invariants.
   table is applied retroactively; a price never sits in the pre-flight path. The
   cumulative counters derive from this file (no separate counter to reconcile).
   Append mode, one `write` per line, `flush` + `fsync`, so an append survives a
-  crash mid-write. Default path `token_log.jsonl` in the code tree, **gitignored
-  and outside the corpus repo** (every corpus-repo commit is a graph change,
-  nothing else); the path is a constructor argument, not a config key.
-- **Config** (`guard_config.toml`, committed — caps set invisibly get set wrong)
+  crash mid-write. Default path `logs/token_log.jsonl` at the repo root
+  (dir auto-created), **gitignored and outside the corpus repo** (every
+  corpus-repo commit is a graph change, nothing else); the path is a constructor
+  argument, not a config key.
+- **Config** (`prasanga/guard_config.toml`, committed — caps set invisibly get set wrong)
   holds: `per_run_token_cap`, `cumulative_token_cap`, `cumulative_window_seconds`,
   `kill_file`, `model`, `iteration_cap`. The last two are read by the ingestion
   role, not the guard (`iteration_cap` bounds a role's traversal loop); they live
@@ -366,7 +367,7 @@ touch neither the session, ops, serializer, store, nor the invariants.
 - Reporting helpers (`read_log`, `cumulative_tokens`) live apart from the
   pre-flight path — cost/reporting is deliberately kept out of the gate.
 
-## Roles (`roles/`)
+## Roles (`prasanga/roles/`)
 
 A role drives one model loop over the writer session and commits the result.
 `role.Role` is the base class; `ingestion.IngestionRole` is the only concrete

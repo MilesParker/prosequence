@@ -1,14 +1,18 @@
 /tmp
 /out-tsc
 
+# Python bytecode.
+__pycache__/
+*.py[cod]
+
 # Corpus store: its own nested git repo (Directive 1c). Kept out of the outer
 # tree so git never records a gitlink / phantom submodule for it.
 /discourse-spaces/
 
 # Stop controls (Directive 1e). The token log is runtime spend data, and the
 # kill file is a runtime signal — neither is committed, and neither belongs in
-# the corpus repo. The guard config (guard_config.toml) IS committed.
-/token_log.jsonl
+# the corpus repo. The guard config (prasanga/guard_config.toml) IS committed.
+/logs/
 /STOP
 
 /node_modules
