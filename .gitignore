@@ -5,6 +5,9 @@
 __pycache__/
 *.py[cod]
 
+# Local secrets: ANTHROPIC_API_KEY etc, loaded by roles/run.py at entry.
+.env
+
 # Corpus store: its own nested git repo (Directive 1c). Kept out of the outer
 # tree so git never records a gitlink / phantom submodule for it.
 /discourse-spaces/

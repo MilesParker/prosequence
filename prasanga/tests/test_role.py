@@ -71,19 +71,23 @@ def _cfg(tmp, model="stub-model", iteration_cap=15):
     )
 
 
-def _valid_finding(session) -> str:
+def _valid_finding(session) -> dict:
     """A minimal valid finding for CORPUS: one new attributive claim used as
-    grounds, concluding an existing non-terminal, non-attributive claim."""
+    grounds, concluding an existing non-terminal, non-attributive claim. This is
+    now the `submit_finding` tool's `input` dict directly — no text/fence."""
     target = next(c.id for c in session.bound_version.claims
                   if not c.terminal and c.attribution is None)
-    return (
-        'Traversed; attaching.\n```json\n'
-        '{"claims":[{"key":"c1","tag":"Role test claim",'
-        '"text":"A test assertion introduced by the document.","terminal":false,'
-        '"attribution":{"source":{"type":"Citation","reference":"http://x"},"quote":null}}],'
-        '"inferences":[{"grounds":["c1"],"warrants":[],"target":"%s","relation":"concludes"}]}'
-        '\n```' % target
-    )
+    return {
+        "claims": [{
+            "key": "c1", "tag": "Role test claim",
+            "text": "A test assertion introduced by the document.",
+            "terminal": False,
+            "attribution": {"source": {"type": "Citation", "reference": "http://x"}, "quote": None},
+        }],
+        "inferences": [{
+            "grounds": ["c1"], "warrants": [], "target": target, "relation": "concludes",
+        }],
+    }
 
 
 # --------------------------------------------------------------------------
@@ -91,16 +95,17 @@ def _valid_finding(session) -> str:
 # --------------------------------------------------------------------------
 
 def check_end_to_end():
-    """Full round trip: a tool turn, then a finding turn, then apply + commit."""
+    """Single-shot round trip: one finding turn, then apply + commit. No tool
+    turn — the corpus is in front of the model, so it attaches in one call."""
     tmp = tempfile.mkdtemp(prefix="role-")
     store, dst = fresh_store()
     head0 = store.head()
     session = Session(store, CORPUS)
 
     script = [
-        _Resp([_block(type="tool_use", name="get_all_tags", input={}, id="t1")],
+        _Resp([_block(type="tool_use", name="submit_finding",
+                      input=_valid_finding(session), id="t1")],
               stop="tool_use"),
-        _Resp([_block(type="text", text=_valid_finding(session))]),
     ]
     stub = StubClient(script)
     guard = GuardedClient(stub, _cfg(tmp), CORPUS,
@@ -112,10 +117,34 @@ def check_end_to_end():
     ops_ok = (len(report["ops"]) == 2
               and report["ops"][0].startswith("add_claim")
               and "concludes" in report["ops"][1])
-    ok = (report["sha"] != head0 and report["iterations"] == 2
-          and stub.calls == 2 and ops_ok and report["tokens"] == 2 * 140)
+    ok = (report["sha"] != head0 and report["iterations"] == 1
+          and stub.calls == 1 and ops_ok and report["tokens"] == 140)
     return ok, (f"sha_advanced={report['sha'] != head0} iters={report['iterations']} "
                 f"calls={stub.calls} ops={len(report['ops'])} tokens={report['tokens']}")
+
+
+def _looping_role(guard, session, iteration_cap):
+    """A minimal role that binds one trivial tool and keeps calling it — the
+    vehicle for exercising the harness iteration cap now that ingestion is
+    single-shot and never loops. Reuses everything else from IngestionRole."""
+    from langchain_core.tools import tool as _lc_tool
+
+    class _LoopingRole(IngestionRole):
+        def build_tools(self, _session):
+            @_lc_tool
+            def ping() -> str:
+                """A no-op tool the model can call to keep the loop going."""
+                return "pong"
+            schema = [{"name": "ping", "description": "ping",
+                       "input_schema": {"type": "object", "properties": {},
+                                        "required": []}}]
+            return [ping], schema
+
+        def cached_context(self):
+            return None  # no corpus needed to test the cap
+
+    return _LoopingRole(guard=guard, session=session,
+                        model="stub-model", iteration_cap=iteration_cap)
 
 
 def check_lands_on_branch():
@@ -188,21 +217,21 @@ def check_capability_rejects_nonwrite():
 
 
 def check_iteration_cap_forces_apply():
-    """With the cap set to 1, a model that keeps calling tools is forced to apply
-    after one turn — the finding turn is scripted but never reached."""
+    """With the cap set to 1, a tool-calling role is forced to apply after one
+    turn. Exercises the shared harness cap via a minimal looping role, since
+    ingestion itself is single-shot and never loops."""
     tmp = tempfile.mkdtemp(prefix="role-cap-")
     store, dst = fresh_store()
     session = Session(store, CORPUS)
     # The model would loop forever on tools; the cap must cut it at 1.
     script = [
-        _Resp([_block(type="tool_use", name="get_all_tags", input={}, id="t1")],
+        _Resp([_block(type="tool_use", name="ping", input={}, id="t1")],
               stop="tool_use"),
     ]
     stub = StubClient(script)
     guard = GuardedClient(stub, _cfg(tmp, iteration_cap=1), CORPUS,
                           token_log=os.path.join(tmp, "tok.jsonl"))
-    role = IngestionRole(guard=guard, session=session,
-                         model="stub-model", iteration_cap=1)
+    role = _looping_role(guard, session, iteration_cap=1)
     # The last message has tool_calls, so apply parses no finding -> the parse
     # raises. We only assert the loop stopped at the cap (one call).
     raised = None
@@ -217,7 +246,7 @@ def check_iteration_cap_forces_apply():
 
 
 CHECKS = [
-    ("ingestion role runs end to end (traverse -> finding -> apply -> commit)", check_end_to_end),
+    ("ingestion role runs end to end (corpus in prompt -> finding -> apply -> commit)", check_end_to_end),
     ("injection lands commit on its own branch, rewinds main", check_lands_on_branch),
     ("capability + objective declared", check_capability_declared),
     ("capability enforced at apply (not by prompt)", check_capability_enforced_at_apply),

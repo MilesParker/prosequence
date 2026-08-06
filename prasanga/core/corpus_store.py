@@ -27,6 +27,14 @@ from pygit2.enums import FileMode, SortMode
 HARNESS_NAME = "parsanga-harness"
 HARNESS_EMAIL = "harness@parsanga.local"
 
+# The store's one ref, both read and write. commit() already hardcodes this as
+# its write target; every read default below resolves it explicitly too,
+# rather than trusting `repo.head.target` (whatever a human has `git
+# checkout`-ed in their own working copy) — this repo has one ref that
+# matters, and the store must not silently reinterpret "head" as something
+# else just because a human is looking at a different branch.
+MAIN_REF = "refs/heads/main"
+
 
 class HeadMoved(Exception):
     """Raised by commit() when parent_sha is not the current head.
@@ -59,8 +67,8 @@ class CorpusStore:
     # -- helpers -----------------------------------------------------------
 
     def _commit(self, sha: Optional[str]) -> pygit2.Commit:
-        """Resolve a sha (or head when None) to a Commit object."""
-        oid = self.repo.head.target if sha is None else sha
+        """Resolve a sha (or main's tip when None) to a Commit object."""
+        oid = self.repo.references[MAIN_REF].target if sha is None else sha
         obj = self.repo[oid]
         return obj.peel(pygit2.Commit)
 
@@ -82,8 +90,9 @@ class CorpusStore:
     # -- read side ---------------------------------------------------------
 
     def head(self) -> str:
-        """Current head commit sha."""
-        return str(self.repo.head.target)
+        """main's current commit sha — explicitly refs/heads/main, regardless of
+        what a human currently has checked out in the working tree."""
+        return str(self.repo.references[MAIN_REF].target)
 
     def read(self, name: str, sha: Optional[str] = None) -> str:
         """Text of corpus `name` at `sha` (defaults to head).
@@ -111,12 +120,13 @@ class CorpusStore:
     def log(self, name: str) -> list[tuple[str, str, int]]:
         """(sha, message, timestamp) for every commit that touched `name`.
 
-        Walks from head; a commit "touches" `name` when its blob oid for that
-        path differs from every parent's (add, modify, or delete). The root
-        commit touches `name` if the path is present in it.
+        Walks from main's tip (not whatever is checked out — see MAIN_REF); a
+        commit "touches" `name` when its blob oid for that path differs from
+        every parent's (add, modify, or delete). The root commit touches `name`
+        if the path is present in it.
         """
         out: list[tuple[str, str, int]] = []
-        for commit in self.repo.walk(self.repo.head.target, SortMode.TIME):
+        for commit in self.repo.walk(self.repo.references[MAIN_REF].target, SortMode.TIME):
             cur = self._blob_oid(commit.tree, name)
             parents = commit.parents
             if not parents:

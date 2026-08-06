@@ -29,11 +29,14 @@ _RELATIONS = {r.value for r in Relation}
 
 
 def roots_of(d):
+    # `or []` guards the empty-collection case: the canonical serializer emits an
+    # empty `roots:` block (a corpus freshly ingested into has claims but no
+    # roots yet), which round-trips through yaml as None, not [].
     if 'roots' in d:
-        return list(d['roots'])
+        return list(d['roots'] or [])
     for k in ('discourseSpace', 'discourse_space'):
         if k in d:
-            return list(d[k].get('roots', []))
+            return list(d[k].get('roots') or [])
     return []
 
 
@@ -44,8 +47,9 @@ def check(d, path=""):
     and no exit. `validate(path)` wraps this for the CLI; the 1d session
     calls it at commit and raises ValidationFailed carrying `errs`.
     """
-    claims = {c['id']: c for c in d.get('claims', [])}
-    infs   = {i['id']: i for i in d.get('inferences', [])}
+    # `or []`: an empty `claims:`/`inferences:` block serializes to None, not [].
+    claims = {c['id']: c for c in d.get('claims') or []}
+    infs   = {i['id']: i for i in d.get('inferences') or []}
     roots  = roots_of(d)
 
     errs  = []   # errors -> non-zero exit
@@ -167,8 +171,8 @@ def check(d, path=""):
 def validate(path):
     d = yaml.safe_load(open(path))
     errs, warns = check(d, path)
-    claims = d.get('claims', [])
-    infs = d.get('inferences', [])
+    claims = d.get('claims') or []
+    infs = d.get('inferences') or []
     roots = roots_of(d)
 
     print(f"{path}: {len(claims)} claims, {len(infs)} inferences, {len(roots)} root(s)")

@@ -11,6 +11,9 @@ langchain-core==1.5.2
 langgraph==1.2.10
 pygit2==1.19.3
 PyYAML==6.0.3
+requests==2.34.2           # roles/run.py: fetch a document by url before ingest
+trafilatura==2.2.0         # roles/run.py: strip nav/ads/boilerplate from a fetched page
+python-dotenv==1.2.2       # roles/run.py: load .env (ANTHROPIC_API_KEY) at entry
 
 # --- trace observability: HARNESS side only (emits OTLP to localhost:4317) ---
 # These three are light — just the OpenTelemetry SDK/exporter + instrumentors.

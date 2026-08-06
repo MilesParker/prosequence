@@ -1,15 +1,22 @@
 #!/usr/bin/env python3
 """The ingestion role.
 
-Promoted from the round-trip spike. One document -> traverse the corpus through
-read tools -> return a finding -> apply it as session writes -> commit, once,
-outside the graph.
+Single-shot. One document + the WHOLE corpus in front of the model at once ->
+one finding -> apply it as session writes -> commit, once, outside the graph.
+The corpus is a stable text/argument transformation, not an interaction: with
+the full corpus visible there is no attachment point to discover step by step,
+so no read-tool loop and none of its O(n^2) re-sent-history cost. The corpus is
+rendered into a cached system block (see `cached_context`); the model reasons
+over it in a single turn.
 
-The shared machinery (graph construction, the conditional edge, message
-accumulation, tool binding, the cap check, capability enforcement, the
-apply/commit boundary) lives in `role.Role`. What stays here is
-ingestion-specific: the read tools, the system prompt, the finding parser, the
-finding-to-ops application, and the (url, document_text) run parameter.
+The shared machinery (graph construction, message accumulation, the cap check,
+capability enforcement, the apply/commit boundary) lives in `role.Role`. What
+stays here is ingestion-specific: the corpus view, the system prompt, the
+finding tool schema, the finding-to-ops application, and the (url,
+document_text) run parameter. The harness's tool loop is retained but unused by
+this role — it is there for interaction-shaped roles (contest, revise) still to
+come. The finding itself is a forced tool call (see `role.py`), not text: the
+API enforces the shape, so there is nothing here to parse.
 
 Declaration is two class attributes:
   * `capability` — the write ops the role holds. Enforced at apply, never by
@@ -22,9 +29,9 @@ from __future__ import annotations
 
 from langchain_core.messages import HumanMessage
 
-from .apply import apply_finding, parse_finding
+from .apply import FINDING_TOOL_SCHEMA, apply_finding
+from .corpus_view import render_corpus
 from .prompt import OBJECTIVE, SYSTEM_PROMPT
-from .read_tools import build_read_tools
 from .role import Role
 from .state import RoleState
 
@@ -36,13 +43,21 @@ class IngestionRole(Role):
     # -- subclass hooks ----------------------------------------------------
 
     def build_tools(self, session):
-        return build_read_tools(session)
+        # Single-shot: no read tools. The whole corpus is placed in front of the
+        # model via `cached_context`, so there is nothing to traverse.
+        return [], []
+
+    def cached_context(self) -> str:
+        # The committed corpus (the session's bound version), rendered in full
+        # and cached as its own system block. Reads uncommitted writes are
+        # irrelevant here — a single call, no writes precede it.
+        return render_corpus(self.session.bound_version)
 
     def system_prompt(self) -> str:
         return SYSTEM_PROMPT
 
-    def parse_finding(self, text: str) -> dict:
-        return parse_finding(text)
+    def finding_tool(self) -> dict:
+        return FINDING_TOOL_SCHEMA
 
     def apply_finding(self, session, finding: dict) -> tuple:
         return apply_finding(session, finding)
@@ -59,10 +74,13 @@ class IngestionRole(Role):
         """
         # The reference url and document are folded into the seed message, not
         # threaded through graph state — the url is a run parameter, supplied
-        # here and never inferred by the model (no fetch tool is bound).
+        # here and never inferred by the model (no fetch tool is bound). The
+        # corpus itself rides in a cached system block (cached_context), not the
+        # seed.
         seed = (
-            f"Ingest the following document into the corpus. Use the tools to "
-            f"find attachment points, then return the finding JSON.\n\n"
+            f"Ingest the following document into the corpus. The full corpus is "
+            f"provided above — attach new nodes to existing uuids drawn from it, "
+            f"then call submit_finding with your finding.\n\n"
             f"Source reference (use for attribution): {url}\n\n"
             f"--- DOCUMENT ---\n{document_text}\n--- END DOCUMENT ---"
         )

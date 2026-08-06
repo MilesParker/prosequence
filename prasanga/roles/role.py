@@ -5,24 +5,38 @@ Extracted from the working ingestion role. What lives here is everything that is
 NOT ingestion-specific: graph construction, the conditional edge, message
 accumulation, tool binding, the iteration-cap check, capability enforcement, and
 the apply/commit boundary. A subclass supplies what is specific — its read
-tools, its system prompt, its finding parser, its finding-to-ops application, and
-its run-parameter type (which builds the initial state).
+tools, its system prompt, its finding tool schema, its finding-to-ops
+application, and its run-parameter type (which builds the initial state).
 
 The graph is always:
 
     START -> call -> (tools -> call)* -> apply -> END
 
 The conditional edge after `call` is the only control point: it enforces the
-hard iteration cap and routes on whether the model asked for tools. commit() is
-called in `_execute`, OUTSIDE the graph; the graph has no path to a store write.
+hard iteration cap and routes on whether the model's tool call was an
+interaction tool (loop back through `tools`) or the finding tool (terminal,
+apply). commit() is called in `_execute`, OUTSIDE the graph; the graph has no
+path to a store write. A role that binds no interaction tools (single-shot
+ingestion does exactly this — see `cached_context`) has `tool_choice` pinned to
+its finding tool, so `call` always returns the finding in one turn and routes
+straight to `apply`; it simply never takes the `tools` edge.
+
+The finding itself is never parsed from text: every role declares a
+`finding_tool` schema, and the model must call it (forced via `tool_choice`
+when there are no interaction tools to choose between first). The Anthropic API
+enforces the shape, so `apply_node` reads the tool call's `input` directly —
+there is no fenced-JSON-in-prose format to go missing or truncate.
 
 Two class attributes DECLARE a role:
   * `capability` — the write ops the role holds. Enforced at apply, via the
     capability-guarded session, never by prompt instruction.
   * `objective`  — the mission prose the subclass folds into its system prompt.
 
-No extension point here is unused by ingestion. Where a not-yet-existing role
-would need a seam this one does not, that is flagged, not built.
+Extension points: `build_tools`, `system_prompt`, `finding_tool`,
+`apply_finding`, and `cached_context`. The last is a seam ingestion needs and a
+tool-driven role does not — a role that must put bulk data in front of the model
+up front (a full corpus snapshot) overrides it; the harness appends it as its
+own cached system block.
 """
 from __future__ import annotations
 
@@ -32,6 +46,17 @@ from langgraph.prebuilt import ToolNode
 from .bridge import from_anthropic, to_anthropic
 from .capability import CapabilityGuardedSession
 from .state import RoleState
+
+
+class FindingCallError(RuntimeError):
+    """The model's final message did not call the role's declared finding tool.
+
+    Terminal — apply cannot proceed without a finding. With `tool_choice`
+    pinned (a role with no interaction tools) this should not happen; it is
+    checked rather than assumed so a cap-cut run mid-interaction-tool-loop (a
+    role with interaction tools, cut before it ever calls the finding tool)
+    fails here with a clear message instead of a downstream KeyError.
+    """
 
 
 class Role:
@@ -66,8 +91,21 @@ class Role:
         """The system prompt (folds in `objective`)."""
         raise NotImplementedError
 
-    def parse_finding(self, text: str):
-        """Extract the finding object from the model's final message text."""
+    def cached_context(self) -> str | None:
+        """Large, stable reference context to place in front of the model as its
+        own cached system block (e.g. a full corpus snapshot for single-shot
+        ingestion). None by default — a tool-driven role reaches its data through
+        tools and does not override this. Rendered order is system prompt, then
+        this block, then the per-run messages, so `[system | context]` cache
+        together and the document stays the variable suffix."""
+        return None
+
+    def finding_tool(self) -> dict:
+        """The Anthropic tool schema the model must call to submit its finding.
+        `input` on that call IS the finding object `apply_finding` consumes —
+        there is no free-text finding format. Forced via `tool_choice` when the
+        role binds no interaction tools; left to the model's discretion
+        (`tool_choice: auto`, alongside the interaction tools) otherwise."""
         raise NotImplementedError
 
     def apply_finding(self, session, finding) -> tuple:
@@ -100,7 +138,10 @@ class Role:
     # -- graph -------------------------------------------------------------
 
     def _build_graph(self):
-        tool_node = ToolNode(self._lc_tools)
+        has_tools = bool(self._lc_tools)
+        tool_node = ToolNode(self._lc_tools) if has_tools else None
+        finding_schema = self.finding_tool()
+        finding_name = finding_schema["name"]
 
         def call_node(state: RoleState) -> dict:
             # LC history -> Anthropic wire, one guard-wrapped call. The system
@@ -112,13 +153,27 @@ class Role:
                 {"type": "text", "text": self.system_prompt(),
                  "cache_control": {"type": "ephemeral"}}
             ]
-            resp = self.guard.create(
+            context = self.cached_context()
+            if context:
+                system_param.append(
+                    {"type": "text", "text": context,
+                     "cache_control": {"type": "ephemeral"}}
+                )
+            create_kwargs = dict(
                 model=self.model,
                 max_tokens=self.max_tokens,
                 messages=messages,
                 system=system_param,
-                tools=self._schemas,
+                thinking={"type": "disabled"},
+                tools=[*self._schemas, finding_schema],
             )
+            if not has_tools:
+                # No interaction tools to choose between: pin tool_choice to the
+                # finding tool so the model always returns a call, never prose
+                # (which is exactly what let a "thinking"/preamble response
+                # starve the whole output budget with nothing left to submit).
+                create_kwargs["tool_choice"] = {"type": "tool", "name": finding_name}
+            resp = self.guard.create(**create_kwargs)
             ai = from_anthropic(resp)
             return {"messages": [ai], "iterations": state.iterations + 1}
 
@@ -128,34 +183,51 @@ class Role:
             return {"messages": msgs}
 
         def apply_node(state: RoleState) -> dict:
-            # Last message is the model's final finding (no tool calls). Writes go
-            # through the capability-guarded session: an op outside `capability`
-            # raises here, at apply.
+            # Last message must carry a call to the finding tool — its `args`
+            # IS the finding, already shaped by the API's schema enforcement.
+            # Writes go through the capability-guarded session: an op outside
+            # `capability` raises here, at apply.
             final = state.messages[-1]
-            text = final.content if isinstance(final.content, str) else str(final.content)
-            finding = self.parse_finding(text)
+            calls = getattr(final, "tool_calls", None) or []
+            finding = next((c["args"] for c in calls if c["name"] == finding_name), None)
+            if finding is None:
+                raise FindingCallError(
+                    f"model's final message did not call {finding_name!r} to "
+                    f"submit its finding (iteration cap may have cut the run "
+                    f"short before it reached the finding tool)")
             ops = self.apply_finding(self._guarded_session, finding)
             return {"ops_applied": ops}
 
         def route_after_call(state: RoleState) -> str:
             # Cap first: a terminal stop, even mid-conversation. Then route on
-            # whether the model asked for tools.
+            # whether the call was an interaction tool (loop) or the finding
+            # tool / no call at all (terminal — apply_node raises cleanly on
+            # the latter rather than routing somewhere invalid).
             if state.iterations >= self.iteration_cap:
                 return "apply"
             last = state.messages[-1]
-            if getattr(last, "tool_calls", None):
+            calls = getattr(last, "tool_calls", None) or []
+            if calls and not any(c["name"] == finding_name for c in calls):
                 return "tools"
             return "apply"
 
         graph = StateGraph(RoleState)
         graph.add_node("call", call_node)
-        graph.add_node("tools", tools_node)
         graph.add_node("apply", apply_node)
-
         graph.add_edge(START, "call")
-        graph.add_conditional_edges("call", route_after_call,
-                                    {"tools": "tools", "apply": "apply"})
-        graph.add_edge("tools", "call")
+
+        if has_tools:
+            graph.add_node("tools", tools_node)
+            graph.add_conditional_edges("call", route_after_call,
+                                        {"tools": "tools", "apply": "apply"})
+            graph.add_edge("tools", "call")
+        else:
+            # No interaction tools bound: tool_choice is pinned, so `call`
+            # always returns the finding call in one turn and routes straight
+            # to apply. route_after_call never yields "tools" here, so a single
+            # target keeps the graph valid.
+            graph.add_conditional_edges("call", route_after_call,
+                                        {"apply": "apply"})
         graph.add_edge("apply", END)
 
         # No checkpointer: invoked once, never resumed.

@@ -379,12 +379,18 @@ role so far (promoted from the round-trip spike).
   asked for tools), message accumulation, tool binding, capability enforcement,
   and the apply/commit boundary (`_execute` invokes the graph, then calls
   `session.commit()` **outside** the graph — the graph has no path to a store
-  write). Two class attributes **declare** a role: `capability` (the write ops it
-  holds) and `objective` (mission prose for the system prompt).
-- **`IngestionRole`** (`ingestion.py`) — the ingestion-specific parts: its read
-  tools, system prompt, finding parser, finding-to-ops application, and its
-  `run(url, document_text)` parameter (the reference `url` is supplied by the
-  harness, never inferred — no fetch tool is bound). Capability is
+  write). A role that binds no tools takes `call → apply` directly, in one turn.
+  The `cached_context` hook lets a role place bulk stable data (a corpus
+  snapshot) in front of the model as its own cached system block. Two class
+  attributes **declare** a role: `capability` (the write ops it holds) and
+  `objective` (mission prose for the system prompt).
+- **`IngestionRole`** (`ingestion.py`) — single-shot: it binds **no** read
+  tools and instead renders the whole corpus into a cached system block
+  (`cached_context` → `corpus_view.render_corpus`), so the model attaches in one
+  turn with no traversal loop. The ingestion-specific parts are that corpus
+  view, the system prompt, the finding parser, the finding-to-ops application,
+  and its `run(url, document_text)` parameter (the reference `url` is supplied by
+  the harness, never inferred — no fetch tool is bound). Capability is
   `(add_claim, add_inference)`.
 - **Capability** (`capability.py`) — `CapabilityGuardedSession` wraps the writer
   session so the apply step may call only the role's `capability` write ops; any
@@ -392,9 +398,12 @@ role so far (promoted from the round-trip spike).
   ungated. Enforcement is at apply, never by prompt instruction.
 - **Supporting modules** — `state.py` (the graph state: a frozen dataclass with
   an `add_messages` reducer), `bridge.py` (LangChain ↔ Anthropic message
-  translation, since the guard wraps the raw SDK), `read_tools.py` (the read-only
-  tool surface over session queries), `prompt.py` (objective + YAML generation
-  rules + finding contract), `apply.py` (finding parse + session writes).
+  translation, since the guard wraps the raw SDK), `corpus_view.py`
+  (`render_corpus` — the whole corpus as JSON Lines for ingestion's cached
+  context block), `read_tools.py` (the read-only tool surface over session
+  queries — unused by ingestion now, retained for interaction-shaped roles),
+  `prompt.py` (objective + YAML generation rules + finding contract), `apply.py`
+  (finding parse + session writes).
 - **Harness entry** (`run.py`) — wires config → guard + session → the role and
   hands it `(url, document_text)`; `main` is a thin CLI. Model and iteration cap
   come from `guard_config.toml`. The role commits onto main (the store's only
