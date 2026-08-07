@@ -339,43 +339,37 @@ def check_all_commits_load_and_validate():
     """Item 4 invariant: every commit reachable from `main` in the REAL store —
     every corpus at each — must parse under the current loader and validate.
     This is the guard against a loader-unreadable commit (like the old genesis)
-    entering the store again.
+    entering the store again. No exemptions: every commit on main must load.
 
-    One exemption, and only one: commits predating the scheme migration, which
-    carry `scheme: null` on some inferences. `scheme` is no longer nullable, so
-    the current loader cannot read them and never will — git history is
-    immutable, and no migration can reach backwards into it. Such a commit is
-    identified from its DATA (a null/absent scheme), never from a hardcoded sha,
-    so the exemption retires itself as those commits age out of the walk rather
-    than becoming a permanent hole. Every other load failure still fails.
+    The v2.3 genesis rebuild is what keeps that true. Making `scheme`
+    non-nullable stranded the pre-v2.3 commits — the loader cannot read them and
+    never will, since git history is immutable and no migration reaches
+    backwards into it. Rather than carve out an exemption and leave a permanent
+    hole here, main was rebuilt onto a new root at the migrated form (the same
+    move the 1d2 genesis rebuild made, for the same reason). The stranded
+    commits survive on the ingest/* and spike/* branches, which this walk does
+    not visit.
     """
     store = CorpusStore(SRC)
     repo = store.repo
     shas = [str(c.id) for c in repo.walk(repo.head.target)]
     pairs = 0
-    pre_scheme = 0
     failures = []
     for sha in shas:
         for name in store.list_corpora(sha):
             text = store.read(name, sha)
             pairs += 1
-            raw = yaml.safe_load(text)
-            if any(i.get("scheme") is None
-                   for i in (raw.get("inferences") or [])):
-                pre_scheme += 1
-                continue
             try:
                 load(text)  # current loader must parse
             except Exception as e:
                 failures.append(f"{sha[:8]}/{name} load: {e}")
                 continue
-            errs, _ = check(raw, name)
+            errs, _ = check(yaml.safe_load(text), name)
             if errs:
                 failures.append(f"{sha[:8]}/{name}: {len(errs)} invariant errs")
     ok = not failures
     return ok, (
-        f"{len(shas)} commit(s), {pairs} corpus-reads "
-        f"({pre_scheme} pre-scheme-migration, exempt), all load+validate={ok}"
+        f"{len(shas)} commit(s), {pairs} corpus-reads, all load+validate={ok}"
         + (f"; FAILURES={failures[:3]}" if failures else "")
     )
 
