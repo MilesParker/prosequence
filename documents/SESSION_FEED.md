@@ -4,14 +4,14 @@ This document is optimized for LLM context injection. It provides the minimum ne
 
 Design rationale, worked examples, rejected alternatives, and research directions are in DESIGN_HISTORY.md. Schema history: v1 (Argument/Proposition/TerminalValueNode) was superseded 2026-07-02 by the claim/inference model below. The v2 draft permitted `contests` to target an InferenceId; that is retired — see the enthymeme-completion thesis under Key Settled Decisions. The migration is complete; no v1 corpora remain live.
 
-Schema is at v2.2. v2.1 retired `cluster` and `Inference.note`. v2.2 replaced the `concludes` / `contests` field pair with `target` + `relation`, and migrated every id from a readable slug to UUIDv7. Corpora now live under git in their own repository behind a canonical serializer and a typed writer — see Runtime.
- 
+Schema is at v2.3. v2.1 retired `cluster` and `Inference.note`. v2.2 replaced the `concludes` / `contests` field pair with `target` + `relation`, and migrated every id from a readable slug to UUIDv7. v2.3 made `scheme` non-nullable, added `Deductive` and `Unknown` to `ArgumentScheme`, and added `Inference.schemeDescriptor`. Corpora now live under git in their own repository behind a canonical serializer and a typed writer — see Runtime.
+
 ---
 
 ## What This Is
 
 A DAG-based argument representation framework. Goal: allow people to map, navigate, and evaluate arguments on contested topics by making implicit logical structure explicit. The animating question is "what would you have to believe in order to believe this?" The framework is a completeness checker not a truth machine — success means dialectical saturation, not adjudication.
- 
+
 ---
 
 ## Core User Model
@@ -20,10 +20,11 @@ When making an argument, a participant must state:
 - **(a) What they believe** — the claim
 - **(b) Why they believe it** — the grounds (an attributive claim)
 - **(c) The assumptions that make b imply a** — warrant claims
-  All three are Claim nodes. What binds them into one inferential act is an Inference node: it points at its grounds-claims and warrant-claims and bears exactly one relation to exactly one target claim — it either concludes that claim or contests it.
+
+All three are Claim nodes. What binds them into one inferential act is an Inference node: it points at its grounds-claims and warrant-claims and bears exactly one relation to exactly one target claim — it either concludes that claim or contests it.
 
 The dialectical layer is not a separate mechanism: contesting is just another inference, aimed at a claim (rebut) or an attributive claim (undermine). There is no third target — see the enthymeme-completion thesis below.
- 
+
 ---
 
 ## Entity Model (Settled — v2.2)
@@ -36,36 +37,42 @@ Two node types. Role is positional throughout; nothing about a node's type says 
 - terminal: boolean — true means this is a bedrock commitment; no inference may conclude it. False and unconcluded means "not yet supported" (a gap), not "cannot be supported." This is the one place the model distinguishes bedrock from absence.
 - attribution?: { source: GroundsSource; quote: string | null } — present iff the claim's text is attributive ("Source X reports Y"). Attributive claims are the empirical leaves: they bottom out by checkability against the source, not by the terminal flag. A claim can migrate from contested to attributive as a debate settles elsewhere (e.g. "smoking causes cancer" moving from a once-contested claim into other corpora's attributions).
 - A claim with no incoming Concludes edge and terminal: false is either a currently-designated root (see DiscourseSpace.roots) or a genuine gap (GAP 6).
-  **Inference** — the only structural node; carries no content
-- id, scheme: ArgumentScheme | null, uncertain, submissionStatus
+
+**Inference** — the only structural node; carries no content
+- id, scheme: ArgumentScheme, uncertain, submissionStatus
+- scheme is required, not nullable. `Unknown` is the value for an inferential move the taxonomy does not name; it is not a stand-in for "not yet classified."
+- schemeDescriptor: string | null — a few words naming the move. Present iff scheme is `Unknown`. Not a note field: it classifies the inference and carries nothing else. The `Inference.note` argument does not apply, because the descriptor is the same kind of fact `scheme` already holds.
 - grounds: ClaimId[] — 1 or more; all conjoint (AND). Alternative, independent justifications for the same claim are separate Inference nodes (OR across inferences), not multiple grounds on one.
 - warrants: ClaimId[] — 0 or more, also conjoint. Empty means the warrant is implicit and not yet surfaced — a legal state, not an omission.
 - target: ClaimId — required, exactly one. Never an InferenceId.
 - relation: Relation — required. `CONCLUDES` means this inference derives its target; `CONTESTS` means it attacks its target. Rebutting an attributive claim is what "undermining grounds" means — there is no separate mechanism for it.
-  Support and contest are the same structural relation with opposite polarity, so polarity is an attribute of the inference rather than a choice between two named fields. A single-valued target admits no ambiguity about which reference the relation applies to. `grounds` and `warrants` stay separate fields because they are many-valued and position is the only thing carrying their role — this is the boundary of "role is positional," not an exception to it.
+
+Support and contest are the same structural relation with opposite polarity, so polarity is an attribute of the inference rather than a choice between two named fields. A single-valued target admits no ambiguity about which reference the relation applies to. `grounds` and `warrants` stay separate fields because they are many-valued and position is the only thing carrying their role — this is the boundary of "role is positional," not an exception to it.
 
 **Definition** — lives at discourse space level, not in the argument graph
 - term, text, importedFrom: DiscourseSpaceId | null
 - Definitions are stipulations not truth claims
 - Challenging a definition redirects to another discourse space via import pointer
 - Philosophical frameworks are not definitions — they live in warrant claims
-  **DiscourseSpace**
+
+**DiscourseSpace**
 - id, title
 - definitions: Definition[]
 - roots: ClaimId[] — the claims currently designated as contested questions (entry points for a view). Not an owned type; any claim can be a root, and a discourse space may have more than one live proposition at once (e.g. a factual question and a separate designational/policy question sharing the same claim and inference graph).
 - claims: Claim[]
 - inferences: Inference[]
+
 ---
 
 ## Enums (Settled)
 
 ```
-ArgumentScheme: FromExample | FromGeneralization | FromAnalogy | FromAuthority | FromConsequence | FromSign | FromCause | FromDefinition
- 
+ArgumentScheme: FromExample | FromGeneralization | FromAnalogy | FromAuthority | FromConsequence | FromSign | FromCause | FromDefinition | Deductive | Unknown
+
 GroundsSourceType: Citation | SelfEvident | CommonKnowledge | LogicalNecessity | None
- 
+
 SubmissionStatus: Pending | Interrogating | Rejected | Accepted
- 
+
 Relation: CONCLUDES | CONTESTS
 ```
 
@@ -78,7 +85,7 @@ Relation: CONCLUDES | CONTESTS
 `Cluster` (Pro | Anti | Empirical | Analogy | Terminal) is retired — see Key Settled Decisions.
 
 `Inference.note` is retired — see Key Settled Decisions.
- 
+
 ---
 
 ## Key Settled Decisions
@@ -125,6 +132,14 @@ This subsumes the v2-draft undercut. `CONTESTS` on an ordinary Claim = rebut; `C
 
 **`Inference.note` is retired.** Applicability remarks in prose were the informal escape hatch the enthymeme-completion thesis already forbids: if a note carries an applicability assumption it is an unsurfaced enthymeme and belongs in `warrants` as an attackable claim; if it is authoring commentary it is not argument content and does not belong in the schema. Empirically, 46 of 158 inferences carried a note and 3 held argument content — see DESIGN_HISTORY.
 
+**Schemes are required and the taxonomy is open at the bottom.** `scheme` is non-nullable. Two values were added to the original eight.
+
+`Deductive` — the grounds, together with the stated warrants, entail the target; any objection names a missing premise rather than a reason the step fails. This is not a misfit category, it is the unmarked case: every AND-decomposition produces one at the top, where the sub-conclusions are bound into the claim they jointly establish. Its absence was a real gap in coverage — the original eight are Walton-style presumptive schemes, all defeasible, and deduction was never one of them. Deductive inferences carry the heaviest warrant-surfacing obligation, since their premises are the only contestable surface. An attack that appears to target a deductive step is naming an unsurfaced premise.
+
+`Unknown` — a real inferential move none of the others names, carrying a short free-text descriptor. Candidate categories were deliberately not pre-nominated: naming bins in advance anchors classification and returns the shape of the guess rather than the shape of the misfits. The descriptors accumulate across ingestion runs and are clustered into enum candidates later. Two known pressure points were left out on purpose — inductive accumulation is a composition question, not a scheme, and unfalsifiability is on the defect list and mostly applies to contests.
+
+**The descriptor lives on the node, not in the commit message.** Routing it to the change record was rejected: the classification is a property of the inference, not of the agent that made it, and log-trawling is not a maintainable retrieval path. It survives the `Inference.note` test because it is neither argument content nor authoring commentary. Drift is fenced by the name, by I9, and by the write-boundary biconditional rather than by convention.
+
 **Stance is computed per reference root, never stored.** A claim's valence is a fact about a path to a commitment, not a property of the statement — the same claim is aligned toward one root and opposed toward another. `computeStance(graph, referenceRootId)` returns `aligned | opposed | divided | neutral` for every node. Divided means paths of conflicting parity; neutral means no path to the root at all, which is absence of stance rather than a point on the axis. The reference root is nominatable and decoupled from selection.
 
 **Ids are opaque and non-semantic — now actually so.** UUIDv7 throughout. The slug ids violated a rule the schema already stated; the migration brought the corpora into conformance rather than revising anything, which is why the filenames did not move to v3. Ids are never parsed, never carry type or role, never appear in a tag. The cost is that reference sites are no longer scannable; readability moved to `tag`.
@@ -136,7 +151,7 @@ This subsumes the v2-draft undercut. `CONTESTS` on an ordinary Claim = rebut; `C
 **Every commit failure is terminal.** Commit happens once at the end of a run, so there is no partial state to reconcile and the cheap response to any failure is to stop. There is no retry, backoff, or loop anywhere in the write path.
 
 **Warrants stay 0..\*.** An inference with no warrant is an enthymeme — the normal state, not a defect. Requiring one at write time would push contributors and agents to invent warrants rather than record their absence. A missing warrant is a gap for gap detection, never an invariant violation.
- 
+
 ---
 
 ## YAML Generation Rules (v2)
@@ -176,8 +191,9 @@ Mark such claims with `attribution: { source: ..., quote: ... }`.
 - `LogicalNecessity` — follows from definitions or conceptual structure
 - `None` — only for terminal claims and pure definition-based inferences with no empirical basis
 - Never use `None` as a shortcut when a source exists or could be inferred
-  **Every inference binds specific grounds to a specific warrant.**
-  Do not attach a warrant to a claim in the abstract. A warrant claim is only meaningful in the context of the particular inference it bridges — attach it via `warrants` on that inference, not as some free-floating property of the concluded claim.
+
+**Every inference binds specific grounds to a specific warrant.**
+Do not attach a warrant to a claim in the abstract. A warrant claim is only meaningful in the context of the particular inference it bridges — attach it via `warrants` on that inference, not as some free-floating property of the concluded claim.
 
 **Warrant claims answer "what assumption makes these grounds imply this claim?"**
 Not a restatement of the grounds, not a restatement of the claim, not a free-floating general principle.
@@ -210,7 +226,7 @@ Unchanged.
 
 **Terminal claims are plain language value assertions.**
 No named philosophical frameworks. `terminal: true`. No inference may conclude a terminal claim — this is a hard validator rule, not a style preference.
- 
+
 ---
 
 ## Views (Settled)
@@ -234,6 +250,7 @@ Both views are built. They swap, never coexist, and share one `ClaimId` selectio
 - `roots[0]` is the default centre and the default reference root.
 - Attribution renders in the focus band only.
 - Never rendered anywhere in the focus view: `id`, `scheme`, computed depth, `tag`, `submissionStatus`, `uncertain`. Depth especially — it is inferential distance and explicitly not importance.
+
 ---
 
 ## Runtime (Settled — Stage 1)
@@ -246,7 +263,8 @@ Both views are built. They swap, never coexist, and share one `ClaimId` selectio
 - Working-tree consistency: `commit` writes the blob and the file, same bytes. Before writing it compares the working-tree file against HEAD's blob and raises `WorkingTreeDirty` on a mismatch, so an agent commit cannot silently discard an uncommitted hand-edit.
 - Every commit reachable from `main` must load with the current loader. This is a test in the suite, not a convention — genesis was rebuilt once because it predated v2.2 and could no longer be read.
 - Independent positioning of a corpus on disk is available through `git worktree`, not through separate repositories.
-  **Writer.** The session is the only write path. There is no patch object and no `submit`; patches exist as output (`session.diff()`) for review and the change record, never as input.
+
+**Writer.** The session is the only write path. There is no patch object and no `submit`; patches exist as output (`session.diff()`) for review and the change record, never as input.
 
 - The harness binds head; the session holds one reference to the current version and rebinds it per op.
 - Reads see uncommitted writes. This is what makes construction work — `add_claim` returns a uuid, `add_inference` consumes it, `neighborhood` shows what was just built.
@@ -254,13 +272,15 @@ Both views are built. They swap, never coexist, and share one `ClaimId` selectio
 - Write ops: `add_claim`, `add_inference(grounds, warrants, target, relation)`, `revise_claim`. Queries: `get`, `neighborhood`, `find_by_tag`, `concludes`, `contesting`, `grounds_citing`, `warrants_citing`.
 - Failures are `ValidationFailed`, `HeadMoved`, `WorkingTreeDirty` — all terminal, distinguishable so the harness can log them differently, not so an agent can respond to them.
 - The commit message carries op lines with tags. It is the change record until Stage 2 has one, and it is where the readability lost to bare uuids comes back.
-  **Guard.** The client is a constructor parameter, never a module-level singleton — that seam is what will later allow a stub client to exercise commit paths without hitting the API. There is no run wrapper and no dry-run flag; git makes rollback cheap enough that dry-run-as-safety buys nothing.
+
+**Guard.** The client is a constructor parameter, never a module-level singleton — that seam is what will later allow a stub client to exercise commit paths without hitting the API. There is no run wrapper and no dry-run flag; git makes rollback cheap enough that dry-run-as-safety buys nothing.
 
 - Pre-flight before every call, in order: kill file → per-run token cap → cumulative token cap. Projected cost is estimated input plus `max_tokens`.
 - The cumulative gate reads the token log from disk. Process memory cannot bound a crash-loop across restarts.
 - Token log is append-only JSONL: timestamp, run_id, corpus, model, input_tokens, output_tokens, committed. No cost figure — cost is a reporting concern computed retrospectively from model and token counts, and a price table inside the pre-flight path is a cap that goes silently wrong.
 - Config holds five keys and rejects price-like and key-like keys. The API key comes only from the environment; the guard never handles it.
-  **Direction — viz and agent surface.** Settled in principle, unbuilt. Recorded here because each one closes an option rather than opening one.
+
+**Direction — viz and agent surface.** Settled in principle, unbuilt. Recorded here because each one closes an option rather than opening one.
 
 - **The viz becomes a client of a local service.** Derivation lives once, in Python, beside the store and validator. This was already forced in miniature: a divergent TypeScript validator reimplemented the invariants, drifted, and was deleted. The same pressure applies to every derived value the two sides share.
 - **The fetch boundary is at version change, never at interaction.** One request per (corpus, version) returns a derived bundle — parsed graph, derived indices, stance. Layout, selection, paging, and animation then run from memory. No interaction path touches the network.
@@ -268,14 +288,16 @@ Both views are built. They swap, never coexist, and share one `ClaimId` selectio
 - **The service reads the working-tree file by default and takes an optional sha.** Hand-editing keeps edit-and-reload immediacy, and replay becomes a viewing mode rather than a checkout.
 - **Agent activity surfaces as an indicator, not a live update.** The reader binds a version as an agent does and rebinds deliberately. A graph re-laying-out under someone reading it is hostile, and arriving nodes collide with the focus view's flight animation.
 - **The derived indices have exactly one implementation.** Stance drifting has a visible symptom — the colour discordance was two implementations disagreeing about what stance was relative to. An index drifting has none; it quietly renders the wrong parent band.
-  **Direction — the agent record.**
+
+**Direction — the agent record.**
 
 - **Proposals go on branches.** A superseded or reverted proposal is a real commit with a real diff, retrievable by an agent deciding what to work on.
 - **Agent authorship is git's author field**, not a commit-message convention. `git log --author` filters on it natively; a message convention gets regex-parsed and drifts.
 - **Working-tree writes are main-only.** A branch commit writes the blob and not the file, or the on-disk corpus tracks whichever branch committed last.
 - **There is no separate refusal object.** Two agents disagreeing produce two commits, and the delta between two valid corpora *is* the disagreement — human-adjudicated. A structured, contestable refusal only exists once a gate does. What remains open is recognition rather than recording: matching a current proposal against one's own prior one is a coreference judgment.
 - **Branch selection by agents is a separate question from branches as record.** Selection implies something eventually merges, and merge is out of scope for single residence — several invariants are not merge-closed.
-  **Vocabulary: bounding and stopping are different concerns.** Bounding is governance and is built — token caps, kill file, terminal failure. Stopping is a per-role feature concern: when has this role done its work. Conflating them puts a design question in the harness config or a config value in a role spec.
+
+**Vocabulary: bounding and stopping are different concerns.** Bounding is governance and is built — token caps, kill file, terminal failure. Stopping is a per-role feature concern: when has this role done its work. Conflating them puts a design question in the harness config or a config value in a role spec.
 
 **Open, raised but not decided.**
 
@@ -283,6 +305,7 @@ Both views are built. They swap, never coexist, and share one `ClaimId` selectio
 - A pre-commit hook rejecting any commit that touches two corpora, to hold the property hand-edits can break.
 - Pinning the store to the main worktree path explicitly. Once a second worktree exists, "the on-disk file" in the dirty-tree check is ambiguous if resolved from cwd.
 - An audit reconciling stale file paths across the project documents.
+
 ---
 ## Agent Roles (Settled — role system)
 
@@ -296,15 +319,27 @@ Both views are built. They swap, never coexist, and share one `ClaimId` selectio
 
 - *Harness-enforced* — capability grant, token caps, kill file, one corpus per commit, validity. All the harness can see.
 - *Self-enforced* — stopping, retry-only-on-new-grounds. Evaluating these requires modelling the role's purpose, which is the adjudication being avoided.
-  A declaration's function is that divergence between declared objective and observed delta is detectable from the change record, post hoc, by a human or another agent.
+
+A declaration's function is that divergence between declared objective and observed delta is detectable from the change record, post hoc, by a human or another agent.
 
 **Roles are types.** Instance cap and rate budget are class attributes. A shared budget spanning two roles lives in the deployment — the object naming which roles run at what multiplicity — because it cannot live on either sharer without one being authoritative over the other. Known-conflicting pairs are not declared: coverage-against-density is readable from two objectives, and a pair list is a cache of a judgment already available. Add it when something consumes it mechanically.
+
+**The role prompt is three modules, assembled in order.** Framework, objective, then harness-generated mechanics. Separate artifacts, not one string literal — a concatenated prompt makes the modularity decorative and the next role copies the whole thing.
+
+- *Framework* — what the graph is, the hard problems that cut across every role, and the model with the discipline for using each construct. Role-invariant, identical for every role, and the stable cache prefix. Written in narrative prose: it is maintained by hand and a prompt that reads well is one whose defects are visible.
+- *Objective* — the role's mission, its ranked failure modes, its change posture, and its pre-emit checks. This is the `objective` class attribute.
+- *Mechanics* — corpus view, tool schema, run parameters. Generated, never hand-authored per role.
+
+Constraints are stated once, in the framework, embedded with the construct they govern rather than listed separately. Restating a rule at its point of use as a bare check is fine; restating it as a second explanation is the repetition that costs clarity.
+
+The hard problems sit at the front, not the end. Three of the five govern how a source is *read*, so they must be in hand before reading rather than arriving as review criteria; and in a cached prefix followed by a corpus view and a document, nothing in the framework is recent by the time generation starts.
 
 **The declaration is two class attributes.**
 
 - `capability` — set of ops. The only harness-enforced field, and the mechanism by which roles differ.
 - `objective` — prose. Goes in the system prompt and is what an observed delta is compared against.
-  `deference policy` is retired. It was a pre-gate concept; the retry norm replaced it and that norm is uniform across roles, so a per-role field could only declare a weaker norm than the protocol's.
+
+`deference policy` is retired. It was a pre-gate concept; the retry norm replaced it and that norm is uniform across roles, so a per-role field could only declare a weaker norm than the protocol's.
 
 `stopping condition` is not a field. It is the trigger returning nothing — a property of the role's selection query, checked when writing it.
 
@@ -315,7 +350,16 @@ Both views are built. They swap, never coexist, and share one `ClaimId` selectio
 - **`commit()` is outside the graph**, after END, in harness code. The graph has no path to a store write.
 - **Full message history per call**, via `add_messages`. Required by tool_use/tool_result pairing, not a compromise. Cost per iteration grows through a run; prompt caching on the stable prefix mitigates it, the per-run token cap bounds it, and no mid-run summarization or trimming is used — both are lossy steps in the one reasoning trace that must stay readable. The token log must distinguish cached from uncached reads or it overstates spend.
 - Per-run state is a typed dataclass holding plan and progress. Dataclasses, never TypedDicts.
-  **Control splits three ways.** What the run is about — harness, via the run parameter. What the model looks at — model, via read tools. What lands — harness, via ops. The model requests; it never executes a write. Read tools cannot fail in a way worth refusing, so retry-past-error on the read surface is correct.
+
+**Control splits three ways.** What the run is about — harness, via the run parameter. What the model looks at — model, via read tools. What lands — harness, via ops. The model requests; it never executes a write. Read tools cannot fail in a way worth refusing, so retry-past-error on the read surface is correct.
+
+**The write boundary enforces the scheme biconditional.** `add_inference` takes `scheme` and optional `schemeDescriptor`, rejects a descriptor on any other scheme, and rejects `Unknown` without one. Enforced at the op rather than only at the tool schema, so hand-driven writes are covered by the same rule. The corpus invariant (I9) stays one-directional; the op is where the stronger rule belongs, because it governs new work rather than existing state.
+
+**Truncation is terminal.** A model response carrying the finding call with `stop_reason == "max_tokens"` fails the run. Nothing is committed. This is failure-is-terminal applied to the output boundary — a partial finding is a silent quality failure that looks like a successful commit, which is the one shape the design has no way to detect afterwards.
+
+**Ingestion is additive: `revise_claim` is withheld from its capability grant.** Existing claim text, tags, and attributions are fixed for this role. Revise flags touching inferences for review, and those inferences were authored against the current wording — ingestion has not read them closely enough to judge the consequences. Wrongly-worded, over-broad, and conflated claims are left standing with the new material alongside; disambiguation is a later role that holds `revise_claim` and has read what depends on the wording.
+
+**Change posture is per-role, not universal.** What is universal is that changes propagate to whatever depends on them, and that the cost of a change scales with what depends on it. How freely a role should change existing structure varies — ingestion barely at all, consolidation as its whole purpose — so the threshold is stated in `objective` rather than in the shared framework prompt. Roles reason from the same fact and act on different thresholds.
 
 **Handoff between roles is a read query over history, never a status field.** Review state belongs to the reviewer, not the reviewed: one flag cannot serve several reviewers, and a set of reviewer ids is GAP 5. The corpus stays canonical and carries no review bookkeeping.
 
@@ -324,7 +368,10 @@ Both views are built. They swap, never coexist, and share one `ClaimId` selectio
 - The general mechanism is `(from_sha, to_sha) -> nodes touched`. A role supplies its own mark; a human supplies any range. Same query.
 - This is the pull form of the notification the architecture refused. It is the only durable per-role state in the design and is not reconstructible — if lost, reset and redo the window.
 - Consequence accepted: the corpus cannot distinguish *reviewed and sound* from *never looked at*. Agreement leaves no trace, which is the price of no gate and no status field.
-  **Read tools are model-called and include their own entry points.** `get_all_tags() -> (uuid, tag) pairs` is the index — the model asks for it rather than receiving the corpus pre-loaded. Whole-corpus-in-prompt was rejected: at 5k tokens it works, but it makes traversal unobservable, and traversal is what strategy consists of.
+
+**Read tools are model-called and include their own entry points.** `get_all_tags() -> (uuid, tag) pairs` is the index — the model asks for it rather than receiving the corpus pre-loaded. Whole-corpus-in-prompt was rejected for roles whose work *is* traversal: it makes the traversal unobservable, and traversal is what strategy consists of.
+
+**Ingestion is the exception, and the exception is about payload profile, not policy.** Ingestion receives the whole corpus in the system prefix. Its work is attachment, which needs a global view at once rather than a search path — and iterative interrogation of an accumulating claim set re-crosses the wire on every turn, which is the growth the read-tool design is avoiding in the first place. Roles that search a host-resident graph (consolidation, disambiguation, review) take the read-tool shape and the traversal transparency that comes with it.
 
 **Cohorts.** A *run* is one parameter to one commit. A *cohort* is n runs sharing one plan, authored once by the model from the objective. The cohort is the unit of attribution — it is what makes one strategy comparable to another. Per-run plan authoring was rejected: it confounds strategy with sampling noise.
 
@@ -333,7 +380,7 @@ Both views are built. They swap, never coexist, and share one `ClaimId` selectio
 **Symmetry is not a role concern.** Asymmetry already in a corpus because one side has more sources is a fact about the world; asymmetry introduced by where an agent spent attention is an artifact. No role can distinguish them from inside a run. Struck from role specs and relocated to deployment-level observation over the change record.
 
 **Objectives are not authored as claims yet.** Prose in the class attribute. The rationale space needs GAP 4 and has no mechanical consumer — a human compares objective against delta. Trigger for revisiting: a role must *answer* another role's objection rather than defer to it.
- 
+
 ---
 
 ## Staging (revised — supersedes the stages in ARCHITECTURE_STAGE1)
@@ -346,16 +393,20 @@ Stage 3 as originally written ("same agent, now proposing through review") does 
 - **5 — Reviewer.** First consumer of the sha-range query and the read mark. Reviews what ingestion landed.
 - **6 — Coreference as a shared service.** Pulled forward by 4.
 - **7 — Cohorts.** First stage whose output is a comparison rather than a graph change.
-  Extraction is proven — three corpora built this way, all passing I1–I8, and the YAML Generation Rules above are that role's guidance. Attachment is not: deciding where a new claim belongs, whether an inference already covers it, whether the assumption is already surfaced two nodes over.
+
+Extraction is proven — three corpora built this way, all validating clean, and the YAML Generation Rules above are that role's guidance. Attachment is not: deciding where a new claim belongs, whether an inference already covers it, whether the assumption is already surfaced two nodes over.
 
 ---
 
 ## Open (from the roles session)
 
+- **Scheme enrichment over the existing corpora.** The migration sets every previously-unscored inference to `Unknown` with no descriptor, which is the worklist. Assigning real schemes is judgment, not migration, and is deliberately not bundled with the schema change. Plan: hand-pass `free-transit` first to test whether the ten values cover real cases before automating. If a third come back `Unknown`, the taxonomy needs work before a role is built. If they cover cleanly, scheme enrichment is a good shape for the first non-ingestion role — narrow capability (`set_scheme` only), trivial stopping condition, cheap and visible errors.
+
 - **`submissionStatus` may be retired.** Review state belongs to the reviewer, not the reviewed, which leaves the enum with no consumer. Same shape as `cluster` and `note` — values better located elsewhere. Needs its own decision.
 - **The saturation criterion has no N.** "No agent produced a materially new distinction in the last N runs" cannot distinguish saturation from sampling noise without one.
 - **Re-selection after reversal — deferred.** See the DESIGN_HISTORY roles addendum for the trigger condition and the mechanism if adopted.
 - **An op that sets status**, and a default for it, are unresolved pending the `submissionStatus` decision.
+
 ---
 
 ## Gaps
@@ -373,7 +424,7 @@ Node references in this section use pre-v2.2 slug ids. Resolve them through `mig
 **GAP 5: User identity and submission history** — unresolved but now recognized as architecturally central rather than peripheral. Prasanga traversal — showing a participant the consequences of their own committed claims — requires knowing which claims a given agent accepts. This is not just a trust/weighting feature; it's a prerequisite for the framework's core mechanism.
 
 **GAP 6: Representing missing arguments** — unresolved, now partly detectable. `validate.py` warns on candidates (free-transit 34, freedman 4, gaza 5), but a warning cannot distinguish an intentional root from an overlooked gap from an unfinished thought. Live instance: `i-obama-attacks-deal` in freedman attacks `c-deal-ended-economic-harm`, but its grounds bear on deal quality, not on economic harm — and the pro argument it was written against was never extracted. Its retired note referred to "the pro warrant," a thing not in the corpus. Unrepaired.
- 
+
 ---
 
 ## Prior Art
@@ -383,12 +434,12 @@ The claim/inference split with binary edges converges independently on the AIF (
 Decision: do not adopt AIF as a dependency. Its ecosystem (OVA+, AIFdb) is a single academic lab's argument-mining tooling with no mainstream adoption; its OWL/RDF vocabulary is unnecessary overhead for this project's goals. Parsanga's genuinely novel territory — Prasanga traversal over agent commitments, terminal value nodes as culturally-neutral bedrock, definitions constituting discourse spaces, the LLM Socratic gatekeeper — has no equivalent in AIF or in any surveyed deliberation platform (Kialo, Debategraph, MIT Deliberatorium, Polis, Aaronson's Worldview Manager). AIF-export as a future interoperability option is cheap and low priority.
 
 Platform graveyard note (for product/funding context, not schema): structured argument-mapping tools have consistently died from the formalization burden they place on users (Debategraph, Deliberatorium, TruthMapping, Worldview Manager); survivors simplified structure away (Kialo → pro/con trees, pivoted to education; Polis → no argument structure, opinion clustering). Every prior attempt predates capable LLMs; the LLM Socratic gatekeeper may remove the constraint that killed the category. See SESSION_FEED_ADDENDUM.md history for the "Prasangafy this" product direction discussed alongside this schema work.
- 
+
 ---
 
 ## Working Corpora
 
-**free-transit.v2.yaml** — stress-test corpus. 102 claims, 68 inferences, 2 terminals. Passes I1–I8. Key reference points (v1 node numbers retained below for continuity with DESIGN_HISTORY.md):
+**free-transit.v2.yaml** — stress-test corpus. Key reference points (v1 node numbers retained below for continuity with DESIGN_HISTORY.md):
 - Root: "Fares should be removed from public transit"
 - Terminal pro: "Society is collectively obligated to fund conditions for full civic participation"
 - Terminal anti: "Those who benefit from a service should bear its costs in proportion to use"
@@ -396,16 +447,19 @@ Platform graveyard note (for product/funding context, not schema): structured ar
 - node-2 (ridership increase): best example of a mediating claim.
 - node-29: the GAP 1 case. Contests the surfaced warrant claim asserting that user-pays legitimately applies to transit, rather than the inference or the terminal behind it.
 - node-19/20/21 → node-32: example claims routing through a generalisation claim.
-  **freedman.v2.yaml** — US-Iran ceasefire, built from the Friedman op-ed. 49 claims, 31 inferences, 4 terminals. Passes I1–I8. Single-source corpus: nearly all citation grounds trace to one op-ed, which is why the tag source-prefix rule is dropped here.
 
-**gaza_genocide** — Bartov (Pro) vs. Stephens (Anti) on "Israel's military campaign in Gaza constitutes genocide." Built directly as a two-source paired extraction, then iteratively refined for cross-source confrontation (shared warrants surfaced, mis-targeted attacks re-pointed to warrants, duplicate nodes merged, one node given dual Warrants/Contests roles). Now gaza.v2.yaml — 81 claims, 59 inferences, 4 terminals. Passes I1–I8 including acyclicity. Was the reference conversion for the schema migration. Notable v2-specific structure: three terminal-value warrants that had no valid home in v1 (they warranted an Anti argument's *attack* on the proposition, not the argument itself) attach cleanly to their contesting inferences in v2 — this was the concrete case that forced the Support/Attack-as-inference-output decision. Also the corpus where five claims warrant two inferences into the same destination, which is why focus-view warrant tiles must render grounds-to-destination pairs.
+**freedman.v2.yaml** — US-Iran ceasefire, built from the Friedman op-ed. Single-source corpus: nearly all citation grounds trace to one op-ed, which is why the tag source-prefix rule is dropped here.
 
-Corpus files live at `discourse-spaces/<slug>.v2.yaml`, inside their own git repository nested in the code tree. Node counts above predate no changes — the uuid migration and the v2.2 field change were both structure-preserving.
+**gaza_genocide** — Bartov (Pro) vs. Stephens (Anti) on "Israel's military campaign in Gaza constitutes genocide." Built directly as a two-source paired extraction, then iteratively refined for cross-source confrontation (shared warrants surfaced, mis-targeted attacks re-pointed to warrants, duplicate nodes merged, one node given dual Warrants/Contests roles). Now gaza.v2.yaml. Was the reference conversion for the schema migration. Notable v2-specific structure: three terminal-value warrants that had no valid home in v1 (they warranted an Anti argument's *attack* on the proposition, not the argument itself) attach cleanly to their contesting inferences in v2 — this was the concrete case that forced the Support/Attack-as-inference-output decision. Also the corpus where five claims warrant two inferences into the same destination, which is why focus-view warrant tiles must render grounds-to-destination pairs.
+
+Corpus files live at `discourse-spaces/<slug>.v2.yaml`, inside their own git repository nested in the code tree.
+
+Node counts, terminal counts, and validation status are code-derived facts and are deliberately not recorded here — they drift on every corpus touch and nothing reads them mechanically. Run the validator.
 
 All ids are UUIDv7 and carry nothing. `tag` is the human handle everywhere: tooling output, logs, and commit messages. Slug references in older documents resolve through `migrations/2026-07-slug-uuid.map`.
 
 Visualization: a Vite/TypeScript React app (`src/viz/`), D3 v7 / js-yaml, force-directed bipartite DAG. There is a build step — `npm run build` (vite) and `tsc -p tsconfig.json` — plus a separate CLI target (`src/index.ts`, `src/loader.ts`, `src/print.ts`) under `tsconfig.node.json`. Inference nodes render as small, visually subordinate junctions, not peers of claims, and are neither selectable nor openable. `viz.html` survives as a standalone prototyping surface and is stale (still references the retired `cluster` field), as is the checked-in `dist/` bundle.
- 
+
 ---
 
 ## Implementation Status
@@ -413,8 +467,9 @@ Visualization: a Vite/TypeScript React app (`src/viz/`), D3 v7 / js-yaml, force-
 - Design history: complete (DESIGN_HISTORY.md) — worked examples, surviving principles, schema evolution, rejected alternatives, research directions. Supersedes DESIGN_PRINCIPLES.md and SESSION_NOTES.md, both deleted
 - Session feed: this document, v2, current
 - TypeScript interfaces: v2 complete (`src/types.ts`) — two node types (Claim, Inference), four edge roles (Grounds, Warrants, Concludes, Contests), branded ids, compiles clean under `tsc --strict`
-- Validator: complete (`validate.py`) — invariants I1–I8, all live:
-  - I1 an inference has a target and a valid relation · I2 no inference concludes a terminal · I3 every referenced id resolves · I4 grounds non-empty · I5 no inference concludes an attributive claim · I6 the Concludes graph is acyclic (contests edges excluded) · I7 terminals appear only in `warrants`, never as grounds and never as the target of a contesting inference · I8 a contests target is never an inference
+- Validator: complete (`validate.py`) — invariants I1–I10, all live:
+  - I1 an inference has a target and a valid relation · I2 no inference concludes a terminal · I3 every referenced id resolves · I4 grounds non-empty · I5 no inference concludes an attributive claim · I6 the Concludes graph is acyclic (contests edges excluded) · I7 terminals appear only in `warrants`, never as grounds and never as the target of a contesting inference · I8 a contests target is never an inference · I9 `schemeDescriptor` non-null implies `scheme` is `Unknown` · I10 [TRANSCRIBE FROM CODE]
+  - I9 is one-directional at the corpus level. `Unknown` with no descriptor is legal, because the scheme migration produces exactly that and it is the worklist for scheme enrichment. The reverse implication is enforced at the write boundary instead, not in the corpus invariants
   - I1 restated at v2.2. It was "exactly one output per inference"; it is now "a target is present and `relation` is one of the two wire values." The typed layer makes both unrepresentable, but `check` runs on raw YAML before anything is constructed, so the boundary still needs guarding. It string-compares against the `Relation` values rather than constructing one, so a bad relation reports as I1 instead of raising
   - I3 resolving a contests target to claim-or-inference is deliberate belt-and-braces on the most recently reversed decision: I3 answers "does this id resolve," I8 answers "is it the right kind," and keeping them separate preserves distinct error messages
   - I5 is an error, not a warning. An attributive claim bottoms out by checkability against its source; concluding one is a category error
@@ -428,6 +483,7 @@ Visualization: a Vite/TypeScript React app (`src/viz/`), D3 v7 / js-yaml, force-
 - Colour discordance: resolved. Both views read stance from one shared `computeStance`; the graph carries it on nodes and edges, the focus view on frontier chevrons. Column tint is chrome only
 - Stage 1 runtime: complete. Id migration, v2.2 field change, canonical serializer, git store, genesis rebuild, typed writer, guard. See Runtime
 - Agentic Prasanga traversal (interview-prep toy): raw Python + Anthropic SDK, no framework. Model is the untrusted edge, harness is the trusted spine, model requests rather than executes. Steps 0–3 working; Step 4 — wiring navigation into the full loop with stop conditions and web search — outstanding
+
 ---
 
 ## v1 → v2 Concept Map
@@ -448,4 +504,3 @@ Retained for reading v1-era corpora and notes:
 | `depth` field | Computed (BFS from roots), not stored |
 | `isMediating` flag | Topological fact: no inference from the claim concludes/contests a root |
 | GAP 1 (warrant-applicability attacks, unresolved) | Resolved: a rebuttal of the surfaced warrant claim carrying the applicability assumption |
- 
