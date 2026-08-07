@@ -22,7 +22,7 @@ import uuid
 import yaml
 
 from prasanga.core.corpus_store import CorpusStore, HeadMoved, WorkingTreeDirty
-from prasanga.core.yaml_io import Relation, load, serialize
+from prasanga.core.yaml_io import ArgumentScheme, Relation, load, serialize
 from prasanga.core.validate import check
 from prasanga.core.session import Session, ValidationFailed, SessionClosed
 
@@ -67,6 +67,7 @@ def check_build_and_diff():
         warrants=[],
         target=cid,
         relation=Relation.CONCLUDES,
+        scheme=ArgumentScheme.DEDUCTIVE,
     )
     sha = s.commit("add one claim and a concluding inference")
     ns = _git(dst, "show", "--numstat", "--format=", "HEAD", "--", CORPUS).stdout
@@ -99,7 +100,7 @@ def check_midsession_violation_deferred():
     dangling = str(uuid.uuid7())
     raised_during_build = False
     try:
-        iid = s.add_inference([g], [], dangling, Relation.CONCLUDES)
+        iid = s.add_inference([g], [], dangling, Relation.CONCLUDES, ArgumentScheme.DEDUCTIVE)
         _ = s.get(iid)
         _ = s.neighborhood(iid, 2)
     except Exception:
@@ -121,7 +122,7 @@ def check_no_warrant_is_valid():
     s = Session(store, CORPUS)
     g = s.add_claim("Ground for a warrantless inference.", "g")
     t = s.add_claim("Target claim.", "t")
-    s.add_inference([g], [], t, Relation.CONCLUDES)
+    s.add_inference([g], [], t, Relation.CONCLUDES, ArgumentScheme.DEDUCTIVE)
     try:
         sha = s.commit("warrantless inference")
         return True, f"committed cleanly (sha {sha[:12]}) — empty warrants are valid"
@@ -137,7 +138,7 @@ def check_validation_failure_kills_session():
     s = Session(store, CORPUS)
     g = s.add_claim("Ground.", "g")
     term = s.add_claim("Bedrock value.", "term", terminal=True)
-    s.add_inference([g], [], term, Relation.CONCLUDES)
+    s.add_inference([g], [], term, Relation.CONCLUDES, ArgumentScheme.DEDUCTIVE)
     failed = False
     try:
         s.commit("concludes a terminal claim")
@@ -161,7 +162,7 @@ def check_head_moved():
     other = Session(store, CORPUS)
     g = next(iter(other.bound_version.claims)).id
     c = other.add_claim("Fast writer's claim.", "fast")
-    other.add_inference([g], [], c, Relation.CONCLUDES)
+    other.add_inference([g], [], c, Relation.CONCLUDES, ArgumentScheme.DEDUCTIVE)
     moved_head = other.commit("move head underneath the open session")
     head_after_other = store.head()
     raised = False
@@ -184,7 +185,7 @@ def check_working_tree_dirty():
     s = Session(store, CORPUS)
     g = next(iter(s.bound_version.claims)).id
     c = s.add_claim("A claim.", "c")
-    s.add_inference([g], [], c, Relation.CONCLUDES)
+    s.add_inference([g], [], c, Relation.CONCLUDES, ArgumentScheme.DEDUCTIVE)
     # A hand-edit lands on disk underneath the session.
     with open(os.path.join(dst, CORPUS), "a", encoding="utf-8") as fh:
         fh.write("\n# stray hand-edit\n")
@@ -201,7 +202,7 @@ def check_ops_after_commit_raise():
     s = Session(store, CORPUS)
     g = next(iter(s.bound_version.claims)).id
     c = s.add_claim("A claim.", "c")
-    s.add_inference([g], [], c, Relation.CONCLUDES)
+    s.add_inference([g], [], c, Relation.CONCLUDES, ArgumentScheme.DEDUCTIVE)
     s.commit("one and done")
     results = {}
     for name, fn in (
@@ -225,8 +226,8 @@ def check_relation_roundtrip():
     c_ok = s.add_claim("Concluded claim.", "cc")
     # A non-terminal claim to contest.
     c_att = s.add_claim("Contested claim.", "xx")
-    i_con = s.add_inference([g], [], c_ok, Relation.CONCLUDES)
-    i_cont = s.add_inference([g], [], c_att, Relation.CONTESTS)
+    i_con = s.add_inference([g], [], c_ok, Relation.CONCLUDES, ArgumentScheme.DEDUCTIVE)
+    i_cont = s.add_inference([g], [], c_att, Relation.CONTESTS, ArgumentScheme.DEDUCTIVE)
     sha = s.commit("one of each relation")
     reloaded = load(store.read(CORPUS, sha))
     con = reloaded.node(i_con)
@@ -255,8 +256,8 @@ def check_polarity_queries():
     s = Session(store, CORPUS)
     g = next(iter(s.bound_version.claims)).id
     target = s.add_claim("Shared target.", "shared")
-    i_con = s.add_inference([g], [], target, Relation.CONCLUDES)
-    i_cont = s.add_inference([g], [], target, Relation.CONTESTS)
+    i_con = s.add_inference([g], [], target, Relation.CONCLUDES, ArgumentScheme.DEDUCTIVE)
+    i_cont = s.add_inference([g], [], target, Relation.CONTESTS, ArgumentScheme.DEDUCTIVE)
     con = [i.id for i in s.concludes(target)]
     cont = [i.id for i in s.contesting(target)]
     ok = con == [i_con] and cont == [i_cont]
@@ -287,7 +288,8 @@ def check_bound_version_frozen():
     cid = s.add_claim("A claim.", "c")
     s.revise_claim(cid, tag="c2")
     s.add_inference(
-        [next(iter(s.bound_version.claims)).id], [], cid, Relation.CONCLUDES
+        [next(iter(s.bound_version.claims)).id], [], cid, Relation.CONCLUDES,
+        ArgumentScheme.DEDUCTIVE,
     )
     after_bytes = serialize(s.bound_version)
     ok = after_bytes == original_bytes
@@ -300,8 +302,8 @@ def check_commit_message():
     g = next(iter(s.bound_version.claims)).id
     c1 = s.add_claim("Concluded.", "c-concl")
     c2 = s.add_claim("Contested.", "c-cont")
-    s.add_inference([g], [], c1, Relation.CONCLUDES)
-    s.add_inference([g], [], c2, Relation.CONTESTS)
+    s.add_inference([g], [], c1, Relation.CONCLUDES, ArgumentScheme.DEDUCTIVE)
+    s.add_inference([g], [], c2, Relation.CONTESTS, ArgumentScheme.DEDUCTIVE)
     s.revise_claim(c1, text="Concluded, revised.")
     sha = s.commit("mixed ops for the message")
     msg = _git(dst, "log", "-1", "--format=%B", sha).stdout
@@ -326,7 +328,8 @@ def check_bare_string_relation_raises():
     c = s.add_claim("A claim.", "c")
     raised = False
     try:
-        s.add_inference([g], [], c, "concludes")  # bare string, not Relation
+        s.add_inference([g], [], c, "concludes",  # bare string, not Relation
+                        ArgumentScheme.DEDUCTIVE)
     except (ValueError, TypeError):
         raised = True
     return raised, f"bare-string relation raises={raised}"
@@ -336,27 +339,44 @@ def check_all_commits_load_and_validate():
     """Item 4 invariant: every commit reachable from `main` in the REAL store —
     every corpus at each — must parse under the current loader and validate.
     This is the guard against a loader-unreadable commit (like the old genesis)
-    entering the store again."""
+    entering the store again.
+
+    One exemption, and only one: commits predating the scheme migration, which
+    carry `scheme: null` on some inferences. `scheme` is no longer nullable, so
+    the current loader cannot read them and never will — git history is
+    immutable, and no migration can reach backwards into it. Such a commit is
+    identified from its DATA (a null/absent scheme), never from a hardcoded sha,
+    so the exemption retires itself as those commits age out of the walk rather
+    than becoming a permanent hole. Every other load failure still fails.
+    """
     store = CorpusStore(SRC)
     repo = store.repo
     shas = [str(c.id) for c in repo.walk(repo.head.target)]
     pairs = 0
+    pre_scheme = 0
     failures = []
     for sha in shas:
         for name in store.list_corpora(sha):
             text = store.read(name, sha)
             pairs += 1
+            raw = yaml.safe_load(text)
+            if any(i.get("scheme") is None
+                   for i in (raw.get("inferences") or [])):
+                pre_scheme += 1
+                continue
             try:
                 load(text)  # current loader must parse
             except Exception as e:
                 failures.append(f"{sha[:8]}/{name} load: {e}")
                 continue
-            errs, _ = check(yaml.safe_load(text), name)
+            errs, _ = check(raw, name)
             if errs:
                 failures.append(f"{sha[:8]}/{name}: {len(errs)} invariant errs")
     ok = not failures
-    return ok, f"{len(shas)} commit(s), {pairs} corpus-reads, all load+validate={ok}" + (
-        f"; FAILURES={failures[:3]}" if failures else ""
+    return ok, (
+        f"{len(shas)} commit(s), {pairs} corpus-reads "
+        f"({pre_scheme} pre-scheme-migration, exempt), all load+validate={ok}"
+        + (f"; FAILURES={failures[:3]}" if failures else "")
     )
 
 

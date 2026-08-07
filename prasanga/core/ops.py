@@ -16,6 +16,7 @@ from dataclasses import replace
 from typing import Optional, Sequence
 
 from .yaml_io import (
+    ArgumentScheme,
     Attribution,
     Claim,
     Corpus,
@@ -64,16 +65,25 @@ def add_inference(
     warrants: Sequence[str],
     target: str,
     relation: Relation,
+    scheme: ArgumentScheme,
+    scheme_descriptor: Optional[str] = None,
 ) -> Corpus:
     """Return a new corpus with one inference appended.
 
     `relation` carries the polarity (there is no separate contest transform).
+    `scheme` is required — every inference is classified, and there is no
+    default: a caller with nothing better passes `ArgumentScheme.UNKNOWN`
+    explicitly, which is a classification, not a gap. `scheme_descriptor` names
+    the move when the scheme is UNKNOWN; `Inference.__post_init__` rejects one
+    beside any other scheme (I9).
+
     `grounds`/`warrants` are captured as tuples; `Inference.__post_init__`
     stores them ascending by uuid.
     """
     inference = Inference(
         id=id,
-        scheme=None,
+        scheme=scheme,
+        schemeDescriptor=scheme_descriptor,
         uncertain=False,
         submissionStatus="Accepted",
         grounds=tuple(grounds),

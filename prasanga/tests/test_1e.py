@@ -26,7 +26,7 @@ from prasanga.core.guarded_client import (
 )
 from prasanga.tests.test_1d import fresh_store, CORPUS
 from prasanga.core.session import Session
-from prasanga.core.yaml_io import Relation
+from prasanga.core.yaml_io import ArgumentScheme, Relation
 
 # prasanga/ package dir (holds guard_config.toml) and the repo root.
 PKG_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -230,7 +230,7 @@ def check_stub_substitution_no_core_change():
     gc.create(max_tokens=500, messages=MSG)
     g = next(iter(sess.bound_version.claims)).id
     c = sess.add_claim("A claim decided during the run.", "1e-demo")
-    sess.add_inference([g], [], c, Relation.CONCLUDES)
+    sess.add_inference([g], [], c, Relation.CONCLUDES, ArgumentScheme.DEDUCTIVE)
     gc.create(max_tokens=500, messages=MSG, committed=True)
     sha = sess.commit("1e: guarded-run demo commit")
     moved = subprocess.run(["git", "-C", dst, "rev-parse", "HEAD"],

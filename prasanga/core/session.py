@@ -34,6 +34,7 @@ import yaml
 from . import ops as _ops
 from .corpus_store import CorpusStore, HeadMoved, WorkingTreeDirty
 from .yaml_io import (
+    ArgumentScheme,
     Attribution,
     Claim,
     Corpus,
@@ -64,7 +65,7 @@ __all__ = [
 
 
 class ValidationFailed(Exception):
-    """Raised by commit() when invariants I1-I8 do not hold at serialize time.
+    """Raised by commit() when invariants I1-I10 do not hold at serialize time.
 
     Carries the specific violations (the `check()` error strings) for the log.
     No commit is created.
@@ -178,8 +179,36 @@ class Session:
         warrants: Sequence[str],
         target: str,
         relation: Relation,
+        scheme: ArgumentScheme,
+        scheme_descriptor: Optional[str] = None,
     ) -> str:
+        """Add an inference.
+
+        `scheme` is required and has no default. A default would have to be
+        UNKNOWN, which is exactly the state the biconditional below refuses —
+        classification is the caller's to make, not something to fall into.
+
+        The write boundary enforces the scheme biconditional in both directions:
+
+          * a descriptor beside any other scheme raises in
+            `Inference.__post_init__`, so it holds for every construction path;
+          * UNKNOWN with no descriptor raises HERE, at the op, and deliberately
+            not in `__post_init__` — the scheme migration produced exactly that
+            state throughout the corpora, so rejecting it at the model would
+            make every corpus unloadable. Loading goes through the loader, new
+            writes go through this op, which is why the stronger rule fits here
+            and I9 stays one-directional over the corpus.
+
+        Enforced at the op rather than only in the finding tool's schema, so a
+        hand-driven write is covered by the same rule as a model-driven one.
+        """
         self._ensure_open()
+        if scheme is ArgumentScheme.UNKNOWN and not scheme_descriptor:
+            raise ValueError(
+                f"add_inference: scheme {ArgumentScheme.UNKNOWN.value!r} "
+                f"requires a scheme_descriptor naming the inferential move "
+                f"(Unknown classifies a move the taxonomy does not name; it is "
+                f"not a stand-in for 'not yet classified')")
         iid = self._minter.mint()
         self._version = _ops.add_inference(
             self._version,
@@ -188,6 +217,8 @@ class Session:
             warrants=warrants,
             target=target,
             relation=relation,
+            scheme=scheme,
+            scheme_descriptor=scheme_descriptor,
         )
         self._records.append(
             {
@@ -297,7 +328,7 @@ class Session:
     # -- commit ------------------------------------------------------------
 
     def commit(self, summary: str) -> str:
-        """Serialize, validate (I1-I8), write through the store, return the sha.
+        """Serialize, validate (I1-I10), write through the store, return the sha.
 
         Behaves like a database commit. The session closes the moment commit is
         entered, so any outcome — success or any of the three terminal failures

@@ -37,6 +37,10 @@ from .state import RoleState
 
 
 class IngestionRole(Role):
+    # `revise_claim` is deliberately absent. Ingestion is additive: it adds
+    # claims and inferences and reuses existing uuids, and it never changes the
+    # text of a claim already in the corpus. Rewriting settled claims is a
+    # different role's business, and the guarded session refuses the op here.
     capability: tuple[str, ...] = ("add_claim", "add_inference")
     objective: str = OBJECTIVE
 

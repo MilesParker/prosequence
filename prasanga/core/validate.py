@@ -1,12 +1,12 @@
 #!/usr/bin/env python3
 """Structural validator for v2 discourse-space corpora.
 
-Enforces invariants I1–I8 from src/types.ts against the YAML corpora. Node
+Enforces invariants I1–I10 from src/types.ts against the YAML corpora. Node
 kind is resolved by membership in the `claims` / `inferences` arrays — never
 inferred from an id prefix. Detects only; enthymemification is authoring work,
 so there is no auto-fix.
 
-Every invariant violation (I1–I8) is an error: exit status is non-zero if any
+Every invariant violation (I1–I10) is an error: exit status is non-zero if any
 error is found. GAP-6 gaps are reported as warnings — a claim that is
 non-terminal, non-attributive, not a root, and concluded by nothing is either
 an authoring gap or a claim that should be declared a root. A warning is
@@ -17,7 +17,7 @@ Usage: python validate.py <corpus.yaml> [<corpus.yaml> ...]
 import sys, glob
 import yaml
 
-from .yaml_io import Relation
+from .yaml_io import ArgumentScheme, Relation
 
 # The valid relation wire strings, sourced from the model enum rather than
 # spelled out here. The validator reads raw YAML (untrusted, possibly
@@ -26,6 +26,11 @@ from .yaml_io import Relation
 _CONCLUDES = Relation.CONCLUDES.value
 _CONTESTS = Relation.CONTESTS.value
 _RELATIONS = {r.value for r in Relation}
+
+# Likewise for schemes: compared as strings, never constructed. `_UNKNOWN` is
+# the one scheme a schemeDescriptor may accompany (I9).
+_UNKNOWN = ArgumentScheme.UNKNOWN.value
+_SCHEMES = {s.value for s in ArgumentScheme}
 
 
 def roots_of(d):
@@ -41,7 +46,7 @@ def roots_of(d):
 
 
 def check(d, path=""):
-    """Run invariants I1-I8 (+ GAP-6) over a parsed corpus dict.
+    """Run invariants I1-I10 (+ GAP-6) over a parsed corpus dict.
 
     Pure: returns (errs, warns) as lists of formatted strings, no printing
     and no exit. `validate(path)` wraps this for the CLI; the 1d session
@@ -116,6 +121,26 @@ def check(d, path=""):
         if contests and contests in infs and contests not in claims:
             fail("I8", iid, contests, "contests targets an inference (attacks may only target claims)")
 
+        # I10 — scheme is present and names a member of ArgumentScheme. Checked
+        #      before I9 so a descriptor beside a garbage scheme reports the
+        #      scheme itself, not just the pairing.
+        scheme = i.get('scheme')
+        if scheme not in _SCHEMES:
+            fail("I10", iid, "-",
+                 f"scheme is {scheme!r} (scheme is required; need one of "
+                 + "/".join(sorted(_SCHEMES)) + ")")
+
+        # I9 — a schemeDescriptor names the inferential move when no other
+        #      scheme value does, so it may only accompany Unknown. Deliberately
+        #      one-directional: Unknown WITHOUT a descriptor is legal (migration
+        #      produced exactly that). The reverse implication is enforced at the
+        #      tool boundary (submit_finding), not over the corpus.
+        descriptor = i.get('schemeDescriptor')
+        if descriptor is not None and scheme != _UNKNOWN:
+            fail("I9", iid, "-",
+                 f"schemeDescriptor {descriptor!r} with scheme {scheme!r} "
+                 f"(a descriptor implies scheme {_UNKNOWN})")
+
     # I3 — roots resolve to claims.
     for r in roots:
         if r not in claims:
@@ -184,7 +209,8 @@ def validate(path):
     else:
         print("   PASS  I1 target+relation  I2 no-concludes-terminal  I3 refint  "
               "I4 grounds>=1  I5 no-concludes-attributive  I6 acyclic-concludes  "
-              "I7 terminals-warrants-only  I8 contests-claim-only"
+              "I7 terminals-warrants-only  I8 contests-claim-only  "
+              "I9 descriptor-implies-unknown  I10 scheme-required"
               + ("  (GAP-6 warnings above)" if warns else ""))
     return not errs
 

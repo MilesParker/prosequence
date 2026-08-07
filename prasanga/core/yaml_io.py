@@ -6,11 +6,11 @@ commit diff shows exactly the nodes that changed. Parsing is delegated to
 `yaml.safe_load` (stable). Emitting is hand-written — never through a YAML
 library — so the canonical form depends on nothing but this file.
 
-Object model mirrors src/types.ts (the "parsanga.ts" schema). All dataclasses
-are frozen; ops transform whole versions rather than mutating nodes in place.
-Canonical ordering (nodes ascending by uuid, reference lists ascending by uuid)
-is established at construction time in __post_init__, so serialize() emits
-stored order without re-sorting.
+Object model mirrors src/types.ts. All dataclasses are frozen; ops transform
+whole versions rather than mutating nodes in place. Canonical ordering (nodes
+ascending by uuid, reference lists ascending by uuid) is established at
+construction time in __post_init__, so serialize() emits stored order without
+re-sorting.
 
 No uuid is ever minted here. load() reads ids; it never creates them.
 """
@@ -42,6 +42,37 @@ class Relation(Enum):
 
 
 # --------------------------------------------------------------------------
+# ArgumentScheme — mirrors the `ArgumentScheme` type in src/types.ts. A plain
+# Enum for the same reason Relation is one (a str-mixin lets a bare wire string
+# sail through call sites that should have adopted the type). `scheme` is NOT
+# nullable: every inference is classified, and `UNKNOWN` is a classification —
+# "a real inferential move that none of the other values names" — not a gap.
+# `DEDUCTIVE` is the top of every AND-decomposition: grounds plus warrants
+# entail the target, and any objection names a missing premise rather than a
+# reason the step fails.
+# --------------------------------------------------------------------------
+
+class ArgumentScheme(Enum):
+    FROM_EXAMPLE = "FromExample"
+    FROM_GENERALIZATION = "FromGeneralization"
+    FROM_ANALOGY = "FromAnalogy"
+    FROM_AUTHORITY = "FromAuthority"
+    FROM_CONSEQUENCE = "FromConsequence"
+    FROM_SIGN = "FromSign"
+    FROM_CAUSE = "FromCause"
+    FROM_DEFINITION = "FromDefinition"
+    DEDUCTIVE = "Deductive"
+    UNKNOWN = "Unknown"
+
+
+# The five discriminants of GroundsSource in src/types.ts, as a closed set. The
+# model here keeps `GroundsSource.type` a str (the union is not a Python enum),
+# so this is what the tool boundary constrains against.
+GROUNDS_SOURCE_TYPES = ("Citation", "SelfEvident", "CommonKnowledge",
+                        "LogicalNecessity", "None")
+
+
+# --------------------------------------------------------------------------
 # Schema declaration order (from src/types.ts). The emitter walks these; a
 # data key outside the corresponding set is a hard error in the loader.
 # --------------------------------------------------------------------------
@@ -50,8 +81,9 @@ CORPUS_KEYS = ("id", "title", "definitions", "roots", "claims", "inferences")
 DEFINITION_KEYS = ("term", "text", "importedFrom")
 CLAIM_KEYS = ("id", "tag", "text", "terminal", "attribution",
               "uncertain", "submissionStatus")
-INFERENCE_KEYS = ("id", "scheme", "uncertain", "submissionStatus",
-                  "grounds", "warrants", "target", "relation")
+INFERENCE_KEYS = ("id", "scheme", "schemeDescriptor", "uncertain",
+                  "submissionStatus", "grounds", "warrants", "target",
+                  "relation")
 ATTRIBUTION_KEYS = ("source", "quote")
 SOURCE_KEYS = ("type", "reference")
 
@@ -98,13 +130,17 @@ class Claim:
 @dataclass(frozen=True)
 class Inference:
     id: str
-    scheme: Optional[str]
+    scheme: ArgumentScheme
     uncertain: bool
     submissionStatus: str
     grounds: Tuple[str, ...]
     warrants: Tuple[str, ...]
     target: str
     relation: Relation
+    # A few words naming the inferential move, only when scheme is UNKNOWN.
+    # It classifies the inference; nothing else goes in it. Optional, so it is
+    # declared last — the emitter uses INFERENCE_KEYS for order, not field order.
+    schemeDescriptor: Optional[str] = None
 
     def __post_init__(self):
         # I1 — a single target and a relation in {concludes, contests}.
@@ -113,6 +149,21 @@ class Inference:
         # uuid so serialize() need not re-sort.
         if not self.target:
             raise ValueError(f"inference {self.id!r} has no target")
+        # scheme is the enum, never a bare string and never None — same reason
+        # as relation below: a plain str is a call site that skipped the type.
+        if not isinstance(self.scheme, ArgumentScheme):
+            raise ValueError(
+                f"inference {self.id!r} scheme must be an ArgumentScheme, got "
+                f"{self.scheme!r} (scheme is required; use "
+                f"ArgumentScheme.UNKNOWN when no other value names the move)")
+        # I9 — a descriptor only ever accompanies UNKNOWN. Enforced at
+        # construction as well as in validate.py: the node cannot exist wrong.
+        if (self.schemeDescriptor is not None
+                and self.scheme is not ArgumentScheme.UNKNOWN):
+            raise ValueError(
+                f"inference {self.id!r} has schemeDescriptor "
+                f"{self.schemeDescriptor!r} with scheme {self.scheme.value!r} "
+                f"(I9: a descriptor implies scheme Unknown)")
         # relation is the enum, never a bare string: a plain str (even the
         # correct "concludes") is a call site that skipped the type, and is
         # rejected here rather than serialised or compared as text.
@@ -212,11 +263,24 @@ def _load_relation(raw_id, value) -> Relation:
             f"(need one of concludes/contests)")
 
 
+def _load_scheme(raw_id, value) -> ArgumentScheme:
+    """Construct the ArgumentScheme enum from a wire string, raising on anything
+    else. `scheme` is required: a missing or null scheme is a malformed corpus,
+    not a node to default — Unknown is a classification the author must make."""
+    try:
+        return ArgumentScheme(value)
+    except ValueError:
+        raise ValueError(
+            f"inference {raw_id!r} has scheme {value!r} (need one of "
+            + "/".join(s.value for s in ArgumentScheme) + ")")
+
+
 def _load_inference(raw) -> Inference:
     _reject_unknown(f"inference {raw.get('id')!r}", raw, INFERENCE_KEYS)
     return Inference(
         id=raw["id"],
-        scheme=raw.get("scheme"),
+        scheme=_load_scheme(raw.get("id"), raw.get("scheme")),
+        schemeDescriptor=raw.get("schemeDescriptor"),
         uncertain=raw.get("uncertain", False),
         submissionStatus=raw.get("submissionStatus", "Accepted"),
         grounds=tuple(raw.get("grounds") or ()),
@@ -332,7 +396,13 @@ def _emit_id_list(key, ids, indent, out):
 def _emit_inference(inf: Inference, indent, out):
     out.append(f"{' ' * indent}- id: {_scalar(inf.id)}")
     inner = indent + 2
-    out.append(_kv(inner, "scheme", inf.scheme))
+    # Emit the wire string; scheme is the ArgumentScheme enum, not a str scalar.
+    out.append(_kv(inner, "scheme", inf.scheme.value))
+    # schemeDescriptor is present only on Unknown (I9), and a null one is
+    # omitted entirely rather than emitted as `null` — absent and null carry
+    # the same meaning, and the corpora are overwhelmingly the absent case.
+    if inf.schemeDescriptor is not None:
+        out.append(_kv(inner, "schemeDescriptor", inf.schemeDescriptor))
     out.append(_kv(inner, "uncertain", inf.uncertain))
     out.append(_kv(inner, "submissionStatus", inf.submissionStatus))
     _emit_id_list("grounds", inf.grounds, inner, out)

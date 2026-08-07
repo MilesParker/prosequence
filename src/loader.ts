@@ -7,6 +7,7 @@ import {
   InferenceId,
   Claim,
   Inference,
+  ArgumentScheme,
   Relation,
   Attribution,
   Definition
@@ -35,7 +36,11 @@ function castClaim(c: any): Claim {
 function castInference(i: any): Inference {
   return {
     id: i.id as InferenceId,
-    scheme: i.scheme ?? null,
+    // scheme is required in the schema; a corpus missing it is malformed, but
+    // the loader is a cast, not a validator (validate.py owns I10), so an
+    // absent scheme lands as Unknown rather than crashing the viz.
+    scheme: (i.scheme ?? 'Unknown') as ArgumentScheme,
+    schemeDescriptor: i.schemeDescriptor ?? null,
     uncertain: i.uncertain ?? false,
     submissionStatus: i.submissionStatus ?? 'Accepted',
     grounds: (i.grounds ?? []) as ClaimId[],

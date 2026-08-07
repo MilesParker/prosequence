@@ -52,7 +52,7 @@ export function Tooltip({ node, x, y, nodeById }: Props) {
           {because}{given}.
         </div>
         <div style={chips}>
-          <span style={chipStyle('inference')}>{inf.scheme || 'no scheme'}</span>
+          <span style={chipStyle('inference')}>{inf.schemeDescriptor ?? inf.scheme}</span>
           {warrants.length === 0 && <span style={chipStyle('default')}>implicit warrant</span>}
         </div>
       </div>

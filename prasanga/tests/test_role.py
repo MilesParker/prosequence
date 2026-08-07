@@ -86,6 +86,9 @@ def _valid_finding(session) -> dict:
         }],
         "inferences": [{
             "grounds": ["c1"], "warrants": [], "target": target, "relation": "concludes",
+            # scheme is required on every inference; a descriptor rides with
+            # Unknown and only with Unknown (the tool-boundary biconditional).
+            "scheme": "Unknown", "schemeDescriptor": "report to fact",
         }],
     }
 
@@ -151,7 +154,7 @@ def check_lands_on_branch():
     """After the role commits onto main, the injection lands it on its own branch
     and rewinds main to the pre-run head, leaving the working tree clean."""
     import subprocess
-    from prasanga.core.yaml_io import Relation
+    from prasanga.core.yaml_io import ArgumentScheme, Relation
     from prasanga.roles.run import _land_on_branch
 
     store, dst = fresh_store()
@@ -159,7 +162,7 @@ def check_lands_on_branch():
     session = Session(store, CORPUS)
     g = next(iter(session.bound_version.claims)).id
     c = session.add_claim("A claim added by the injection.", "branch-demo")
-    session.add_inference([g], [], c, Relation.CONCLUDES)
+    session.add_inference([g], [], c, Relation.CONCLUDES, ArgumentScheme.DEDUCTIVE)
     sha = session.commit("injection demo")  # lands on main via the store
     on_main = store.head() == sha
 

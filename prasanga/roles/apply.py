@@ -17,10 +17,16 @@ array, where a new claim carries a local `key` an inference can cite alongside
 real corpus uuids) is a contract this module chose (see prompt.py's prose
 description of the same contract, which must stay in sync).
 
-Validation is NOT done here — the session validates the whole graph once at
-commit() (I1-I8). apply deliberately does no invariant checking; a bad
+GRAPH validation is NOT done here — the session validates the whole graph once
+at commit() (I1-I10). apply deliberately does no invariant checking; a bad
 attachment surfaces as a ValidationFailed at commit, which is where the spec
 wants it.
+
+What apply DOES check is field well-formedness, because the API will not: the
+enum and required constraints in `input_schema` are guidance the model usually
+follows, not a gate the wire enforces. `_check_schemes` and
+`_check_source_types` are that gate. They run before any session write, so a
+malformed finding fails the run without touching the corpus.
 
 Writes go straight to session ops (add_claim / add_inference). No write op is a
 tool; the model never calls these. apply is harness code and calls them
@@ -31,7 +37,16 @@ from __future__ import annotations
 import json
 from typing import Tuple
 
-from ..core.yaml_io import Attribution, GroundsSource, Relation
+from ..core.yaml_io import (
+    ArgumentScheme,
+    Attribution,
+    GROUNDS_SOURCE_TYPES,
+    GroundsSource,
+    Relation,
+)
+
+_SCHEME_VALUES = [s.value for s in ArgumentScheme]
+_UNKNOWN = ArgumentScheme.UNKNOWN.value
 
 
 class FindingShapeError(Exception):
@@ -70,12 +85,21 @@ FINDING_TOOL_SCHEMA = {
                         "terminal": {"type": "boolean"},
                         "attribution": {
                             "type": "object",
-                            "description": "Required for a grounds/evidence claim; omit for a value or generalisation claim.",
+                            # Role is positional — it is not a property of a
+                            # claim, so it cannot be read off this field.
+                            # Attribution tracks the claim's TEXT: present iff
+                            # the text is attributive ("Source X reports Y"),
+                            # absent when the claim asserts something directly.
+                            "description": "Present iff this claim's text is attributive -- it reports what a source says (\"Source X reports Y\") rather than asserting Y directly. Omit for a claim that asserts in its own voice.",
                             "properties": {
                                 "source": {
                                     "type": "object",
                                     "properties": {
-                                        "type": {"type": "string"},
+                                        "type": {
+                                            "type": "string",
+                                            "enum": list(GROUNDS_SOURCE_TYPES),
+                                            "description": "How the claim's text bottoms out. Citation carries a `reference`; the rest do not.",
+                                        },
                                         "reference": {"type": "string"},
                                     },
                                     "required": ["type"],
@@ -98,8 +122,28 @@ FINDING_TOOL_SCHEMA = {
                         "warrants": {"type": "array", "items": {"type": "string"}},
                         "target": {"type": "string", "description": "Uuid-or-key of the claim this inference attaches to."},
                         "relation": {"type": "string", "enum": ["concludes", "contests"]},
+                        "scheme": {
+                            "type": "string",
+                            "enum": _SCHEME_VALUES,
+                            "description": (
+                                "The kind of inferential move this step makes. Required on every inference. "
+                                "Deductive: the grounds, together with the stated warrants, entail the target -- "
+                                "any objection to the step names a missing premise rather than a reason the step "
+                                "fails; this is the top of every AND-decomposition. "
+                                "Unknown: a real inferential move that none of the other values names -- give it "
+                                "a schemeDescriptor. Unknown is a classification, not a way to skip classifying."
+                            ),
+                        },
+                        "schemeDescriptor": {
+                            "type": "string",
+                            "description": (
+                                "A few words naming the inferential move. Required when scheme is \"Unknown\"; "
+                                "must be omitted for every other scheme. It classifies the inference and nothing "
+                                "else goes in it -- it is not a note field."
+                            ),
+                        },
                     },
-                    "required": ["grounds", "target", "relation"],
+                    "required": ["grounds", "target", "relation", "scheme"],
                 },
             },
         },
@@ -186,13 +230,70 @@ def _check_all_claims_attached(claims: list, inferences: list) -> None:
             f"anything: {unattached}")
 
 
+def _check_schemes(inferences: list) -> None:
+    """`scheme` present and in the enum, and `schemeDescriptor` present IFF the
+    scheme is Unknown.
+
+    Enforced here rather than left to the tool's `input_schema`: `tool_choice`
+    forces WHICH tool is called, but Anthropic does not validate argument values
+    against the schema (see the module docstring), so `required` and `enum` in
+    FINDING_TOOL_SCHEMA are guidance to the model, not a gate. This is the gate.
+
+    The biconditional is the tool boundary's half of I9. I9 itself is only
+    one-directional over the corpus — Unknown with no descriptor is legal there,
+    because migration produced exactly that — but nothing NEW should arrive
+    classified as Unknown without saying what the move actually was.
+    """
+    bad = []
+    for n, inf in enumerate(inferences):
+        scheme = inf.get("scheme")
+        descriptor = inf.get("schemeDescriptor")
+        if scheme not in _SCHEME_VALUES:
+            bad.append(f"inference[{n}]: scheme is {scheme!r}, need one of "
+                       + "/".join(_SCHEME_VALUES))
+            continue
+        if scheme == _UNKNOWN and not descriptor:
+            bad.append(f"inference[{n}]: scheme {_UNKNOWN!r} with no "
+                       f"schemeDescriptor (name the inferential move)")
+        elif scheme != _UNKNOWN and descriptor:
+            bad.append(f"inference[{n}]: schemeDescriptor {descriptor!r} with "
+                       f"scheme {scheme!r} (a descriptor belongs only to "
+                       f"{_UNKNOWN!r})")
+    if bad:
+        raise FindingShapeError(
+            f"{len(bad)} inference(s) with a malformed scheme:\n  "
+            + "\n  ".join(bad))
+
+
+def _check_source_types(claims: list) -> None:
+    """`attribution.source.type` names one of the five GroundsSource
+    discriminants. Same reason as `_check_schemes`: the schema's `enum` does not
+    bind, and `GroundsSource.type` is a plain str in the model, so an invented
+    source type would otherwise reach the corpus unchallenged."""
+    bad = []
+    for n, c in enumerate(claims):
+        attr = c.get("attribution")
+        if not attr:
+            continue
+        stype = (attr.get("source") or {}).get("type")
+        if stype not in GROUNDS_SOURCE_TYPES:
+            bad.append(f"claim[{n}] ({c.get('key')!r}): source.type is "
+                       f"{stype!r}, need one of "
+                       + "/".join(GROUNDS_SOURCE_TYPES))
+    if bad:
+        raise FindingShapeError(
+            f"{len(bad)} claim(s) with a malformed attribution source:\n  "
+            + "\n  ".join(bad))
+
+
 def _attribution(raw) -> Attribution | None:
     if not raw:
         return None
     src = raw.get("source") or {}
+    # No default for `type`: _check_source_types has already established it is
+    # one of the five discriminants, so defaulting here would only mask a bug.
     return Attribution(
-        source=GroundsSource(type=src.get("type", "Citation"),
-                             reference=src.get("reference")),
+        source=GroundsSource(type=src["type"], reference=src.get("reference")),
         quote=raw.get("quote"),
     )
 
@@ -206,6 +307,8 @@ def apply_finding(session, finding: dict) -> Tuple[str, ...]:
     """
     finding = _normalize_finding(finding)
     _check_all_claims_attached(finding["claims"], finding["inferences"])
+    _check_source_types(finding["claims"])
+    _check_schemes(finding["inferences"])
     ops: list[str] = []
     key_to_uuid: dict[str, str] = {}
 
@@ -229,8 +332,12 @@ def apply_finding(session, finding: dict) -> Tuple[str, ...]:
         warrants = [resolve(w) for w in inf.get("warrants", [])]
         target = resolve(inf["target"])
         relation = Relation(inf["relation"])
+        # Both already checked by _check_schemes, so the enum construction
+        # cannot raise and the descriptor cannot be a stray note field.
+        scheme = ArgumentScheme(inf["scheme"])
         iid = session.add_inference(
-            grounds=grounds, warrants=warrants, target=target, relation=relation
+            grounds=grounds, warrants=warrants, target=target, relation=relation,
+            scheme=scheme, scheme_descriptor=inf.get("schemeDescriptor"),
         )
         ops.append(f"add_inference {iid} {relation.value} -> {target}")
 

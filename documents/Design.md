@@ -44,10 +44,22 @@ Concludes and Contests are not separate fields: an inference carries one
 bears on that target.
 
 **Enums.** `ArgumentScheme` (FromExample, FromGeneralization, FromAnalogy,
-FromAuthority, FromConsequence, FromSign, FromCause, FromDefinition),
-`SubmissionStatus`
-(Pending, Interrogating, Rejected, Accepted), `GroundsSource` (Citation,
-SelfEvident, CommonKnowledge, LogicalNecessity, None).
+FromAuthority, FromConsequence, FromSign, FromCause, FromDefinition,
+Deductive, Unknown), `SubmissionStatus`
+(Pending, Interrogating, Rejected, Accepted), `GroundsSourceType` (Citation,
+SelfEvident, CommonKnowledge, LogicalNecessity, None) — the five
+discriminants of the `GroundsSource` union, named so the tool boundary can
+constrain `source.type` against the same closed set.
+
+**Scheme is required.** `Inference.scheme` is not nullable: every inference
+carries a classification. `Deductive` is the top of every AND-decomposition
+(grounds plus warrants entail the target; an objection names a missing
+premise, not a failing step). `Unknown` is a real move none of the other
+values names — a classification, not a gap — and `Inference.schemeDescriptor:
+string | null` names that move in a few words. The descriptor classifies and
+nothing else goes in it; it is not a note field. The Python mirror is
+`yaml_io.ArgumentScheme`, a plain `Enum` for the same reason `Relation` is
+one, constructed at the parse boundary and emitted as `.value`.
 
 **Positions, not types.** "Proposition", "terminal", "warrant", "grounds",
 "attack" are no longer node/edge types — they are positions a claim or
@@ -176,10 +188,15 @@ unchanged in spirit; only the shapes changed.
   attribution, never concluded.
 
 Validate every corpus with `python -m prasanga.core.validate <corpus.v2.yaml> ...`, which
-enforces invariants I1–I8. I1–I4 and I6–I8 are hard errors (non-zero exit);
+enforces invariants I1–I10. I1–I4 and I6–I10 are hard errors (non-zero exit);
 I5 (attributive claims should not be concluded) is a soft warning. I7 keeps
 terminal claims in `warrants` only — never in grounds, never as a `contests`
-target — and I8 forbids an attack from targeting an inference.
+target — and I8 forbids an attack from targeting an inference. I10 requires
+`scheme` present and in the enum. I9 requires a non-null `schemeDescriptor`
+to imply `scheme == Unknown`; it is one-directional on purpose, since
+migration produced `Unknown` with no descriptor throughout the corpora. The
+reverse implication — a new `Unknown` must carry a descriptor — is enforced
+at the tool boundary (`submit_finding`), not over the corpus.
 
 ## Corpus extraction (Step 4 shape change)
 
@@ -300,9 +317,20 @@ serializer (`yaml_io.py`), the validator (`validate.py`), and the store
   a flag.
 - **No incremental validation.** Mid-construction states legitimately violate
   invariants (an inference whose target is not added yet). Validation runs only
-  at commit.
+  at commit. The scheme biconditional below is not an exception: it is a check
+  on one call's arguments, not on the graph.
+- **`add_inference` enforces the scheme biconditional**, in both directions and
+  at the write op, so a hand-driven write is covered by the same rule as a
+  model-driven one. `scheme` is required with no default (a default would have
+  to be `Unknown`, the one value the rule refuses bare). A descriptor beside any
+  other scheme raises in `Inference.__post_init__`, covering every construction
+  path; `Unknown` with no descriptor raises in `Session.add_inference` and
+  deliberately *not* in `__post_init__` — migration produced that state
+  throughout the corpora, so refusing it at the model would make every corpus
+  unloadable. Loading goes through the loader, new writes through the op, which
+  is why the stronger rule fits there and I9 stays one-directional.
 - **`commit(summary)`** — serialize the current version, validate invariants
-  I1–I8 (`validate.check`), write through `CorpusStore.commit` bound to the
+  I1–I10 (`validate.check`), write through `CorpusStore.commit` bound to the
   session's parent sha, return the sha. Every failure is terminal and creates no
   commit: `ValidationFailed` (carries the specific violations, for the log),
   `HeadMoved` (the bound version is stale), `WorkingTreeDirty` (an uncommitted
@@ -383,7 +411,11 @@ role so far (promoted from the round-trip spike).
   The `cached_context` hook lets a role place bulk stable data (a corpus
   snapshot) in front of the model as its own cached system block. Two class
   attributes **declare** a role: `capability` (the write ops it holds) and
-  `objective` (mission prose for the system prompt).
+  `objective` (mission prose for the system prompt). **Truncation is terminal**:
+  `call` inspects the raw response and raises `TruncatedResponseError` on
+  `stop_reason == "max_tokens"`. A finding cut off mid-emission is a partial
+  finding that cannot be told from a complete one by inspection, so the run
+  fails there and commits nothing. There is no retry.
 - **`IngestionRole`** (`ingestion.py`) — single-shot: it binds **no** read
   tools and instead renders the whole corpus into a cached system block
   (`cached_context` → `corpus_view.render_corpus`), so the model attaches in one
@@ -391,7 +423,9 @@ role so far (promoted from the round-trip spike).
   view, the system prompt, the finding parser, the finding-to-ops application,
   and its `run(url, document_text)` parameter (the reference `url` is supplied by
   the harness, never inferred — no fetch tool is bound). Capability is
-  `(add_claim, add_inference)`.
+  `(add_claim, add_inference)` — `revise_claim` is deliberately withheld:
+  ingestion is additive, adding nodes and reusing existing uuids, and never
+  changes the text of a claim already in the corpus.
 - **Capability** (`capability.py`) — `CapabilityGuardedSession` wraps the writer
   session so the apply step may call only the role's `capability` write ops; any
   other write raises `CapabilityError` at the call site. Reads pass through
@@ -403,7 +437,17 @@ role so far (promoted from the round-trip spike).
   context block), `read_tools.py` (the read-only tool surface over session
   queries — unused by ingestion now, retained for interaction-shaped roles),
   `prompt.py` (objective + YAML generation rules + finding contract), `apply.py`
-  (finding parse + session writes).
+  (finding parse + field gates + session writes).
+- **The tool boundary** (`apply.py`) — `tool_choice` forces *which* tool is
+  called, but the API does not validate argument values against `input_schema`,
+  so `required` and `enum` there are guidance to the model, not a gate.
+  `apply_finding` gates the fields itself, before any session write:
+  `_check_all_claims_attached`, `_check_source_types` (`source.type` is one of
+  the five `GroundsSourceType` values), and `_check_schemes` (`scheme` present
+  and in the enum; `schemeDescriptor` present **iff** `scheme == Unknown` — the
+  biconditional whose corpus-side half is I9). Any violation raises
+  `FindingShapeError` and fails the run. Graph invariants are still not checked
+  here: those run once at `commit()`.
 - **Harness entry** (`run.py`) — wires config → guard + session → the role and
   hands it `(url, document_text)`; `main` is a thin CLI. Model and iteration cap
   come from `guard_config.toml`. The role commits onto main (the store's only

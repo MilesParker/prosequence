@@ -39,7 +39,10 @@ export function printDiscourseSpace(ds: DiscourseSpace): void {
     const output = `${inf.relation} → ${tagOf(inf.target)}`
     const grounds = inf.grounds.map(g => tagOf(g)).join(', ')
     const warrants = inf.warrants.length ? inf.warrants.map(w => tagOf(w)).join(', ') : '(implicit)'
-    const scheme = inf.scheme ? ` [${inf.scheme}]` : ''
+    // scheme is always present; a descriptor rides beside it only on Unknown.
+    const scheme = inf.schemeDescriptor
+      ? ` [${inf.scheme}: ${inf.schemeDescriptor}]`
+      : ` [${inf.scheme}]`
     console.log(`  ${inf.id}${scheme}`)
     console.log(`    grounds:  ${grounds}`)
     console.log(`    warrants: ${warrants}`)

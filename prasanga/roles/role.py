@@ -48,6 +48,18 @@ from .capability import CapabilityGuardedSession
 from .state import RoleState
 
 
+class TruncatedResponseError(RuntimeError):
+    """The model's response hit the output ceiling (`stop_reason == "max_tokens"`).
+
+    Terminal, and deliberately not retried. A finding cut off mid-emission is a
+    PARTIAL finding — some claims extracted, the inferences attaching them
+    missing — and applying it would commit a mutilated subgraph that looks
+    well-formed. There is no way to tell a truncated finding from a complete one
+    by inspecting it, so the stop_reason is the only signal, and it is treated as
+    fatal wherever it appears in a run.
+    """
+
+
 class FindingCallError(RuntimeError):
     """The model's final message did not call the role's declared finding tool.
 
@@ -174,6 +186,15 @@ class Role:
                 # starve the whole output budget with nothing left to submit).
                 create_kwargs["tool_choice"] = {"type": "tool", "name": finding_name}
             resp = self.guard.create(**create_kwargs)
+            # Truncation is terminal. Checked here, at the wire, rather than at
+            # apply: this is the only place stop_reason is visible (the LC
+            # AIMessage does not carry it), and for a single-shot role this IS
+            # the response carrying the finding. Nothing partial is committed.
+            if getattr(resp, "stop_reason", None) == "max_tokens":
+                raise TruncatedResponseError(
+                    f"response hit the {self.max_tokens}-token output ceiling "
+                    f"(stop_reason=max_tokens); the finding is partial and the "
+                    f"run fails rather than committing it — there is no retry")
             ai = from_anthropic(resp)
             return {"messages": [ai], "iterations": state.iterations + 1}
 

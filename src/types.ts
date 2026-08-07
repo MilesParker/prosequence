@@ -24,6 +24,17 @@ export type DiscourseSpaceId = Brand<string, "DiscourseSpaceId">;
 
 // ---------- Enums ----------
 
+/**
+ * The kind of inferential move an inference makes. Required on every
+ * inference — there is no "unclassified" state, only `Unknown`, which is a
+ * classification.
+ *
+ *   - Deductive: the grounds, together with the stated warrants, entail the
+ *     target. Any objection to the step names a missing premise rather than a
+ *     reason the step fails. This is the top of every AND-decomposition.
+ *   - Unknown: a real inferential move that none of the other values names.
+ *     `schemeDescriptor` carries a few words naming the move.
+ */
 export type ArgumentScheme =
     | "FromExample"
     | "FromGeneralization"
@@ -32,7 +43,9 @@ export type ArgumentScheme =
     | "FromConsequence"
     | "FromSign"
     | "FromCause"
-    | "FromDefinition";
+    | "FromDefinition"
+    | "Deductive"
+    | "Unknown";
 
 export type SubmissionStatus =
     | "Pending"
@@ -48,6 +61,15 @@ export type SubmissionStatus =
 export type Relation = "concludes" | "contests";
 
 // ---------- Attribution (for claims that report what a source says) ----------
+
+/** The five discriminants of `GroundsSource`, named so the tool boundary can
+ *  constrain `source.type` against the same closed set the union spells. */
+export type GroundsSourceType =
+    | "Citation"
+    | "SelfEvident"
+    | "CommonKnowledge"
+    | "LogicalNecessity"
+    | "None";
 
 export type GroundsSource =
     | { type: "Citation"; reference: string }
@@ -117,7 +139,20 @@ export interface Claim {
  */
 export interface Inference {
     id: InferenceId;
-    scheme: ArgumentScheme | null;
+
+    /** Required. Every inference is classified; `Unknown` is a value, not a gap. */
+    scheme: ArgumentScheme;
+
+    /**
+     * A few words naming the inferential move when `scheme` is `Unknown`.
+     * It classifies the inference and nothing else goes in it — it is not a
+     * note field. Non-null implies `scheme === "Unknown"` (I9); the converse
+     * is not required, because migration produced `Unknown` with no
+     * descriptor. New findings must supply one (enforced at the tool
+     * boundary, not here).
+     */
+    schemeDescriptor: string | null;
+
     uncertain: boolean;
     submissionStatus: SubmissionStatus;
 
@@ -168,7 +203,14 @@ export interface DiscourseSpace {
 //     never as the target of a contesting inference.
 // I8. A contesting inference's target is a ClaimId, never an InferenceId.
 //     [type-enforced: target is ClaimId]
+// I9. schemeDescriptor non-null implies scheme == "Unknown".
+//     One-directional deliberately: `Unknown` with no descriptor is legal,
+//     because migration produced exactly that. The reverse implication —
+//     `Unknown` requires a descriptor — is enforced at the tool boundary
+//     (submit_finding), not over the corpus.
+// I10. scheme is present and is a member of ArgumentScheme.
+//     [type-enforced: scheme is a required ArgumentScheme]
 //
-// I1 and I8 are structurally enforced in TypeScript (target is a single
-// required ClaimId, relation a required enum). They still require runtime
-// assertions in validate.py, which reads YAML and has no compiler.
+// I1, I8 and I10 are structurally enforced in TypeScript (target is a single
+// required ClaimId, relation and scheme required enums). They still require
+// runtime assertions in validate.py, which reads YAML and has no compiler.
