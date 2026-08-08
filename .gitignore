@@ -14,7 +14,7 @@ __pycache__/
 
 # Stop controls (Directive 1e). The token log is runtime spend data, and the
 # kill file is a runtime signal — neither is committed, and neither belongs in
-# the corpus repo. The guard config (prasanga/guard_config.toml) IS committed.
+# the corpus repo. The guard config (prosequence/guard_config.toml) IS committed.
 /logs/
 /STOP
 

@@ -1,4 +1,4 @@
-# Parsanga
+# Prosequence
 
 DAG-based argument mapping. Two node types (Claim, Inference), four
 edge roles (Grounds, Warrants, Concludes, Contests).
@@ -23,8 +23,8 @@ Invariants are errors unless explicitly marked warnings.
 npm run build                   # vite
 tsc -p tsconfig.json            # app: src/viz, src/config.ts, src/types.ts
 tsc -p tsconfig.node.json       # CLI: src/index.ts, src/loader.ts, src/print.ts
-python3 -m prasanga.core.validate  # all three corpora, invariants I1-I8
-python3 -m prasanga.tests          # all suites (1d store/session, 1e guard, role protocol)
+python3 -m prosequence.core.validate  # all three corpora, invariants I1-I8
+python3 -m prosequence.tests          # all suites (1d store/session, 1e guard, role protocol)
 
 ## Layout
 
@@ -32,8 +32,8 @@ documents/          design docs and other non-executable artifacts. Ignore archi
 src/viz/            graph view, focus view, shared indices
 src/types.ts        canonical schema (change only on instruction)
 discourse-spaces/   <slug>.v2.yaml corpora (change only on instruction)
-prasanga/           all Python: core/ (model, session, store, validate, guard), roles/ (role protocol), scripts/
-prasanga/core/validate.py   invariants
+prosequence/           all Python: core/ (model, session, store, validate, guard), roles/ (role protocol), scripts/
+prosequence/core/validate.py   invariants
 logs/               runtime token log (gitignored, auto-created)
 
 ## Documentation

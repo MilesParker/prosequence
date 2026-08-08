@@ -1,8 +1,8 @@
-# Python dependencies for the harness (the `prasanga` package: core/ + roles/).
+# Python dependencies for the harness (the `prosequence` package: core/ + roles/).
 #
 # Top-level deps only; pip resolves the transitive set. Derived from the actual
-# imports across prasanga/core/ (yaml_io, ops, session, corpus_store, validate,
-# guarded_client) and prasanga/roles/. (The repo previously tracked no Python
+# imports across prosequence/core/ (yaml_io, ops, session, corpus_store, validate,
+# guarded_client) and prosequence/roles/. (The repo previously tracked no Python
 # manifest — only JS deps, in package.json.)
 
 # --- harness runtime ---

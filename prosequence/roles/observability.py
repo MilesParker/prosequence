@@ -3,7 +3,7 @@
 
 Orthogonal to the commit path. This wires OpenTelemetry tracing for the
 harness's two spines — the raw Anthropic SDK call (guarded_client.create) and
-the LangGraph role protocol (prasanga.roles.role) — and exports spans to a local
+the LangGraph role protocol (prosequence.roles.role) — and exports spans to a local
 Phoenix collector (localhost:6006 by default; SQLite-backed, no egress). It
 touches neither validate.py, the writer, nor the store.
 
@@ -19,7 +19,7 @@ Design points honoured here:
     a missing package or any register() error here degrades to a no-op with a
     warning. Tracing is never a runtime dependency of the commit path.
 
-  * Opt out with PARSANGA_TRACE=0. Override the collector with the standard
+  * Opt out with PROSEQUENCE_TRACE=0. Override the collector with the standard
     PHOENIX_COLLECTOR_ENDPOINT env var (default http://localhost:6006).
 """
 from __future__ import annotations
@@ -30,7 +30,7 @@ import sys
 _STARTED = False
 
 
-def init_tracing(project_name: str = "parsanga") -> bool:
+def init_tracing(project_name: str = "prosequence") -> bool:
     """Register the Phoenix tracer provider + auto-instrumentation, once.
 
     Returns True if tracing is active after this call, False if it was skipped
@@ -40,7 +40,7 @@ def init_tracing(project_name: str = "parsanga") -> bool:
     global _STARTED
     if _STARTED:
         return True
-    if os.environ.get("PARSANGA_TRACE", "1") == "0":
+    if os.environ.get("PROSEQUENCE_TRACE", "1") == "0":
         return False
     try:
         from phoenix.otel import register

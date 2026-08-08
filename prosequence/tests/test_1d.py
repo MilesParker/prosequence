@@ -21,13 +21,13 @@ import uuid
 
 import yaml
 
-from prasanga.core.corpus_store import CorpusStore, HeadMoved, WorkingTreeDirty
-from prasanga.core.yaml_io import ArgumentScheme, Relation, load, serialize
-from prasanga.core.validate import check
-from prasanga.core.session import Session, ValidationFailed, SessionClosed
+from prosequence.core.corpus_store import CorpusStore, HeadMoved, WorkingTreeDirty
+from prosequence.core.yaml_io import ArgumentScheme, Relation, load, serialize
+from prosequence.core.validate import check
+from prosequence.core.session import Session, ValidationFailed, SessionClosed
 
 CORPUS = "freedman.v2.yaml"
-# Repo root is three dirs up (prasanga/tests/test_1d.py), where discourse-spaces
+# Repo root is three dirs up (prosequence/tests/test_1d.py), where discourse-spaces
 # lives — independent of the process working directory.
 REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 SRC = os.path.join(REPO_ROOT, "discourse-spaces")
@@ -41,7 +41,7 @@ def _git(tmp, *args):
 
 def fresh_store():
     """Temp copy of the corpus repo, HEAD advanced to the assumed 1a2 form."""
-    tmp = tempfile.mkdtemp(prefix="parsanga-1d-")
+    tmp = tempfile.mkdtemp(prefix="prosequence-1d-")
     dst = os.path.join(tmp, "discourse-spaces")
     shutil.copytree(SRC, dst)
     # Advance HEAD to the working-tree (target/relation) form, clean tree.

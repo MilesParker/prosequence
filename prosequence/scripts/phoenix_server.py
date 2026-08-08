@@ -6,7 +6,7 @@ observability). Localhost only, SQLite-backed, no egress.
 
 Wraps `python -m phoenix.server.main serve` so the launch matches the repo's
 scripts/*.py convention. This is an AUXILIARY local process, not a runtime
-dependency of the harness: prasanga.roles.run runs identically whether or not
+dependency of the harness: prosequence.roles.run runs identically whether or not
 this is up — spans just fail to export (non-blockingly) while it is down.
 
 Phoenix keeps its SQLite store under PHOENIX_WORKING_DIR (default ~/.phoenix).

@@ -14,7 +14,7 @@ import sys
 import tempfile
 import time
 
-from prasanga.core.guarded_client import (
+from prosequence.core.guarded_client import (
     GuardedClient,
     GuardConfig,
     Refused,
@@ -24,11 +24,11 @@ from prasanga.core.guarded_client import (
     read_log,
     cumulative_tokens,
 )
-from prasanga.tests.test_1d import fresh_store, CORPUS
-from prasanga.core.session import Session
-from prasanga.core.yaml_io import ArgumentScheme, Relation
+from prosequence.tests.test_1d import fresh_store, CORPUS
+from prosequence.core.session import Session
+from prosequence.core.yaml_io import ArgumentScheme, Relation
 
-# prasanga/ package dir (holds guard_config.toml) and the repo root.
+# prosequence/ package dir (holds guard_config.toml) and the repo root.
 PKG_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 REPO_ROOT = os.path.dirname(PKG_DIR)
 

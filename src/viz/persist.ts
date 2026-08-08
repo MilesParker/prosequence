@@ -9,7 +9,7 @@
 // ids or viewport.
 import { DATA_FILE } from '../config'
 
-const NS = 'prasanga'
+const NS = 'prosequence'
 const keyFor = (name: string) => `${NS}:${DATA_FILE}:${name}`
 
 function load<T>(name: string, fallback: T): T {

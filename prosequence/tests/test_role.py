@@ -14,13 +14,13 @@ import sys
 import tempfile
 import types
 
-os.environ.setdefault("PARSANGA_TRACE", "0")  # no exporter during tests
+os.environ.setdefault("PROSEQUENCE_TRACE", "0")  # no exporter during tests
 
-from prasanga.tests.test_1d import fresh_store, CORPUS
-from prasanga.core.session import Session
-from prasanga.core.guarded_client import GuardConfig, GuardedClient
-from prasanga.roles.ingestion import IngestionRole
-from prasanga.roles.capability import CapabilityGuardedSession, CapabilityError
+from prosequence.tests.test_1d import fresh_store, CORPUS
+from prosequence.core.session import Session
+from prosequence.core.guarded_client import GuardConfig, GuardedClient
+from prosequence.roles.ingestion import IngestionRole
+from prosequence.roles.capability import CapabilityGuardedSession, CapabilityError
 
 
 # --------------------------------------------------------------------------
@@ -154,8 +154,8 @@ def check_lands_on_branch():
     """After the role commits onto main, the injection lands it on its own branch
     and rewinds main to the pre-run head, leaving the working tree clean."""
     import subprocess
-    from prasanga.core.yaml_io import ArgumentScheme, Relation
-    from prasanga.roles.run import _land_on_branch
+    from prosequence.core.yaml_io import ArgumentScheme, Relation
+    from prosequence.roles.run import _land_on_branch
 
     store, dst = fresh_store()
     head0 = store.head()

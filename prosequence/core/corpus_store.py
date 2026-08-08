@@ -24,8 +24,8 @@ from pygit2.enums import FileMode, SortMode
 
 
 # Identity stamped on every commit written through this module (machine writes).
-HARNESS_NAME = "parsanga-harness"
-HARNESS_EMAIL = "harness@parsanga.local"
+HARNESS_NAME = "prosequence-harness"
+HARNESS_EMAIL = "harness@prosequence.local"
 
 # The store's one ref, both read and write. commit() already hardcodes this as
 # its write target; every read default below resolves it explicitly too,

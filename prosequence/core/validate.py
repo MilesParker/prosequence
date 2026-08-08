@@ -221,12 +221,12 @@ def main(argv):
         paths.extend(sorted(glob.glob(a)) or [a])
     if not paths:
         # Default to the repo's corpora regardless of cwd (this module lives at
-        # prasanga/core/validate.py, so the repo root is three dirs up).
+        # prosequence/core/validate.py, so the repo root is three dirs up).
         import os
         repo_root = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
         paths = sorted(glob.glob(os.path.join(repo_root, 'discourse-spaces', '*.v2.yaml')))
     if not paths:
-        print("usage: python -m prasanga.core.validate <corpus.yaml> [<corpus.yaml> ...]", file=sys.stderr)
+        print("usage: python -m prosequence.core.validate <corpus.yaml> [<corpus.yaml> ...]", file=sys.stderr)
         return 2
     ok = all([validate(p) for p in paths])
     return 0 if ok else 1

@@ -13,7 +13,7 @@ import sys
 
 from ..core.yaml_io import load, serialize
 
-# Repo root is three dirs up (prasanga/scripts/canonicalize.py), so the corpora
+# Repo root is three dirs up (prosequence/scripts/canonicalize.py), so the corpora
 # resolve regardless of the process working directory.
 _REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 CORPORA = tuple(

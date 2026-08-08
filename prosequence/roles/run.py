@@ -42,7 +42,7 @@ from ..core.yaml_io import Claim, Corpus, serialize
 from .ingestion import IngestionRole
 from .observability import init_tracing
 
-PKG_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # prasanga/
+PKG_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))  # prosequence/
 REPO_ROOT = os.path.dirname(PKG_DIR)                                   # outer repo root
 CORPUS_DIR = os.path.join(REPO_ROOT, "discourse-spaces")
 GUARD_CONFIG = os.path.join(PKG_DIR, "guard_config.toml")
@@ -239,7 +239,7 @@ def run(url: str, document_text: str, *, corpus_name: str = "free-transit",
     """
     # Observability: register the tracer provider + auto-instrumentation before
     # the Anthropic client and the graph are constructed. Idempotent; a no-op
-    # when Phoenix/openinference are absent or PARSANGA_TRACE=0. Orthogonal to
+    # when Phoenix/openinference are absent or PROSEQUENCE_TRACE=0. Orthogonal to
     # the commit path — never gates a run.
     _load_env()
     init_tracing()
@@ -319,7 +319,7 @@ def ingest(corpus_name: str, *, url: str | None = None,
 
 def main(argv: list[str]) -> int:
     if len(argv) < 2:
-        print("usage: python -m prasanga.roles.run <reference_url> <document_file>",
+        print("usage: python -m prosequence.roles.run <reference_url> <document_file>",
               file=sys.stderr)
         return 2
     reference, doc_path = argv[0], argv[1]
