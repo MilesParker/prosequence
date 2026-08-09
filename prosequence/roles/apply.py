@@ -12,7 +12,7 @@ wrong — observed in practice: `claims` arriving as a JSON-encoded string
 (the model dumping the array as text into one field) instead of an actual
 array. `_coerce_list` below recovers that one known shape; anything else
 malformed raises `FindingShapeError` rather than a confusing TypeError three
-frames into apply_finding. The shape (a `claims` array and an `inferences`
+frames into plan_from_finding. The shape (a `claims` array and an `inferences`
 array, where a new claim carries a local `key` an inference can cite alongside
 real corpus uuids) is a contract this module chose (see prompt.py's prose
 description of the same contract, which must stay in sync).
@@ -25,12 +25,17 @@ wants it.
 What apply DOES check is field well-formedness, because the API will not: the
 enum and required constraints in `input_schema` are guidance the model usually
 follows, not a gate the wire enforces. `_check_schemes` and
-`_check_source_types` are that gate. They run before any session write, so a
-malformed finding fails the run without touching the corpus.
+`_check_source_types` are that gate. Structural checks over the resulting plan
+(references that resolve to nothing, created nodes nothing attaches) belong to
+`plan.check_plan`, which this calls. All of it runs before any session write, so
+a malformed finding fails the run without touching the corpus.
 
-Writes go straight to session ops (add_claim / add_inference). No write op is a
-tool; the model never calls these. apply is harness code and calls them
-directly, which is the only place in the whole run that touches session writes.
+This module NO LONGER WRITES. It turns a finding into a `plan.Op` list and
+nothing else — pure, session-free, and testable without a corpus. `plan.execute`
+is what touches the session, called from the role's apply node. The wire shape
+below is unchanged by that split: a ref is still a bare string, disambiguated
+here by whether it matches a key the finding declares, and turned into a typed
+`New`/`Existing` at this boundary.
 """
 from __future__ import annotations
 
@@ -43,6 +48,16 @@ from ..core.yaml_io import (
     GROUNDS_SOURCE_TYPES,
     GroundsSource,
     Relation,
+)
+from .plan import (
+    AddClaim,
+    AddInference,
+    ClaimId,
+    Existing,
+    New,
+    Op,
+    Ref,
+    check_plan,
 )
 
 _SCHEME_VALUES = [s.value for s in ArgumentScheme]
@@ -206,30 +221,6 @@ def _normalize_finding(finding: dict) -> dict:
             "inferences": _coerce_list(finding.get("inferences"), "inferences")}
 
 
-def _check_all_claims_attached(claims: list, inferences: list) -> None:
-    """Every new claim's `key` must appear in at least one inference's grounds,
-    warrants, or target. Enforced here, not just asked for in the prompt:
-    observed twice in practice (an empty-corpus seed, and separately a
-    populated corpus) that prompt instruction alone did not stop the model
-    from extracting a batch of claims and submitting zero inferences — treating
-    attachment as optional rather than the point. This raises before any
-    session write happens, so a bad finding fails cleanly instead of silently
-    committing a pile of claims disconnected from the graph."""
-    referenced: set = set()
-    for inf in inferences:
-        referenced.update(inf.get("grounds") or [])
-        referenced.update(inf.get("warrants") or [])
-        target = inf.get("target")
-        if target is not None:
-            referenced.add(target)
-    unattached = [c.get("key") for c in claims if c.get("key") not in referenced]
-    if unattached:
-        raise FindingShapeError(
-            f"{len(unattached)} new claim(s) added with no inference "
-            f"referencing them (grounds/warrants/target) -- not attached to "
-            f"anything: {unattached}")
-
-
 def _check_schemes(inferences: list) -> None:
     """`scheme` present and in the enum, and `schemeDescriptor` present IFF the
     scheme is Unknown.
@@ -298,47 +289,54 @@ def _attribution(raw) -> Attribution | None:
     )
 
 
-def apply_finding(session, finding: dict) -> Tuple[str, ...]:
-    """Apply a parsed finding to the session, returning one line per op.
+def plan_from_finding(finding: dict, known_ids: frozenset) -> Tuple[Op, ...]:
+    """A finding -> the plan of ops that would apply it. Pure: no session, no
+    writes, nothing minted.
 
-    Claims first (so their minted uuids exist), then inferences, whose id
-    references are resolved: a local `key` -> the minted uuid, an existing
-    corpus uuid -> itself. Ops are executed in listed order.
+    Claims come first so that every `New` is bound before an inference uses it.
+    That ordering is produced here and VERIFIED by `check_plan` rather than
+    trusted — it holds today only because claims bind without referencing and
+    inferences reference without binding, which a third op type would break.
+
+    A ref on the wire is a bare string carrying two different kinds of thing. It
+    is a `New` iff it matches a key this finding declares, and an `Existing`
+    otherwise — the same rule the old resolver used, except that an `Existing`
+    is now checked against `known_ids` instead of being assumed to name
+    something. A key typo used to pass through here as though it were a corpus
+    uuid; now it is a PlanError naming the ref.
     """
     finding = _normalize_finding(finding)
-    _check_all_claims_attached(finding["claims"], finding["inferences"])
     _check_source_types(finding["claims"])
     _check_schemes(finding["inferences"])
-    ops: list[str] = []
-    key_to_uuid: dict[str, str] = {}
 
-    for c in finding["claims"]:
-        cid = session.add_claim(
-            text=c["text"],
+    keys = {c.get("key") for c in finding["claims"] if c.get("key")}
+
+    def ref(raw: str) -> Ref[ClaimId]:
+        return New(raw) if raw in keys else Existing(ClaimId(raw))
+
+    plan: list[Op] = [
+        AddClaim(
+            key=c["key"],
             tag=c["tag"],
-            attribution=_attribution(c.get("attribution")),
+            text=c["text"],
             terminal=bool(c.get("terminal", False)),
+            attribution=_attribution(c.get("attribution")),
         )
-        key = c.get("key")
-        if key:
-            key_to_uuid[key] = cid
-        ops.append(f'add_claim {cid} "{c["tag"]}"')
-
-    def resolve(ref: str) -> str:
-        return key_to_uuid.get(ref, ref)
-
-    for inf in finding["inferences"]:
-        grounds = [resolve(g) for g in inf.get("grounds", [])]
-        warrants = [resolve(w) for w in inf.get("warrants", [])]
-        target = resolve(inf["target"])
-        relation = Relation(inf["relation"])
-        # Both already checked by _check_schemes, so the enum construction
-        # cannot raise and the descriptor cannot be a stray note field.
-        scheme = ArgumentScheme(inf["scheme"])
-        iid = session.add_inference(
-            grounds=grounds, warrants=warrants, target=target, relation=relation,
-            scheme=scheme, scheme_descriptor=inf.get("schemeDescriptor"),
+        for c in finding["claims"]
+    ]
+    plan += [
+        AddInference(
+            grounds=tuple(ref(g) for g in inf.get("grounds") or ()),
+            warrants=tuple(ref(w) for w in inf.get("warrants") or ()),
+            target=ref(inf["target"]),
+            relation=Relation(inf["relation"]),
+            # Both already checked by _check_schemes, so the enum construction
+            # cannot raise and the descriptor cannot be a stray note field.
+            scheme=ArgumentScheme(inf["scheme"]),
+            scheme_descriptor=inf.get("schemeDescriptor"),
         )
-        ops.append(f"add_inference {iid} {relation.value} -> {target}")
+        for inf in finding["inferences"]
+    ]
 
-    return tuple(ops)
+    check_plan(plan, known_ids)
+    return tuple(plan)

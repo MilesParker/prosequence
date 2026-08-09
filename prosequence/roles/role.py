@@ -28,15 +28,19 @@ enforces the shape, so `apply_node` reads the tool call's `input` directly —
 there is no fenced-JSON-in-prose format to go missing or truncate.
 
 Two class attributes DECLARE a role:
-  * `capability` — the write ops the role holds. Enforced at apply, via the
-    capability-guarded session, never by prompt instruction.
+  * `capability` — the op TYPES the role holds (`plan.Op` subclasses). Checked
+    across the whole plan before the first write, never by prompt instruction.
   * `objective`  — the mission prose the subclass folds into its system prompt.
 
-Extension points: `build_tools`, `system_prompt`, `finding_tool`,
-`apply_finding`, and `cached_context`. The last is a seam ingestion needs and a
-tool-driven role does not — a role that must put bulk data in front of the model
-up front (a full corpus snapshot) overrides it; the harness appends it as its
-own cached system block.
+Apply is two steps, and only the second touches the corpus: `build_plan` turns
+the finding into a list of ops (pure, no session), `plan.execute` runs it. A
+role that overreaches fails at the capability check with nothing written.
+
+Extension points: `build_tools`, `system_prompt`, `finding_tool`, `build_plan`,
+and `cached_context`. The last is a seam ingestion needs and a tool-driven role
+does not — a role that must put bulk data in front of the model up front (a full
+corpus snapshot) overrides it; the harness appends it as its own cached system
+block.
 """
 from __future__ import annotations
 
@@ -44,7 +48,8 @@ from langgraph.graph import StateGraph, START, END
 from langgraph.prebuilt import ToolNode
 
 from .bridge import from_anthropic, to_anthropic
-from .capability import CapabilityGuardedSession
+from .capability import validate_capability
+from .plan import Op, execute
 from .state import RoleState
 
 
@@ -73,7 +78,7 @@ class FindingCallError(RuntimeError):
 
 class Role:
     # -- declaration (subclasses set these) --------------------------------
-    capability: tuple[str, ...] = ()
+    capability: tuple[type[Op], ...] = ()
     objective: str = ""
 
     # Per-call output ceiling. A deliberate constant, not a config knob (config
@@ -87,10 +92,12 @@ class Role:
         self.model = model
         self.iteration_cap = iteration_cap
         self.max_tokens = max_tokens if max_tokens is not None else self.MAX_TOKENS
-        # Read tools see the raw session (reads are never capability-gated); the
-        # apply step writes only through the capability-guarded session.
+        # A malformed capability declaration fails here, at construction, not at
+        # apply — a bare containment check would otherwise just match nothing.
+        validate_capability(self.capability)
+        # Read tools see the raw session (reads are never capability-gated);
+        # writes are gated by checking the plan against `capability` at apply.
         self._lc_tools, self._schemas = self.build_tools(session)
-        self._guarded_session = CapabilityGuardedSession(session, self.capability)
         self._graph = self._build_graph()
 
     # -- subclass hooks ----------------------------------------------------
@@ -114,25 +121,32 @@ class Role:
 
     def finding_tool(self) -> dict:
         """The Anthropic tool schema the model must call to submit its finding.
-        `input` on that call IS the finding object `apply_finding` consumes —
+        `input` on that call IS the finding object `build_plan` consumes —
         there is no free-text finding format. Forced via `tool_choice` when the
         role binds no interaction tools; left to the model's discretion
         (`tool_choice: auto`, alongside the interaction tools) otherwise."""
         raise NotImplementedError
 
-    def apply_finding(self, session, finding) -> tuple:
-        """Apply a parsed finding as session writes, returning one line per op.
-        `session` is the capability-guarded session: a write outside the role's
-        capability raises here."""
+    def build_plan(self, finding) -> tuple[Op, ...]:
+        """A parsed finding -> the plan of ops that applies it. Pure: builds and
+        checks the plan without touching the session. `plan.execute` runs it,
+        after the capability check."""
         raise NotImplementedError
 
     # -- the run (apply/commit boundary) -----------------------------------
 
     def _execute(self, init_state: RoleState, *, commit_summary: str) -> dict:
         """Run the graph to apply, then commit OUTSIDE the graph. Returns a
-        report dict (sha, ops, op_lines, diff, iterations, tokens)."""
+        report dict (sha, plan, op_lines, diff, iterations, tokens).
+
+        `plan` is the executed ops themselves; `op_lines` is the session's own
+        rendering of what it recorded. There is deliberately no third,
+        caller-authored rendering — the previous `ops` key was exactly that, and
+        it was both staler (it could not resolve a target's tag against the
+        final version) and unread: the CLI prints `op_lines`.
+        """
         final_state = self._graph.invoke(init_state)
-        ops = tuple(final_state["ops_applied"])
+        plan = tuple(final_state["plan"])
         iterations = final_state["iterations"]
 
         diff = self.session.diff()
@@ -140,7 +154,7 @@ class Role:
 
         return {
             "sha": sha,
-            "ops": list(ops),
+            "plan": plan,
             "op_lines": list(diff.ops),
             "diff": diff.patch,
             "iterations": iterations,
@@ -206,8 +220,9 @@ class Role:
         def apply_node(state: RoleState) -> dict:
             # Last message must carry a call to the finding tool — its `args`
             # IS the finding, already shaped by the API's schema enforcement.
-            # Writes go through the capability-guarded session: an op outside
-            # `capability` raises here, at apply.
+            # The finding becomes a plan (pure), the plan is checked against
+            # `capability` in full, and only then does anything get written: an
+            # op outside the role's capability leaves the session untouched.
             final = state.messages[-1]
             calls = getattr(final, "tool_calls", None) or []
             finding = next((c["args"] for c in calls if c["name"] == finding_name), None)
@@ -216,8 +231,9 @@ class Role:
                     f"model's final message did not call {finding_name!r} to "
                     f"submit its finding (iteration cap may have cut the run "
                     f"short before it reached the finding tool)")
-            ops = self.apply_finding(self._guarded_session, finding)
-            return {"ops_applied": ops}
+            plan = self.build_plan(finding)
+            execute(self.session, plan, self.capability)
+            return {"plan": plan}
 
         def route_after_call(state: RoleState) -> str:
             # Cap first: a terminal stop, even mid-conversation. Then route on

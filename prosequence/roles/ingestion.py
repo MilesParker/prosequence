@@ -29,19 +29,21 @@ from __future__ import annotations
 
 from langchain_core.messages import HumanMessage
 
-from .apply import FINDING_TOOL_SCHEMA, apply_finding
+from .apply import FINDING_TOOL_SCHEMA, plan_from_finding
 from .corpus_view import render_corpus
+from .plan import AddClaim, AddInference, Op
 from .prompt import OBJECTIVE, SYSTEM_PROMPT
 from .role import Role
 from .state import RoleState
 
 
 class IngestionRole(Role):
-    # `revise_claim` is deliberately absent. Ingestion is additive: it adds
+    # `ReviseClaim` is deliberately absent. Ingestion is additive: it adds
     # claims and inferences and reuses existing uuids, and it never changes the
     # text of a claim already in the corpus. Rewriting settled claims is a
-    # different role's business, and the guarded session refuses the op here.
-    capability: tuple[str, ...] = ("add_claim", "add_inference")
+    # different role's business, and a plan containing that op is refused here
+    # before any of it runs.
+    capability: tuple[type[Op], ...] = (AddClaim, AddInference)
     objective: str = OBJECTIVE
 
     # -- subclass hooks ----------------------------------------------------
@@ -63,8 +65,13 @@ class IngestionRole(Role):
     def finding_tool(self) -> dict:
         return FINDING_TOOL_SCHEMA
 
-    def apply_finding(self, session, finding: dict) -> tuple:
-        return apply_finding(session, finding)
+    def build_plan(self, finding: dict) -> tuple[Op, ...]:
+        # `Existing` refs are checked against the bound version: no write has
+        # happened yet at plan time, so it is also the current one.
+        known = frozenset(
+            n.id for n in (*self.session.bound_version.claims,
+                           *self.session.bound_version.inferences))
+        return plan_from_finding(finding, known)
 
     # -- run parameter -----------------------------------------------------
 

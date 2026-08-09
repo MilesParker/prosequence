@@ -14,7 +14,7 @@ costs nothing and buys the immutability guarantee the rest of the model assumes.
 `messages` accumulates through the `add_messages` reducer (LangChain message
 objects: Human/AI/Tool); nodes append, never replace. Every other field is a
 plain last-value-wins slot: `iterations` is overwritten with an incremented
-value by the `call` node; `ops_applied` is written once by `apply`.
+value by the `call` node; `plan` is written once by `apply`.
 """
 from __future__ import annotations
 
@@ -23,6 +23,8 @@ from typing import Annotated, Tuple
 
 from langchain_core.messages import AnyMessage
 from langgraph.graph.message import add_messages
+
+from .plan import Op
 
 
 @dataclass(frozen=True)
@@ -34,6 +36,8 @@ class RoleState:
     # hard cap in the conditional edge, not inside the model loop.
     iterations: int = 0
 
-    # Ops the `apply` node emitted (one string per session write). Empty until
-    # the graph reaches apply.
-    ops_applied: Tuple[str, ...] = ()
+    # The plan the `apply` node executed — the reified ops themselves, not a
+    # rendering of them. Empty until the graph reaches apply. The human-readable
+    # op log is the session's (`Session._op_lines`), generated from what the
+    # session actually recorded rather than authored here.
+    plan: Tuple[Op, ...] = ()

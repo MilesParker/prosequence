@@ -20,7 +20,10 @@ from prosequence.tests.test_1d import fresh_store, CORPUS
 from prosequence.core.session import Session
 from prosequence.core.guarded_client import GuardConfig, GuardedClient
 from prosequence.roles.ingestion import IngestionRole
-from prosequence.roles.capability import CapabilityGuardedSession, CapabilityError
+from prosequence.roles.capability import CapabilityError, check_capability
+from prosequence.roles.plan import (
+    AddClaim, AddInference, Existing, New, PlanError, check_plan, execute,
+)
 
 
 # --------------------------------------------------------------------------
@@ -117,13 +120,19 @@ def check_end_to_end():
                          model="stub-model", iteration_cap=15)
 
     report = role.run("http://x", "A document.")
-    ops_ok = (len(report["ops"]) == 2
-              and report["ops"][0].startswith("add_claim")
-              and "concludes" in report["ops"][1])
+    # The plan is the reified ops; op_lines is the session's own rendering.
+    plan_ok = (len(report["plan"]) == 2
+               and isinstance(report["plan"][0], AddClaim)
+               and isinstance(report["plan"][1], AddInference))
+    lines_ok = (len(report["op_lines"]) == 2
+                and report["op_lines"][0].startswith("add_claim")
+                and "concludes" in report["op_lines"][1])
     ok = (report["sha"] != head0 and report["iterations"] == 1
-          and stub.calls == 1 and ops_ok and report["tokens"] == 140)
+          and stub.calls == 1 and plan_ok and lines_ok
+          and report["tokens"] == 140)
     return ok, (f"sha_advanced={report['sha'] != head0} iters={report['iterations']} "
-                f"calls={stub.calls} ops={len(report['ops'])} tokens={report['tokens']}")
+                f"calls={stub.calls} plan={[type(o).__name__ for o in report['plan']]} "
+                f"tokens={report['tokens']}")
 
 
 def _looping_role(guard, session, iteration_cap):
@@ -178,45 +187,91 @@ def check_lands_on_branch():
 
 
 def check_capability_declared():
-    """Ingestion declares exactly add_claim + add_inference; objective is prose."""
-    ok = (IngestionRole.capability == ("add_claim", "add_inference")
+    """Ingestion declares exactly AddClaim + AddInference as op TYPES (not
+    method-name strings); objective is prose."""
+    ok = (IngestionRole.capability == (AddClaim, AddInference)
           and isinstance(IngestionRole.objective, str)
           and IngestionRole.objective.strip().startswith("You are ingesting"))
-    return ok, f"capability={IngestionRole.capability} objective_len={len(IngestionRole.objective)}"
+    return ok, (f"capability={[c.__name__ for c in IngestionRole.capability]} "
+                f"objective_len={len(IngestionRole.objective)}")
 
 
-def check_capability_enforced_at_apply():
-    """A role holding only add_claim cannot add_inference: the guarded session
-    raises CapabilityError when apply invokes the disallowed op — no prompt
-    instruction involved."""
+def check_capability_refuses_whole_plan():
+    """A role holding only AddClaim cannot execute a plan containing an
+    AddInference — and because the check runs over the whole plan first, the
+    held AddClaim ahead of it is NOT written either. The old proxy refused at
+    the offending call, after earlier ops had already landed."""
+    from prosequence.core.yaml_io import ArgumentScheme, Relation
+
     store, dst = fresh_store()
     session = Session(store, CORPUS)
-    guarded = CapabilityGuardedSession(session, ("add_claim",))
-    # add_claim is held: works and mints an id.
-    cid = guarded.add_claim("held op works", "cap-test")
-    held_ok = isinstance(cid, str)
-    # add_inference is not held: raises at the call site.
+    target = next(c.id for c in session.bound_version.claims if not c.terminal)
+    plan = (
+        AddClaim(key="c1", tag="cap-test", text="A held op."),
+        AddInference(grounds=(New("c1"),), warrants=(), target=Existing(target),
+                     relation=Relation.CONCLUDES, scheme=ArgumentScheme.DEDUCTIVE),
+    )
     refused = False
     try:
-        guarded.add_inference([cid], [], cid, None)
+        execute(session, plan, (AddClaim,))
     except CapabilityError:
         refused = True
-    # reads are never gated.
-    read_ok = guarded.get(cid) is not None
-    ok = held_ok and refused and read_ok
-    return ok, f"held_op={held_ok} disallowed_refused={refused} read_passes={read_ok}"
+    # Atomic: the AddClaim that WAS held did not run.
+    nothing_written = len(session.diff().ops) == 0
+    # The full capability accepts the same plan.
+    check_capability(plan, (AddClaim, AddInference))
+    ok = refused and nothing_written
+    return ok, (f"disallowed_refused={refused} "
+                f"nothing_written={nothing_written}")
 
 
-def check_capability_rejects_nonwrite():
-    """Declaring a non-write op as a capability is a construction error."""
-    store, dst = fresh_store()
-    session = Session(store, CORPUS)
+def check_capability_rejects_non_op():
+    """Declaring something that is not an Op type is a construction error,
+    caught when the role is built rather than silently matching nothing."""
+    from prosequence.roles.capability import validate_capability
+
     rejected = False
     try:
-        CapabilityGuardedSession(session, ("neighborhood",))
+        validate_capability(("add_claim",))
     except ValueError:
         rejected = True
-    return rejected, f"non_write_capability_rejected={rejected}"
+    return rejected, f"non_op_capability_rejected={rejected}"
+
+
+def check_plan_rejects_bad_refs():
+    """The three structural rules, all raising before any write: an Existing ref
+    naming nothing in the corpus (previously it fell through as a uuid and
+    failed far downstream at commit), a New ref nothing binds, and a created
+    node nothing references."""
+    from prosequence.core.yaml_io import ArgumentScheme, Relation
+
+    def _inf(**kw):
+        base = dict(grounds=(), warrants=(), target=Existing("real"),
+                    relation=Relation.CONCLUDES, scheme=ArgumentScheme.DEDUCTIVE)
+        return AddInference(**{**base, **kw})
+
+    known = frozenset({"real"})
+    results = {}
+    for label, plan in (
+        ("unknown_existing", (_inf(grounds=(Existing("ghost"),)),)),
+        ("unbound_new", (_inf(grounds=(New("nope"),)),)),
+        ("orphan_binding", (AddClaim(key="c1", tag="t", text="x"),)),
+    ):
+        try:
+            check_plan(plan, known)
+            results[label] = False
+        except PlanError:
+            results[label] = True
+    # A well-formed plan passes.
+    good = (AddClaim(key="c1", tag="t", text="x"),
+            _inf(grounds=(New("c1"),)))
+    try:
+        check_plan(good, known)
+        results["well_formed_passes"] = True
+    except PlanError:
+        results["well_formed_passes"] = False
+    ok = all(results.values())
+    return ok, " ".join(f"{k}={v}" for k, v in results.items())
 
 
 def check_iteration_cap_forces_apply():
@@ -251,9 +306,10 @@ def check_iteration_cap_forces_apply():
 CHECKS = [
     ("ingestion role runs end to end (corpus in prompt -> finding -> apply -> commit)", check_end_to_end),
     ("injection lands commit on its own branch, rewinds main", check_lands_on_branch),
-    ("capability + objective declared", check_capability_declared),
-    ("capability enforced at apply (not by prompt)", check_capability_enforced_at_apply),
-    ("capability rejects non-write ops", check_capability_rejects_nonwrite),
+    ("capability + objective declared (op types)", check_capability_declared),
+    ("capability refuses whole plan, writes nothing", check_capability_refuses_whole_plan),
+    ("capability rejects non-Op entries", check_capability_rejects_non_op),
+    ("plan rejects unresolvable refs and orphan bindings", check_plan_rejects_bad_refs),
     ("iteration cap forces apply", check_iteration_cap_forces_apply),
 ]
 

@@ -1,57 +1,58 @@
 #!/usr/bin/env python3
-"""Capability enforcement at the apply boundary.
+"""Capability enforcement over a plan.
 
-A role declares the write ops it holds (its `capability`). This wraps the writer
-session so that only those ops may be called; any other write op raises at the
-moment it is invoked — enforcement at apply, independent of anything the prompt
-does or does not say. Reads always pass through: capability governs writes.
+A role declares the write ops it holds as op TYPES (`plan.Op` subclasses). This
+checks a plan against that declaration before any of it executes: an op whose
+type the role does not hold raises, and nothing is written.
 
-The write-op universe below is exactly the mutating surface of `session.Session`
-(add_claim / add_inference / revise_claim). Anything not in it — every read
-query, every non-op attribute — is returned untouched, so an apply step reads
-the graph freely and only its writes are gated.
+This replaced a proxy over the writer session that intercepted attribute access
+and matched METHOD NAMES against a `WRITE_OPS` frozenset. Two things were wrong
+with that. The name set was a hand-maintained mirror of `Session`'s mutating
+surface, free to drift from it — a rename on either side broke the grant
+silently, surfacing as an AttributeError mid-run. And enforcement happened at
+the call, so a plan whose third op was disallowed had already written the first
+two by the time it raised; refusal was not atomic.
+
+With ops reified there is nothing to intercept. A capability is a set of types,
+a plan is a list of instances, and the check is containment run over the whole
+list up front. No proxy, no name mirror, no strings.
 """
 from __future__ import annotations
 
-from typing import Iterable
-
-
-# The full set of session write ops. A name in this set is gated against the
-# role's capability; a name outside it (reads, properties) is never gated.
-WRITE_OPS = frozenset({"add_claim", "add_inference", "revise_claim"})
+from typing import Sequence
 
 
 class CapabilityError(RuntimeError):
-    """A role invoked a write op it does not hold. Terminal — the run dies.
+    """A plan contains a write op the role does not hold. Terminal — the run
+    dies, and it dies before anything is written.
 
-    Raised at the call site (apply), not by inspecting the prompt: a role can
-    only write what its `capability` grants regardless of what the model asked.
+    Raised from the declared capability, never by inspecting the prompt: a role
+    can only write what its `capability` grants regardless of what the model
+    asked for.
     """
 
 
-class CapabilityGuardedSession:
-    """Proxy over a writer session that permits only the role's capability ops.
+def validate_capability(capability: Sequence[type]) -> None:
+    """Every entry names an op type. Checked when a role is constructed, so a
+    malformed declaration fails at startup rather than silently matching
+    nothing at apply — the failure mode a bare containment check would
+    otherwise have."""
+    from .plan import Op
 
-    Passed to a role's apply step in place of the raw session. Read queries and
-    non-op attributes forward unchanged; a write op outside `capability` returns
-    a stub that raises CapabilityError when called.
-    """
+    bad = [c for c in capability
+           if not (isinstance(c, type) and issubclass(c, Op))]
+    if bad:
+        raise ValueError(
+            f"capability entries must be Op subclasses, got {bad}; "
+            f"capability governs session writes only")
 
-    def __init__(self, session, capability: Iterable[str]):
-        self._session = session
-        self._capability = frozenset(capability)
-        unknown = self._capability - WRITE_OPS
-        if unknown:
-            raise ValueError(
-                f"capability names non-write ops {sorted(unknown)}; "
-                f"capability governs writes only ({sorted(WRITE_OPS)})")
 
-    def __getattr__(self, name):
-        attr = getattr(self._session, name)
-        if name in WRITE_OPS and name not in self._capability:
-            def _refused(*_a, **_k):
-                raise CapabilityError(
-                    f"role does not hold capability {name!r} "
-                    f"(holds {sorted(self._capability)})")
-            return _refused
-        return attr
+def check_capability(plan: Sequence, capability: Sequence[type]) -> None:
+    """Refuse a plan containing any op outside `capability`. Runs over the whole
+    plan before the first write, so refusal leaves the session untouched."""
+    held = tuple(capability)
+    refused = sorted({type(op).__name__ for op in plan if type(op) not in held})
+    if refused:
+        raise CapabilityError(
+            f"role does not hold {refused} "
+            f"(holds {sorted(c.__name__ for c in held)})")

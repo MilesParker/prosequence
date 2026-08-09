@@ -98,11 +98,18 @@ are the prompt-bearing parts.›
             "terminal": {"type": "boolean"},
             "attribution": {
               "type": "object",
-              "description": "Required for a grounds/evidence claim; omit for a value or generalisation claim.",
+              "description": "Present iff this claim's text is attributive -- it reports what a source says (\"Source X reports Y\") rather than asserting Y directly. Omit for a claim that asserts in its own voice.",
               "properties": {
                 "source": {
                   "type": "object",
-                  "properties": {"type": {"type": "string"}, "reference": {"type": "string"}},
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["Citation", "SelfEvident", "CommonKnowledge", "LogicalNecessity", "None"],
+                      "description": "How the claim's text bottoms out. Citation carries a `reference`; the rest do not."
+                    },
+                    "reference": {"type": "string"}
+                  },
                   "required": ["type"]
                 },
                 "quote": {"type": "string"}
@@ -122,9 +129,18 @@ are the prompt-bearing parts.›
             "grounds": {"type": "array", "items": {"type": "string"}},
             "warrants": {"type": "array", "items": {"type": "string"}},
             "target": {"type": "string", "description": "Uuid-or-key of the claim this inference attaches to."},
-            "relation": {"type": "string", "enum": ["concludes", "contests"]}
+            "relation": {"type": "string", "enum": ["concludes", "contests"]},
+            "scheme": {
+              "type": "string",
+              "enum": ["FromExample", "FromGeneralization", "FromAnalogy", "FromAuthority", "FromConsequence", "FromSign", "FromCause", "FromDefinition", "Deductive", "Unknown"],
+              "description": "The kind of inferential move this step makes. Required on every inference. Deductive: the grounds, together with the stated warrants, entail the target -- any objection to the step names a missing premise rather than a reason the step fails; this is the top of every AND-decomposition. Unknown: a real inferential move that none of the other values names -- give it a schemeDescriptor. Unknown is a classification, not a way to skip classifying."
+            },
+            "schemeDescriptor": {
+              "type": "string",
+              "description": "A few words naming the inferential move. Required when scheme is \"Unknown\"; must be omitted for every other scheme. It classifies the inference and nothing else goes in it -- it is not a note field."
+            }
           },
-          "required": ["grounds", "target", "relation"]
+          "required": ["grounds", "target", "relation", "scheme"]
         }
       }
     },

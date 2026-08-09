@@ -420,16 +420,29 @@ role so far (promoted from the round-trip spike).
   tools and instead renders the whole corpus into a cached system block
   (`cached_context` → `corpus_view.render_corpus`), so the model attaches in one
   turn with no traversal loop. The ingestion-specific parts are that corpus
-  view, the system prompt, the finding parser, the finding-to-ops application,
-  and its `run(url, document_text)` parameter (the reference `url` is supplied by
-  the harness, never inferred — no fetch tool is bound). Capability is
-  `(add_claim, add_inference)` — `revise_claim` is deliberately withheld:
-  ingestion is additive, adding nodes and reusing existing uuids, and never
-  changes the text of a claim already in the corpus.
-- **Capability** (`capability.py`) — `CapabilityGuardedSession` wraps the writer
-  session so the apply step may call only the role's `capability` write ops; any
-  other write raises `CapabilityError` at the call site. Reads pass through
-  ungated. Enforcement is at apply, never by prompt instruction.
+  view, the system prompt, the finding parser, the finding-to-plan translation
+  (`build_plan`), and its `run(url, document_text)` parameter (the reference
+  `url` is supplied by the harness, never inferred — no fetch tool is bound).
+  Capability is `(AddClaim, AddInference)` — `ReviseClaim` is deliberately
+  withheld: ingestion is additive, adding nodes and reusing existing uuids, and
+  never changes the text of a claim already in the corpus.
+- **Ops and plans** (`plan.py`) — a session write is an object: a frozen
+  dataclass generic in what applying it yields (`AddClaim(Op[ClaimId])`,
+  `AddInference(Op[InferenceId])`, `ReviseClaim(Op[None])`). A plan is a list of
+  them. References are typed and the two kinds are distinct: `New(key)` names a
+  node the plan creates, `Existing(id)` names one already in the corpus — ids are
+  minted by the session at add time, so nothing carries an id before the node it
+  names exists. `check_plan` runs the three structural rules with no session:
+  every `Existing` is in the corpus, every `New` is bound by an earlier op, and
+  every binding is referenced by something. `execute` folds the plan, binding
+  each minted id into an environment the later ops resolve against. Graph
+  invariants remain a commit-time concern.
+- **Capability** (`capability.py`) — a role's `capability` is a tuple of op
+  **types**; `check_capability` refuses a plan containing any op outside it,
+  raising `CapabilityError`. The check runs over the whole plan before the first
+  write, so a refused plan writes nothing at all. `validate_capability` rejects a
+  declaration whose entries are not `Op` subclasses, at role construction. Reads
+  are never gated. Enforcement is at apply, never by prompt instruction.
 - **Supporting modules** — `state.py` (the graph state: a frozen dataclass with
   an `add_messages` reducer), `bridge.py` (LangChain ↔ Anthropic message
   translation, since the guard wraps the raw SDK), `corpus_view.py`
@@ -437,17 +450,21 @@ role so far (promoted from the round-trip spike).
   context block), `read_tools.py` (the read-only tool surface over session
   queries — unused by ingestion now, retained for interaction-shaped roles),
   `prompt.py` (objective + YAML generation rules + finding contract), `apply.py`
-  (finding parse + field gates + session writes).
+  (finding parse + field gates + finding→plan translation; it performs no
+  writes), `plan.py` (the ops themselves and plan execution).
 - **The tool boundary** (`apply.py`) — `tool_choice` forces *which* tool is
   called, but the API does not validate argument values against `input_schema`,
   so `required` and `enum` there are guidance to the model, not a gate.
-  `apply_finding` gates the fields itself, before any session write:
-  `_check_all_claims_attached`, `_check_source_types` (`source.type` is one of
-  the five `GroundsSourceType` values), and `_check_schemes` (`scheme` present
-  and in the enum; `schemeDescriptor` present **iff** `scheme == Unknown` — the
-  biconditional whose corpus-side half is I9). Any violation raises
-  `FindingShapeError` and fails the run. Graph invariants are still not checked
-  here: those run once at `commit()`.
+  `plan_from_finding` gates the fields itself, before any session write:
+  `_check_source_types` (`source.type` is one of the five `GroundsSourceType`
+  values) and `_check_schemes` (`scheme` present and in the enum;
+  `schemeDescriptor` present **iff** `scheme == Unknown` — the biconditional
+  whose corpus-side half is I9). Any violation raises `FindingShapeError`. The
+  wire carries a reference as a bare string for both kinds; this boundary
+  resolves it to `New` iff it matches a key the finding declares and `Existing`
+  otherwise, then hands the plan to `check_plan` for the structural rules
+  (`PlanError`). Graph invariants are still not checked here: those run once at
+  `commit()`.
 - **Harness entry** (`run.py`) — wires config → guard + session → the role and
   hands it `(url, document_text)`; `main` is a thin CLI. Model and iteration cap
   come from `guard_config.toml`. The role commits onto main (the store's only
