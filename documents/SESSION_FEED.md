@@ -110,6 +110,8 @@ This subsumes the v2-draft undercut. `CONTESTS` on an ordinary Claim = rebut; `C
 
 **All grounds-claims are attributive.** "Source X reports Y" not "Y is true." `attribution.source` determines the form of the implicit source-credibility warrant. Unchanged from v1 in spirit.
 
+**Warrants carry no attribution.** New rule — SESSION_FEED settled attribution for grounds-claims and said nothing about warrants; a warrant claim never gets an `attribution` block. Not yet enforced: no invariant in `validate.py` checks it.
+
 **Discourse spaces are constituted by their definitions, not their proposition(s).** Two spaces are the same space iff they share compatible definitions for their key terms. Propositions (roots) are views into a space, not what defines it. This resolves the old "what defines a discourse space" ambiguity in favor of the definition layer.
 
 **One validator: `validate.py` is canonical.** A parallel TypeScript validator existed with a divergent rule set and was deleted; its GAP 6 detection was ported across as a warning. Invariants are errors unless explicitly marked warnings; the vocabulary is "error" and "warning", not hard/soft.
@@ -118,7 +120,7 @@ This subsumes the v2-draft undercut. `CONTESTS` on an ordinary Claim = rebut; `C
 
 **Inference and dialectic are not separate layers.** Strengthened from v1: they were already unified conceptually; v2 unifies them structurally too, since Support and Attack are now the same node type with different output edges.
 
-**LLM role is Socratic gatekeeper not judge.** Unchanged. Surfaces implicit warrants, enforces the attributive-claim discipline, checks well-formedness, refuses inferences that would conclude a terminal claim or duplicate an existing claim under different wording. Never rules on correctness.
+**LLM role is Socratic gatekeeper not judge.** Unchanged. Surfaces implicit warrants, enforces the attributive-claim discipline, checks well-formedness, refuses inferences that would conclude a terminal claim or duplicate an existing claim under different wording. Never rules on correctness. This is the general philosophy; the ingestion role's concrete instantiation diverges on two points — see Agent Roles.
 
 **Graph depth ≠ argumentative importance.** Unchanged, though depth is now purely computed (BFS from roots alternating claim/inference layers) rather than a stored field.
 
@@ -148,7 +150,7 @@ This subsumes the v2-draft undercut. `CONTESTS` on an ordinary Claim = rebut; `C
 
 **Serialization is canonical and the emitter is hand-written.** The same graph always produces the same bytes, so a commit diff shows exactly the nodes that changed. Dumping through a YAML library would make the canonical byte sequence a function of that library's version; loading still uses a standard parser, since parsing is stable and emitting is where the variance lives.
 
-**Every commit failure is terminal.** Commit happens once at the end of a run, so there is no partial state to reconcile and the cheap response to any failure is to stop. There is no retry, backoff, or loop anywhere in the write path.
+**Every commit failure is terminal.** Commit happens once at the end of a run, so there is no partial state to reconcile and the cheap response to any failure is to stop. There is no retry, backoff, or loop anywhere in the write path. Ingestion is the exception in practice, not in principle: it heads off a would-be failure by dropping the offending ops before commit, rather than retrying or recovering after one — see Runtime, Writer.
 
 **Warrants stay 0..\*.** An inference with no warrant is an enthymeme — the normal state, not a defect. Requiring one at write time would push contributors and agents to invent warrants rather than record their absence. A missing warrant is a gap for gap detection, never an invariant violation.
 
@@ -183,6 +185,8 @@ In a single-source corpus the prefix is constant and carries nothing — drop it
 Wrong: `text: "Low-income people spend a disproportionate share of income on transit"`
 Right: `text: "Sustainable America reports that low-income people spend a disproportionate share of income on transit"`
 Mark such claims with `attribution: { source: ..., quote: ... }`.
+
+**`quote` is populated only where the wording itself carries weight** — legal or treaty language, a principal's own words. Capture the phrase, not the paragraph. No quote where there is no single passage doing the work.
 
 **Attribution source type must be chosen carefully.**
 - `Citation` — a specific author, paper, report, or organisation is named; always include a reference in the source
@@ -272,6 +276,10 @@ Both views are built. They swap, never coexist, and share one `ClaimId` selectio
 - Write ops: `add_claim`, `add_inference(grounds, warrants, target, relation, scheme, scheme_descriptor)`, `revise_claim`. Queries: `get`, `neighborhood`, `find_by_tag`, `concludes`, `contesting`, `grounds_citing`, `warrants_citing`.
 - Failures are `ValidationFailed`, `HeadMoved`, `WorkingTreeDirty` — all terminal, distinguishable so the harness can log them differently, not so an agent can respond to them.
 - The commit message carries op lines with tags. It is the change record until Stage 2 has one, and it is where the readability lost to bare uuids comes back.
+- **Ingestion commits partial, not all-or-nothing.** Failure-is-terminal still holds literally — repair heads off the failure rather than recovering from one — but the practical posture for ingestion changed from all-or-nothing to keep-the-valid-remainder. On a would-be validation failure, ingestion drops the offending ops and commits what's left. Ingestion-specific: no other role has this posture yet.
+- **Cycle policy (ingestion): drop the newest inference on the cycle** — the one with the highest op index.
+- **Only inferences are ever dropped. Claims are never dropped.** (Ingestion.)
+- **Drops are recorded in the commit message.** `Session.commit` gained a `notes` parameter — `commit(summary, notes)` — and dropped ops are listed under a `not applied` heading, after the op lines.
 
 **Guard.** The client is a constructor parameter, never a module-level singleton — that seam is what will later allow a stub client to exercise commit paths without hitting the API. There is no run wrapper and no dry-run flag; git makes rollback cheap enough that dry-run-as-safety buys nothing.
 
@@ -358,6 +366,10 @@ The hard problems sit at the front, not the end. Three of the five govern how a 
 **Truncation is terminal.** A model response carrying the finding call with `stop_reason == "max_tokens"` fails the run. Nothing is committed. This is failure-is-terminal applied to the output boundary — a partial finding is a silent quality failure that looks like a successful commit, which is the one shape the design has no way to detect afterwards.
 
 **Ingestion is additive: `revise_claim` is withheld from its capability grant.** Existing claim text, tags, and attributions are fixed for this role. Revise flags touching inferences for review, and those inferences were authored against the current wording — ingestion has not read them closely enough to judge the consequences. Wrongly-worded, over-broad, and conflated claims are left standing with the new material alongside; disambiguation is a later role that holds `revise_claim` and has read what depends on the wording.
+
+**Warrant surfacing is split across roles, not one undifferentiated gatekeeper duty.** Ingestion surfaces the warrants the document itself evidences. Pure logical reconstruction — a warrant no source states, inferred from the structure of the argument alone — is left to a later role: Staging's Stage 3, Warrant surfacing, which does not exist yet. Until it does, an inference's unstated-but-inferable warrant stays an enthymeme rather than getting surfaced by ingestion reaching past what the document supports.
+
+**Ingestion's ranked failure modes put omission worst and duplication as the accepted failure.** Missing a claim or inference is the costliest error; landing a duplicate claim under different wording is the cheapest, and the instruction is to include it when genuinely unsure rather than withhold. This reverses the gatekeeper's stated default (refuse a likely duplicate) for this one role — deliberately, not by oversight — because coreference is cheap to fix later and an omission leaves no trace to fix. Consistent with the accepted duplicate-risk note under Staging, Stage 2.
 
 **Change posture is per-role, not universal.** What is universal is that changes propagate to whatever depends on them, and that the cost of a change scales with what depends on it. How freely a role should change existing structure varies — ingestion barely at all, consolidation as its whole purpose — so the threshold is stated in `objective` rather than in the shared framework prompt. Roles reason from the same fact and act on different thresholds.
 
@@ -474,6 +486,7 @@ Visualization: a Vite/TypeScript React app (`src/viz/`), D3 v7 / js-yaml, force-
   - I3 resolving a contests target to claim-or-inference is deliberate belt-and-braces on the most recently reversed decision: I3 answers "does this id resolve," I8 answers "is it the right kind," and keeping them separate preserves distinct error messages
   - I5 is an error, not a warning. An attributive claim bottoms out by checkability against its source; concluding one is a category error
   - `check(data, path) -> (errs, warns)` is the pure invariant pass; `validate(path)` wraps it for the CLI, with output and exit codes unchanged. The writer calls `check` at commit and raises `ValidationFailed` carrying `errs`
+  - `Violation` and `check_violations(data, path) -> list[Violation]` are structured records, so repair works from data rather than parsing prose. `check` is now a formatter over `check_violations`; the two produce byte-identical output strings, so there's one implementation of every invariant, not two
   - I5 is an error, not a warning. An attributive claim bottoms out by checkability against its source; concluding one is a category error. A claim migrating from contested to attributive must have its concluding inferences removed or the claim split — that repair *is* the migration, not cleanup after it
   - GAP 6 detection is a warning, ported from the deleted TypeScript validator
 - Navigation: no standalone module in the repo. Navigation is inline (`navigate` in `src/viz/App.tsx`). `corpus_nav.py` / `test_nav.py` are not present — they belong to the agentic toy or are gone
