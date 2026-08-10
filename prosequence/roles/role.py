@@ -213,6 +213,10 @@ class Role:
             return {"messages": [ai], "iterations": state.iterations + 1}
 
         def tools_node(state: RoleState) -> dict:
+            # Only ever wired up on the has_tools branch below, where tool_node
+            # is constructed. Asserted rather than assumed: a future edit that
+            # routes here without binding tools fails loudly, not with None.
+            assert tool_node is not None
             out = tool_node.invoke(state)
             msgs = out["messages"] if isinstance(out, dict) else out.messages
             return {"messages": msgs}

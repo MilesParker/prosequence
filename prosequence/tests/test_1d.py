@@ -245,6 +245,9 @@ def check_relation_required_signature():
     g = next(iter(s.bound_version.claims)).id
     c = s.add_claim("A claim.", "c")
     try:
+        # Deliberately missing `relation` and `scheme`. No type: ignore is
+        # needed — this check function is an untyped def, so mypy does not
+        # inspect the body (it would need one under check_untyped_defs).
         s.add_inference([g], [], c)  # type: ignore[call-arg]
         return False, "no TypeError — relation was defaulted"
     except TypeError as e:
@@ -328,7 +331,7 @@ def check_bare_string_relation_raises():
     c = s.add_claim("A claim.", "c")
     raised = False
     try:
-        s.add_inference([g], [], c, "concludes",  # bare string, not Relation
+        s.add_inference([g], [], c, "concludes",  # type: ignore[arg-type]
                         ArgumentScheme.DEDUCTIVE)
     except (ValueError, TypeError):
         raised = True

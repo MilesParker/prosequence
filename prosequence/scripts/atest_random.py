@@ -1,5 +1,6 @@
 import random
 import anthropic
+from anthropic.types import MessageParam, ToolParam, ToolResultBlockParam
 
 from .anthropic_key import KEY
 
@@ -9,7 +10,7 @@ MODEL = "claude-sonnet-4-5"   # confirm against your account's model list
 MAX_ITERS = 5                 # the hard cap — the safety net
 
 # ---- tool declaration (sent to the model) ----
-tools = [
+tools: list[ToolParam] = [
     {
         "name": "get_random_number",
         "description": "Return a random integer between 1 and 10 inclusive.",
@@ -25,7 +26,7 @@ def get_random_number():
 TOOL_IMPL = {"get_random_number": get_random_number}
 
 # ---- the loop ----
-messages = [
+messages: list[MessageParam] = [
     {
         "role": "user",
         "content": (
@@ -60,7 +61,7 @@ for turn in range(1, MAX_ITERS + 1):
         break
 
     # otherwise: run each requested tool, collect results
-    tool_results = []
+    tool_results: list[ToolResultBlockParam] = []
     for block in resp.content:
         if block.type == "tool_use":
             print(f"  -> model calls {block.name}({block.input})")

@@ -264,5 +264,5 @@ def execute(session, plan: Sequence[Op], capability: Sequence[type[Op]]) -> tupl
         minted = op.apply(session, env)
         key = op.binds()
         if key is not None:
-            env[key] = minted  # type: ignore[assignment]
+            env[key] = minted
     return tuple(plan)

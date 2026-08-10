@@ -18,8 +18,10 @@ import sys
 
 def main() -> int:
     # exec so signals (Ctrl-C) go straight to the server process.
+    # execvp never returns — it replaces this process image — so there is
+    # no return below it. The `-> int` stands for the SystemExit contract
+    # the caller uses; it is simply never satisfied by a normal return.
     os.execvp(sys.executable, [sys.executable, "-m", "phoenix.server.main", "serve"])
-    return 0  # unreachable
 
 
 if __name__ == "__main__":

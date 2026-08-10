@@ -22,7 +22,8 @@ from prosequence.core.guarded_client import GuardConfig, GuardedClient
 from prosequence.roles.ingestion import IngestionRole
 from prosequence.roles.capability import CapabilityError, check_capability
 from prosequence.roles.plan import (
-    AddClaim, AddInference, Existing, New, PlanError, check_plan, execute,
+    AddClaim, AddInference, ClaimId, Existing, New, PlanError, check_plan,
+    execute,
 )
 
 
@@ -208,7 +209,7 @@ def check_capability_refuses_whole_plan():
     target = next(c.id for c in session.bound_version.claims if not c.terminal)
     plan = (
         AddClaim(key="c1", tag="cap-test", text="A held op."),
-        AddInference(grounds=(New("c1"),), warrants=(), target=Existing(target),
+        AddInference(grounds=(New("c1"),), warrants=(), target=Existing(ClaimId(target)),
                      relation=Relation.CONCLUDES, scheme=ArgumentScheme.DEDUCTIVE),
     )
     refused = False
@@ -232,7 +233,7 @@ def check_capability_rejects_non_op():
 
     rejected = False
     try:
-        validate_capability(("add_claim",))
+        validate_capability(("add_claim",))  # type: ignore[arg-type]
     except ValueError:
         rejected = True
     return rejected, f"non_op_capability_rejected={rejected}"
@@ -246,14 +247,14 @@ def check_plan_rejects_bad_refs():
     from prosequence.core.yaml_io import ArgumentScheme, Relation
 
     def _inf(**kw):
-        base = dict(grounds=(), warrants=(), target=Existing("real"),
+        base = dict(grounds=(), warrants=(), target=Existing(ClaimId("real")),
                     relation=Relation.CONCLUDES, scheme=ArgumentScheme.DEDUCTIVE)
         return AddInference(**{**base, **kw})
 
     known = frozenset({"real"})
     results = {}
     for label, plan in (
-        ("unknown_existing", (_inf(grounds=(Existing("ghost"),)),)),
+        ("unknown_existing", (_inf(grounds=(Existing(ClaimId("ghost")),)),)),
         ("unbound_new", (_inf(grounds=(New("nope"),)),)),
         ("orphan_binding", (AddClaim(key="c1", tag="t", text="x"),)),
     ):

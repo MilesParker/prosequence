@@ -1,0 +1,9 @@
+# Development-only dependencies. NOT needed to run the harness — see
+# requirements.txt for that. Install both to work on the code:
+#
+#   pip install -r requirements.txt -r requirements-dev.txt
+#
+# Kept separate because nothing here is imported by prosequence/ at runtime; a
+# deploy or a CI job that only runs the harness should not pull these in.
+
+mypy==2.3.0                # static check: python3 -m mypy prosequence/

@@ -23,8 +23,9 @@ Invariants are errors unless explicitly marked warnings.
 npm run build                   # vite
 tsc -p tsconfig.json            # app: src/viz, src/config.ts, src/types.ts
 tsc -p tsconfig.node.json       # CLI: src/index.ts, src/loader.ts, src/print.ts
-python3 -m prosequence.core.validate  # all three corpora, invariants I1-I8
+python3 -m prosequence.core.validate  # all three corpora, invariants I1-I10
 python3 -m prosequence.tests          # all suites (1d store/session, 1e guard, role protocol)
+python3 -m mypy prosequence/          # static check; config in mypy.ini, dev dep in requirements-dev.txt
 
 ## Layout
 

@@ -27,6 +27,7 @@ from __future__ import annotations
 import os
 import sys
 import uuid
+from typing import cast
 from html.parser import HTMLParser
 
 import anthropic
@@ -80,7 +81,9 @@ def _reset_main_to(store: CorpusStore, head0: str, corpus_file: str) -> None:
     if corpus_file in head0_commit.tree:
         blob = head0_commit.tree[corpus_file]
         with open(path, "wb") as fh:
-            fh.write(repo[blob.id].data)
+            # pygit2 types repo[oid] as the base Object; this entry is a
+            # blob, and only Blob carries `.data`.
+            fh.write(cast(pygit2.Blob, repo[blob.id]).data)
     elif os.path.exists(path):
         os.remove(path)
     repo.index.read_tree(head0_commit.tree)

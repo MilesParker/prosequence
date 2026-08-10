@@ -1,6 +1,7 @@
 import os
 import random
 import anthropic
+from anthropic.types import MessageParam, ToolParam, ToolResultBlockParam
 
 from .anthropic_key import KEY
 
@@ -17,7 +18,7 @@ SOURCE_SNIPPET = (
 )
 
 # ---- tool declarations ----
-tools = [
+tools: list[ToolParam] = [
     {
         "name": "read_source",
         "description": (
@@ -51,7 +52,7 @@ def read_corpus():
 TOOL_IMPL = {"read_source": read_source, "read_corpus": read_corpus}
 
 # ---- the loop ----
-messages = [
+messages: list[MessageParam] = [
     {
         "role": "user",
         "content": (
@@ -88,7 +89,7 @@ for turn in range(1, MAX_ITERS + 1):
         hit_cap = False
         break
 
-    tool_results = []
+    tool_results: list[ToolResultBlockParam] = []
     for block in resp.content:
         if block.type == "tool_use":
             print(f"  -> calls {block.name}({block.input})")

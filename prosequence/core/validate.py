@@ -149,7 +149,7 @@ def check(d, path=""):
     # I6 — the graph of Concludes edges is acyclic. Support chains
     #      (grounds/warrants -> inference -> concludes) may not cycle; contests
     #      edges are excluded (an attack is allowed to point "up").
-    adj = {}
+    adj: dict[str, list[str]] = {}
     for iid, i in infs.items():
         adj.setdefault(iid, [])
         for c in (i.get('grounds') or []) + (i.get('warrants') or []):

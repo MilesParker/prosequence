@@ -13,7 +13,7 @@ no `contest` transform: polarity is the `relation` argument to `add_inference`.
 from __future__ import annotations
 
 from dataclasses import replace
-from typing import Optional, Sequence
+from typing import Any, Optional, Sequence
 
 from .yaml_io import (
     ArgumentScheme,
@@ -109,7 +109,11 @@ def revise_claim(
     old = corpus.node(id)
     if old is None or not isinstance(old, Claim):
         raise KeyError(f"revise_claim: {id!r} is not a claim in this corpus")
-    changed = {}
+    # `Any` is required, not laziness: mypy expands `**changed` against every
+    # field of Claim, so a dict[str, str] reads as a candidate for `terminal:
+    # bool` and `attribution: Attribution | None`. The dict only ever carries
+    # `text`/`tag`, both str, and both guarded above.
+    changed: dict[str, Any] = {}
     if text is not None:
         changed["text"] = text
     if tag is not None:

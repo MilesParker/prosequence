@@ -28,7 +28,7 @@ list rather than letting a divergence sit unrecorded.
 """
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from enum import Enum
 from typing import NewType, Optional, Tuple
 
@@ -177,7 +177,7 @@ class Inference:
     relation: Relation
     schemeDescriptor: Optional[str] = None
 
-    def __post_init__(self):
+    def __post_init__(self) -> None:
         # I1 — a single target and a relation in {concludes, contests}.
         # I4 — grounds non-empty (an empty required list is a validation error,
         # never something to emit). Reference lists are stored ascending by
@@ -238,7 +238,15 @@ class Corpus:
     claims: Tuple[Claim, ...]
     inferences: Tuple[Inference, ...]
 
-    def __post_init__(self):
+    # Cached id -> node index, filled by __post_init__. Declared as a real
+    # field so it is a visible attribute rather than one smuggled in by
+    # object.__setattr__; init/compare/repr are all off, so Corpus still
+    # constructs, compares and prints as the six schema fields alone, and
+    # `replace()` rebuilds the index instead of copying it.
+    _index: dict = field(
+        init=False, compare=False, repr=False, default_factory=dict)
+
+    def __post_init__(self) -> None:
         # Canonical order established here, once, at construction: nodes and
         # roots ascending by uuid; definitions keep authoring order (the
         # schema does not designate them a sortable reference list).
@@ -250,14 +258,15 @@ class Corpus:
             tuple(sorted(self.inferences, key=lambda i: i.id)))
         # Cached id -> node index (a non-field; a plain assignment would be
         # rejected by the frozen dataclass, and a linear scan would be O(n)).
-        index = {}
-        for node in self.claims:
-            index[node.id] = node
-        for node in self.inferences:
-            index[node.id] = node
+        index: dict = {}
+        for claim in self.claims:
+            index[claim.id] = claim
+        for inference in self.inferences:
+            index[inference.id] = inference
         object.__setattr__(self, "_index", index)
 
-    def node(self, node_id):
+    def node(self, node_id: str):
+        """The claim or inference with this id, or None."""
         return self._index.get(node_id)
 
 

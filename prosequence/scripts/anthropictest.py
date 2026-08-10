@@ -1,10 +1,11 @@
 import anthropic
+from anthropic.types import ToolParam
 from .anthropic_key import KEY
 
 client = anthropic.Anthropic(api_key=KEY)  # reads ANTHROPIC_API_KEY from env
 
 # One tool, deliberately trivial. We're testing the round-trip, not the tool.
-tools = [
+tools: list[ToolParam] = [
     {
         "name": "read_source",
         "description": "Return the source snippet the agent should work from.",

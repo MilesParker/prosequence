@@ -17,7 +17,7 @@ git config and are made outside this module.
 from __future__ import annotations
 
 import os
-from typing import Optional
+from typing import Optional, cast
 
 import pygit2
 from pygit2.enums import FileMode, SortMode
@@ -101,7 +101,9 @@ class CorpusStore:
         """
         commit = self._commit(sha)
         entry = commit.tree[name]  # raises KeyError if absent
-        return self.repo[entry.id].data.decode("utf-8")
+        # pygit2 types repo[oid] as the base Object; a tree entry looked up
+        # by corpus name is a blob, and only Blob carries `.data`.
+        return cast(pygit2.Blob, self.repo[entry.id]).data.decode("utf-8")
 
     def list_corpora(self, sha: Optional[str] = None) -> list[str]:
         """Names of the corpora present at `sha` (defaults to head).
@@ -110,10 +112,14 @@ class CorpusStore:
         anything else is excluded.
         """
         commit = self._commit(sha)
+        # `e.name` is Optional in pygit2's types; a real tree entry always
+        # has one, but the guard is what makes that checkable.
         names = [
             e.name
             for e in commit.tree
-            if e.type_str == "blob" and e.name.endswith(".v2.yaml")
+            if e.type_str == "blob"
+            and e.name is not None
+            and e.name.endswith(".v2.yaml")
         ]
         return sorted(names)
 
@@ -168,7 +174,8 @@ class CorpusStore:
 
         head_commit = self.repo[current].peel(pygit2.Commit)
         head_oid = self._blob_oid(head_commit.tree, name)
-        head_bytes = self.repo[head_oid].data if head_oid is not None else None
+        head_bytes = (cast(pygit2.Blob, self.repo[head_oid]).data
+                      if head_oid is not None else None)
 
         if self._worktree_bytes(name) != head_bytes:
             raise WorkingTreeDirty(
