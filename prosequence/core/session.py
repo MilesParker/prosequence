@@ -147,6 +147,32 @@ class Session:
         return self._bound_version
 
     @property
+    def current_version(self) -> Corpus:
+        """The version as ops have left it — `bound_version` before the first
+        write, the would-be commit after the last.
+
+        Deliberately NOT guarded by `_ensure_open`: its one caller reads it
+        AFTER a failed `commit()`, which closes the session on any outcome. That
+        is the whole reason it is public — a corpus that failed validation is
+        the most valuable thing a failed run has, and it was previously
+        unreachable (see roles/salvage.py). Read-only; the reference is to a
+        frozen Corpus and no caller can write through it.
+        """
+        return self._version
+
+    @property
+    def name(self) -> str:
+        """The corpus blob name this session is bound to (e.g.
+        `free-transit.v2.yaml`), for callers that must label their output with
+        it. The store, not this, decides where that name is read and written."""
+        return self._name
+
+    @property
+    def bound_head(self) -> str:
+        """The sha this session bound at open."""
+        return self._bound_head
+
+    @property
     def sha(self) -> Optional[str]:
         """The commit sha, once commit() has succeeded; otherwise None."""
         return self._sha
@@ -327,12 +353,20 @@ class Session:
 
     # -- commit ------------------------------------------------------------
 
-    def commit(self, summary: str) -> str:
+    def commit(self, summary: str, notes: Sequence[str] = ()) -> str:
         """Serialize, validate (I1-I10), write through the store, return the sha.
 
         Behaves like a database commit. The session closes the moment commit is
         entered, so any outcome — success or any of the three terminal failures
         — leaves the session dead with no commit-and-retry path.
+
+        `notes` are free-text lines appended to the commit message under their
+        own heading — what the caller decided BEFORE writing that this diff does
+        not show. Repair is the case: an inference dropped to satisfy an
+        invariant leaves no trace in the corpus, because a node that was never
+        written cannot be diffed. The change record is where SESSION_FEED puts
+        that kind of account ("reason is the commit message"), so it goes here
+        rather than into a field on a node.
         """
         self._ensure_open()
         self._closed = True  # any outcome closes the session
@@ -343,7 +377,7 @@ class Session:
         if errs:
             raise ValidationFailed(errs)
 
-        message = self._render_message(summary)
+        message = self._render_message(summary, notes)
         # Store guards (HeadMoved / WorkingTreeDirty) run before any write, so a
         # failure here also creates no commit.
         sha = self._store.commit(
@@ -396,7 +430,7 @@ class Session:
                 )
         return lines
 
-    def _render_message(self, summary: str) -> str:
+    def _render_message(self, summary: str, notes: Sequence[str] = ()) -> str:
         op_lines = self._op_lines()
         body = [
             f"{self._name}: {len(self._records)} ops — {summary}",
@@ -405,4 +439,9 @@ class Session:
             "ops:",
         ]
         body.extend(f"  {line}" for line in op_lines)
+        if notes:
+            # After the ops, not folded into the subject line: the subject stays
+            # one line, and these describe what is absent rather than what ran.
+            body += ["", f"not applied ({len(notes)}):"]
+            body.extend(f"  {line}" for line in notes)
         return "\n".join(body) + "\n"

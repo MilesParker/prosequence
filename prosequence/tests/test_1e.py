@@ -34,9 +34,29 @@ REPO_ROOT = os.path.dirname(PKG_DIR)
 
 
 # --------------------------------------------------------------------------
-# Stub client — scripted usage, mirrors the anthropic surface the guard uses
-# (`client.messages.create(...) -> resp.usage.{input,output}_tokens`).
+# Stub client — scripted usage, mirrors the anthropic surface the guard uses:
+# `client.messages.stream(...)` as a context manager whose
+# `get_final_message()` yields `resp.usage.{input,output}_tokens`. The guard
+# streams (see guarded_client.create); nothing here produces deltas, because
+# nothing there consumes them — the accumulated final message is the surface.
 # --------------------------------------------------------------------------
+
+
+class _StreamCtx:
+    """The context manager `messages.stream(...)` returns. Accumulation is the
+    real SDK's job; a stub already has the finished message."""
+
+    def __init__(self, resp):
+        self._resp = resp
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+    def get_final_message(self):
+        return self._resp
 
 class _Usage:
     def __init__(self, i, o):
@@ -55,12 +75,12 @@ class StubClient:
     def __init__(self, script):
         self._script = list(script)
         self.calls = 0
-        self.messages = self  # so `client.messages.create(...)` resolves here
+        self.messages = self  # so `client.messages.stream(...)` resolves here
 
-    def create(self, **kwargs):
+    def stream(self, **kwargs):
         i, o = self._script[self.calls]
         self.calls += 1
-        return _Resp(i, o)
+        return _StreamCtx(_Resp(i, o))
 
 
 def _cfg(tmp, per_run, cumulative, window=86400, kill=None, model="stub-model"):

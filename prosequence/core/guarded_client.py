@@ -10,7 +10,9 @@ Design seams that matter:
 * The underlying client is a **constructor parameter**, never a module-level
   singleton. A test substitutes a stub returning scripted usage and exercises
   every commit path without touching the API or the network. Nothing in the
-  session/ops/store needs to know which client it is.
+  session/ops/store needs to know which client it is. The surface required of
+  that client is `messages.stream(...)` as a context manager yielding an object
+  with `get_final_message()` — see `create` for why it is the streaming one.
 * The **pre-flight check runs before every API call**, never after — a cap
   checked after the call has already spent the tokens. Three gates, in order:
   the kill file, the per-run cap, the cumulative (rolling-window) cap. The
@@ -237,9 +239,28 @@ class GuardedClient:
 
         self._preflight(projected)  # raises => terminal, nothing below runs
 
-        resp = self._client.messages.create(
+        # Streamed, then accumulated back into one message. Nothing here
+        # consumes deltas — `get_final_message()` returns the same Message a
+        # non-streaming call would, so `usage`, `content`, and `stop_reason`
+        # below are unchanged, and so is every caller.
+        #
+        # The transport matters anyway, because it is what makes a large
+        # `max_tokens` legal at all. A non-streaming call is capped by the
+        # request's wall-clock: the SDK estimates it as
+        # `3600 * max_tokens / 128000` and REFUSES with ValueError above ten
+        # minutes — any max_tokens over ~21,333 — because an idle HTTP
+        # connection held open that long is liable to be dropped by something in
+        # the middle. A stream is never idle, so the ceiling is the model's
+        # (128K for the current Sonnet/Opus), not the transport's.
+        #
+        # Non-streaming was never a decision here; it was the shape this class
+        # was written in for Directive 1e, when the output ceiling was 8192 and
+        # the limit was invisible. It stops being invisible the moment a
+        # single-shot role needs room for a whole corpus of findings.
+        with self._client.messages.stream(
             model=model, max_tokens=max_tokens, messages=list(messages), **kwargs
-        )
+        ) as stream:
+            resp = stream.get_final_message()
 
         usage = resp.usage
         in_tok = int(usage.input_tokens)

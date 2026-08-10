@@ -28,7 +28,10 @@ follows, not a gate the wire enforces. `_check_schemes` and
 `_check_source_types` are that gate. Structural checks over the resulting plan
 (references that resolve to nothing, created nodes nothing attaches) belong to
 `plan.check_plan`, which this calls. All of it runs before any session write, so
-a malformed finding fails the run without touching the corpus.
+a malformed finding fails the run without touching the corpus. What such a
+failure leaves behind on disk is `roles/salvage.py`'s business, not this
+module's: apply stays pure and writes nothing, which is why the ops-building
+step is exposed separately as `ops_from_finding` for salvage to consume.
 
 This module NO LONGER WRITES. It turns a finding into a `plan.Op` list and
 nothing else — pure, session-free, and testable without a corpus. `plan.execute`
@@ -133,8 +136,22 @@ FINDING_TOOL_SCHEMA = {
                 "items": {
                     "type": "object",
                     "properties": {
-                        "grounds": {"type": "array", "items": {"type": "string"}},
-                        "warrants": {"type": "array", "items": {"type": "string"}},
+                        # grounds/warrants are REFERENCE lists, and saying so is
+                        # load-bearing: undescribed, they were filled with the
+                        # proposition's prose instead of a handle to it, while
+                        # `target` — the one slot that said "uuid-or-key" — was
+                        # never once got wrong. A warrant is a claim like any
+                        # other; the only way to cite one is to declare it.
+                        "grounds": {
+                            "type": "array",
+                            "description": "Uuid-or-key REFERENCES to the claims this inference reasons from. Each entry is either a uuid copied from the corpus above or a `key` of a claim in `claims`. Never the claim's text: to use a proposition not already in the corpus, add it to `claims` and cite its key here.",
+                            "items": {"type": "string"},
+                        },
+                        "warrants": {
+                            "type": "array",
+                            "description": "Uuid-or-key REFERENCES to the claims that license this step (0 or more). Same rule as `grounds` — a warrant IS a claim, so a warrant you are surfacing from the document must be added to `claims` with its own key and cited here by that key. Never put the warrant's text in this array.",
+                            "items": {"type": "string"},
+                        },
                         "target": {"type": "string", "description": "Uuid-or-key of the claim this inference attaches to."},
                         "relation": {"type": "string", "enum": ["concludes", "contests"]},
                         "scheme": {
@@ -289,9 +306,20 @@ def _attribution(raw) -> Attribution | None:
     )
 
 
-def plan_from_finding(finding: dict, known_ids: frozenset) -> Tuple[Op, ...]:
-    """A finding -> the plan of ops that would apply it. Pure: no session, no
-    writes, nothing minted.
+def ops_from_finding(finding: dict) -> Tuple[Op, ...]:
+    """A finding -> the ops it asks for, UNCHECKED. Pure: no session, no writes,
+    nothing minted.
+
+    Split out from `plan_from_finding` so the structural check is a separate
+    step a caller can fail around. `roles/salvage.py` needs the ops that
+    `check_plan` refused in order to write them out as an error corpus, and it
+    cannot get them from a raised exception.
+
+    Field well-formedness IS checked here (`_check_source_types`,
+    `_check_schemes`), because those are the gate the API does not provide and a
+    finding that fails them yields no ops at all — there is nothing to salvage
+    from a scheme that names no enum member. What is deferred is only the
+    structural check over the assembled plan.
 
     Claims come first so that every `New` is bound before an inference uses it.
     That ordering is produced here and VERIFIED by `check_plan` rather than
@@ -301,9 +329,9 @@ def plan_from_finding(finding: dict, known_ids: frozenset) -> Tuple[Op, ...]:
     A ref on the wire is a bare string carrying two different kinds of thing. It
     is a `New` iff it matches a key this finding declares, and an `Existing`
     otherwise — the same rule the old resolver used, except that an `Existing`
-    is now checked against `known_ids` instead of being assumed to name
-    something. A key typo used to pass through here as though it were a corpus
-    uuid; now it is a PlanError naming the ref.
+    is checked against the corpus by `check_plan` instead of being assumed to
+    name something. A key typo used to pass through here as though it were a
+    corpus uuid; now it is a PlanError naming the ref.
     """
     finding = _normalize_finding(finding)
     _check_source_types(finding["claims"])
@@ -338,5 +366,17 @@ def plan_from_finding(finding: dict, known_ids: frozenset) -> Tuple[Op, ...]:
         for inf in finding["inferences"]
     ]
 
-    check_plan(plan, known_ids)
     return tuple(plan)
+
+
+def plan_from_finding(finding: dict, known_ids: frozenset) -> Tuple[Op, ...]:
+    """A finding -> a plan that is structurally executable, or a PlanError.
+
+    The composition of the two steps above: build the ops, then check them. Kept
+    as one function because "a finding becomes a checked plan" is the operation
+    every caller actually wants; the seam exists for the one caller (salvage)
+    that needs the rejected ops rather than only the rejection.
+    """
+    plan = ops_from_finding(finding)
+    check_plan(plan, known_ids)
+    return plan

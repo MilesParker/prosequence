@@ -15,9 +15,39 @@ reported but does not affect exit status.
 Usage: python validate.py <corpus.yaml> [<corpus.yaml> ...]
 """
 import sys, glob
+from dataclasses import dataclass, field
+from typing import Tuple
+
 import yaml
 
 from .yaml_io import ArgumentScheme, Relation
+
+
+@dataclass(frozen=True)
+class Violation:
+    """One invariant failure, before it is formatted into a string.
+
+    `check` has always produced prose, which is right for a CLI and useless to
+    anything that wants to ACT on a violation — repair has to know which node
+    failed, and recovering that by re-parsing the message would make the
+    message's wording load-bearing. The record is the structured form; the
+    string is derived from it, so the two cannot drift.
+
+    `iid` is the inference at fault, or "-" where the invariant is not about one
+    (a root that does not resolve; a cycle, which is a property of a path rather
+    than of any single edge). `nodes` carries the cycle path for I6 and is empty
+    otherwise — for a cycle, every inference on it is a candidate for removal
+    and choosing between them is the caller's policy, not the validator's.
+    """
+    inv: str
+    iid: str
+    target: str
+    msg: str
+    nodes: Tuple[str, ...] = field(default=())
+
+    def format(self, path: str = "") -> str:
+        # file, invariant, inference id, target id — in that order.
+        return f"{path}: {self.inv} {self.iid} {self.target}  {self.msg}"
 
 # The valid relation wire strings, sourced from the model enum rather than
 # spelled out here. The validator reads raw YAML (untrusted, possibly
@@ -51,6 +81,19 @@ def check(d, path=""):
     Pure: returns (errs, warns) as lists of formatted strings, no printing
     and no exit. `validate(path)` wraps this for the CLI; the 1d session
     calls it at commit and raises ValidationFailed carrying `errs`.
+
+    `check_violations` is the same pass returning `Violation` records instead of
+    strings, for callers that must act on a failure rather than print it.
+    """
+    viols, warns = check_violations(d, path)
+    return [v.format(path) for v in viols], warns
+
+
+def check_violations(d, path=""):
+    """The invariant pass, structured: returns (violations, warns).
+
+    Identical analysis to `check` — which is a formatter over this — so there is
+    exactly one implementation of every invariant.
     """
     # `or []`: an empty `claims:`/`inferences:` block serializes to None, not [].
     claims = {c['id']: c for c in d.get('claims') or []}
@@ -60,9 +103,8 @@ def check(d, path=""):
     errs  = []   # errors -> non-zero exit
     warns = []   # warnings (GAP-6 gaps) -> reported only
 
-    def fail(inv, iid, target, msg):
-        # file, invariant, inference id, target id — in that order.
-        errs.append(f"{path}: {inv} {iid} {target}  {msg}")
+    def fail(inv, iid, target, msg, nodes=()):
+        errs.append(Violation(inv, iid, target, msg, tuple(nodes)))
 
     for iid, i in infs.items():
         target    = i.get('target')
@@ -167,7 +209,10 @@ def check(d, path=""):
             if c == GREY and m not in reported:
                 reported.add(m)
                 cyc = stack[stack.index(m):] + [m] if m in stack else [m]
-                fail("I6", "-", m, "cycle in concludes graph: " + " -> ".join(cyc))
+                # The whole path rides along: a cycle names no single guilty
+                # edge, so a caller that wants to break one needs the choices.
+                fail("I6", "-", m,
+                     "cycle in concludes graph: " + " -> ".join(cyc), cyc)
             elif c == WHITE:
                 dfs(m, stack + [m])
         color[n] = BLACK

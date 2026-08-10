@@ -17,7 +17,7 @@ convenience over it — it accepts a url and/or document_text, fetches the page
 when no text is supplied, and seeds the corpus when it does not exist. Both
 fetching and corpus creation are deterministic harness steps: only the
 text->graph transform is the model's. A stub client with the same
-`.messages.create` surface can be passed to either to exercise the plumbing
+`.messages.stream` surface can be passed to either to exercise the plumbing
 without the API. `main` is a thin CLI over `run()` — it requires both the
 reference url and a document (read from a file), because the reference is a run
 parameter, never inferred.
@@ -238,7 +238,7 @@ def run(url: str, document_text: str, *, corpus_name: str = "free-transit",
     required, and the corpus must already exist — no fetch, no creation. Use
     `ingest()` for the convenience variants. `client` defaults to a real
     anthropic.Anthropic() (reads ANTHROPIC_API_KEY); pass a stub with the same
-    `.messages.create` surface to run without the API.
+    `.messages.stream` surface to run without the API.
     """
     # Observability: register the tracer provider + auto-instrumentation before
     # the Anthropic client and the graph are constructed. Idempotent; a no-op

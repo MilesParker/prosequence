@@ -393,6 +393,17 @@ touch neither the session, ops, serializer, store, nor the invariants.
   `CumulativeCapExceeded`) — terminal, no wait/backoff/retry/loop. A run commits
   once at the very end, so a refusal at any point leaves the corpus repo
   untouched.
+- **The call is streamed** — `messages.stream(...)` accumulated back to one
+  message via `get_final_message()`. No caller sees a delta: the returned
+  `Message` carries the same `usage`, `content`, and `stop_reason` a
+  non-streaming call would, so the pre-flight, the token log and the role are
+  all unchanged. The transport is what makes a large `max_tokens` legal: a
+  non-streaming request is bounded by its own wall-clock (the SDK estimates
+  `3600 * max_tokens / 128000` and raises `ValueError` above ten minutes — any
+  `max_tokens` over ~21,333), because an HTTP connection idle that long gets
+  dropped in the middle. A stream is never idle, so the ceiling is the model's
+  128K. This is also the surface an injected stub must implement: a context
+  manager with `get_final_message()`, not `.create`.
 - **Token log** — append-only JSONL, one line per API call written after it
   returns: `timestamp, run_id, corpus, model, input_tokens, output_tokens,
   committed`. No cost figure — the model and counts are recorded and a price
@@ -479,7 +490,9 @@ role so far (promoted from the round-trip spike).
   queries — unused by ingestion now, retained for interaction-shaped roles),
   `prompts/` (prompt prose, one module per prompt — see below), `apply.py`
   (finding parse + field gates + finding→plan translation; it performs no
-  writes), `plan.py` (the ops themselves and plan execution).
+  writes), `plan.py` (the ops themselves and plan execution), `repair.py` and
+  `salvage.py` (what a failing run keeps, and what it leaves on disk — both
+  below).
 - **The tool boundary** (`apply.py`) — `tool_choice` forces *which* tool is
   called, but the API does not validate argument values against `input_schema`,
   so `required` and `enum` there are guidance to the model, not a gate.
@@ -492,7 +505,54 @@ role so far (promoted from the round-trip spike).
   resolves it to `New` iff it matches a key the finding declares and `Existing`
   otherwise, then hands the plan to `check_plan` for the structural rules
   (`PlanError`). Graph invariants are still not checked here: those run once at
-  `commit()`.
+  `commit()`. Building the ops and checking them are separate entry points
+  (`ops_from_finding`, then `check_plan`; `plan_from_finding` composes the two)
+  so a caller can get hold of the ops a check refused — which is what salvage
+  needs.
+- **Repair** (`repair.py`) — a graph that would fail I1-I10 at commit is not
+  discarded whole. Repair predicts the corpus the plan would produce
+  (`salvage.apply_plan`, pure), reads violations off it
+  (`validate.check_violations`), drops the inferences implicated, and returns a
+  plan that commits cleanly. **Only inferences are dropped** — every I1-I10
+  error names an inference or a root, claims are the extracted content, and a
+  claim left unattached is legal (an orphan is a GAP-6 warning, not an error),
+  so the material survives for a later role. Observed on a real run: 3 errors
+  from 3 of 36 inferences, repaired to 0 with all 45 claims kept. Most
+  invariants name their culprit; a **cycle names no single edge**, so the policy
+  is to drop the newest inference on it — the highest op index, which is stable
+  across dry runs where a minted uuid is not, and which biases toward keeping
+  what the corpus already had (ingestion is additive). Iterative and bounded;
+  a violation no drop can fix (an unresolvable root) raises `Unrepairable` and
+  the run fails as before.
+  - Repair operates on the **plan**, never on a built session, and runs **after
+    `check_plan`**. Both orderings are load-bearing. Plan-level keeps the write
+    path free of the retry SESSION_FEED forbids (one session, one execute, one
+    commit), leaves head valid by construction, and means ingestion needs no
+    removal capability. Running after `check_plan` is what bounds the blast
+    radius: a plan whose refs do not resolve fails I3 in *every* inference, and
+    repair would silently drop all of them — `check_plan` rejects that plan
+    first, so what reaches repair is a few bad edges, not a systemic defect.
+  - Drops are recorded in the **commit message** (`Session.commit(summary,
+    notes)`), under a `not applied` heading after the ops. A node that was never
+    written cannot be diffed, so the change record is the only place the account
+    can live — which is where SESSION_FEED puts it ("reason is the commit
+    message"). Review labels on nodes were rejected: see the note below.
+- **Salvage** (`salvage.py`) — every terminal failure is still terminal and
+  still commits nothing, but the run's output is written out first instead of
+  being lost with the exception. The plan is applied best-effort to the bound
+  version and serialized to `logs/failed/<slug>.<utc>.<run>.error.v2.yaml`: a
+  real v2 corpus (`load` reads it, `validate.check` runs over it, the viz opens
+  it) whose YAML-comment header names the failure and lists every op that could
+  not be applied. It is written to `logs/`, which is gitignored and is **not**
+  the corpus store — `discourse-spaces/` is a separate git repo and nothing here
+  writes there. Three call sites: `IngestionRole.build_plan` catches
+  `FindingShapeError` (no ops exist yet, so only the raw finding is written) and
+  `PlanError` (full corpus + finding); `Role._execute` catches `ValidationFailed`
+  and writes the session's own `current_version`, the completed graph that
+  I1-I10 rejected. A dangling `Existing` id is deliberately kept in the salvaged
+  graph so the error file shows I3 failing at that id rather than hiding it.
+  Salvage failures are swallowed (`capture`) — a diagnostic must never mask the
+  error it is diagnosing.
 - **Harness entry** (`run.py`) — wires config → guard + session → the role and
   hands it `(url, document_text)`; `main` is a thin CLI. Model and iteration cap
   come from `guard_config.toml`. The role commits onto main (the store's only

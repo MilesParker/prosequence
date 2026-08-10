@@ -17,7 +17,7 @@ import types
 os.environ.setdefault("PROSEQUENCE_TRACE", "0")  # no exporter during tests
 
 from prosequence.tests.test_1d import fresh_store, CORPUS
-from prosequence.core.session import Session
+from prosequence.core.session import Session, ValidationFailed
 from prosequence.core.guarded_client import GuardConfig, GuardedClient
 from prosequence.roles.ingestion import IngestionRole
 from prosequence.roles.capability import CapabilityError, check_capability
@@ -50,18 +50,37 @@ class _Resp:
         self.stop_reason = stop
 
 
+class _StreamCtx:
+    """The context manager `messages.stream(...)` returns — the surface the
+    guard requires of an injected client (see guarded_client.create). Nothing
+    here produces deltas because nothing there consumes them: the accumulated
+    final message is the whole contract."""
+
+    def __init__(self, resp):
+        self._resp = resp
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        return False
+
+    def get_final_message(self):
+        return self._resp
+
+
 class StubClient:
     """Fake Anthropic client returning scripted responses (content + usage)."""
 
     def __init__(self, script):
         self._script = list(script)
         self.calls = 0
-        self.messages = self  # so `client.messages.create(...)` resolves here
+        self.messages = self  # so `client.messages.stream(...)` resolves here
 
-    def create(self, **kwargs):
+    def stream(self, **kwargs):
         r = self._script[self.calls]
         self.calls += 1
-        return r
+        return _StreamCtx(r)
 
 
 def _cfg(tmp, model="stub-model", iteration_cap=15):
@@ -338,8 +357,84 @@ def check_iteration_cap_forces_apply():
     return ok, f"calls={stub.calls} iterations={iters} apply_outcome={raised or 'ops'}"
 
 
+def check_repair_drops_only_violators():
+    """A finding that violates I2, I5 and I6 commits anyway, minus exactly the
+    three inferences at fault — and every claim survives.
+
+    Built against the real corpus rather than a hand-made graph so the
+    invariants fire the way they do in production: I5 needs an attributive
+    claim to conclude, I2 a terminal one, and I6 a genuine two-step cycle.
+    """
+    store, dst = fresh_store()
+    session = Session(store, CORPUS)
+    bound = session.bound_version
+
+    attributive = next(c.id for c in bound.claims if c.attribution is not None)
+    terminal = next(c.id for c in bound.claims if c.terminal)
+    plain = next(c.id for c in bound.claims
+                 if not c.terminal and c.attribution is None)
+
+    def claim(key, tag, attributive=True):
+        # Attributive iff it is only ever used as grounds. The two cycle claims
+        # must be concludable, and I5 forbids concluding an attributive claim —
+        # make them attributive and I5 fires on both cycle edges before I6 can
+        # ever form, which is not the invariant this check is aiming at.
+        c = {"key": key, "tag": tag, "text": f"Text for {key}.",
+             "terminal": False}
+        if attributive:
+            c["attribution"] = {"source": {"type": "Citation",
+                                           "reference": "http://x"},
+                                "quote": None}
+        return c
+
+    def inf(grounds, target, descr):
+        return {"grounds": grounds, "warrants": [], "target": target,
+                "relation": "concludes", "scheme": "Unknown",
+                "schemeDescriptor": descr}
+
+    finding = {
+        "claims": [claim("ok", "Repair ok claim"),
+                   claim("cyc_a", "Repair cycle a", attributive=False),
+                   claim("cyc_b", "Repair cycle b", attributive=False)],
+        "inferences": [
+            inf(["ok"], plain, "valid, must survive"),          # legal
+            inf(["ok"], attributive, "I5 violation"),           # concludes attributive
+            inf(["ok"], terminal, "I2 violation"),              # concludes terminal
+            inf(["cyc_a"], "cyc_b", "I6 half one"),             # cyc_a -> cyc_b
+            inf(["cyc_b"], "cyc_a", "I6 half two"),             # cyc_b -> cyc_a
+        ],
+    }
+
+    role = IngestionRole(
+        guard=GuardedClient(StubClient([]), _cfg(dst), CORPUS,
+                            token_log=os.path.join(dst, "tok.jsonl")),
+        session=session, model="stub-model", iteration_cap=5)
+
+    plan = role.build_plan(finding)          # runs ops -> check_plan -> repair
+    notes = role._repair_notes
+
+    kept_infs = sum(1 for op in plan if isinstance(op, AddInference))
+    kept_claims = sum(1 for op in plan if isinstance(op, AddClaim))
+    # "op[N] ... dropped: I6 — cycle in concludes graph: a -> b -> a" — split on
+    # the marker, not on ": ", which also appears inside the cycle message.
+    invs = sorted(n.split("dropped: ")[1].split(" — ")[0] for n in notes)
+
+    execute(session, plan, role.capability)
+    committed = True
+    try:
+        session.commit("repair test")
+    except ValidationFailed:
+        committed = False
+
+    ok = (kept_claims == 3 and kept_infs == 2 and len(notes) == 3
+          and invs == ["I2", "I5", "I6"] and committed)
+    return ok, (f"claims_kept={kept_claims}/3 inferences_kept={kept_infs}/5 "
+                f"dropped={invs} commits={committed}")
+
+
 CHECKS = [
     ("ingestion role runs end to end (corpus in prompt -> finding -> apply -> commit)", check_end_to_end),
+    ("repair drops only the violating inferences, keeps every claim", check_repair_drops_only_violators),
     ("injection lands commit on its own branch, rewinds main", check_lands_on_branch),
     ("capability + role_prompt declared (op types)", check_capability_declared),
     ("system prompt composes operations + role halves", check_system_prompt_composed),

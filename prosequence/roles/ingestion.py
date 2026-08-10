@@ -31,10 +31,12 @@ from __future__ import annotations
 
 from langchain_core.messages import HumanMessage
 
-from .apply import FINDING_TOOL_SCHEMA, plan_from_finding
+from . import salvage
+from .apply import FINDING_TOOL_SCHEMA, FindingShapeError, ops_from_finding
 from .corpus_view import render_corpus
-from .plan import AddClaim, AddInference, Op
+from .plan import AddClaim, AddInference, Op, PlanError, check_plan
 from .prompts import INGESTION
+from .repair import Unrepairable, repair_plan
 from .role import Role
 from .state import RoleState
 
@@ -65,12 +67,70 @@ class IngestionRole(Role):
         return FINDING_TOOL_SCHEMA
 
     def build_plan(self, finding: dict) -> tuple[Op, ...]:
+        """Finding -> checked plan, salvaging the work if the check refuses it.
+
+        Both failures here are terminal and stay terminal: nothing is committed,
+        and the exception propagates unchanged. What changes is that the run's
+        output no longer evaporates with it — the plan the model asked for is
+        written out as an error corpus under `logs/failed/` first (see
+        `salvage`). That is the difference between diagnosing a bad finding by
+        reading a graph and diagnosing it by re-running the ingestion.
+
+        The two failures salvage differently because they leave different
+        amounts behind: a malformed FIELD (`FindingShapeError`) yields no ops at
+        all, so only the raw finding can be written; a malformed PLAN
+        (`PlanError`) yields a full op list, which becomes a corpus.
+        """
         # `Existing` refs are checked against the bound version: no write has
         # happened yet at plan time, so it is also the current one.
         known = frozenset(
             n.id for n in (*self.session.bound_version.claims,
                            *self.session.bound_version.inferences))
-        return plan_from_finding(finding, known)
+
+        try:
+            plan = ops_from_finding(finding)
+        except FindingShapeError as exc:
+            salvage.capture(
+                lambda: salvage.write_finding_only(
+                    corpus_file=self.session.name, run_id=self.guard.run_id,
+                    stage="finding shape", error=exc, finding=finding),
+                label="finding")
+            raise
+
+        try:
+            check_plan(plan, known)
+        except PlanError as exc:
+            corpus, notes = salvage.salvage_corpus(
+                self.session.bound_version, plan)
+            salvage.capture(
+                lambda: salvage.write_error_corpus(
+                    corpus, corpus_file=self.session.name,
+                    run_id=self.guard.run_id, stage="plan check", error=exc,
+                    bound_head=self.session.bound_head, notes=notes,
+                    finding=finding),
+                label="error corpus")
+            raise
+
+        # Drop the inferences that would fail I1-I10, keeping the rest, so three
+        # bad edges do not cost 45 claims. Nothing is written yet: this rewrites
+        # the plan, and the session still executes and commits exactly once.
+        # A graph that no drop can fix (`Unrepairable`) fails as it did before.
+        try:
+            plan, notes = repair_plan(self.session.bound_version, plan)
+            self._repair_notes = tuple(notes)
+        except Unrepairable as exc:
+            corpus, notes = salvage.salvage_corpus(
+                self.session.bound_version, plan)
+            salvage.capture(
+                lambda: salvage.write_error_corpus(
+                    corpus, corpus_file=self.session.name,
+                    run_id=self.guard.run_id, stage="repair", error=exc,
+                    bound_head=self.session.bound_head, notes=notes,
+                    finding=finding),
+                label="error corpus")
+            raise
+
+        return plan
 
     # -- run parameter -----------------------------------------------------
 

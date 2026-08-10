@@ -53,6 +53,8 @@ from __future__ import annotations
 from langgraph.graph import StateGraph, START, END
 from langgraph.prebuilt import ToolNode
 
+from ..core.session import ValidationFailed
+from . import salvage
 from .bridge import from_anthropic, to_anthropic
 from .capability import validate_capability
 from .plan import Op, execute
@@ -88,9 +90,27 @@ class Role:
     capability: tuple[type[Op], ...] = ()
     role_prompt: str = ""
 
+    # What the apply step decided not to write, recorded for the commit message.
+    # A class-level default so a role that never repairs needs no constructor
+    # ceremony, and `_execute` can read it unconditionally.
+    _repair_notes: tuple = ()
+
     # Per-call output ceiling. A deliberate constant, not a config knob (config
     # supplies model + iteration cap); a subclass may override.
-    MAX_TOKENS = 8192
+    #
+    # It has to be generous for a single-shot role: at 8192 an ingestion run
+    # spent 7990 tokens emitting claims and then closed the finding tool call
+    # with an EMPTY inferences array. That is not truncation — `stop_reason` was
+    # not `max_tokens`, so nothing here caught it — it is a complete,
+    # well-formed, entirely unattached finding, which surfaced two layers down
+    # as a PlanError about orphaned claims and read like a modelling mistake
+    # rather than a budget one.
+    #
+    # The ceiling this can be raised to is the model's (128K on the current
+    # Sonnet and Opus), not the transport's — `guarded_client` streams, so there
+    # is no wall-clock limit on the request to trip. A non-streaming call would
+    # cap this at ~21,333 whatever the model allows.
+    MAX_TOKENS = 32 * 1024
 
     def __init__(self, *, guard, session, model: str, iteration_cap: int,
                  max_tokens: int | None = None):
@@ -162,13 +182,34 @@ class Role:
         caller-authored rendering — the previous `ops` key was exactly that, and
         it was both staler (it could not resolve a target's tag against the
         final version) and unread: the CLI prints `op_lines`.
+
+        A failed commit is salvaged, not just reported. `ValidationFailed` is
+        the most expensive failure in the harness: the model answered, the plan
+        checked out, every op ran, and the completed graph is discarded on
+        I1-I10. That graph is exactly what someone needs to read to understand
+        which invariant it broke and why, so it is written out under
+        `logs/failed/` before the exception propagates. This is generic — every
+        role commits — which is why it lives here rather than in a subclass.
         """
         final_state = self._graph.invoke(init_state)
         plan = tuple(final_state["plan"])
         iterations = final_state["iterations"]
 
         diff = self.session.diff()
-        sha = self.session.commit(commit_summary)
+        try:
+            sha = self.session.commit(commit_summary, self._repair_notes)
+        except ValidationFailed as exc:
+            # `current_version` survives the failed commit: the session closes
+            # on any outcome, but the version it would have written is still
+            # bound to it, and this is the only chance to read it.
+            salvage.capture(
+                lambda: salvage.write_error_corpus(
+                    self.session.current_version,
+                    corpus_file=self.session.name, run_id=self.guard.run_id,
+                    stage="commit validation", error=exc,
+                    bound_head=self.session.bound_head),
+                label="error corpus")
+            raise
 
         return {
             "sha": sha,
