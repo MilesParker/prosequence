@@ -58,7 +58,7 @@ premise, not a failing step). `Unknown` is a real move none of the other
 values names — a classification, not a gap — and `Inference.schemeDescriptor:
 string | null` names that move in a few words. The descriptor classifies and
 nothing else goes in it; it is not a note field. The Python mirror is
-`yaml_io.ArgumentScheme`, a plain `Enum` for the same reason `Relation` is
+`types.ArgumentScheme`, a plain `Enum` for the same reason `Relation` is
 one, constructed at the parse boundary and emitted as `.value`.
 
 **Positions, not types.** "Proposition", "terminal", "warrant", "grounds",
@@ -209,10 +209,28 @@ ones and `terminal` on the bedrock ones), a `roots` list, and an
 `inferences` list whose `grounds`/`warrants`/`target`/`relation` fields
 encode all the connective tissue.
 
+## Schema mirror (`prosequence/core/types.py`)
+
+`types.py` is the Python mirror of `src/types.ts`, and holds nothing but
+declarations — the branded ids, the enums (`ArgumentScheme`, `Relation`), the
+closed-set tuples (`GROUNDS_SOURCE_TYPES`, `SUBMISSION_STATUSES`), the frozen
+dataclasses, and the `*_KEYS` declaration-order tuples. It is written to be read
+beside `types.ts`: same section order, same declaration order, same names where
+Python allows. `yaml_io.py` imports these and re-exports them, so existing
+`from ..core.yaml_io import Claim` call sites still resolve.
+
+The file ends with a **Known divergences** block enumerating every deliberate
+difference from `types.ts` — `Corpus` vs `DiscourseSpace`, id fields typed
+`str` rather than the branded `NewType`s declared above them, `GroundsSource`
+flattened from a discriminated union, `submissionStatus` unconstrained, arrays
+as tuples, and the invariants `Inference.__post_init__` enforces beyond what
+`types.ts` states. Anything differing that is *not* on that list is drift.
+
 ## Canonical corpus I/O (`prosequence/core/yaml_io.py`, `prosequence/scripts/canonicalize.py`)
 
 `yaml_io.py` is the canonical load/serialize pair: `load(path_or_text)`
-parses a corpus with `yaml.safe_load` and casts it into frozen dataclasses
+parses a corpus with `yaml.safe_load` and casts it into the frozen dataclasses
+declared in `types.py`
 (`Corpus`, `Definition`, `Claim`, `Inference`, `Attribution`, `GroundsSource`),
 and `serialize(corpus)` emits the corpus back to YAML. Same graph, same bytes —
 so a commit diff shows exactly the nodes that changed. (The module is named
@@ -349,7 +367,7 @@ pass the session calls at commit); `validate(path)` wraps it for the CLI,
 unchanged. It reads raw YAML, so it string-compares relations against
 `{r.value for r in Relation}` (reporting a bad one as I1) rather than
 constructing the enum and raising. `Relation` (the `concludes`/`contests` enum
-mirroring `src/types.ts`) lives with the model in `yaml_io.py`; ops, the
+mirroring `src/types.ts`) lives with the model in `types.py`; ops, the
 session, and the validator import it rather than redefine it.
 
 ## Stop controls (`prosequence/core/guarded_client.py`, `prosequence/guard_config.toml`, token log)

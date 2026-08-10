@@ -19,7 +19,12 @@ list up front. No proxy, no name mirror, no strings.
 """
 from __future__ import annotations
 
-from typing import Sequence
+from typing import TYPE_CHECKING, Sequence
+
+if TYPE_CHECKING:
+    # Import for annotations only: plan.py imports this module at runtime, so a
+    # real import here would be circular.
+    from .plan import Op
 
 
 class CapabilityError(RuntimeError):
@@ -32,7 +37,7 @@ class CapabilityError(RuntimeError):
     """
 
 
-def validate_capability(capability: Sequence[type]) -> None:
+def validate_capability(capability: Sequence[type["Op"]]) -> None:
     """Every entry names an op type. Checked when a role is constructed, so a
     malformed declaration fails at startup rather than silently matching
     nothing at apply — the failure mode a bare containment check would
@@ -47,7 +52,7 @@ def validate_capability(capability: Sequence[type]) -> None:
             f"capability governs session writes only")
 
 
-def check_capability(plan: Sequence, capability: Sequence[type]) -> None:
+def check_capability(plan: Sequence["Op"], capability: Sequence[type["Op"]]) -> None:
     """Refuse a plan containing any op outside `capability`. Runs over the whole
     plan before the first write, so refusal leaves the session untouched."""
     held = tuple(capability)

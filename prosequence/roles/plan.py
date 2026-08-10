@@ -51,16 +51,13 @@ moment a third op does both.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Generic, NewType, Optional, Sequence, TypeVar, Union
+from typing import Generic, Optional, Sequence, TypeVar, Union
 
-from ..core.yaml_io import ArgumentScheme, Attribution, Relation
+# The branded ids are declared once, in the model mirror, and imported here —
+# not redefined. The model's own dataclasses do not yet use them (see "Known
+# divergences" in types.py); this op layer does.
+from ..core.types import ArgumentScheme, Attribution, ClaimId, InferenceId, Relation
 from .capability import check_capability
-
-# Branded ids, mirroring src/types.ts. NewType is erased at runtime and checked
-# by the type checker, so this costs nothing and catches a ClaimId used where an
-# InferenceId belongs.
-ClaimId = NewType("ClaimId", str)
-InferenceId = NewType("InferenceId", str)
 
 T = TypeVar("T")
 T_co = TypeVar("T_co", covariant=True)
@@ -249,7 +246,7 @@ def check_plan(plan: Sequence[Op], known_ids: frozenset) -> None:
         raise PlanError("; ".join(problems))
 
 
-def execute(session, plan: Sequence[Op], capability: Sequence[type]) -> tuple:
+def execute(session, plan: Sequence[Op], capability: Sequence[type[Op]]) -> tuple:
     """Run a plan against the session, returning the ops executed.
 
     Capability is checked across the WHOLE plan first, so a plan containing one

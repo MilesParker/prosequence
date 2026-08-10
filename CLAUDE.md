@@ -5,8 +5,8 @@ edge roles (Grounds, Warrants, Concludes, Contests).
 
 ## Scope
 
-Your scope is the visualization app, the build, validate.py, and
-Design.md.
+Your scope is the entire codebase — viz app, build, and the whole
+Python harness — except the graph model itself.
 
 The model is not yours to change. src/types.ts and
 discourse-spaces/*.v2.yaml are edited only on explicit instruction —
@@ -33,6 +33,7 @@ src/viz/            graph view, focus view, shared indices
 src/types.ts        canonical schema (change only on instruction)
 discourse-spaces/   <slug>.v2.yaml corpora (change only on instruction)
 prosequence/           all Python: core/ (model, session, store, validate, guard), roles/ (role protocol), scripts/
+prosequence/core/types.py      Python mirror of src/types.ts (declarations only)
 prosequence/core/validate.py   invariants
 logs/               runtime token log (gitignored, auto-created)
 
