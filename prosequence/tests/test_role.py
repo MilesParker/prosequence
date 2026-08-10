@@ -189,12 +189,46 @@ def check_lands_on_branch():
 
 def check_capability_declared():
     """Ingestion declares exactly AddClaim + AddInference as op TYPES (not
-    method-name strings); objective is prose."""
+    method-name strings), and a non-empty role_prompt."""
     ok = (IngestionRole.capability == (AddClaim, AddInference)
-          and isinstance(IngestionRole.objective, str)
-          and IngestionRole.objective.strip().startswith("You are ingesting"))
+          and isinstance(IngestionRole.role_prompt, str)
+          and IngestionRole.role_prompt.strip() != "")
     return ok, (f"capability={[c.__name__ for c in IngestionRole.capability]} "
-                f"objective_len={len(IngestionRole.objective)}")
+                f"role_prompt_len={len(IngestionRole.role_prompt)}")
+
+
+def check_system_prompt_composed():
+    """The system prompt is OPERATIONS then the role's own half, composed by the
+    base class. Asserted structurally, not on wording, so replacing either half
+    does not break the test — what must hold is that BOTH reach the model and
+    that a role declaring no prompt fails loudly rather than silently shipping
+    the shared half alone."""
+    from prosequence.roles.prompts import INGESTION, OPERATIONS
+
+    store, dst = fresh_store()
+    session = Session(store, CORPUS)
+    tmp = tempfile.mkdtemp(prefix="role-prompt-")
+    guard = GuardedClient(StubClient([]), _cfg(tmp), CORPUS,
+                          token_log=os.path.join(tmp, "tok.jsonl"))
+    role = IngestionRole(guard=guard, session=session,
+                         model="stub-model", iteration_cap=15)
+    rendered = role.system_prompt()
+    both = OPERATIONS in rendered and INGESTION in rendered
+    ordered = rendered.index(OPERATIONS) < rendered.index(INGESTION)
+
+    # A role with no role_prompt must raise, not ship OPERATIONS by itself.
+    class _Bare(IngestionRole):
+        role_prompt = ""
+    raised = False
+    try:
+        _Bare(guard=guard, session=session, model="stub-model",
+              iteration_cap=15).system_prompt()
+    except NotImplementedError:
+        raised = True
+
+    ok = both and ordered and raised
+    return ok, (f"both_halves={both} operations_first={ordered} "
+                f"empty_role_prompt_raises={raised} chars={len(rendered)}")
 
 
 def check_capability_refuses_whole_plan():
@@ -307,7 +341,8 @@ def check_iteration_cap_forces_apply():
 CHECKS = [
     ("ingestion role runs end to end (corpus in prompt -> finding -> apply -> commit)", check_end_to_end),
     ("injection lands commit on its own branch, rewinds main", check_lands_on_branch),
-    ("capability + objective declared (op types)", check_capability_declared),
+    ("capability + role_prompt declared (op types)", check_capability_declared),
+    ("system prompt composes operations + role halves", check_system_prompt_composed),
     ("capability refuses whole plan, writes nothing", check_capability_refuses_whole_plan),
     ("capability rejects non-Op entries", check_capability_rejects_non_op),
     ("plan rejects unresolvable refs and orphan bindings", check_plan_rejects_bad_refs),

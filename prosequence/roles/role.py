@@ -28,19 +28,25 @@ enforces the shape, so `apply_node` reads the tool call's `input` directly —
 there is no fenced-JSON-in-prose format to go missing or truncate.
 
 Two class attributes DECLARE a role:
-  * `capability` — the op TYPES the role holds (`plan.Op` subclasses). Checked
+  * `capability`  — the op TYPES the role holds (`plan.Op` subclasses). Checked
     across the whole plan before the first write, never by prompt instruction.
-  * `objective`  — the mission prose the subclass folds into its system prompt.
+  * `role_prompt` — this role's half of the system prompt: its job, its input,
+    its finding contract. The other half is `prompts.OPERATIONS`, shared by
+    every role, and `system_prompt()` composes the two. A subclass supplies
+    prose and never assembles it, so a rule that belongs to the corpus rather
+    than to one role is written once.
 
 Apply is two steps, and only the second touches the corpus: `build_plan` turns
 the finding into a list of ops (pure, no session), `plan.execute` runs it. A
 role that overreaches fails at the capability check with nothing written.
 
-Extension points: `build_tools`, `system_prompt`, `finding_tool`, `build_plan`,
-and `cached_context`. The last is a seam ingestion needs and a tool-driven role
-does not — a role that must put bulk data in front of the model up front (a full
+Extension points: `build_tools`, `finding_tool`, `build_plan`, and
+`cached_context`. The last is a seam ingestion needs and a tool-driven role does
+not — a role that must put bulk data in front of the model up front (a full
 corpus snapshot) overrides it; the harness appends it as its own cached system
-block.
+block. `system_prompt` is deliberately NOT an extension point: it is concrete,
+and a subclass overrides it only to change how the two halves compose, never to
+supply content.
 """
 from __future__ import annotations
 
@@ -50,6 +56,7 @@ from langgraph.prebuilt import ToolNode
 from .bridge import from_anthropic, to_anthropic
 from .capability import validate_capability
 from .plan import Op, execute
+from .prompts import OPERATIONS
 from .state import RoleState
 
 
@@ -79,7 +86,7 @@ class FindingCallError(RuntimeError):
 class Role:
     # -- declaration (subclasses set these) --------------------------------
     capability: tuple[type[Op], ...] = ()
-    objective: str = ""
+    role_prompt: str = ""
 
     # Per-call output ceiling. A deliberate constant, not a config knob (config
     # supplies model + iteration cap); a subclass may override.
@@ -107,8 +114,19 @@ class Role:
         raise NotImplementedError
 
     def system_prompt(self) -> str:
-        """The system prompt (folds in `objective`)."""
-        raise NotImplementedError
+        """The operations prompt, then this role's own.
+
+        Concrete, not a hook: composing the two halves is harness business, and
+        a role that assembled its own would be free to drop the shared half.
+        Rendered as ONE cached system block — splitting it so OPERATIONS caches
+        separately across roles is a change to `call_node`, and only worth
+        making if OPERATIONS alone clears the model's minimum cacheable prefix.
+        """
+        if not self.role_prompt:
+            raise NotImplementedError(
+                f"{type(self).__name__} declares no role_prompt; set it to the "
+                f"role's prompt constant (see roles/prompts/)")
+        return f"{OPERATIONS}\n\n{self.role_prompt}"
 
     def cached_context(self) -> str | None:
         """Large, stable reference context to place in front of the model as its

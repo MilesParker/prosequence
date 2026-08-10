@@ -19,9 +19,11 @@ come. The finding itself is a forced tool call (see `role.py`), not text: the
 API enforces the shape, so there is nothing here to parse.
 
 Declaration is two class attributes:
-  * `capability` — the write ops the role holds. Enforced at apply, never by
+  * `capability`  — the write ops the role holds. Enforced at apply, never by
     prompt instruction.
-  * `objective`  — the mission prose, folded into the system prompt.
+  * `role_prompt` — ingestion's half of the system prompt (roles/prompts/
+    ingestion.py). `Role.system_prompt` prepends the shared operations prompt;
+    this role does not assemble either one.
 
 Model and iteration cap are supplied by the caller (from config).
 """
@@ -32,7 +34,7 @@ from langchain_core.messages import HumanMessage
 from .apply import FINDING_TOOL_SCHEMA, plan_from_finding
 from .corpus_view import render_corpus
 from .plan import AddClaim, AddInference, Op
-from .prompt import OBJECTIVE, SYSTEM_PROMPT
+from .prompts import INGESTION
 from .role import Role
 from .state import RoleState
 
@@ -44,7 +46,7 @@ class IngestionRole(Role):
     # different role's business, and a plan containing that op is refused here
     # before any of it runs.
     capability: tuple[type[Op], ...] = (AddClaim, AddInference)
-    objective: str = OBJECTIVE
+    role_prompt: str = INGESTION
 
     # -- subclass hooks ----------------------------------------------------
 
@@ -58,9 +60,6 @@ class IngestionRole(Role):
         # and cached as its own system block. Reads uncommitted writes are
         # irrelevant here — a single call, no writes precede it.
         return render_corpus(self.session.bound_version)
-
-    def system_prompt(self) -> str:
-        return SYSTEM_PROMPT
 
     def finding_tool(self) -> dict:
         return FINDING_TOOL_SCHEMA

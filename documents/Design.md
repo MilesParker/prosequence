@@ -429,7 +429,8 @@ role so far (promoted from the round-trip spike).
   The `cached_context` hook lets a role place bulk stable data (a corpus
   snapshot) in front of the model as its own cached system block. Two class
   attributes **declare** a role: `capability` (the write ops it holds) and
-  `objective` (mission prose for the system prompt). **Truncation is terminal**:
+  `role_prompt` (its half of the system prompt; `system_prompt()` is concrete
+  and prepends the shared `OPERATIONS` half). **Truncation is terminal**:
   `call` inspects the raw response and raises `TruncatedResponseError` on
   `stop_reason == "max_tokens"`. A finding cut off mid-emission is a partial
   finding that cannot be told from a complete one by inspection, so the run
@@ -444,6 +445,15 @@ role so far (promoted from the round-trip spike).
   Capability is `(AddClaim, AddInference)` — `ReviseClaim` is deliberately
   withheld: ingestion is additive, adding nodes and reusing existing uuids, and
   never changes the text of a claim already in the corpus.
+- **Prompts** (`prompts/`) — prose only, no logic. Every role's system prompt is
+  two pieces, composed by `Role.system_prompt`: `operations.OPERATIONS` (shared
+  by every role — the model and the corpus discipline) followed by that role's
+  own `role_prompt` (its job, its input, its finding contract). The split is the
+  editing boundary: a rule that holds for contest and revise as much as for
+  ingestion is written once in `operations.py`; anything naming a specific
+  role's tool, capability, or input lives in that role's module. Adding a role
+  means adding one module here and setting `role_prompt` on the subclass —
+  `system_prompt` is concrete on the base class, so no role assembles its own.
 - **Ops and plans** (`plan.py`) — a session write is an object: a frozen
   dataclass generic in what applying it yields (`AddClaim(Op[ClaimId])`,
   `AddInference(Op[InferenceId])`, `ReviseClaim(Op[None])`). A plan is a list of
@@ -467,7 +477,7 @@ role so far (promoted from the round-trip spike).
   (`render_corpus` — the whole corpus as JSON Lines for ingestion's cached
   context block), `read_tools.py` (the read-only tool surface over session
   queries — unused by ingestion now, retained for interaction-shaped roles),
-  `prompt.py` (objective + YAML generation rules + finding contract), `apply.py`
+  `prompts/` (prompt prose, one module per prompt — see below), `apply.py`
   (finding parse + field gates + finding→plan translation; it performs no
   writes), `plan.py` (the ops themselves and plan execution).
 - **The tool boundary** (`apply.py`) — `tool_choice` forces *which* tool is
