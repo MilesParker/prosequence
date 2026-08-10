@@ -43,18 +43,34 @@ def _claim_line(c: Claim, roots: frozenset) -> dict:
 
 
 def _inference_line(i: Inference) -> dict:
-    return {
+    d = {
         "kind": "inference",
         "id": i.id,
         "grounds": list(i.grounds),
         "warrants": list(i.warrants),
         "target": i.target,
         "relation": i.relation.value,
+        # `scheme` is REQUIRED on every inference the model submits, so the
+        # corpus has to show how existing ones are classified — otherwise the
+        # model is asked to classify each inferential move with no in-context
+        # example of how this corpus draws the distinctions, working only from
+        # the enum description in the tool schema.
+        "scheme": i.scheme.value,
     }
+    if i.schemeDescriptor is not None:
+        # Present iff scheme is Unknown (I9). Shown because it is the only
+        # place the corpus records what an unnamed move actually was.
+        d["schemeDescriptor"] = i.schemeDescriptor
+    return d
 
 
 def render_corpus(corpus: Corpus) -> str:
     """The whole corpus as JSON Lines: every claim, then every inference.
+
+    An inference line carries its `scheme` (and `schemeDescriptor` when the
+    scheme is Unknown), because `scheme` is required on every inference the
+    model submits — a corpus rendered without it asks the model to classify
+    moves it has never seen classified.
 
     One node per line so the block is a clean, cacheable prefix. A root claim
     carries `"root": true` — the only marker distinguishing it from any other

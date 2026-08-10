@@ -78,8 +78,11 @@ def build_read_tools(session) -> tuple[list, list[dict]]:
     """Return (langchain tools for ToolNode, Anthropic tool schemas).
 
     The two lists describe the same surface: LangChain tool objects for
-    dispatch, hand-written Anthropic `input_schema` dicts for the API call
-    (langchain_core 1.5 has no convert_to_anthropic_tool helper).
+    dispatch, Anthropic tool dicts for the API call (langchain_core 1.5 has no
+    convert_to_anthropic_tool helper). Each description is written ONCE, as the
+    tool's docstring, and read off the LangChain object when the schema is
+    built; only `input_schema` is hand-written here, and a tool without one
+    raises rather than silently dropping out of the API surface.
     """
 
     @tool
@@ -132,24 +135,34 @@ def build_read_tools(session) -> tuple[list, list[dict]]:
         props = {n: {"type": "string"} for n in names}
         return {"type": "object", "properties": props, "required": list(names)}
 
+    # Only the input_schema is hand-written. The DESCRIPTION the model reads is
+    # the tool's own docstring, taken from the LangChain object — previously
+    # this list carried a second, hand-maintained copy of each description, and
+    # the two had already drifted (`get_all_tags` said "call this first" here
+    # and "start here to see what already exists" in the docstring). One tool,
+    # one description: edit the docstring above.
+    _schemas = {
+        "get_all_tags": {"type": "object", "properties": {}, "required": []},
+        "get": _id_schema("id"),
+        "neighborhood": {"type": "object",
+                         "properties": {"id": {"type": "string"},
+                                        "hops": {"type": "integer"}},
+                         "required": ["id", "hops"]},
+        "concludes": _id_schema("id"),
+        "contesting": _id_schema("id"),
+        "grounds_citing": _id_schema("id"),
+        "warrants_citing": _id_schema("id"),
+    }
+    missing = {t.name for t in lc_tools} ^ set(_schemas)
+    if missing:
+        raise RuntimeError(
+            f"read-tool surface mismatch: no input_schema/tool pairing for "
+            f"{sorted(missing)}")
+
     anthropic_schemas = [
-        {"name": "get_all_tags",
-         "description": "List every claim in the corpus as (id, tag). The entry point: call this first.",
-         "input_schema": {"type": "object", "properties": {}, "required": []}},
-        {"name": "get", "description": "Fetch one node (claim or inference) by uuid.",
-         "input_schema": _id_schema("id")},
-        {"name": "neighborhood", "description": "Nodes within `hops` undirected edges of `id`.",
-         "input_schema": {"type": "object",
-                          "properties": {"id": {"type": "string"}, "hops": {"type": "integer"}},
-                          "required": ["id", "hops"]}},
-        {"name": "concludes", "description": "Inferences that conclude `id`.",
-         "input_schema": _id_schema("id")},
-        {"name": "contesting", "description": "Inferences that contest `id`.",
-         "input_schema": _id_schema("id")},
-        {"name": "grounds_citing", "description": "Inferences citing `id` in grounds.",
-         "input_schema": _id_schema("id")},
-        {"name": "warrants_citing", "description": "Inferences citing `id` in warrants.",
-         "input_schema": _id_schema("id")},
+        {"name": t.name, "description": t.description,
+         "input_schema": _schemas[t.name]}
+        for t in lc_tools
     ]
 
     return lc_tools, anthropic_schemas
