@@ -9,6 +9,7 @@ enforced at apply, not by the prompt.
 """
 from __future__ import annotations
 
+import json
 import os
 import sys
 import tempfile
@@ -358,6 +359,51 @@ def check_plan_rejects_bad_refs():
     return ok, " ".join(f"{k}={v}" for k, v in results.items())
 
 
+def check_finding_split_across_both_fields():
+    """A finding the model serialized into BOTH fields as separate JSON strings
+    keeps all of it. Observed three times on large findings: `claims` arrives as
+    a string wrapping `{"claims": [...], "inferences": []}` while `inferences`
+    arrives as its own string wrapping the real inferences. Superseding on the
+    first decoded wrapper took the nested EMPTY list and silently dropped 40, 19
+    and 18 inferences across three runs — each surfacing as check_plan reporting
+    that no claim was attached, which read as a model failure and was ours."""
+    from prosequence.roles.apply import _normalize_finding
+
+    claim = {"key": "c1", "tag": "T", "text": "x", "terminal": False}
+    inf = {"grounds": ["c1"], "target": "u", "relation": "concludes",
+           "scheme": "Deductive"}
+    results = {}
+
+    split = {"claims": json.dumps({"claims": [claim], "inferences": []}),
+             "inferences": json.dumps({"inferences": [inf]})}
+    got = _normalize_finding(split)
+    results["split_keeps_both"] = (len(got["claims"]) == 1
+                                   and len(got["inferences"]) == 1)
+
+    # The shapes that already worked must keep working.
+    plain = {"claims": [claim], "inferences": [inf]}
+    got = _normalize_finding(plain)
+    results["plain_unchanged"] = (got["claims"] == [claim]
+                                  and got["inferences"] == [inf])
+
+    whole = {"claims": json.dumps({"claims": [claim], "inferences": [inf]})}
+    got = _normalize_finding(whole)
+    results["whole_nested_recovered"] = (len(got["claims"]) == 1
+                                         and len(got["inferences"]) == 1)
+
+    arrays = {"claims": json.dumps([claim]), "inferences": json.dumps([inf])}
+    got = _normalize_finding(arrays)
+    results["stringified_arrays"] = (len(got["claims"]) == 1
+                                     and len(got["inferences"]) == 1)
+
+    # A genuinely empty inference list stays empty rather than being invented.
+    empty = {"claims": [claim], "inferences": []}
+    results["empty_stays_empty"] = _normalize_finding(empty)["inferences"] == []
+
+    ok = all(results.values())
+    return ok, " ".join(f"{k}={v}" for k, v in results.items())
+
+
 def check_iteration_cap_forces_apply():
     """With the cap set to 1, a tool-calling role is forced to apply after one
     turn. Exercises the shared harness cap via a minimal looping role, since
@@ -471,6 +517,7 @@ CHECKS = [
     ("capability refuses whole plan, writes nothing", check_capability_refuses_whole_plan),
     ("capability rejects non-Op entries", check_capability_rejects_non_op),
     ("plan rejects unresolvable refs and orphan bindings", check_plan_rejects_bad_refs),
+    ("finding split across both fields keeps all of it", check_finding_split_across_both_fields),
     ("iteration cap forces apply", check_iteration_cap_forces_apply),
 ]
 

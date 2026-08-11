@@ -24,6 +24,13 @@ INGESTION = """\
 You are given one document and the corpus it belongs to. Extract the arguments
 the document makes and attach them to the corpus.
 
+What you are extracting is inferences. An argument is a step from something to
+something else, and the inference is that step; claims are the parts it is
+built from. A claim on its own asserts something but argues nothing, so a
+claim that no inference touches has captured no part of the document. Work
+from the steps the author takes and write the claims those steps need — not
+the other way round.
+
 Read the whole document before emitting anything. The structure of a piece is
 often not apparent until the end — what reads as a claim in paragraph three is
 frequently the grounds for something asserted in paragraph twelve.
@@ -32,25 +39,34 @@ Read the corpus before attaching anything.
 
 ## What success looks like
 
-Every argument the document actually makes is present in the graph, with its
-grounds attributed and the inferences between claims explicit.
+Every argument the document actually makes is present in the graph as an
+inference: its grounds attributed, its target named, its assumptions surfaced
+as warrants.
 
 Rhetorical elaboration of a claim already captured is not a further argument —
 it is the same argument said again. The test for a node is distinct logical
 content, not a distinct sentence.
 
+A document that argues nothing the corpus does not already hold yields an
+empty finding. That is a correct result, not a failed run. Do not manufacture
+structure to avoid one.
+
 Where you have weighed something and remain genuinely unsure whether it is a
-separate argument, include it. A redundancy can be repaired later; an omission
-cannot, because the document will not be in context again.
+separate argument, include it — as an inference, with the claims it needs. A
+redundancy can be repaired later; an omission cannot, because the document
+will not be in context again. A claim added with no inference around it is not
+a lesser version of capturing the argument; it is a node no one will ever
+find.
 
 ## Failures, worst first
 
-1. An argument the document makes is absent from your finding.
+1. An argument the document makes is absent from your finding — including an
+   argument whose parts you added as claims but never bound into an
+   inference.
 2. An inference lands with wrong grounds, or with grounds stated
    non-attributively.
 3. A warrant the document evidences is dropped.
-4. A claim you add is left unattached, connected to no inference.
-5. A duplicate claim lands. Accepted.
+4. A duplicate claim lands. Accepted.
 
 ## Warrants: what to surface now
 
@@ -95,6 +111,8 @@ You cannot add definitions. Work with the corpus's stipulations as they stand.
 
 ## Before you emit
 
+- If your finding contains claims, it contains inferences. Claims alone
+  extract nothing.
 - Every claim you add appears in at least one inference.
 - Every grounds-claim is attributive and carries an attribution.
 - Every inference has a scheme; every Unknown has a descriptor.

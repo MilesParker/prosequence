@@ -215,27 +215,62 @@ def _coerce_list(value, key: str) -> list:
 
 
 def _normalize_finding(finding: dict) -> dict:
-    """Recover the two ways a large finding call has been observed to arrive
-    malformed: `claims`/`inferences` individually stringified, or the WHOLE
-    finding dumped as a JSON string into one of those two fields. The latter
-    is checked first per field — if a decoded string turns out to itself carry
-    a `claims` or `inferences` key, it IS the finding (the other field's raw
-    value, if any, is superseded, not merged: a nested full finding is
-    authoritative over a stray sibling)."""
+    """Recover a finding whose two arrays arrived JSON-encoded as strings.
+
+    The API does not validate argument values against `input_schema` (see the
+    module docstring), and on a large finding the model has been observed to
+    serialize its own output rather than emit arrays: `claims` and/or
+    `inferences` come back as strings, and a decoded string may be the bare
+    array OR a dict wrapping one or both fields.
+
+    HARVEST, NEVER SUPERSEDE. An earlier version returned the first decoded
+    dict that carried either key, on the reasoning that a nested full finding
+    was authoritative over a stray sibling. That destroyed real work: a model
+    split one finding across both fields as two independent JSON strings —
+    `claims` holding `{"claims": [57], "inferences": []}` and `inferences`
+    holding `{"inferences": [40]}` — and the early return took the nested EMPTY
+    inferences and discarded the sibling's 40. The finding was complete and
+    well-formed; it surfaced as `check_plan` reporting that none of the 57
+    claims was attached, which reads as a modelling failure and was ours.
+
+    So every field of every decoded value is examined, and each of the two
+    arrays is filled from the first non-empty candidate found for it, with a
+    field's own value preferred over one nested inside the other field's blob.
+    A field that is genuinely absent or empty everywhere stays empty.
+    """
+    def decode(key: str):
+        v = finding.get(key)
+        if not isinstance(v, str):
+            return v
+        try:
+            return json.loads(v)
+        except json.JSONDecodeError as e:
+            raise FindingShapeError(
+                f"finding[{key!r}] was a string but not valid JSON: {e}") from e
+
+    decoded = {k: decode(k) for k in ("claims", "inferences")}
+    out: dict[str, list] = {}
+
+    # Own field first: a list under `inferences` is what `inferences` means,
+    # and outranks anything found nested inside the `claims` blob.
     for k in ("claims", "inferences"):
-        v = finding.get(k)
-        if isinstance(v, str):
-            try:
-                decoded = json.loads(v)
-            except json.JSONDecodeError as e:
-                raise FindingShapeError(
-                    f"finding[{k!r}] was a string but not valid JSON: {e}") from e
-            if isinstance(decoded, dict) and ("claims" in decoded or "inferences" in decoded):
-                return {"claims": _coerce_list(decoded.get("claims"), "claims"),
-                        "inferences": _coerce_list(decoded.get("inferences"), "inferences")}
-            finding = {**finding, k: decoded}
-    return {"claims": _coerce_list(finding.get("claims"), "claims"),
-            "inferences": _coerce_list(finding.get("inferences"), "inferences")}
+        v = decoded[k]
+        if not isinstance(v, dict):
+            out[k] = _coerce_list(v, k)
+
+    # Then fill what is still missing or empty from any decoded wrapper dict,
+    # whichever field it arrived in.
+    for k in ("claims", "inferences"):
+        if out.get(k):
+            continue
+        for source in ("claims", "inferences"):
+            v = decoded[source]
+            if isinstance(v, dict) and v.get(k):
+                out[k] = _coerce_list(v.get(k), k)
+                break
+        out.setdefault(k, [])
+
+    return {"claims": out["claims"], "inferences": out["inferences"]}
 
 
 def _check_schemes(inferences: list) -> None:

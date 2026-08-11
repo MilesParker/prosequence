@@ -90,6 +90,18 @@ def _reset_main_to(store: CorpusStore, head0: str, corpus_file: str) -> None:
     repo.index.write()
 
 
+def view_url(corpus_file: str) -> str:
+    """Where to look at the result of a run.
+
+    Nothing is exported and nothing is checked out: the dev server resolves a
+    managed corpus to the newest commit touching it (see the `latestCorpus`
+    plugin in vite.config.ts), so this URL shows the run that just finished and
+    keeps showing the newest one after every run.
+    """
+    slug = corpus_file[:-len(".v2.yaml")] if corpus_file.endswith(".v2.yaml") else corpus_file
+    return f"http://localhost:5173/?model={slug}"
+
+
 def _land_on_branch(store: CorpusStore, head0: str, new_sha: str,
                     corpus_file: str) -> str:
     """Move the just-made commit off main onto its own branch and rewind main to
@@ -226,6 +238,7 @@ def _ingest_into(store: CorpusStore, head0: str, corpus_file: str,
     # The role committed onto main (the store's only ref); land it on its own
     # branch and rewind main, in the injection's own git.
     report["branch"] = _land_on_branch(store, head0, report["sha"], corpus_file)
+    report["view"] = view_url(corpus_file)
     return report
 
 
@@ -332,6 +345,7 @@ def main(argv: list[str]) -> int:
     report = run(reference, document_text)
     print(f"commit:     {report['sha']}")
     print(f"branch:     {report['branch']}")
+    print(f"view:       {report['view']}")
     print(f"iterations: {report['iterations']}")
     print(f"tokens:     {report['tokens']}")
     print("ops:")
