@@ -177,6 +177,13 @@ A warrant answers one question: what assumption makes these grounds imply this
 claim? Not a restatement of the grounds, not a restatement of the claim, not a
 general principle floating free of the inference it bridges.
 
+You formulate warrants. A document rarely states its bridging assumption as a
+sentence you can lift — you work out what the step requires and write it. What
+you write is a claim node like any other, and it must exist as a claim before
+an inference can cite it. Often it already exists: a shared assumption
+bridging several inferences is one claim cited by all of them, and that reuse
+is the structure you want.
+
 ```
 Wrong: Low-income people rationing trips means fare removal helps them.
 Right: Fare cost is the binding constraint on low-income trip rationing,
@@ -190,6 +197,12 @@ that source's inference.
 Several warrants on one inference are conjoint — both assumptions needed for
 the one bridge. An inference with no warrants is an enthymeme, which is a
 normal state and not an error.
+
+Two kinds of step almost always need one. A Deductive inference has nothing
+contestable left except its premises, so an unstated premise there is the
+whole argument hidden. A generalisation carries a representativeness
+assumption that an opponent will attack, and it needs somewhere to be
+attacked.
 
 ## Contesting
 

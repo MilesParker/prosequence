@@ -263,6 +263,29 @@ package directory lands on `sys.path`.)
   Comments are not preserved. The one-time large formatting diff has been
   applied; the pre-canonical originals are kept under `_pre-canonical/`.
 
+## Managed vs unmanaged corpora (`src/config.ts`, `discourse-spaces/scratch/`)
+
+Two roots, one viewer. `discourse-spaces/*.v2.yaml` is the **managed** store —
+its own git repo, written only by a role's commit, and the only thing the
+harness knows about. `discourse-spaces/scratch/` is **unmanaged**: hand-copied
+corpora, snapshots, an error corpus lifted out of `logs/failed/`. The viewer
+loads either (`?model=<name>` and `?scratch=<name>`); nothing else sees the
+second.
+
+That separation needed no harness code, because the harness is
+subdirectory-blind by construction and was already relying on it for
+`migrations/`: `CorpusStore.list_corpora` keeps only top-level blobs,
+`validate.py`'s default sweep globs `*.v2.yaml` with a `*` that cannot cross a
+`/`, and the store's dirty-tree guard is keyed on a top-level name. So a scratch
+file is invisible to the store, absent from the default validation sweep, and
+incapable of blocking a commit — while `python3 -m prosequence.core.validate
+discourse-spaces/scratch/<f>.v2.yaml` still checks one on demand.
+
+Both query params are sanitised to a bare slug (`[^a-zA-Z0-9_-]` stripped) and
+joined to a FIXED prefix chosen by which param was supplied. The prefix is never
+caller-supplied and a `/` cannot survive the slug filter, so neither root can be
+escaped. `scratch/` is gitignored inside the corpus repo.
+
 ## Corpus store (`prosequence/core/corpus_store.py`)
 
 The three corpora live in their own **nested git repository** at

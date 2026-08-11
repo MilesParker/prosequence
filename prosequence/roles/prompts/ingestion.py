@@ -59,6 +59,11 @@ Stated outright or clearly relied upon — if you would point at passages to
 justify "this argument assumes X," capture it now. That evidence leaves with
 the document.
 
+Work through the inferences you are writing one at a time and ask the warrant
+question of each. Most steps a document takes rest on something, and the
+assumption is usually visible in what the author treats as not needing
+argument.
+
 Leave a warrant for later when it is pure logical reconstruction: derivable
 from the inference structure alone by any careful reader. A later role exists
 for those.
@@ -73,8 +78,8 @@ inference, not the claim.
 
 Where it attacks something in the corpus, find what it actually attacks —
 often the evidence underneath, or an assumption held as a warrant. If the
-assumption under attack is stated nowhere, add it as a warrant on the
-inference relying on it, then contest it.
+assumption under attack is nowhere in the corpus, add it as a claim, cite it
+as a warrant on the inference relying on it, then contest it.
 
 You may add terminal claims when an argument bottoms out on a commitment the
 corpus does not yet hold.

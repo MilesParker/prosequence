@@ -293,10 +293,18 @@ def check_capability_rejects_non_op():
 
 
 def check_plan_rejects_bad_refs():
-    """The three structural rules, all raising before any write: an Existing ref
-    naming nothing in the corpus (previously it fell through as a uuid and
-    failed far downstream at commit), a New ref nothing binds, and a created
-    node nothing references."""
+    """What is fatal before any write, and what is only recorded.
+
+    Fatal: an Existing ref naming nothing in the corpus (previously it fell
+    through as a uuid and failed far downstream at commit), and a New ref
+    nothing binds. Both make the plan unexecutable.
+
+    NOT fatal: a created claim nothing references. Orphans are legal in the
+    model — no invariant forbids them, GAP-6 warns on them, and repair creates
+    them deliberately when it drops an inference — so `check_plan` returns a
+    note and the run continues. This holds even when EVERY new claim is an
+    orphan, which is a real defect in the finding and still not worth
+    discarding the claims over."""
     from prosequence.core.yaml_io import ArgumentScheme, Relation
 
     def _inf(**kw):
@@ -309,19 +317,41 @@ def check_plan_rejects_bad_refs():
     for label, plan in (
         ("unknown_existing", (_inf(grounds=(Existing(ClaimId("ghost")),)),)),
         ("unbound_new", (_inf(grounds=(New("nope"),)),)),
-        ("orphan_binding", (AddClaim(key="c1", tag="t", text="x"),)),
     ):
         try:
             check_plan(plan, known)
             results[label] = False
         except PlanError:
             results[label] = True
-    # A well-formed plan passes.
+
+    # SOME attached, one not: reported, not raised — and the note names the key
+    # so the commit message can carry it. Repair relies on this staying legal,
+    # since dropping an inference is how it creates orphans on purpose.
+    partial = (AddClaim(key="c1", tag="t", text="x"),
+               AddClaim(key="c2", tag="t2", text="y"),
+               _inf(grounds=(New("c1"),)))
+    try:
+        notes = check_plan(partial, known)
+        results["partial_orphan_noted"] = any("c2" in n for n in notes)
+    except PlanError:
+        results["partial_orphan_noted"] = False
+
+    # Every new claim orphaned: fatal. A finding with no inference in it has
+    # extracted no argument, and most of what it produces is unrecoverable —
+    # grounds-claims are attributive, and an attributive claim with nothing to
+    # ground is an orphan quote.
+    try:
+        check_plan((AddClaim(key="c1", tag="t", text="x"),
+                    AddClaim(key="c2", tag="t2", text="y")), known)
+        results["all_orphaned_raises"] = False
+    except PlanError:
+        results["all_orphaned_raises"] = True
+
+    # A well-formed plan passes with nothing to report.
     good = (AddClaim(key="c1", tag="t", text="x"),
             _inf(grounds=(New("c1"),)))
     try:
-        check_plan(good, known)
-        results["well_formed_passes"] = True
+        results["well_formed_passes"] = check_plan(good, known) == []
     except PlanError:
         results["well_formed_passes"] = False
     ok = all(results.values())

@@ -98,7 +98,7 @@ class IngestionRole(Role):
             raise
 
         try:
-            check_plan(plan, known)
+            plan_notes = check_plan(plan, known)
         except PlanError as exc:
             corpus, notes = salvage.salvage_corpus(
                 self.session.bound_version, plan)
@@ -116,8 +116,10 @@ class IngestionRole(Role):
         # the plan, and the session still executes and commits exactly once.
         # A graph that no drop can fix (`Unrepairable`) fails as it did before.
         try:
-            plan, notes = repair_plan(self.session.bound_version, plan)
-            self._repair_notes = tuple(notes)
+            plan, repair_notes = repair_plan(self.session.bound_version, plan)
+            # Both records land in the commit message: what the plan check found
+            # odd but survivable, then what repair removed to make it commit.
+            self._repair_notes = (*plan_notes, *repair_notes)
         except Unrepairable as exc:
             corpus, notes = salvage.salvage_corpus(
                 self.session.bound_version, plan)

@@ -192,21 +192,40 @@ class ReviseClaim(Op[None]):
 # The plan
 # --------------------------------------------------------------------------
 
-def check_plan(plan: Sequence[Op], known_ids: frozenset) -> None:
+def check_plan(plan: Sequence[Op], known_ids: frozenset) -> list[str]:
     """Everything about a plan that can be checked without a session.
 
-    Three rules, all raising before any write:
+    Returns notes on what is odd but survivable; raises `PlanError` on what is
+    not. Two rules are fatal, and both are fatal because the plan cannot be
+    executed or repaired as written:
 
       * every `Existing` names a node in the corpus. Previously unchecked — an
         id that resolved to nothing reached commit and failed as an invariant
         violation pointing at a uuid found nowhere.
       * every `New` is bound by an op EARLIER in the plan. Covers both an
         unbound key and a use that precedes its binding.
-      * every binding is referenced by something. A created node no op
-        references is attached to nothing, which is extraction without
-        attachment — observed twice in practice (an empty-corpus seed, and
-        separately a populated corpus) that prompt instruction alone did not
-        prevent the model treating attachment as optional.
+
+    Orphans split by degree, and the split is the point:
+
+      * SOME new claims unattached — a NOTE. Repair depends on this being legal,
+        since dropping an inference to satisfy an invariant is exactly how it
+        creates orphans on purpose. I1-I10 have no rule against them either, so
+        the graph commits and validates clean.
+      * EVERY new claim unattached — FATAL. A finding with no inference
+        referencing anything it created has extracted no argument, only
+        sentences, and most of what it produces cannot be salvaged later:
+        grounds-claims are attributive by the attributive discipline, and an
+        attributive claim with nothing to ground is an orphan quote. Observed
+        at 22 attributive out of 30.
+
+    Failing the second case is cheap now in a way it was not before: salvage
+    writes the graph AND the finding to logs/failed/ ahead of the raise, so the
+    run's output survives for inspection and nothing is lost by refusing to
+    commit it. The loud failure is what keeps a prompt defect visible instead of
+    letting it accumulate as corpus sediment — which matters because the corpus
+    would not show it: GAP-6 skips terminal and attributive claims, so an
+    unattached grounds-claim leaves no trace in the graph at all. That is also
+    why the surviving note exists for the partial case.
 
     GRAPH invariants are not checked here; the session validates the whole graph
     at commit (I1-I10). These are structural facts about the plan itself.
@@ -237,13 +256,35 @@ def check_plan(plan: Sequence[Op], known_ids: frozenset) -> None:
         problems.append(
             f"{len(unbound)} reference(s) to keys nothing creates earlier in "
             f"the plan: {unbound}")
-    orphans = sorted(seen - used)
-    if orphans:
-        problems.append(
-            f"{len(orphans)} new node(s) no op references -- not attached to "
-            f"anything, existing or new: {orphans}")
+
     if problems:
         raise PlanError("; ".join(problems))
+
+    orphans = sorted(seen - used)
+    if not orphans:
+        return []
+
+    # Nothing attached to anything. The claims may each be sound, but a finding
+    # with no inference in it has extracted no ARGUMENT — and most of what it
+    # produces is unrecoverable rather than merely unfinished: grounds-claims
+    # are attributive by the attributive discipline, and an attributive claim
+    # with no inference to ground is an orphan quote. In one such run 22 of 30
+    # were attributive. Failing costs nothing now that salvage writes the graph
+    # and the finding to logs/failed/ first, and the loud failure is what makes
+    # the prompt defect visible instead of accumulating as corpus sediment.
+    if seen and len(orphans) == len(seen):
+        raise PlanError(
+            f"none of the {len(seen)} new claims is attached -- the finding "
+            f"extracted content and connected none of it (no inference "
+            f"references any new claim): {orphans}")
+
+    # Some attached, some not: a miss, not a systemic failure. Recorded and
+    # carried into the commit message, because the corpus mostly will not show
+    # it — GAP-6 skips terminal and attributive claims, so an unattached
+    # grounds-claim leaves no trace in the graph at all.
+    return [f"claim {key!r} added unattached -- no inference references it "
+            f"(legal, and warned as a GAP-6 gap by the validator)"
+            for key in orphans]
 
 
 def execute(session, plan: Sequence[Op], capability: Sequence[type[Op]]) -> tuple:

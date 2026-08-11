@@ -2,17 +2,46 @@
 // v2 corpus (claim/inference model). Swap to another *.v2.yaml to view it.
 export const DEFAULT_MODEL = 'gaza'
 
-// Resolve the corpus file, honouring a `?model=<name>` query param
-// (e.g. ?model=gaza → discourse-spaces/gaza.v2.yaml). The name is sanitised to
-// a safe slug so it can only reference files within discourse-spaces/.
+// The two roots a corpus may be loaded from.
+//
+// MANAGED is the corpus store: its own git repo, written only by a role's
+// commit, and the only thing the harness knows about. SCRATCH is for corpora
+// that are not managed at all — hand-copied files, an error corpus pulled out
+// of logs/failed/, a snapshot someone wants to look at. The viewer treats them
+// identically; nothing else does.
+//
+// A subdirectory works because the harness is subdirectory-blind by
+// construction, not by accident: CorpusStore.list_corpora keeps only top-level
+// blobs, validate.py globs `*.v2.yaml` with a `*` that cannot cross a `/`, and
+// the store's dirty-tree guard is keyed on a top-level name. `migrations/` has
+// always sat there on the same terms. So a file under SCRATCH is invisible to
+// the store, the validator, and every guard — which is the point: an ad-hoc
+// corpus should never be mistaken for one a role is responsible for, and should
+// never make `python3 -m prosequence.core.validate` fail.
+export const MANAGED_DIR = 'discourse-spaces'
+export const SCRATCH_DIR = 'discourse-spaces/scratch'
+
+// Strip everything that is not a bare slug. This is the path-traversal guard:
+// a `/` cannot survive it, so neither root can be escaped and a corpus name can
+// never resolve outside the directory its prefix names.
+const slugify = (name: string): string => name.replace(/[^a-zA-Z0-9_-]/g, '')
+
+// Resolve the corpus file, honouring `?model=<name>` (managed) or
+// `?scratch=<name>` (unmanaged) — e.g. ?model=gaza → discourse-spaces/gaza.v2.yaml,
+// ?scratch=china-ai → discourse-spaces/scratch/china-ai.v2.yaml. Both are
+// sanitised to a safe slug and joined to a FIXED prefix; the prefix is chosen by
+// which param was given, never supplied by the caller.
 export function resolveDataFile(): string {
-  let model = DEFAULT_MODEL
-  if (typeof window !== 'undefined') {
-    const param = new URLSearchParams(window.location.search).get('model')
-    if (param) model = param
+  if (typeof window === 'undefined') {
+    return `${MANAGED_DIR}/${DEFAULT_MODEL}.v2.yaml`
   }
-  const slug = model.replace(/[^a-zA-Z0-9_-]/g, '')
-  return `discourse-spaces/${slug || DEFAULT_MODEL}.v2.yaml`
+  const params = new URLSearchParams(window.location.search)
+
+  const scratch = slugify(params.get('scratch') ?? '')
+  if (scratch) return `${SCRATCH_DIR}/${scratch}.v2.yaml`
+
+  const model = slugify(params.get('model') ?? '')
+  return `${MANAGED_DIR}/${model || DEFAULT_MODEL}.v2.yaml`
 }
 
 export const DATA_FILE = resolveDataFile()

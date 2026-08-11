@@ -53,7 +53,7 @@ from __future__ import annotations
 from langgraph.graph import StateGraph, START, END
 from langgraph.prebuilt import ToolNode
 
-from ..core.session import ValidationFailed
+from ..core.session import HeadMoved, ValidationFailed, WorkingTreeDirty
 from . import salvage
 from .bridge import from_anthropic, to_anthropic
 from .capability import validate_capability
@@ -198,7 +198,15 @@ class Role:
         diff = self.session.diff()
         try:
             sha = self.session.commit(commit_summary, self._repair_notes)
-        except ValidationFailed as exc:
+        except (ValidationFailed, HeadMoved, WorkingTreeDirty) as exc:
+            # All three of the session's terminal commit failures, not just the
+            # invariant one. The graph is equally finished and equally lost
+            # whichever refused it, and the two store guards are the ones a
+            # caller can do nothing about from inside the run: a stale
+            # working-tree file left by an earlier failed run blocks commits to
+            # that corpus until it is cleaned up, and losing a whole run to that
+            # would be the harshest failure of the three.
+            #
             # `current_version` survives the failed commit: the session closes
             # on any outcome, but the version it would have written is still
             # bound to it, and this is the only chance to read it.
@@ -206,7 +214,7 @@ class Role:
                 lambda: salvage.write_error_corpus(
                     self.session.current_version,
                     corpus_file=self.session.name, run_id=self.guard.run_id,
-                    stage="commit validation", error=exc,
+                    stage=f"commit ({type(exc).__name__})", error=exc,
                     bound_head=self.session.bound_head),
                 label="error corpus")
             raise
