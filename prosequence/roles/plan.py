@@ -237,6 +237,52 @@ class ReviseClaim(Op[None]):
 # The plan
 # --------------------------------------------------------------------------
 
+def prune_unresolvable(
+    plan: Sequence[Op], known_ids: frozenset,
+) -> tuple[tuple[Op, ...], list[str]]:
+    """Drop inferences that cite something which does not exist. Returns
+    (plan, notes).
+
+    An `Existing` ref is any ref that is not a key the finding declared, so a
+    key the model CITED BUT NEVER DECLARED arrives here indistinguishable from a
+    corpus uuid — and fails as "id not in the corpus". Two invented keys, one
+    inference each, were enough to discard 22 claims and 11 sound inferences.
+    The edge is genuinely broken and unrecoverable (there is no text anywhere
+    from which to mint the missing claim), but it is one edge, and the rest of
+    the finding is unaffected by it.
+
+    This runs BEFORE `check_plan`, which is what keeps that ordering meaningful
+    rather than breaking it: check_plan's job is to guarantee that every
+    reference resolves before repair is allowed to start dropping things, and it
+    still does. This only removes the edges that would have made it refuse,
+    and only when doing so leaves something behind.
+
+    THE SYSTEMIC CASE IS LEFT ALONE. If every inference in the plan cites
+    something unresolvable, nothing is pruned and the plan is returned untouched
+    so `check_plan` raises naming the refs. A wholesale reference failure is a
+    broken finding, not a few bad edges, and the accurate error is the one that
+    names what did not resolve — not a downstream complaint that no claim ended
+    up attached.
+    """
+    def unresolved(op: Op) -> list[str]:
+        return [str(r.id) for r in op.refs()
+                if isinstance(r, Existing) and r.id not in known_ids]
+
+    doomed = {n: bad for n, op in enumerate(plan)
+              if isinstance(op, AddInference) and (bad := unresolved(op))}
+    if not doomed:
+        return tuple(plan), []
+
+    total = sum(1 for op in plan if isinstance(op, AddInference))
+    if len(doomed) >= total:
+        return tuple(plan), []      # systemic — let check_plan report it
+
+    notes = [f"inference dropped: cites {', '.join(repr(b) for b in bad)}, "
+             f"which is neither a claim this finding declares nor a node in "
+             f"the corpus" for bad in doomed.values()]
+    return tuple(op for n, op in enumerate(plan) if n not in doomed), notes
+
+
 def check_plan(plan: Sequence[Op], known_ids: frozenset) -> list[str]:
     """Everything about a plan that can be checked without a session.
 

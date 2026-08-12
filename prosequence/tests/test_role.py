@@ -441,6 +441,56 @@ def check_plan_rejects_bad_refs():
     return ok, " ".join(f"{k}={v}" for k, v in results.items())
 
 
+def check_prune_unresolvable():
+    """A broken edge costs that edge, not the run — unless every edge is broken.
+
+    A key the model cited but never declared is indistinguishable from a corpus
+    uuid by the time a plan exists, so it fails as "id not in the corpus". Two
+    such keys, one inference each, were enough to discard 22 claims and 11 sound
+    inferences; pruning keeps them. The systemic case is deliberately NOT pruned
+    so `check_plan` still reports the refs that did not resolve, which is the
+    accurate error for a wholesale reference failure.
+    """
+    from prosequence.roles.plan import prune_unresolvable
+    from prosequence.core.yaml_io import ArgumentScheme, Relation
+
+    def _inf(*, grounds, target=None):
+        return AddInference(grounds=grounds, warrants=(),
+                            target=target or Existing(ClaimId("real")),
+                            relation=Relation.CONCLUDES,
+                            scheme=ArgumentScheme.DEDUCTIVE)
+
+    known = frozenset({"real"})
+    claim = AddClaim(key="c1", tag="t", text="x")
+    good = _inf(grounds=(New("c1"),))
+    bad = _inf(grounds=(Existing(ClaimId("never_declared")),))
+    results = {}
+
+    kept, notes = prune_unresolvable((claim, good, bad), known)
+    results["drops_only_the_bad_edge"] = (len(kept) == 2 and good in kept
+                                          and bad not in kept
+                                          and len(notes) == 1
+                                          and "never_declared" in notes[0])
+    # The survivor must now satisfy check_plan, which is the whole point of
+    # pruning ahead of it.
+    try:
+        check_plan(kept, known)
+        results["survivor_passes_check"] = True
+    except PlanError:
+        results["survivor_passes_check"] = False
+
+    # Every inference broken: untouched, so check_plan names the refs.
+    same, notes = prune_unresolvable((claim, bad), known)
+    results["systemic_left_alone"] = (len(same) == 2 and not notes)
+
+    # A clean plan is returned unchanged and allocates no notes.
+    same, notes = prune_unresolvable((claim, good), known)
+    results["clean_untouched"] = (len(same) == 2 and not notes)
+
+    ok = all(results.values())
+    return ok, " ".join(f"{k}={v}" for k, v in results.items())
+
+
 def check_finding_split_across_both_fields():
     """A finding the model serialized into BOTH fields as separate JSON strings
     keeps all of it. Observed three times on large findings: `claims` arrives as
@@ -601,6 +651,7 @@ CHECKS = [
     ("capability refuses whole plan, writes nothing", check_capability_refuses_whole_plan),
     ("capability rejects non-Op entries", check_capability_rejects_non_op),
     ("plan rejects unresolvable refs and orphan bindings", check_plan_rejects_bad_refs),
+    ("unresolvable refs prune the edge, not the run", check_prune_unresolvable),
     ("finding split across both fields keeps all of it", check_finding_split_across_both_fields),
     ("iteration cap forces apply", check_iteration_cap_forces_apply),
 ]

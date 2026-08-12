@@ -90,7 +90,22 @@ in scope.
 ## Attaching
 
 Where the document argues for a claim the corpus already holds, add the
-inference, not the claim.
+inference, not the claim. Attach direct support directly. If a document
+reports an authoritative finding of the very thing a claim asserts, that
+finding is grounds for that claim — do not route it through intermediate
+claims the document goes on to derive.
+
+Documents also reason forward. What follows *from* a corpus claim — an
+obligation it creates, a consequence it entails, a further conclusion it
+licenses — is an inference taking that claim as grounds, not support for it.
+This holds for any claim, including a thesis. A document may argue downstream
+of the very matter the corpus is organised around.
+
+Direction is easy to get backwards under pressure to connect things. The test:
+name which claim rests on which. If the document establishes A and then argues
+that A obliges B, then B rests on A — even if B feels closer to the corpus's
+subject. Reversing that to make B support A fabricates an argument the
+document does not make.
 
 Where it attacks something in the corpus, find what it actually attacks —
 often the evidence underneath, or an assumption held as a warrant. If the
@@ -99,15 +114,6 @@ as a warrant on the inference relying on it, then contest it.
 
 You may add terminal claims when an argument bottoms out on a commitment the
 corpus does not yet hold.
-
-Where the document argues FROM a standing thesis to something further, add that
-consequent as a claim, bind it with an inference whose grounds include what it
-follows from, and mark it a thesis. This is the one case where the graph grows
-upward, and the corpus you are shown will not suggest it — a thesis reads as the
-top of the graph because everything else in the corpus so far sits beneath it.
-Do not force it: most documents argue toward the standing thesis, and inventing
-a further question the document does not actually reach is worse than missing
-one it does.
 
 ## What you may not do
 
@@ -126,8 +132,6 @@ You cannot add definitions. Work with the corpus's stipulations as they stand.
 - Every grounds-claim is attributive and carries an attribution.
 - Every inference has a scheme; every Unknown has a descriptor.
 - Nothing concludes a terminal or an attributive claim.
-- Any claim you marked a thesis is a question the corpus now argues about, and
-  is the target of an inference you are also submitting.
 
 Submit the finding in a single call.\
 """

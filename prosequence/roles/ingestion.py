@@ -34,7 +34,10 @@ from langchain_core.messages import HumanMessage
 from . import salvage
 from .apply import FINDING_TOOL_SCHEMA, FindingShapeError, ops_from_finding
 from .corpus_view import render_corpus
-from .plan import AddClaim, AddInference, DesignateThesis, Op, PlanError, check_plan
+from .plan import (
+    AddClaim, AddInference, DesignateThesis, Op, PlanError, check_plan,
+    prune_unresolvable,
+)
 from .prompts import INGESTION
 from .repair import Unrepairable, repair_plan
 from .role import Role
@@ -103,8 +106,14 @@ class IngestionRole(Role):
                 label="finding")
             raise
 
+        # An inference citing a key the finding never declared is a broken edge
+        # and nothing more; it should not cost the other 11 and the 22 claims.
+        # Before check_plan, so its guarantee that every ref resolves — the one
+        # repair depends on — still holds when repair runs.
+        plan, pruned = prune_unresolvable(plan, known)
+
         try:
-            plan_notes = check_plan(plan, known)
+            plan_notes = [*pruned, *check_plan(plan, known)]
         except PlanError as exc:
             corpus, notes = salvage.salvage_corpus(
                 self.session.bound_version, plan)
