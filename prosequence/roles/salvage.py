@@ -62,7 +62,7 @@ from typing import Optional, Sequence
 from ..core import ops as _ops
 from ..core.types import Corpus
 from ..core.yaml_io import serialize
-from .plan import AddClaim, AddInference, Existing, Op, Ref
+from .plan import AddClaim, AddInference, DesignateThesis, Existing, Op, Ref
 
 # logs/failed, beside the token log. Not a config key (see guarded_client's
 # DEFAULT_TOKEN_LOG for the same reasoning); the directory is created on demand.
@@ -153,10 +153,22 @@ def apply_plan(
                 notes.append(f"op[{n}] AddInference dropped: {exc}")
             else:
                 id_by_index[n] = iid
+        elif isinstance(op, DesignateThesis):
+            # Mints nothing, so it contributes no entry to id_by_index — which
+            # is also why repair can never choose it as a drop candidate, and
+            # never needs to: `check_plan` has already bound every ref, so the
+            # one violation a designation could raise (I3, an unresolvable
+            # thesis) cannot arise from a plan that reaches here.
+            try:
+                version = _ops.designate_thesis(version, id=_resolve(op.target, env))
+            except KeyError as exc:
+                notes.append(
+                    f"op[{n}] DesignateThesis dropped: reference {exc.args[0]!r} "
+                    f"is a plan key that no op in the plan creates")
         else:
             notes.append(
                 f"op[{n}] {type(op).__name__} not applied "
-                f"(salvage covers AddClaim and AddInference only)")
+                f"(salvage covers AddClaim, AddInference and DesignateThesis)")
 
     return version, notes, id_by_index
 

@@ -3,12 +3,12 @@ import * as d3 from 'd3'
 import type { DiscourseSpace } from '../../types'
 import {
   COLORS, EDGE, NODE, DISCLOSURE, TITLE_BAR_HEIGHT, VIEW, STANCE_FILL_OPACITY,
-  STANCE_SELECTED_FILL_OPACITY, STANCE_SELECTED_STROKE_BUMP, REF_ROOT,
+  STANCE_SELECTED_FILL_OPACITY, STANCE_SELECTED_STROKE_BUMP, REF_THESIS,
 } from '../../config'
 import { fitTransform, type LayoutBounds, type GroupBox } from '../layout'
 import { loadViewport, saveViewport } from '../persist'
 import {
-  nodeHW, nodeHH, isRootClaim,
+  nodeHW, nodeHH, isThesisClaim,
   rectEdgePt, fitTag,
   computeStance, stanceColor, edgeStance,
   contestTickForPolyline, contestTickSegments,
@@ -26,10 +26,10 @@ interface Props {
   /** How to frame `centerOn` on mount: 'reveal' pans it in at a moderate zoom;
    *  'neighborhood' zooms tight on its immediate surroundings (return icon). */
   centerMode?: 'reveal' | 'neighborhood'
-  /** The claim everything is coloured relative to (the movable reference root).
+  /** The claim everything is coloured relative to (the movable reference thesis).
    *  null ⇒ no origin set, so the whole graph is unpainted (all neutral). Updates
    *  recolour the scene in place — they never rebuild it. */
-  referenceRootId?: string | null
+  referenceThesisId?: string | null
   onHover: (node: GraphNode | null, x?: number, y?: number) => void
   onSelect: (node: GraphNode | null) => void
   /** Double-click a claim to open it in the focus view. */
@@ -57,11 +57,11 @@ type NodeSel = d3.Selection<SVGGElement, GraphNode, SVGGElement, unknown>
  * interactions are pan/zoom, hover, click-to-select, drag-to-nudge, and search
  * highlight — no disclosure.
  *
- * Colour is a *stance wash* relative to the reference root (see `computeStance`):
- * aligned / opposed / divided / neutral. Moving the reference root recolours the
+ * Colour is a *stance wash* relative to the reference thesis (see `computeStance`):
+ * aligned / opposed / divided / neutral. Moving the reference thesis recolours the
  * whole scene in place via `applyStance`, without a rebuild.
  */
-export function Graph({ data, graphData, bounds, groups, highlight, centerOn, centerMode, referenceRootId, onHover, onSelect, onActivate }: Props) {
+export function Graph({ data, graphData, bounds, groups, highlight, centerOn, centerMode, referenceThesisId, onHover, onSelect, onActivate }: Props) {
   const svgRef = useRef<SVGSVGElement>(null)
   const onHoverRef = useRef(onHover)
   const onSelectRef = useRef(onSelect)
@@ -75,14 +75,14 @@ export function Graph({ data, graphData, bounds, groups, highlight, centerOn, ce
   useEffect(() => { centerOnRef.current = centerOn }, [centerOn])
   const centerModeRef = useRef(centerMode)
   useEffect(() => { centerModeRef.current = centerMode }, [centerMode])
-  const referenceRootIdRef = useRef(referenceRootId)
-  useEffect(() => { referenceRootIdRef.current = referenceRootId }, [referenceRootId])
+  const referenceThesisIdRef = useRef(referenceThesisId)
+  useEffect(() => { referenceThesisIdRef.current = referenceThesisId }, [referenceThesisId])
   // The selected/centred claim (same id the viewport frames), used to emphasise it.
   // A change repaints in place but must NOT re-frame the viewport, so it's separate
   // from the mount-only centring read.
   const selectedIdRef = useRef(centerOn)
   const nodesRef = useRef<NodeSel | null>(null)
-  // Repaints the whole scene by stance for a given reference root. Rebuilt on each
+  // Repaints the whole scene by stance for a given reference thesis. Rebuilt on each
   // scene mount (closes over that mount's selections); called by the recolour effect.
   const recolorRef = useRef<((refId: string | null) => void) | null>(null)
 
@@ -145,14 +145,14 @@ export function Graph({ data, graphData, bounds, groups, highlight, centerOn, ce
       return pts ? lineGen(pts) : null
     }
 
-    // Root-directed edges are not drawn individually — each group's are bundled
+    // Thesis-directed edges are not drawn individually — each group's are bundled
     // into one line per role (drawn below).
-    const isRoot = (id: string) => {
+    const isThesis = (id: string) => {
       const n = gd.nodeById.get(id)
-      return !!n && n._kind === 'claim' && (n as ClaimNode)._isRoot
+      return !!n && n._kind === 'claim' && (n as ClaimNode)._isThesis
     }
     const innerLinks = links.filter(l =>
-      !isRoot(l.source as unknown as string) && !isRoot(l.target as unknown as string))
+      !isThesis(l.source as unknown as string) && !isThesis(l.target as unknown as string))
 
     // Stroke colour comes from applyStance(); geometry channels (warrant dash,
     // contest tick) are set here and are independent of that colour.
@@ -165,12 +165,12 @@ export function Graph({ data, graphData, bounds, groups, highlight, centerOn, ce
       .attr('marker-end', 'url(#arrow)')
       .attr('d', d => linkPath(d))
 
-    // ── Bundled root edges ─────────────────────────────────────────────────────
-    // Each group's root-directed edges merge into one trunk per role, but for
+    // ── Bundled thesis edges ─────────────────────────────────────────────────────
+    // Each group's thesis-directed edges merge into one trunk per role, but for
     // continuity the trunk fans back out at the group border: a thin branch runs
     // from every member inference up to the bundle's exit point, so each edge is
     // individually traceable end-to-end.
-    interface Bundle { box: GroupBox; rootId: string; role: EdgeRole; count: number; members: string[]; idx: number; total: number }
+    interface Bundle { box: GroupBox; thesisId: string; role: EdgeRole; count: number; members: string[]; idx: number; total: number }
     const bundles: Bundle[] = groups.flatMap(box =>
       box.bundles.map((b, idx) => ({ box, ...b, idx, total: box.bundles.length })))
     const exitPt = (b: Bundle) => ({
@@ -179,10 +179,10 @@ export function Graph({ data, graphData, bounds, groups, highlight, centerOn, ce
       y: b.box.y - 12,
     })
     const trunkPath = (b: Bundle): string => {
-      const root = gd.nodeById.get(b.rootId)
+      const thesis = gd.nodeById.get(b.thesisId)
       const { x: bx, y: by } = exitPt(b)
-      const rx = root?.x ?? 0
-      const ry = (root?.y ?? 0) + (root ? nodeHH(root) : 0) + VIEW.arrowTargetPad
+      const rx = thesis?.x ?? 0
+      const ry = (thesis?.y ?? 0) + (thesis ? nodeHH(thesis) : 0) + VIEW.arrowTargetPad
       const my = Math.min(by, ry) - 40   // bow upward between the two
       return `M${bx},${by} C${bx},${my} ${rx},${my} ${rx},${ry}`
     }
@@ -212,16 +212,16 @@ export function Graph({ data, graphData, bounds, groups, highlight, centerOn, ce
 
     // ── Contest ticks — the "contesting" relation mark ──────────────────────────
     // Wired in-situ for BOTH edge shapes: routed polylines AND bundled trunks (in
-    // this corpus ~half the contests target the root and render as bundles, so
+    // this corpus ~half the contests target the thesis and render as bundles, so
     // ticking only polylines would look half-done). Colour is applied later by
     // applyStance so it matches the edge; here we only place the geometry.
     const bundleTickSegs = (b: Bundle): TickSeg[] => {
-      const root = gd.nodeById.get(b.rootId)
-      const rx = root?.x ?? 0
-      const ry = (root?.y ?? 0) + (root ? nodeHH(root) : 0) + VIEW.arrowTargetPad
+      const thesis = gd.nodeById.get(b.thesisId)
+      const rx = thesis?.x ?? 0
+      const ry = (thesis?.y ?? 0) + (thesis ? nodeHH(thesis) : 0) + VIEW.arrowTargetPad
       const { y: by } = exitPt(b)
       const my = Math.min(by, ry) - 40
-      const dy = ry - my                 // the trunk arrives vertically at the root
+      const dy = ry - my                 // the trunk arrives vertically at the thesis
       const dir = dy >= 0 ? 1 : -1
       const off = Math.min(EDGE.contestTick.offset, Math.abs(dy) || EDGE.contestTick.offset)
       return contestTickSegments(rx, ry - dir * off, Math.atan2(dy, 0))
@@ -270,30 +270,30 @@ export function Graph({ data, graphData, bounds, groups, highlight, centerOn, ce
         .attr('opacity', highlight.has(d.id as unknown as string) ? 1 : 0)
       sel.append('rect').attr('class', 'shape')       // the claim box — coloured by applyStance()
         .attr('x', -hw).attr('y', -hh).attr('width', hw * 2).attr('height', hh * 2).attr('rx', NODE.rx)
-        .attr('stroke-width', isRootClaim(c) ? NODE.rootStrokeWidth : NODE.strokeWidth)
+        .attr('stroke-width', isThesisClaim(c) ? NODE.thesisStrokeWidth : NODE.strokeWidth)
         .attr('pointer-events', 'all')   // stay clickable when unpainted (fill:none)
-      const lines = fitTag(c.tag || (c.id as unknown as string), hw, hh, isRootClaim(c) ? 10 : 9.5)
+      const lines = fitTag(c.tag || (c.id as unknown as string), hw, hh, isThesisClaim(c) ? 10 : 9.5)
       const totalH = (lines.length - 1) * NODE.lineHeight
       sel.append('text')
         .attr('text-anchor', 'middle').attr('fill', COLORS.text)
-        .attr('font-size', isRootClaim(c) ? '10px' : '9.5px')
+        .attr('font-size', isThesisClaim(c) ? '10px' : '9.5px')
         .attr('font-family', 'system-ui, sans-serif').attr('pointer-events', 'none')
-        .attr('font-weight', isRootClaim(c) ? '600' : '400')
+        .attr('font-weight', isThesisClaim(c) ? '600' : '400')
         .selectAll('tspan').data(lines).join('tspan')
         .attr('x', 0).attr('dy', (_, i) => i === 0 ? `${-totalH / 2}px` : `${NODE.lineHeight}px`)
         .attr('dominant-baseline', 'middle').text(t => t)
-      // Reference-root marker: a single bold ink ring around the box (hidden by
-      // default; shown on the reference root by applyStance). One rounded rect offset
+      // Reference-thesis marker: a single bold ink ring around the box (hidden by
+      // default; shown on the reference thesis by applyStance). One rounded rect offset
       // by ringGap — surrounds the node so it reads even at overview zoom.
       const target = sel.append('g').attr('class', 'target').attr('opacity', 0).attr('pointer-events', 'none')
       target.append('rect')
-        .attr('x', -hw - REF_ROOT.ringGap).attr('y', -hh - REF_ROOT.ringGap)
-        .attr('width', hw * 2 + REF_ROOT.ringGap * 2).attr('height', hh * 2 + REF_ROOT.ringGap * 2)
-        .attr('rx', NODE.rx + REF_ROOT.ringGap).attr('fill', 'none')
-        .attr('stroke', REF_ROOT.ringColor).attr('stroke-width', REF_ROOT.ringWidth)
+        .attr('x', -hw - REF_THESIS.ringGap).attr('y', -hh - REF_THESIS.ringGap)
+        .attr('width', hw * 2 + REF_THESIS.ringGap * 2).attr('height', hh * 2 + REF_THESIS.ringGap * 2)
+        .attr('rx', NODE.rx + REF_THESIS.ringGap).attr('fill', 'none')
+        .attr('stroke', REF_THESIS.ringColor).attr('stroke-width', REF_THESIS.ringWidth)
     })
 
-    // ── Stance wash — recolour the whole scene relative to a reference root ──────
+    // ── Stance wash — recolour the whole scene relative to a reference thesis ──────
     const applyStance = (refId: string | null) => {
       const sm = computeStance(gd, refId)
       // Nodes
@@ -309,8 +309,8 @@ export function Graph({ data, graphData, bounds, groups, highlight, centerOn, ce
         }
         const isRef = refId != null && id === refId
         const isSel = id === selectedIdRef.current
-        // The reference root is always its aligned valence (it's on its own side by
-        // definition); every other claim takes its stance relative to the root.
+        // The reference thesis is always its aligned valence (it's on its own side by
+        // definition); every other claim takes its stance relative to the thesis.
         // Neutral = outline only.
         let col: string | null
         if (isRef) {
@@ -322,9 +322,9 @@ export function Graph({ data, graphData, bounds, groups, highlight, centerOn, ce
         if (col) shape.attr('fill', col).attr('fill-opacity', isSel ? STANCE_SELECTED_FILL_OPACITY : STANCE_FILL_OPACITY).attr('stroke', col)
         else shape.attr('fill', 'none').attr('fill-opacity', 1).attr('stroke', COLORS.border)
         // Selected/centred node: same hue, heavier border (denser fill applied above).
-        const baseW = isRootClaim(d) ? NODE.rootStrokeWidth : NODE.strokeWidth
+        const baseW = isThesisClaim(d) ? NODE.thesisStrokeWidth : NODE.strokeWidth
         shape.attr('stroke-width', isSel ? baseW + STANCE_SELECTED_STROKE_BUMP : baseW)
-        // The reference-root ring takes the node's own colour, not ink.
+        // The reference-thesis ring takes the node's own colour, not ink.
         const targetSel = sel.select('.target')
         targetSel.attr('opacity', isRef ? 1 : 0)
         if (isRef) targetSel.select('rect').attr('stroke', col ?? stanceColor('aligned'))
@@ -350,7 +350,7 @@ export function Graph({ data, graphData, bounds, groups, highlight, centerOn, ce
       })
     }
     recolorRef.current = applyStance
-    applyStance(referenceRootIdRef.current ?? null)
+    applyStance(referenceThesisIdRef.current ?? null)
 
     // ── Interaction ────────────────────────────────────────────────────────────
     nodeSel
@@ -374,12 +374,12 @@ export function Graph({ data, graphData, bounds, groups, highlight, centerOn, ce
             const p = linkPath(l); if (p) d3.select(this).attr('d', p)
           }
         })
-        if (isRoot(id)) bundleSel.attr('d', b => trunkPath(b))
+        if (isThesis(id)) bundleSel.attr('d', b => trunkPath(b))
         branchSel.filter(br => br.member === id).attr('d', br => branchPath(br))
         tickSel.each(function (t) {
           const touches = t.kind === 'link'
             ? ((t.link!.source as unknown as string) === id || (t.link!.target as unknown as string) === id)
-            : isRoot(id)
+            : isThesis(id)
           if (touches) drawTick(this, tickSegsFor(t))
         })
       }))
@@ -422,17 +422,17 @@ export function Graph({ data, graphData, bounds, groups, highlight, centerOn, ce
     })
   }, [highlight])
 
-  // Move the reference root: recolour the whole scene in place (no rebuild, so the
+  // Move the reference thesis: recolour the whole scene in place (no rebuild, so the
   // viewport and any nudged positions are preserved).
   useEffect(() => {
-    recolorRef.current?.(referenceRootId ?? null)
-  }, [referenceRootId])
+    recolorRef.current?.(referenceThesisId ?? null)
+  }, [referenceThesisId])
 
   // Move the selection emphasis when the centred claim changes — repaint in place,
   // never reframe (viewport framing stays mount-only).
   useEffect(() => {
     selectedIdRef.current = centerOn
-    recolorRef.current?.(referenceRootIdRef.current ?? null)
+    recolorRef.current?.(referenceThesisIdRef.current ?? null)
   }, [centerOn])
 
   return <svg ref={svgRef} style={{ display: 'block' }} />

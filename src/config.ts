@@ -97,7 +97,7 @@ export const PANEL_FONT = {
 // The focus view centres one claim and stacks parent band / focus band /
 // For+Against columns. Layout tokens live here alongside the graph's.
 // Feature flag: show each claim's `tag` as a mini header above its text on every
-// focus-view item (root line, parent band, focus band, For/Against cells). Flip
+// focus-view item (thesis line, parent band, focus band, For/Against cells). Flip
 // to false to hide them everywhere.
 export const SHOW_FOCUS_TAGS = true
 
@@ -110,7 +110,7 @@ export const FOCUS = {
   columnMaxWidth: 860,   // max width of the centred stack
   rowFont: 14.5,         // attribution, empty-state text
   labelFont: 11,         // uppercase region headings, counts, subheads, bedrock
-  // The tag is the primary identifier everywhere (tile, focus band, root line) and
+  // The tag is the primary identifier everywhere (tile, focus band, thesis line) and
   // reads as plain, prominent text; the claim's full text is secondary DETAIL shown
   // muted beneath it (or on dwell, on a tile). One tag look throughout — see TAG_STYLE.
   tagFont: 15,           // the tag — primary, plain text
@@ -155,11 +155,11 @@ export const FOCUS = {
   fromRing: HIGHLIGHT,
   fromTint: HIGHLIGHT_WASH,
 
-  // Stage 4 — the reference root pinned at the top ("what's ultimately at
+  // Stage 4 — the reference thesis pinned at the top ("what's ultimately at
   // stake"), the inert "torn sheet" that stands in for the hidden chain of hops
   // between it and the parent band, and the bullseye that marks the origin.
-  targetIcon: 16,        // bullseye glyph — root line + focus-band root header
-  rootLineGap: 8,        // breathing room above/below the tear
+  targetIcon: 16,        // bullseye glyph — thesis line + focus-band thesis header
+  thesisLineGap: 8,      // breathing room above/below the tear
   tearHeight: 13,        // torn-edge zigzag band height
   tearToothW: 14,        // width of one zigzag tooth (the pattern tile)
 
@@ -187,13 +187,13 @@ export const FOCUS = {
 export const NODE = {
   halfWidth: 60,
   halfHeight: 30,
-  rootHalfWidth: 66,
-  rootHalfHeight: 38,
+  thesisHalfWidth: 66,
+  thesisHalfHeight: 38,
   lineHeight: 12,
   wordsPerLine: 2,
   rx: 4,
   strokeWidth: 1.5,
-  rootStrokeWidth: 2.5,
+  thesisStrokeWidth: 2.5,
   // Inference junction marks are small and visually subordinate — wiring, not
   // peers. Rendered as a small circle of this radius.
   infRadius: 7,
@@ -227,7 +227,7 @@ export const COLORS = {
     default:     { bg: 'hsl(40, 16%, 91%)',  color: 'hsl(220, 10%, 40%)' },
     empirical:   { bg: 'hsl(205, 38%, 92%)', color: 'hsl(205, 32%, 36%)' },
     analogy:     { bg: 'hsl(280, 40%, 93%)', color: 'hsl(282, 38%, 42%)' },
-    root:        { bg: 'hsl(212, 80%, 92%)', color: 'hsl(212, 64%, 38%)' },
+    thesis:        { bg: 'hsl(212, 80%, 92%)', color: 'hsl(212, 64%, 38%)' },
     terminal:    { bg: 'hsl(45, 88%, 86%)',  color: 'hsl(34, 72%, 34%)'  },
     attributive: { bg: 'hsl(210, 18%, 92%)', color: 'hsl(210, 14%, 38%)' },
     inference:   { bg: 'hsl(230, 16%, 90%)', color: 'hsl(230, 14%, 40%)' },
@@ -331,13 +331,13 @@ export const STANCE_SELECTED_STROKE_BUMP = 1.4
 // regular-weight tiles inside it read as sitting on top rather than blending in.
 export const STANCE_CONTAINER_FILL_OPACITY = 0.08
 
-// ── Reference root marker ─────────────────────────────────────────────────────
-// The reference root is the origin all stance is measured from (a movable viewing
+// ── Reference thesis marker ─────────────────────────────────────────────────────
+// The reference thesis is the origin all stance is measured from (a movable viewing
 // choice, not a property of the claim). It IS painted — always its ALIGNED valence
 // (it is on its own side by definition; `divided` is reserved for nodes whose paths
 // reach both sides) — and surrounded by a single strong ink ring so it's
 // unmistakable, its whole-box outline reading even at overview zoom.
-export const REF_ROOT = {
+export const REF_THESIS = {
   ringColor: 'hsl(220, 18%, 26%)',   // ink — legible on paper and over any stance fill
   ringWidth: 2.6,                     // one bold rounded-rect ring around the box
   ringGap:   4.5,                     // gap from the box edge out to the ring
@@ -357,12 +357,12 @@ export const REF_ROOT = {
 export const LAYOUT = {
   // Grouped layout: disjoint subtrees are laid out independently (ELK layered,
   // routed edges), then their boxes are rect-packed toward `aspectRatio`, with
-  // the root above and one bundled edge per group/role.
+  // the thesis above and one bundled edge per group/role.
   nodeSpacing: 28,      // gap between nodes in a layer (within a group)
   layerSpacing: 46,     // gap between layers (routing room, within a group)
   aspectRatio: 1.6,     // target width/height for the packed group boxes
   groupGap: 50,         // gap between packed group boxes
-  rootGap: 90,          // vertical gap between the root and the packed block
+  thesisGap: 90,        // vertical gap between the thesis and the packed block
   // Initial zoom-to-fit leaves this much of the viewport as margin.
   fitPadding: 0.92,
 } as const

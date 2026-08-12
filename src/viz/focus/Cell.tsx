@@ -113,7 +113,7 @@ export function InferenceBox({
   ]
   // Spine + wash by the stance of the inference's inputs (its grounds/warrants) — the
   // side it argues from — washed lighter than a claim so the tiles read on top. The
-  // contest tick takes the same stance. Neutral / no root falls back to a plain card
+  // contest tick takes the same stance. Neutral / no thesis falls back to a plain card
   // (grey spine, surface fill) so the box still has an edge.
   const stance = stanceStyle(combinedStance(useContext(StanceContext), inputs.map(i => i.id)), {
     neutralBg: COLORS.surface, neutralBorder: COLORS.border, fillOpacity: STANCE_CONTAINER_FILL_OPACITY,

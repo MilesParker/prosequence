@@ -27,7 +27,7 @@ function ViewSwitch({ view, onGraph, onFocus }: { view: View; onGraph: () => voi
 export function App() {
   const { data, graphData, bounds, groups, error, loading } = useDiscourseData()
 
-  // Restore the reader's last surface, centred claim and reference root (per
+  // Restore the reader's last surface, centred claim and reference thesis (per
   // corpus). Read once at mount; validated against the loaded data below.
   const persisted = useMemo(loadSettings, [])
 
@@ -37,20 +37,20 @@ export function App() {
   // The one shared selection (§9a): always a ClaimId, owned by neither view. It
   // drives the graph's centre-on-swap and the focus view's centre alike.
   const [focusId, setFocusId] = useState<string | null>(persisted.focusId ?? null)
-  // The reference root — the origin all stance is measured from. A movable viewing
+  // The reference thesis — the origin all stance is measured from. A movable viewing
   // choice, not a property of the claim, and deliberately DECOUPLED from selection:
-  // it defaults to the structural root and moves ONLY via the graph key's explicit
-  // "set reference root" mode, never as a side effect of selecting or centring a
+  // it defaults to the structural thesis and moves ONLY via the graph key's explicit
+  // "set reference thesis" mode, never as a side effect of selecting or centring a
   // claim. That keeps "what's ultimately at stake" from drifting to wherever you
-  // last clicked. States: undefined = pre-init (→ structural root); string = anchor;
+  // last clicked. States: undefined = pre-init (→ structural thesis); string = anchor;
   // null = unpainted (all neutral) — reachable only via an explicit clear, not by
   // deselecting.
   // Presence of the persisted key distinguishes a stored anchor/clear (string|null)
-  // from a first visit (undefined → structural-root default effect below).
-  const [refRootId, setRefRootId] = useState<string | null | undefined>(
-    'refRootId' in persisted ? persisted.refRootId : undefined,
+  // from a first visit (undefined → structural-thesis default effect below).
+  const [refThesisId, setRefThesisId] = useState<string | null | undefined>(
+    'refThesisId' in persisted ? persisted.refThesisId : undefined,
   )
-  // "Set reference root" mode, toggled from the key: while on, the next graph click
+  // "Set reference thesis" mode, toggled from the key: while on, the next graph click
   // nominates that claim as the origin instead of selecting it. Keeps re-anchoring a
   // deliberate act without hanging a control off every node (which the zoom layer
   // would shrink to nothing on the overview map anyway).
@@ -65,29 +65,29 @@ export function App() {
   const focusIdRef = useRef(focusId)
   useEffect(() => { focusIdRef.current = focusId }, [focusId])
 
-  const rootId = data?.roots?.[0] != null ? String(data.roots[0]) : null
+  const thesisId = data?.theses?.[0] != null ? String(data.theses[0]) : null
 
-  // One reference root is selected by default on load (the structural root) so the
+  // One reference thesis is selected by default on load (the structural thesis) so the
   // graph isn't blank — but it's only a default; the user can move it to any claim.
   useEffect(() => {
-    if (refRootId === undefined && rootId) setRefRootId(rootId)
-  }, [refRootId, rootId])
+    if (refThesisId === undefined && thesisId) setRefThesisId(thesisId)
+  }, [refThesisId, thesisId])
 
-  // Persist the view settings (surface, centred claim, reference root) so a reload
+  // Persist the view settings (surface, centred claim, reference thesis) so a reload
   // lands where the reader left off. Viewport ("location") is persisted separately
   // by the graph itself.
   useEffect(() => {
-    saveSettings({ view, focusId, refRootId })
-  }, [view, focusId, refRootId])
+    saveSettings({ view, focusId, refThesisId })
+  }, [view, focusId, refThesisId])
 
   // Drop restored ids that no longer exist in this corpus (e.g. the YAML changed
-  // since the last visit) so a stale focus/root can't point at nothing. Clearing
-  // refRootId to undefined re-triggers the structural-root default above.
+  // since the last visit) so a stale focus/thesis can't point at nothing. Clearing
+  // refThesisId to undefined re-triggers the structural-thesis default above.
   useEffect(() => {
     if (!data) return
     const ids = new Set((data.claims ?? []).map(c => String(c.id)))
     setFocusId(f => (f && !ids.has(f) ? null : f))
-    setRefRootId(r => (typeof r === 'string' && !ids.has(r) ? undefined : r))
+    setRefThesisId(r => (typeof r === 'string' && !ids.has(r) ? undefined : r))
   }, [data])
 
   // Search highlights matching claims on the map (no expansion — it's a static map).
@@ -104,24 +104,24 @@ export function App() {
   }, [])
 
   // Single click selects/centres a claim — nothing more; it never re-anchors the
-  // reference root (that's the key's explicit mode). A normal background click only
-  // deselects; the root is cleared ONLY from within "set reference root" mode, so a
+  // reference thesis (that's the key's explicit mode). A normal background click only
+  // deselects; the thesis is cleared ONLY from within "set reference thesis" mode, so a
   // stray click in normal use never drops it. Inference nodes aren't selectable.
   const handleSelect = useCallback((node: GraphNode | null) => {
     if (node) setHovered(null)
-    // In "set reference root" mode: a claim anchors the root there, empty space (or a
+    // In "set reference thesis" mode: a claim anchors the thesis there, empty space (or a
     // junction) CLEARS it — either way the one-shot mode ends.
     if (nominating) {
       setNominating(false)
-      setRefRootId(node?._kind === 'claim' ? String(node.id) : null)
+      setRefThesisId(node?._kind === 'claim' ? String(node.id) : null)
       return
     }
-    if (!node) { setFocusId(null); return }   // normal background → deselect only; root stays
+    if (!node) { setFocusId(null); return }   // normal background → deselect only; thesis stays
     if (node._kind === 'claim') setFocusId(String(node.id))
   }, [nominating])
 
   // Double-click a claim dives straight into the focus view for it, keeping the
-  // reference root where it is (you're centring on the claim, not re-anchoring the
+  // reference thesis where it is (you're centring on the claim, not re-anchoring the
   // whole space). No "came from" claim on a fresh entry from the graph.
   const handleActivate = useCallback((node: GraphNode) => {
     if (node._kind !== 'claim') return
@@ -135,9 +135,9 @@ export function App() {
   // The one deliberate way to move the origin all stance is measured from — wired to
   // the explicit target control on a claim, never to a plain tap. Selecting stays
   // cheap and frequent; re-anchoring stays rare and intentional.
-  // Re-anchoring the reference root is a graph-only act: arm "set reference root"
+  // Re-anchoring the reference thesis is a graph-only act: arm "set reference thesis"
   // mode from the key, then the next graph click nominates. The focus view can
-  // centre on any claim (a plain click) but never moves the root.
+  // centre on any claim (a plain click) but never moves the thesis.
   const toggleNominate = useCallback(() => setNominating(v => !v), [])
 
   // Refocus inside the stack (§7). The claim we leave becomes the "came from"
@@ -150,7 +150,7 @@ export function App() {
 
   // Focus-band return icon: drop back to the graph zoomed onto this claim's
   // immediate neighbourhood, rather than the generic back button's reveal. Centres
-  // on the claim without disturbing the reference root.
+  // on the claim without disturbing the reference thesis.
   const handleLocate = useCallback((id: string) => {
     setFocusId(id)
     setGraphEntryMode('neighborhood')
@@ -173,17 +173,17 @@ export function App() {
     }
   }, [])
 
-  // Null selection defaults to a root when entering the focus view (§9a-2/§10.3).
+  // Null selection defaults to a thesis when entering the focus view (§9a-2/§10.3).
   useEffect(() => {
-    if (view === 'focus' && !focusId && rootId) setFocusId(rootId)
-  }, [view, focusId, rootId])
+    if (view === 'focus' && !focusId && thesisId) setFocusId(thesisId)
+  }, [view, focusId, thesisId])
 
   if (loading) return <Loading />
   if (error)   return <Loading message={`Failed to load YAML: ${error}`} error />
   if (!data || !graphData || !bounds || !groups) return null
 
   const gd = graphData as GraphData
-  const fid = focusId ?? rootId
+  const fid = focusId ?? thesisId
 
   return (
     <>
@@ -205,7 +205,7 @@ export function App() {
             highlight={highlight}
             centerOn={focusId}
             centerMode={graphEntryMode}
-            referenceRootId={refRootId ?? null}
+            referenceThesisId={refThesisId ?? null}
             onHover={handleHover}
             onSelect={handleSelect}
             onActivate={handleActivate}
@@ -214,11 +214,11 @@ export function App() {
           <Legend nominating={nominating} onToggleNominate={toggleNominate} />
         </>
       ) : (
-        // The focus view pins the same reference root the graph measures from
-        // (Stage 3). When the root has been cleared to null, fall back to the
-        // structural root so "what's ultimately at stake" — the always-available
+        // The focus view pins the same reference thesis the graph measures from
+        // (Stage 3). When the thesis has been cleared to null, fall back to the
+        // structural thesis so "what's ultimately at stake" — the always-available
         // top — is never blank; the graph stays unpainted in that state regardless.
-        fid && <FocusView gd={gd} focusId={fid} fromId={fromId} referenceRootId={refRootId ?? rootId} onFocus={navigate} onLocate={handleLocate} />
+        fid && <FocusView gd={gd} focusId={fid} fromId={fromId} referenceThesisId={refThesisId ?? thesisId} onFocus={navigate} onLocate={handleLocate} />
       )}
     </>
   )

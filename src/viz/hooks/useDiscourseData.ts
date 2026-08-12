@@ -14,6 +14,20 @@ interface Result {
   error: string | null
 }
 
+/**
+ * The one place the parsed YAML is reconciled with the schema. `roots` is the
+ * pre-rename spelling of `theses`, read but never written: the dev server
+ * serves the newest commit touching a corpus, which may be an ingest branch
+ * that predates the rename, so the viewer has to accept both. Normalizing here
+ * rather than at each reader keeps `DiscourseSpace.theses` the only spelling
+ * anything downstream knows about.
+ */
+function normalize(parsed: DiscourseSpace): DiscourseSpace {
+  const legacy = (parsed as { roots?: unknown }).roots
+  if (parsed.theses || !Array.isArray(legacy)) return parsed
+  return { ...parsed, theses: legacy as DiscourseSpace['theses'] }
+}
+
 export function useDiscourseData(): Result {
   const [data, setData]           = useState<DiscourseSpace | null>(null)
   const [graphData, setGraphData] = useState<GraphData | null>(null)
@@ -29,7 +43,7 @@ export function useDiscourseData(): Result {
         const resp = await fetch(DATA_FILE)
         if (!resp.ok) throw new Error(`HTTP ${resp.status}`)
         const raw = await resp.text()
-        const parsed = jsyaml.load(raw) as DiscourseSpace
+        const parsed = normalize(jsyaml.load(raw) as DiscourseSpace)
         const gd = buildGraphData(parsed)
         const r = await layoutGraph(gd)   // ELK is async; positions land on gd's nodes/links
         if (!cancelled) {

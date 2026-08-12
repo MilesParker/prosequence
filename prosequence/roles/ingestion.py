@@ -34,7 +34,7 @@ from langchain_core.messages import HumanMessage
 from . import salvage
 from .apply import FINDING_TOOL_SCHEMA, FindingShapeError, ops_from_finding
 from .corpus_view import render_corpus
-from .plan import AddClaim, AddInference, Op, PlanError, check_plan
+from .plan import AddClaim, AddInference, DesignateThesis, Op, PlanError, check_plan
 from .prompts import INGESTION
 from .repair import Unrepairable, repair_plan
 from .role import Role
@@ -47,7 +47,13 @@ class IngestionRole(Role):
     # text of a claim already in the corpus. Rewriting settled claims is a
     # different role's business, and a plan containing that op is refused here
     # before any of it runs.
-    capability: tuple[type[Op], ...] = (AddClaim, AddInference)
+    #
+    # `DesignateThesis` IS held, and is additive on the same terms: it appends
+    # to `theses` and can never remove. A document that argues from the standing
+    # thesis to a further claim is extending the argument upward, which is
+    # ordinary ingestion; refusing it would have made the questions a corpus can
+    # argue about permanent at genesis.
+    capability: tuple[type[Op], ...] = (AddClaim, AddInference, DesignateThesis)
     role_prompt: str = INGESTION
 
     # -- subclass hooks ----------------------------------------------------

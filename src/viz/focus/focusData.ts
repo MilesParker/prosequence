@@ -32,16 +32,16 @@ export function outputOf(inf: Inference): Output {
  * output claim's stance: an inference that contests an aligned claim argues from the
  * opposed side, so its box reads opposed while the contested claim's own tile stays
  * aligned. (It matches the graph's `edgeStance`, which colours an edge by the end
- * further from the root — the grounds' side.) One stance among the inputs ⇒ that
- * stance; both poles present (or any `divided`) ⇒ `divided`; all neutral / no root ⇒
- * undefined (the box falls back to a plain card). The reference root itself counts as
+ * further from the thesis — the grounds' side.) One stance among the inputs ⇒ that
+ * stance; both poles present (or any `divided`) ⇒ `divided`; all neutral / no thesis ⇒
+ * undefined (the box falls back to a plain card). The reference thesis itself counts as
  * `aligned`, mirroring `useStance`.
  */
 export function combinedStance(sm: StanceMap | null, ids: string[]): Stance | undefined {
   if (!sm) return undefined
   let aligned = false, opposed = false, divided = false
   for (const id of ids) {
-    const st = id === sm.refRootId ? 'aligned' : sm.node.get(id)
+    const st = id === sm.refThesisId ? 'aligned' : sm.node.get(id)
     if (st === 'aligned') aligned = true
     else if (st === 'opposed') opposed = true
     else if (st === 'divided') divided = true
@@ -77,7 +77,7 @@ export function renderedClaimIds(gd: GraphData, focusId: string): Set<string> {
  * a tap target (a cell ground/warrant or a parent destination) whose own
  * support/attack is off-frame. Walks down from `id` (its supporting/attacking
  * inferences → their grounds/warrants, recursively) and reports where everything
- * hidden past it leads *relative to the reference root*, reusing the Stage 3 stance
+ * hidden past it leads *relative to the reference thesis*, reusing the Stage 3 stance
  * map: one-sided ⇒ that stance's colour, two-sided (or any genuinely `divided`
  * node) ⇒ `divided`. Claims already on screen (`visible`) are the frame, not the
  * frontier, so they don't count — we still descend past them to reach what's

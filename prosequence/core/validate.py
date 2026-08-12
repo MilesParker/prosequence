@@ -8,8 +8,8 @@ so there is no auto-fix.
 
 Every invariant violation (I1–I10) is an error: exit status is non-zero if any
 error is found. GAP-6 gaps are reported as warnings — a claim that is
-non-terminal, non-attributive, not a root, and concluded by nothing is either
-an authoring gap or a claim that should be declared a root. A warning is
+non-terminal, non-attributive, not a thesis, and concluded by nothing is either
+an authoring gap or a claim that should be declared a thesis. A warning is
 reported but does not affect exit status.
 
 Usage: python validate.py <corpus.yaml> [<corpus.yaml> ...]
@@ -34,7 +34,7 @@ class Violation:
     string is derived from it, so the two cannot drift.
 
     `iid` is the inference at fault, or "-" where the invariant is not about one
-    (a root that does not resolve; a cycle, which is a property of a path rather
+    (a thesis that does not resolve; a cycle, which is a property of a path rather
     than of any single edge). `nodes` carries the cycle path for I6 and is empty
     otherwise — for a cycle, every inference on it is a candidate for removal
     and choosing between them is the caller's policy, not the validator's.
@@ -63,15 +63,23 @@ _UNKNOWN = ArgumentScheme.UNKNOWN.value
 _SCHEMES = {s.value for s in ArgumentScheme}
 
 
-def roots_of(d):
+def theses_of(d):
     # `or []` guards the empty-collection case: the canonical serializer emits an
-    # empty `roots:` block (a corpus freshly ingested into has claims but no
-    # roots yet), which round-trips through yaml as None, not [].
-    if 'roots' in d:
-        return list(d['roots'] or [])
+    # empty `theses:` block (a corpus freshly ingested into has claims but no
+    # theses yet), which round-trips through yaml as None, not [].
+    #
+    # `roots` is the pre-rename spelling of the same key, read but never
+    # written. The validator runs over blobs from any commit in the corpus
+    # repo's history — repair re-validates a predicted corpus, and the CLI is
+    # pointed at whatever file a reader hands it — so refusing the old key
+    # would make every corpus committed before the rename unvalidatable.
+    for key in ('theses', 'roots'):
+        if key in d:
+            return list(d[key] or [])
     for k in ('discourseSpace', 'discourse_space'):
         if k in d:
-            return list(d[k].get('roots') or [])
+            inner = d[k]
+            return list(inner.get('theses') or inner.get('roots') or [])
     return []
 
 
@@ -98,7 +106,7 @@ def check_violations(d, path=""):
     # `or []`: an empty `claims:`/`inferences:` block serializes to None, not [].
     claims = {c['id']: c for c in d.get('claims') or []}
     infs   = {i['id']: i for i in d.get('inferences') or []}
-    roots  = roots_of(d)
+    theses = theses_of(d)
 
     errs  = []   # errors -> non-zero exit
     warns = []   # warnings (GAP-6 gaps) -> reported only
@@ -183,10 +191,10 @@ def check_violations(d, path=""):
                  f"schemeDescriptor {descriptor!r} with scheme {scheme!r} "
                  f"(a descriptor implies scheme {_UNKNOWN})")
 
-    # I3 — roots resolve to claims.
-    for r in roots:
+    # I3 — theses resolve to claims.
+    for r in theses:
         if r not in claims:
-            fail("I3", "-", r, "root id does not resolve to a claim")
+            fail("I3", "-", r, "thesis id does not resolve to a claim")
 
     # I6 — the graph of Concludes edges is acyclic. Support chains
     #      (grounds/warrants -> inference -> concludes) may not cycle; contests
@@ -222,18 +230,18 @@ def check_violations(d, path=""):
             dfs(n, [n])
 
     # GAP-6 (warning) — a non-terminal, non-attributive claim that is not a
-    #     root and is concluded by nothing is either an authoring gap or a
-    #     claim that should be declared a root. Warned, never an error.
+    #     thesis and is concluded by nothing is either an authoring gap or a
+    #     claim that should be declared a thesis. Warned, never an error.
     concluded = {i.get('target') for i in infs.values() if i.get('relation') == _CONCLUDES}
     for cid, c in claims.items():
         if c.get('terminal'):
             continue
         if c.get('attribution') is not None:
             continue
-        if cid in roots:
+        if cid in theses:
             continue
         if cid not in concluded:
-            warns.append(f"{path}: GAP6 - {cid}  non-terminal, non-attributive, not a root, and concluded by nothing (GAP-6 gap, or it should be a root)")
+            warns.append(f"{path}: GAP6 - {cid}  non-terminal, non-attributive, not a thesis, and concluded by nothing (GAP-6 gap, or it should be a thesis)")
 
     return errs, warns
 
@@ -243,9 +251,10 @@ def validate(path):
     errs, warns = check(d, path)
     claims = d.get('claims') or []
     infs = d.get('inferences') or []
-    roots = roots_of(d)
+    theses = theses_of(d)
 
-    print(f"{path}: {len(claims)} claims, {len(infs)} inferences, {len(roots)} root(s)")
+    print(f"{path}: {len(claims)} claims, {len(infs)} inferences, "
+          f"{len(theses)} thes{'is' if len(theses) == 1 else 'es'}")
     for w in warns:
         print("   WARN", w)
     if errs:

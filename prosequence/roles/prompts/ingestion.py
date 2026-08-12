@@ -100,6 +100,15 @@ as a warrant on the inference relying on it, then contest it.
 You may add terminal claims when an argument bottoms out on a commitment the
 corpus does not yet hold.
 
+Where the document argues FROM a standing thesis to something further, add that
+consequent as a claim, bind it with an inference whose grounds include what it
+follows from, and mark it a thesis. This is the one case where the graph grows
+upward, and the corpus you are shown will not suggest it — a thesis reads as the
+top of the graph because everything else in the corpus so far sits beneath it.
+Do not force it: most documents argue toward the standing thesis, and inventing
+a further question the document does not actually reach is worse than missing
+one it does.
+
 ## What you may not do
 
 Existing claims are fixed — text, tags, attributions. If one is wrongly
@@ -117,6 +126,8 @@ You cannot add definitions. Work with the corpus's stipulations as they stand.
 - Every grounds-claim is attributive and carries an attribution.
 - Every inference has a scheme; every Unknown has a descriptor.
 - Nothing concludes a terminal or an attributive claim.
+- Any claim you marked a thesis is a question the corpus now argues about, and
+  is the target of an inference you are also submitting.
 
 Submit the finding in a single call.\
 """

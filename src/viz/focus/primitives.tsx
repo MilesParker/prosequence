@@ -5,7 +5,7 @@
 // shared pip/colour tokens; they do not reach above the primitive level.
 
 import { createContext, useContext } from 'react'
-import { COLORS, FOCUS, REF_ROOT, SHOW_FOCUS_TAGS, STANCE_FILL_OPACITY, STANCE_SELECTED_FILL_OPACITY, TAG_TEXT } from '../../config'
+import { COLORS, FOCUS, REF_THESIS, SHOW_FOCUS_TAGS, STANCE_FILL_OPACITY, STANCE_SELECTED_FILL_OPACITY, TAG_TEXT } from '../../config'
 import type { GraphData, StanceMap, Stance } from '../graphData'
 import { stanceColor } from '../graphData'
 import { getClaim, frontierStance } from './focusData'
@@ -37,32 +37,32 @@ export const HoverContext = createContext<(id: string | null, x?: number, y?: nu
 /**
  * The Stage 3 stance map plus the claims currently on screen, provided by the
  * focus view so any claim rendered as a continuation can mark what's hidden past
- * it (see `frontierStance`). Null when there's no reference root to measure from.
+ * it (see `frontierStance`). Null when there's no reference thesis to measure from.
  */
 export const FrontierContext = createContext<{ sm: StanceMap; visible: Set<string> } | null>(null)
 
 // ── Stance fill ───────────────────────────────────────────────────────────────
 //
 // Stance is the absolute channel: where a claim sits relative to the reference
-// root. It is carried by the FILL on every claim surface (this replaces the old
+// thesis. It is carried by the FILL on every claim surface (this replaces the old
 // frontier-chevron colouring), mirroring the graph's node wash so the two surfaces
 // cannot drift. POSITION (For/Against, Supports/Contests) stays a separate channel
 // carried by layout + chrome tint; the two are independent and both hues appearing
-// in one column is the expected off-root state, not an error.
+// in one column is the expected off-thesis state, not an error.
 
 /** The Stage-3 stance map, provided by the focus view so every claim surface can
- *  paint its own stance. Null when there is no reference root to measure against —
- *  then nothing is painted (the honesty constraint: no fill without a legible root
- *  in the frame, which the pinned root line / focus-band header guarantee). */
+ *  paint its own stance. Null when there is no reference thesis to measure against —
+ *  then nothing is painted (the honesty constraint: no fill without a legible thesis
+ *  in the frame, which the pinned thesis line / focus-band header guarantee). */
 export const StanceContext = createContext<StanceMap | null>(null)
 
-/** This claim's stance relative to the reference root. The root is `aligned` by
+/** This claim's stance relative to the reference thesis. The thesis is `aligned` by
  *  construction (it is on its own side); `computeStance` leaves it out of the map,
- *  so we special-case it exactly as the graph does. Undefined ⇒ neutral / no root. */
+ *  so we special-case it exactly as the graph does. Undefined ⇒ neutral / no thesis. */
 export function useStance(id: string): Stance | undefined {
   const sm = useContext(StanceContext)
   if (!sm) return undefined
-  return id === sm.refRootId ? 'aligned' : sm.node.get(id)
+  return id === sm.refThesisId ? 'aligned' : sm.node.get(id)
 }
 
 /** 'hsl(h, s%, l%)' → 'hsla(h, s%, l%, a)'. The pale wash is derived from the one
@@ -88,16 +88,16 @@ export function stanceStyle(
   return { background: hslaFrom(hue, alpha), borderColor: hue }
 }
 
-/** The reference-root "target": a small bullseye in ink, no stance hue — it marks
+/** The reference-thesis "target": a small bullseye in ink, no stance hue — it marks
  *  the origin all stance is measured from, matching the graph's ringed target. Used
- *  only to *label* the root in the focus view (root line / focus-band header); the
- *  reference root is moved from the graph's key, never from here. */
+ *  only to *label* the thesis in the focus view (thesis line / focus-band header); the
+ *  reference thesis is moved from the graph's key, never from here. */
 export function TargetIcon({ size = FOCUS.targetIcon }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={REF_ROOT.ringColor} strokeWidth="2" aria-hidden>
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={REF_THESIS.ringColor} strokeWidth="2" aria-hidden>
       <circle cx="12" cy="12" r="9" />
       <circle cx="12" cy="12" r="4.5" />
-      <circle cx="12" cy="12" r="1.4" fill={REF_ROOT.ringColor} stroke="none" />
+      <circle cx="12" cy="12" r="1.4" fill={REF_THESIS.ringColor} stroke="none" />
     </svg>
   )
 }
@@ -155,7 +155,7 @@ function FrontierGlyph({ color }: { color: string }) {
  * open it to follow." Stance itself is now the surface fill, so the chevron only
  * marks *presence* of a hidden branch — `frontierStance` is reused purely as the
  * "is anything hidden past here" oracle (non-null), its hue discarded. Nothing at
- * all when there's no reference root, or when nothing is hidden past this claim.
+ * all when there's no reference thesis, or when nothing is hidden past this claim.
  * Terminals keep the badge in ADDITION to their fill (the fill comes from the row).
  */
 export function FrontierMark({ gd, id }: { gd: GraphData; id: string }) {
@@ -236,8 +236,8 @@ export function ClaimTile({
   const hl = useFromHighlight(id)
   const onHover = useContext(HoverContext)
   const onLocate = useContext(LocateContext)
-  // Tiles are standalone surfaces, so neutral / no-root paints a plain card edge
-  // rather than nothing — stance fill takes over the moment a root is in frame. The
+  // Tiles are standalone surfaces, so neutral / no-thesis paints a plain card edge
+  // rather than nothing — stance fill takes over the moment a thesis is in frame. The
   // centred tile mirrors the focus band: the selected (denser) fill and a 2px stroke.
   const stance = stanceStyle(useStance(id), { selected: centred, neutralBg: COLORS.surface, neutralBorder: COLORS.border })
   return (

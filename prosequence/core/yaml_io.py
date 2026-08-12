@@ -43,6 +43,7 @@ from .types import (  # noqa: F401
     INFERENCE_KEYS,
     Inference,
     InferenceId,
+    LEGACY_CORPUS_KEYS,
     Relation,
     SOURCE_KEYS,
     SUBMISSION_STATUSES,
@@ -131,13 +132,21 @@ def _load_inference(raw) -> Inference:
 
 
 def _corpus_from_dict(data) -> Corpus:
-    _reject_unknown("corpus", data, CORPUS_KEYS)
+    # LEGACY_CORPUS_KEYS carries `roots`, the pre-rename spelling of `theses`:
+    # read here so every corpus committed before the rename still loads, and
+    # absent from the emitter below so nothing writes it back.
+    _reject_unknown("corpus", data, CORPUS_KEYS + LEGACY_CORPUS_KEYS)
+    if "theses" in data and "roots" in data:
+        raise ValueError(
+            "corpus: both `theses` and `roots` are present; `roots` is the "
+            "pre-rename spelling of the same key and the two cannot be "
+            "reconciled — keep `theses`")
     return Corpus(
         id=data["id"],
         title=data["title"],
         definitions=tuple(_load_definition(d)
                           for d in data.get("definitions") or ()),
-        roots=tuple(data.get("roots") or ()),
+        theses=tuple(data.get("theses") or data.get("roots") or ()),
         claims=tuple(_load_claim(c) for c in data.get("claims") or ()),
         inferences=tuple(_load_inference(i)
                          for i in data.get("inferences") or ()),
@@ -266,7 +275,7 @@ def serialize(corpus: Corpus) -> str:
     for d in corpus.definitions:
         _emit_definition(d, 2, out)
 
-    _emit_id_list("roots", corpus.roots, 0, out)
+    _emit_id_list("theses", corpus.theses, 0, out)
 
     out.append("claims:")
     for n, c in enumerate(corpus.claims):

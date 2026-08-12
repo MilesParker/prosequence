@@ -36,7 +36,7 @@ Two node types. Role is positional throughout; nothing about a node's type says 
 - IDs are branded string types (ClaimId, InferenceId, DiscourseSpaceId) — not interchangeable with plain strings
 - terminal: boolean — true means this is a bedrock commitment; no inference may conclude it. False and unconcluded means "not yet supported" (a gap), not "cannot be supported." This is the one place the model distinguishes bedrock from absence.
 - attribution?: { source: GroundsSource; quote: string | null } — present iff the claim's text is attributive ("Source X reports Y"). Attributive claims are the empirical leaves: they bottom out by checkability against the source, not by the terminal flag. A claim can migrate from contested to attributive as a debate settles elsewhere (e.g. "smoking causes cancer" moving from a once-contested claim into other corpora's attributions).
-- A claim with no incoming Concludes edge and terminal: false is either a currently-designated root (see DiscourseSpace.roots) or a genuine gap (GAP 6).
+- A claim with no incoming Concludes edge and terminal: false is either a currently-designated thesis (see DiscourseSpace.theses) or a genuine gap (GAP 6).
 
 **Inference** — the only structural node; carries no content
 - id, scheme: ArgumentScheme, uncertain, submissionStatus
@@ -58,7 +58,7 @@ Support and contest are the same structural relation with opposite polarity, so 
 **DiscourseSpace**
 - id, title
 - definitions: Definition[]
-- roots: ClaimId[] — the claims currently designated as contested questions (entry points for a view). Not an owned type; any claim can be a root, and a discourse space may have more than one live proposition at once (e.g. a factual question and a separate designational/policy question sharing the same claim and inference graph).
+- theses: ClaimId[] — the claims currently designated as contested questions (entry points for a view). Not an owned type; any claim can be a thesis, and a discourse space may have more than one live proposition at once (e.g. a factual question and a separate designational/policy question sharing the same claim and inference graph).
 - claims: Claim[]
 - inferences: Inference[]
 
@@ -102,7 +102,7 @@ Relation: CONCLUDES | CONTESTS
 
 This subsumes the v2-draft undercut. `CONTESTS` on an ordinary Claim = rebut; `CONTESTS` on an attributive Claim = undermine. There is no third case, and no taxonomy field is needed.
 
-**Proposition is not a type.** A proposition is a claim currently designated as a contested question — listed in `DiscourseSpace.roots`. Any claim's content is a candidate proposition (the sub-graph of inferences attacking/supporting it is locally shaped like a discourse space rooted there). A discourse space may hold multiple roots simultaneously sharing one graph (e.g. "did X happen" and "should X be designated Y" as two roots over overlapping claims and inferences) — this replaces the v1 idea of enlarging a single proposition's scope to absorb consequentialist arguments that don't belong to the factual question.
+**Proposition is not a type.** A proposition is a claim currently designated as a contested question — listed in `DiscourseSpace.theses`. Any claim's content is a candidate proposition (the sub-graph of inferences attacking/supporting it is locally shaped like a discourse space thesised there). A discourse space may hold multiple theses simultaneously sharing one graph (e.g. "did X happen" and "should X be designated Y" as two theses over overlapping claims and inferences) — this replaces the v1 idea of enlarging a single proposition's scope to absorb consequentialist arguments that don't belong to the factual question.
 
 **Terminal value nodes are not a type.** `Claim.terminal: boolean` marks bedrock. The gatekeeper must refuse any inference that would conclude a terminal claim. Distinguishes "cannot be supported within this space" (terminal) from "not yet supported" (a GAP 6 gap) — a distinction the topology alone cannot make, which is why this is the one flag the schema keeps.
 
@@ -112,7 +112,7 @@ This subsumes the v2-draft undercut. `CONTESTS` on an ordinary Claim = rebut; `C
 
 **Warrants carry no attribution.** New rule — SESSION_FEED settled attribution for grounds-claims and said nothing about warrants; a warrant claim never gets an `attribution` block. Not yet enforced: no invariant in `validate.py` checks it.
 
-**Discourse spaces are constituted by their definitions, not their proposition(s).** Two spaces are the same space iff they share compatible definitions for their key terms. Propositions (roots) are views into a space, not what defines it. This resolves the old "what defines a discourse space" ambiguity in favor of the definition layer.
+**Discourse spaces are constituted by their definitions, not their proposition(s).** Two spaces are the same space iff they share compatible definitions for their key terms. Propositions (theses) are views into a space, not what defines it. This resolves the old "what defines a discourse space" ambiguity in favor of the definition layer.
 
 **One validator: `validate.py` is canonical.** A parallel TypeScript validator existed with a divergent rule set and was deleted; its GAP 6 detection was ported across as a warning. Invariants are errors unless explicitly marked warnings; the vocabulary is "error" and "warning", not hard/soft.
 
@@ -122,15 +122,15 @@ This subsumes the v2-draft undercut. `CONTESTS` on an ordinary Claim = rebut; `C
 
 **LLM role is Socratic gatekeeper not judge.** Unchanged. Surfaces implicit warrants, enforces the attributive-claim discipline, checks well-formedness, refuses inferences that would conclude a terminal claim or duplicate an existing claim under different wording. Never rules on correctness. This is the general philosophy; the ingestion role's concrete instantiation diverges on two points — see Agent Roles.
 
-**Graph depth ≠ argumentative importance.** Unchanged, though depth is now purely computed (BFS from roots alternating claim/inference layers) rather than a stored field.
+**Graph depth ≠ argumentative importance.** Unchanged, though depth is now purely computed (BFS from theses alternating claim/inference layers) rather than a stored field.
 
 **Example nodes route through generalisation claims.** A specific case's inference concludes a generalisation claim; the generalisation's own inference (carrying the representativeness warrant) concludes the claim it supports. Never a direct inference from example to non-generalisation claim.
 
-**Mediating claims do not connect directly to a root.** A claim is mediating if no inference exists (or should exist) from it directly concluding/contesting a root claim — it only feeds inferences for other, non-root claims. No longer a stored flag; a topological fact, checked at gatekeeping time with the same test as before: "would this claim be a reason to adopt/reject the root even with no downstream effects?"
+**Mediating claims do not connect directly to a thesis.** A claim is mediating if no inference exists (or should exist) from it directly concluding/contesting a thesis claim — it only feeds inferences for other, non-thesis claims. No longer a stored flag; a topological fact, checked at gatekeeping time with the same test as before: "would this claim be a reason to adopt/reject the thesis even with no downstream effects?"
 
 **TypeScript interfaces are the canonical schema definition.** See `src/types.ts`. YAML is the human-readable storage format. Git for versioning.
 
-**Cluster is retired.** Every value it carried was already representable elsewhere and better located there: `Terminal` duplicated `Claim.terminal`; `Pro`/`Anti` are root-relative stance, computed from topology, not properties of a claim; `Analogy` is `Inference.scheme = FromAnalogy`; `Empirical` is the presence of `attribution`. Argument type and approach are carried by `Inference.scheme` and `attribution.source.type` together — the claim records who said it, the inference records what kind of move consumes it. One enum forcing an exclusive choice between orthogonal dimensions was the defect, not a gap.
+**Cluster is retired.** Every value it carried was already representable elsewhere and better located there: `Terminal` duplicated `Claim.terminal`; `Pro`/`Anti` are thesis-relative stance, computed from topology, not properties of a claim; `Analogy` is `Inference.scheme = FromAnalogy`; `Empirical` is the presence of `attribution`. Argument type and approach are carried by `Inference.scheme` and `attribution.source.type` together — the claim records who said it, the inference records what kind of move consumes it. One enum forcing an exclusive choice between orthogonal dimensions was the defect, not a gap.
 
 **`Inference.note` is retired.** Applicability remarks in prose were the informal escape hatch the enthymeme-completion thesis already forbids: if a note carries an applicability assumption it is an unsurfaced enthymeme and belongs in `warrants` as an attackable claim; if it is authoring commentary it is not argument content and does not belong in the schema. Empirically, 46 of 158 inferences carried a note and 3 held argument content — see DESIGN_HISTORY.
 
@@ -142,7 +142,7 @@ This subsumes the v2-draft undercut. `CONTESTS` on an ordinary Claim = rebut; `C
 
 **The descriptor lives on the node, not in the commit message.** Routing it to the change record was rejected: the classification is a property of the inference, not of the agent that made it, and log-trawling is not a maintainable retrieval path. It survives the `Inference.note` test because it is neither argument content nor authoring commentary. Drift is fenced by the name, by I9, and by the write-boundary biconditional rather than by convention.
 
-**Stance is computed per reference root, never stored.** A claim's valence is a fact about a path to a commitment, not a property of the statement — the same claim is aligned toward one root and opposed toward another. `computeStance(graph, referenceRootId)` returns `aligned | opposed | divided | neutral` for every node. Divided means paths of conflicting parity; neutral means no path to the root at all, which is absence of stance rather than a point on the axis. The reference root is nominatable and decoupled from selection.
+**Stance is computed per reference thesis, never stored.** A claim's valence is a fact about a path to a commitment, not a property of the statement — the same claim is aligned toward one thesis and opposed toward another. `computeStance(graph, referencethesisId)` returns `aligned | opposed | divided | neutral` for every node. Divided means paths of conflicting parity; neutral means no path to the thesis at all, which is absence of stance rather than a point on the axis. The reference thesis is nominatable and decoupled from selection.
 
 **Ids are opaque and non-semantic — now actually so.** UUIDv7 throughout. The slug ids violated a rule the schema already stated; the migration brought the corpora into conformance rather than revising anything, which is why the filenames did not move to v3. Ids are never parsed, never carry type or role, never appear in a tag. The cost is that reference sites are no longer scannable; readability moved to `tag`.
 
@@ -214,12 +214,12 @@ Give a contesting inference its own grounds and, where the attack itself rests o
 When an argument accepts a warrant's general validity but disputes that it applies to this specific link, find the warrant claim carrying the applicability assumption and rebut it. If the inference does not state one, add it to `warrants` first — the assumption was always there, unstated. An inference id cannot be a target; since v2.2 the schema cannot express it.
 
 **Example claims route through generalisation claims.**
-A specific case (Boston, Kansas City, Luxembourg) is never concluded by an inference that also concludes a root or a non-generalisation claim. Its inference concludes a generalisation claim; the generalisation's inference (carrying the representativeness warrant) concludes the claim it supports.
+A specific case (Boston, Kansas City, Luxembourg) is never concluded by an inference that also concludes a thesis or a non-generalisation claim. Its inference concludes a generalisation claim; the generalisation's inference (carrying the representativeness warrant) concludes the claim it supports.
 
-**Mediating claims must not be concluded/contested-into by an inference targeting a root.**
-Test unchanged: "would this claim be a reason to adopt/reject the root even if it produced no downstream effects?" If no, do not add an inference from it to a root claim.
+**Mediating claims must not be concluded/contested-into by an inference targeting a thesis.**
+Test unchanged: "would this claim be a reason to adopt/reject the thesis even if it produced no downstream effects?" If no, do not add an inference from it to a thesis claim.
 
-**Only intrinsically valuable claims connect directly to a root.**
+**Only intrinsically valuable claims connect directly to a thesis.**
 Unchanged in spirit.
 
 **Claim and its grounds-claim must be genuinely distinct.**
@@ -235,9 +235,9 @@ No named philosophical frameworks. `terminal: true`. No inference may conclude a
 
 ## Views (Settled)
 
-Both views are built. They swap, never coexist, and share one `ClaimId` selection plus one reference root.
+Both views are built. They swap, never coexist, and share one `ClaimId` selection plus one reference thesis.
 
-**Shared.** Design tokens, the derived indices (`supports`, `attacks`, `consumers`, computed once on load), the selection, the reference root, and `computeStance`. Not shared: layout, composition, and node/cell rendering above the primitive level.
+**Shared.** Design tokens, the derived indices (`supports`, `attacks`, `consumers`, computed once on load), the selection, the reference thesis, and `computeStance`. Not shared: layout, composition, and node/cell rendering above the primitive level.
 
 **Stance rendering.** The graph carries stance on nodes and edges; edge geometry (a double-tick slash) carries `CONCLUDES` vs `CONTESTS` independently of hue. The focus view carries stance on frontier chevrons. Palette poles are matched on perceived loudness rather than equal lightness/chroma, since blue is gamut-limited; `divided` is set apart by low chroma and its hue must avoid both pole families.
 
@@ -249,9 +249,9 @@ Both views are built. They swap, never coexist, and share one `ClaimId` selectio
 - Frontier chevrons replaced pips entirely. Chevrons render on every claim row wherever one appears, never on the focus band; terminals render a `bedrock` badge instead. A chevron answers "there is more this way, and here is where it leads" — a different question from the retired supported/contested pip.
 - The cell conjunction label is `assumes` / `assumes, together`. "Because" in natural language signals grounds, not warrants.
 - Column tint applies to chrome only — headings, pager, labels — never to claim-bearing surfaces. The warrant bracket is neutral.
-- A pinned reference-root line sits at the top of the stack with a target icon; a torn-sheet divider shows hop count when the centered claim is off-root.
+- A pinned reference-thesis line sits at the top of the stack with a target icon; a torn-sheet divider shows hop count when the centered claim is off-thesis.
 - Per-claim "show in graph" locate and a "came from" back-trace are kept. Neither changes selection.
-- `roots[0]` is the default centre and the default reference root.
+- `theses[0]` is the default centre and the default reference thesis.
 - Attribution renders in the focus band only.
 - Never rendered anywhere in the focus view: `id`, `scheme`, computed depth, `tag`, `submissionStatus`, `uncertain`. Depth especially — it is inferential distance and explicitly not importance.
 
@@ -292,7 +292,7 @@ Both views are built. They swap, never coexist, and share one `ClaimId` selectio
 
 - **The viz becomes a client of a local service.** Derivation lives once, in Python, beside the store and validator. This was already forced in miniature: a divergent TypeScript validator reimplemented the invariants, drifted, and was deleted. The same pressure applies to every derived value the two sides share.
 - **The fetch boundary is at version change, never at interaction.** One request per (corpus, version) returns a derived bundle — parsed graph, derived indices, stance. Layout, selection, paging, and animation then run from memory. No interaction path touches the network.
-- **The bundle carries stance for every candidate root**, so root nomination is a lookup rather than a fetch. Nomination stays a front-end concern without stance being computed twice. Revisit when corpus size shows up in a profile, not before.
+- **The bundle carries stance for every candidate thesis**, so thesis nomination is a lookup rather than a fetch. Nomination stays a front-end concern without stance being computed twice. Revisit when corpus size shows up in a profile, not before.
 - **The service reads the working-tree file by default and takes an optional sha.** Hand-editing keeps edit-and-reload immediacy, and replay becomes a viewing mode rather than a checkout.
 - **Agent activity surfaces as an indicator, not a live update.** The reader binds a version as an agent does and rebinds deliberately. A graph re-laying-out under someone reading it is hostile, and arriving nodes collide with the focus view's flight animation.
 - **The derived indices have exactly one implementation.** Stance drifting has a visible symptom — the colour discordance was two implementations disagreeing about what stance was relative to. An index drifting has none; it quietly renders the wrong parent band.
@@ -435,7 +435,7 @@ Node references in this section use pre-v2.2 slug ids. Resolve them through `mig
 
 **GAP 5: User identity and submission history** — unresolved but now recognized as architecturally central rather than peripheral. Prasanga traversal — showing a participant the consequences of their own committed claims — requires knowing which claims a given agent accepts. This is not just a trust/weighting feature; it's a prerequisite for the framework's core mechanism.
 
-**GAP 6: Representing missing arguments** — unresolved, now partly detectable. `validate.py` warns on candidates (free-transit 34, freedman 4, gaza 5), but a warning cannot distinguish an intentional root from an overlooked gap from an unfinished thought. Live instance: `i-obama-attacks-deal` in freedman attacks `c-deal-ended-economic-harm`, but its grounds bear on deal quality, not on economic harm — and the pro argument it was written against was never extracted. Its retired note referred to "the pro warrant," a thing not in the corpus. Unrepaired.
+**GAP 6: Representing missing arguments** — unresolved, now partly detectable. `validate.py` warns on candidates (free-transit 34, freedman 4, gaza 5), but a warning cannot distinguish an intentional thesis from an overlooked gap from an unfinished thought. Live instance: `i-obama-attacks-deal` in freedman attacks `c-deal-ended-economic-harm`, but its grounds bear on deal quality, not on economic harm — and the pro argument it was written against was never extracted. Its retired note referred to "the pro warrant," a thing not in the corpus. Unrepaired.
 
 ---
 
@@ -452,7 +452,7 @@ Platform graveyard note (for product/funding context, not schema): structured ar
 ## Working Corpora
 
 **free-transit.v2.yaml** — stress-test corpus. Key reference points (v1 node numbers retained below for continuity with DESIGN_HISTORY.md):
-- Root: "Fares should be removed from public transit"
+- thesis: "Fares should be removed from public transit"
 - Terminal pro: "Society is collectively obligated to fund conditions for full civic participation"
 - Terminal anti: "Those who benefit from a service should bear its costs in proportion to use"
 - node-13 (regressivity): best example of conjoint warrants on one inference — the general subsidy-direction principle and the implicit non-trivial-tax-incidence claim are both required and neither survives alone.
@@ -506,7 +506,7 @@ Retained for reading v1-era corpora and notes:
 | v1 | v2 |
 |---|---|
 | Argument node (claim + embedded grounds) | Claim node (conclusion) + attributive Claim node (grounds) + Inference node binding them |
-| Proposition (distinct type) | A Claim listed in `DiscourseSpace.roots` |
+| Proposition (distinct type) | A Claim listed in `DiscourseSpace.theses` |
 | TerminalValueNode (distinct type) | A Claim with `terminal: true` |
 | Warrant argument node | An ordinary Claim referenced in an Inference's `warrants` |
 | Support edge | An Inference with `relation: CONCLUDES` |
@@ -514,6 +514,6 @@ Retained for reading v1-era corpora and notes:
 | Warrants edge | Membership of a Claim in an Inference's `warrants` array |
 | `Grounds` struct on Argument | An attributive Claim, referenced in an Inference's `grounds` |
 | Edge `hint` | Retired. Became `Inference.note` in v2, then dropped entirely — see Key Settled Decisions |
-| `depth` field | Computed (BFS from roots), not stored |
-| `isMediating` flag | Topological fact: no inference from the claim concludes/contests a root |
+| `depth` field | Computed (BFS from theses), not stored |
+| `isMediating` flag | Topological fact: no inference from the claim concludes/contests a thesis |
 | GAP 1 (warrant-applicability attacks, unresolved) | Resolved: a rebuttal of the surfaced warrant claim carrying the applicability assumption |

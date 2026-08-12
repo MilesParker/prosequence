@@ -19,11 +19,13 @@ os.environ.setdefault("PROSEQUENCE_TRACE", "0")  # no exporter during tests
 
 from prosequence.tests.test_1d import fresh_store, CORPUS
 from prosequence.core.session import Session, ValidationFailed
+from prosequence.core.yaml_io import load
 from prosequence.core.guarded_client import GuardConfig, GuardedClient
 from prosequence.roles.ingestion import IngestionRole
 from prosequence.roles.capability import CapabilityError, check_capability
 from prosequence.roles.plan import (
-    AddClaim, AddInference, ClaimId, Existing, New, PlanError, check_plan,
+    AddClaim, AddInference, ClaimId, DesignateThesis, Existing, New, PlanError,
+    ReviseClaim, check_plan,
     execute,
 )
 
@@ -156,6 +158,80 @@ def check_end_to_end():
                 f"tokens={report['tokens']}")
 
 
+def check_upward_thesis_commits():
+    """A document that argues FROM the standing thesis to a further claim lands
+    that claim as a NEW thesis, and the corpus commits.
+
+    This is the whole upward path in one check, because every stage of it used
+    to refuse: the finding had no way to spell the designation, ingestion held
+    no op that could write `theses`, and a claim above the standing thesis
+    validated only as a GAP-6 warning about an unconcluded orphan. What must
+    hold now is that the new claim is IN `theses`, that the old one is still
+    there beside it (designation appends, never replaces), and that the
+    inference binding them survives to the commit."""
+    tmp = tempfile.mkdtemp(prefix="role-thesis-")
+    store, dst = fresh_store()
+    session = Session(store, CORPUS)
+
+    standing = session.bound_version.theses[0]
+    finding = {
+        "claims": [{
+            "key": "t2", "tag": "Further question the document reaches",
+            "text": "The consequent the standing thesis is a reason for.",
+            "terminal": False, "thesis": True,
+        }],
+        "inferences": [{
+            # The standing thesis as GROUNDS — the direction that was missing.
+            "grounds": [standing], "warrants": [], "target": "t2",
+            "relation": "concludes", "scheme": "FromConsequence",
+        }],
+    }
+    script = [_Resp([_block(type="tool_use", name="submit_finding",
+                            input=finding, id="t1")], stop="tool_use")]
+    stub = StubClient(script)
+    guard = GuardedClient(stub, _cfg(tmp), CORPUS,
+                          token_log=os.path.join(tmp, "tok.jsonl"))
+    role = IngestionRole(guard=guard, session=session,
+                         model="stub-model", iteration_cap=15)
+    report = role.run("http://x", "A document arguing past the thesis.")
+
+    committed = load(store.read(CORPUS, report["sha"]))
+    new_id = next(c.id for c in committed.claims if c.tag.startswith("Further"))
+    designated = new_id in committed.theses
+    kept_standing = standing in committed.theses
+    bound = any(i.target == new_id and standing in i.grounds
+                for i in committed.inferences)
+    # The designation is an op in its own right, and the commit message says so.
+    logged = any(l.startswith("designate_thesis") for l in report["op_lines"])
+
+    ok = designated and kept_standing and bound and logged
+    return ok, (f"designated={designated} kept_standing={kept_standing} "
+                f"bound_by_inference={bound} in_op_lines={logged} "
+                f"theses={len(committed.theses)}")
+
+
+def check_designation_is_not_attachment():
+    """A finding whose ONLY use of its new claims is designating them is still
+    "nothing is attached", and still fatal.
+
+    `DesignateThesis.attaches` is False for exactly this: `check_plan` counts a
+    claim as attached when an inference binds it, not when an op merely names
+    it. Were designation to count, one `thesis: true` in a finding of otherwise
+    unconnected claims would launder the whole thing past the guard."""
+    plan = (
+        AddClaim(key="a", tag="A", text="a."),
+        AddClaim(key="b", tag="B", text="b."),
+        DesignateThesis(target=New("a")),
+    )
+    try:
+        check_plan(plan, frozenset())
+    except PlanError as exc:
+        refused = "none of the 2 new claims is attached" in str(exc)
+    else:
+        refused = False
+    return refused, f"designation_alone_refused={refused}"
+
+
 def _looping_role(guard, session, iteration_cap):
     """A minimal role that binds one trivial tool and keeps calling it — the
     vehicle for exercising the harness iteration cap now that ingestion is
@@ -208,9 +284,15 @@ def check_lands_on_branch():
 
 
 def check_capability_declared():
-    """Ingestion declares exactly AddClaim + AddInference as op TYPES (not
-    method-name strings), and a non-empty role_prompt."""
-    ok = (IngestionRole.capability == (AddClaim, AddInference)
+    """Ingestion declares exactly its three additive ops as op TYPES (not
+    method-name strings), and a non-empty role_prompt.
+
+    All three only ever append — claims, inferences, thesis designations.
+    `ReviseClaim` stays out, which is the grant's actual content: ingestion may
+    extend the corpus in any direction, including upward past a standing thesis,
+    and may not rewrite what is already there."""
+    ok = (IngestionRole.capability == (AddClaim, AddInference, DesignateThesis)
+          and ReviseClaim not in IngestionRole.capability
           and isinstance(IngestionRole.role_prompt, str)
           and IngestionRole.role_prompt.strip() != "")
     return ok, (f"capability={[c.__name__ for c in IngestionRole.capability]} "
@@ -512,6 +594,8 @@ CHECKS = [
     ("ingestion role runs end to end (corpus in prompt -> finding -> apply -> commit)", check_end_to_end),
     ("repair drops only the violating inferences, keeps every claim", check_repair_drops_only_violators),
     ("injection lands commit on its own branch, rewinds main", check_lands_on_branch),
+    ("upward thesis: new consequent designated and committed", check_upward_thesis_commits),
+    ("designating a claim does not count as attaching it", check_designation_is_not_attachment),
     ("capability + role_prompt declared (op types)", check_capability_declared),
     ("system prompt composes operations + role halves", check_system_prompt_composed),
     ("capability refuses whole plan, writes nothing", check_capability_refuses_whole_plan),

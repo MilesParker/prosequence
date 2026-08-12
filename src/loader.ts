@@ -65,7 +65,10 @@ export function loadDiscourseSpace(path: string): DiscourseSpace {
     id: data.id as DiscourseSpaceId,
     title: data.title,
     definitions: (data.definitions ?? []).map(castDefinition),
-    roots: (data.roots ?? []) as ClaimId[],
+    // `roots` is the pre-rename spelling, read but never written. The dev
+    // server serves the newest commit touching a corpus, which may predate the
+    // rename, so the viewer has to load both.
+    theses: (data.theses ?? data.roots ?? []) as ClaimId[],
     claims: (data.claims ?? []).map(castClaim),
     inferences: (data.inferences ?? []).map(castInference)
   }

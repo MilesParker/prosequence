@@ -256,6 +256,19 @@ class Session:
         )
         return iid
 
+    def designate_thesis(self, id: str) -> None:
+        """Add claim `id` to the corpus's `theses`.
+
+        The only write path to `theses` other than seeding. Without it the set
+        was fixed at genesis: a corpus could only ever argue about the one
+        question it was seeded with, and a document arguing FROM that question
+        to a further one had nowhere to put the consequent. Additive and
+        idempotent, like the ops beside it — see `ops.designate_thesis`.
+        """
+        self._ensure_open()
+        self._version = _ops.designate_thesis(self._version, id=id)
+        self._records.append({"kind": "designate_thesis", "id": id})
+
     def revise_claim(
         self, id: str, text: Optional[str] = None, tag: Optional[str] = None
     ) -> None:
@@ -423,6 +436,9 @@ class Session:
                     f'add_inference {r["id"]} {self._rel_word(r["relation"])} '
                     f'{r["target"]} "{self._tag_of(r["target"])}"'
                 )
+            elif kind == "designate_thesis":
+                lines.append(
+                    f'designate_thesis {r["id"]} "{self._tag_of(r["id"])}"')
             elif kind == "revise_claim":
                 fields = " ".join(r["fields"])
                 lines.append(

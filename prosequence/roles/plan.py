@@ -51,7 +51,7 @@ moment a third op does both.
 from __future__ import annotations
 
 from dataclasses import dataclass
-from typing import Generic, Optional, Sequence, TypeVar, Union
+from typing import ClassVar, Generic, Optional, Sequence, TypeVar, Union
 
 # The branded ids are declared once, in the model mirror, and imported here —
 # not redefined. The model's own dataclasses do not yet use them (see "Known
@@ -113,6 +113,17 @@ class Op(Generic[T_co]):
     """One session write. Generic in what applying it yields: an id for the ops
     that mint one, None for the ops that do not."""
 
+    #: Whether this op's references ATTACH the claims they name — bind them into
+    #: the argument structure, as an inference's grounds/warrants/target do.
+    #: `check_plan`'s orphan rule counts only these, so an op that merely says
+    #: something ABOUT a claim (`DesignateThesis`) cannot pass a claim off as
+    #: attached. Without the distinction, one designation in a finding of
+    #: thirty unconnected claims would demote the fatal "nothing is attached"
+    #: case to a survivable note. A ClassVar, not a field: the subclasses are
+    #: frozen dataclasses, and an annotated attribute there would become a
+    #: constructor argument.
+    attaches: ClassVar[bool] = True
+
     def apply(self, session, env: Env) -> T_co:
         """Perform the write. `env` resolves this op's `New` references; the
         return is whatever the session minted (see the class parameter)."""
@@ -169,6 +180,40 @@ class AddInference(Op[InferenceId]):
             scheme=self.scheme,
             scheme_descriptor=self.scheme_descriptor,
         ))
+
+
+@dataclass(frozen=True)
+class DesignateThesis(Op[None]):
+    """Add a claim to `theses` — the claims designated as the contested
+    questions the space is about.
+
+    Held by ingestion. Before it existed, `theses` was writable only by the
+    genesis seed, so the set of questions a corpus could argue about was fixed
+    the moment it was created. A document that argues FROM the standing thesis
+    to a further claim — the consequent that the thesis is a reason for — had
+    nowhere to record that the further claim is now what is being argued: the
+    claim landed as an ordinary unconcluded node, warned as a GAP-6 gap, and
+    fell to the bottom of the graph view because depth is a BFS from `theses`.
+
+    `attaches = False`: designating a claim says something about it, it does not
+    bind it into any inference. A claim that is only designated is still an
+    orphan as far as `check_plan` is concerned, which is correct — a thesis with
+    no argument reaching it has extracted nothing.
+
+    `target` is a `Ref[ClaimId]`, so a later role can promote an existing claim.
+    The finding path only ever produces a `New` here (the wire carries a
+    per-claim `thesis` flag, so the ref is always a key `AddClaim` binds), which
+    is why an inference uuid cannot arrive in this slot from a model.
+    """
+    attaches = False
+
+    target: Ref[ClaimId]
+
+    def refs(self) -> tuple[Ref[ClaimId], ...]:
+        return (self.target,)
+
+    def apply(self, session, env: Env) -> None:
+        session.designate_thesis(resolve(self.target, env))
 
 
 @dataclass(frozen=True)
@@ -241,7 +286,10 @@ def check_plan(plan: Sequence[Op], known_ids: frozenset) -> list[str]:
                 if r.id not in known_ids:
                     unknown.append(str(r.id))
             else:
-                used.add(r.key)
+                # `attaches` gates only the orphan tally — a `New` must be
+                # bound by an earlier op whatever the op does with it.
+                if op.attaches:
+                    used.add(r.key)
                 if r.key not in seen:
                     unbound.append(r.key)
         key = op.binds()

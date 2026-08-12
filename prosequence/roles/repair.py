@@ -11,10 +11,16 @@ that commits cleanly.
 
 ONLY inferences. Claims are never removed — they are the extracted content, they
 cannot themselves violate an invariant (every I1-I10 error names an inference or
-a root), and a claim left unattached by a dropped inference is legal: orphans
+a thesis), and a claim left unattached by a dropped inference is legal: orphans
 are not an invariant violation, so the material survives in the corpus for a
 later role to attach. That is the whole reason this is worth doing rather than
 failing: the expensive part of a run is the claims.
+
+Thesis designations are likewise never dropped, and never need to be: the only
+violation one can raise is I3 (a thesis id resolving to nothing), and
+`check_plan` has already established that every reference in the plan resolves.
+A designation also mints no node, so it never appears in the id-to-op index
+repair decides from — it cannot be chosen even by accident.
 
 ## Why the PLAN and not the corpus
 
@@ -45,7 +51,7 @@ minted uuid is not.
 
 Repair is iterative because dropping an edge can reveal a cycle that the first
 pass reported only once. It is bounded, and it never reports success it did not
-achieve: a violation naming nothing droppable (a root that does not resolve is
+achieve: a violation naming nothing droppable (a thesis that does not resolve is
 the real case) is returned as unrepairable and the run fails as it did before,
 with the salvage file written.
 

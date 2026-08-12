@@ -88,6 +88,40 @@ grounds here, warrant there, target somewhere else. Nothing on the claim
 records its role, and a claim is never duplicated because it plays a different
 one elsewhere.
 
+## Theses
+
+A **thesis** is a claim the corpus is currently organised around — the
+contested question it argues about. A corpus is seeded with one, and existing
+theses are marked in the corpus you are shown.
+
+A thesis is an ordinary claim. Nothing about the graph makes it one; it is
+designated, and the designation is the only thing distinguishing it. In
+particular it is not "the top" in any structural sense, and the graph is not
+required to terminate there.
+
+So the graph grows in both directions. Downward is the usual case: a claim is
+supported by grounds, which are supported in turn. Upward is the case worth
+naming, because it is easy to miss — a document may take the standing thesis as
+a *reason for something further*. There the existing thesis is the grounds and
+the new claim is the target, and the new claim is what the argument is now
+about.
+
+```
+Standing thesis:  Fares should be removed from public transit
+Document argues:  ...therefore transit should be funded from general taxation
+New claim:        Transit should be funded from general taxation   [thesis]
+Inference:        grounds [standing thesis, ...] --concludes--> new claim
+```
+
+Designate such a claim a thesis. Do not designate anything else. A claim that
+supports, attacks, qualifies, or elaborates is not a thesis however important it
+is — the test is whether the corpus is now arguing about it, not whether it
+matters. Designation never removes an existing thesis; a space holds several
+live questions at once over one shared graph.
+
+Designation is not attachment. A designated claim still needs the inference that
+reaches it, on the same terms as every other claim.
+
 ## Congruence
 
 The same claim asserted for different reasons is one claim node with several

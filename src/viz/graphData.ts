@@ -9,7 +9,7 @@ import { COLORS, NODE, EDGE, STANCE, STANCE_NEUTRAL_STROKE } from '../config'
 
 export type ClaimNode = Claim & {
   _kind: 'claim'
-  _isRoot: boolean
+  _isThesis: boolean
   _depth: number
   /**
    * Half-width override (set by `layoutPorts`) when a claim carries more ports
@@ -63,7 +63,7 @@ export interface GraphData {
 export function buildGraphData(ds: DiscourseSpace): GraphData {
   const claims = ds.claims ?? []
   const inferences = ds.inferences ?? []
-  const roots = new Set<string>((ds.roots ?? []).map(String))
+  const theses = new Set<string>((ds.theses ?? []).map(String))
 
   const claimIds = new Set(claims.map(c => c.id as unknown as string))
   const infIds = new Set(inferences.map(i => i.id as unknown as string))
@@ -86,8 +86,8 @@ export function buildGraphData(ds: DiscourseSpace): GraphData {
     }
   }
 
-  // ── Depth (BFS from roots, alternating claim/inference layers) ──────────────
-  const depth = computeDepth(claims, inferences, roots)
+  // ── Depth (BFS from theses, alternating claim/inference layers) ──────────────
+  const depth = computeDepth(claims, inferences, theses)
   const computedMax = Math.max(0, ...Array.from(depth.values()))
 
   // Terminal claims sink to the bottom regardless of computed depth.
@@ -98,7 +98,7 @@ export function buildGraphData(ds: DiscourseSpace): GraphData {
   const claimNodes: GraphNode[] = claims.map(c => {
     const id = c.id as unknown as string
     const d = c.terminal ? terminalDepth : (depth.get(id) ?? computedMax)
-    return { ...c, _kind: 'claim' as const, _isRoot: roots.has(id), _depth: d } as ClaimNode & SimulationNodeDatum
+    return { ...c, _kind: 'claim' as const, _isThesis: theses.has(id), _depth: d } as ClaimNode & SimulationNodeDatum
   })
   const infNodes: GraphNode[] = inferences.map(i => {
     const id = i.id as unknown as string
@@ -141,8 +141,8 @@ export function buildGraphData(ds: DiscourseSpace): GraphData {
   return { nodes, links: cleanLinks, nodeById, incoming, outgoing, maxDepth, supports, attacks, consumers }
 }
 
-/** BFS depth: roots at 0, then alternating inference/claim layers. */
-function computeDepth(claims: Claim[], inferences: Inference[], roots: Set<string>): Map<string, number> {
+/** BFS depth: theses at 0, then alternating inference/claim layers. */
+function computeDepth(claims: Claim[], inferences: Inference[], theses: Set<string>): Map<string, number> {
   // Which inferences output to a given claim (concludes or rebut-contests it).
   const outputsToClaim = new Map<string, string[]>()
   // Which inferences undercut a given inference (contests it).
@@ -162,7 +162,7 @@ function computeDepth(claims: Claim[], inferences: Inference[], roots: Set<strin
 
   const depth = new Map<string, number>()
   const queue: string[] = []
-  for (const r of roots) { depth.set(r, 0); queue.push(r) }
+  for (const r of theses) { depth.set(r, 0); queue.push(r) }
 
   const isInf = new Set(inferences.map(i => i.id as unknown as string))
 
@@ -177,7 +177,7 @@ function computeDepth(claims: Claim[], inferences: Inference[], roots: Set<strin
     }
   }
 
-  // Anything not reached from a root: place just below the deepest reached.
+  // Anything not reached from a thesis: place just below the deepest reached.
   const fallback = (Math.max(0, ...Array.from(depth.values()))) + 1
   for (const c of claims) { const id = c.id as unknown as string; if (!depth.has(id)) depth.set(id, fallback) }
   for (const i of inferences) { const id = i.id as unknown as string; if (!depth.has(id)) depth.set(id, fallback) }
@@ -195,8 +195,8 @@ function push<T>(m: Map<string, T[]>, k: string, v: T) {
 
 // ── Geometry helpers ──────────────────────────────────────────────────────────
 
-export function isRootClaim(n: GraphNode): boolean {
-  return n._kind === 'claim' && (n as ClaimNode)._isRoot
+export function isThesisClaim(n: GraphNode): boolean {
+  return n._kind === 'claim' && (n as ClaimNode)._isThesis
 }
 
 
@@ -204,12 +204,12 @@ export function nodeHW(n: GraphNode): number {
   if (n._kind === 'inference') return NODE.infRadius
   const override = (n as ClaimNode)._halfWidth
   if (override != null) return override
-  return isRootClaim(n) ? NODE.rootHalfWidth : NODE.halfWidth
+  return isThesisClaim(n) ? NODE.thesisHalfWidth : NODE.halfWidth
 }
 
 export function nodeHH(n: GraphNode): number {
   if (n._kind === 'inference') return NODE.infRadius
-  return isRootClaim(n) ? NODE.rootHalfHeight : NODE.halfHeight
+  return isThesisClaim(n) ? NODE.thesisHalfHeight : NODE.halfHeight
 }
 
 export function rectEdgePt(
@@ -263,11 +263,11 @@ export function fitTag(tag: string, hw: number, hh: number, fontSize: number): s
   return kept
 }
 
-// ── Stance relative to a reference root ─────────────────────────────────────────
+// ── Stance relative to a reference thesis ─────────────────────────────────────────
 //
 // A claim's "side" is not fixed — it depends on which claim you measure against.
-// Pick a *reference root*; every node's stance is the PARITY of the contesting
-// steps on the DIRECTED argument paths that connect it to the root — the chains
+// Pick a *reference thesis*; every node's stance is the PARITY of the contesting
+// steps on the DIRECTED argument paths that connect it to the thesis — the chains
 // running UP to R (claims that support/attack R) or DOWN from R (what R feeds).
 // The graph is a DAG, so these paths never loop (an undirected walk would instead
 // turn every reconvergence into a cycle, and a stray odd one would smear "divided"
@@ -276,40 +276,40 @@ export function fitTag(tag: string, hw: number, hh: number, fontSize: number): s
 //   • every path even  → aligned  (an even number of contests ⇒ same side)
 //   • every path odd   → opposed  (an odd number of contests ⇒ the other side)
 //   • paths disagree   → divided  (the claim genuinely cuts both ways)
-//   • no directed path → neutral  (nothing connects it to the reference root)
+//   • no directed path → neutral  (nothing connects it to the reference thesis)
 //
 // Only `Contests` edges flip parity; Grounds / Warrants / Concludes preserve it
 // (grounds support their inference's output; a contest inverts it). Reaching the
-// root by several routes is normal — routes *disagreeing* is exactly "divided".
+// thesis by several routes is normal — routes *disagreeing* is exactly "divided".
 
 export type Stance = 'aligned' | 'opposed' | 'divided' | 'neutral'
 
 export interface StanceMap {
   /** Stance of each reachable node (claims AND inference junctions). Absent ⇒ neutral. */
   node: Map<string, Stance>
-  /** Hop distance from the reference root; picks an edge's far (owning) endpoint. */
+  /** Hop distance from the reference thesis; picks an edge's far (owning) endpoint. */
   dist: Map<string, number>
-  refRootId: string | null
+  refThesisId: string | null
 }
 
 const REACH_EVEN = 1   // bitmask: node reached with an even contest-count (aligned)
 const REACH_ODD  = 2   // bitmask: node reached with an odd contest-count (opposed)
 
 /**
- * Colour the whole graph relative to `refRootId`. Parity is taken over the DIRECTED
- * argument paths connecting each node to the root — followed UP from R (its
+ * Colour the whole graph relative to `refThesisId`. Parity is taken over the DIRECTED
+ * argument paths connecting each node to the thesis — followed UP from R (its
  * supporters/attackers, via reversed edges) and DOWN from R (what R feeds, via
  * forward edges). A node is aligned/opposed when every such path agrees, divided
  * when they disagree, neutral when none connect it. The `visited` set keeps each
- * path simple; since the graph is a DAG it also can't loop. A null / unknown root
+ * path simple; since the graph is a DAG it also can't loop. A null / unknown thesis
  * ⇒ everything neutral. These are small DAGs, so full path enumeration is cheap;
  * the step cap only guards a pathologically dense input.
  */
-export function computeStance(gd: GraphData, refRootId: string | null): StanceMap {
+export function computeStance(gd: GraphData, refThesisId: string | null): StanceMap {
   const node = new Map<string, Stance>()
   const dist = new Map<string, number>()
-  const ref = refRootId && gd.nodeById.has(refRootId) ? refRootId : null
-  if (!ref) return { node, dist, refRootId: null }
+  const ref = refThesisId && gd.nodeById.has(refThesisId) ? refThesisId : null
+  if (!ref) return { node, dist, refThesisId: null }
 
   // Directed adjacency (argument flow: grounds/warrant → inference → conclusion),
   // plus its reverse, each carrying a per-edge parity flip (Contests = 1, else 0).
@@ -359,7 +359,7 @@ export function computeStance(gd: GraphData, refRootId: string | null): StanceMa
   for (const [id, mask] of parity) {
     node.set(id, mask === REACH_EVEN ? 'aligned' : mask === REACH_ODD ? 'opposed' : 'divided')
   }
-  return { node, dist, refRootId: ref }
+  return { node, dist, refThesisId: ref }
 }
 
 /** The stance token for a node's stance (neutral / undefined ⇒ the muted outline). */
@@ -371,8 +371,8 @@ export function stanceColor(s: Stance | undefined): string {
 }
 
 /**
- * An edge's stance = the stance of its endpoint FURTHER from the reference root
- * (the region the edge leads into as you move away from the root). An edge with
+ * An edge's stance = the stance of its endpoint FURTHER from the reference thesis
+ * (the region the edge leads into as you move away from the thesis). An edge with
  * either end outside R's directed neighbourhood is leaving the stance picture, so
  * it's neutral. Contest edges straddle two sides by nature — the double-tick (a
  * separate channel) marks them regardless.

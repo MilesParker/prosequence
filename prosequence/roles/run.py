@@ -181,7 +181,7 @@ def _fetch_text(url: str) -> str:
 def _tag_from(text: str, limit: int = 50) -> str:
     """Derive a claim tag from its text: truncate at `limit` chars on a word
     boundary (never mid-word), capitalized initial — matching the "TAGS NAME
-    CONTENT" rule in prompt.py. Used only for the seed root claim; a model
+    CONTENT" rule in prompt.py. Used only for the seed thesis claim; a model
     finding supplies its own tags."""
     text = text.strip()
     tag = text if len(text) <= limit else text[:limit].rsplit(" ", 1)[0]
@@ -189,26 +189,26 @@ def _tag_from(text: str, limit: int = 50) -> str:
 
 
 def _seed_corpus(store: CorpusStore, corpus_file: str, corpus_id: str,
-                 title: str, root_claim: str) -> str:
-    """Commit a corpus seeded with exactly one claim — the root, `root_claim`'s
+                 title: str, thesis_claim: str) -> str:
+    """Commit a corpus seeded with exactly one claim — the thesis, `thesis_claim`'s
     text — onto main, and return the new sha. Deterministic — no model.
 
     A corpus with zero claims has nothing for ingestion to attach to: I3
     ("attach to existing uuids") is vacuous, and in practice a model handed an
     empty corpus produces a flat, disconnected claim list instead of a DAG
-    rooted at anything. The root claim is what "the existing corpus" means for
+    rooted at anything. The thesis claim is what "the existing corpus" means for
     the very first document — the thesis/question everything else attaches to,
-    same as every hand-authored corpus (see e.g. free-transit.v2.yaml's root
+    same as every hand-authored corpus (see e.g. free-transit.v2.yaml's thesis
     "Fares should be removed from public transit"). `render_corpus` flags it
-    `"root": true` so the model can tell it apart from an ordinary claim."""
-    root = Claim(id=str(uuid.uuid7()), tag=_tag_from(root_claim), text=root_claim,
-                terminal=False, uncertain=False, submissionStatus="Accepted",
-                attribution=None)
-    seeded = Corpus(id=corpus_id, title=title, definitions=(), roots=(root.id,),
-                    claims=(root,), inferences=())
+    `"thesis": true` so the model can tell it apart from an ordinary claim."""
+    thesis = Claim(id=str(uuid.uuid7()), tag=_tag_from(thesis_claim),
+                   text=thesis_claim, terminal=False, uncertain=False,
+                   submissionStatus="Accepted", attribution=None)
+    seeded = Corpus(id=corpus_id, title=title, definitions=(), theses=(thesis.id,),
+                    claims=(thesis,), inferences=())
     return store.commit(
         corpus_file, serialize(seeded),
-        f"genesis: seed corpus {corpus_id!r} (root: {root.tag!r})",
+        f"genesis: seed corpus {corpus_id!r} (thesis: {thesis.tag!r})",
         parent_sha=store.head(),
     )
 
@@ -269,7 +269,7 @@ def run(url: str, document_text: str, *, corpus_name: str = "free-transit",
 
 def ingest(corpus_name: str, *, url: str | None = None,
            document_text: str | None = None, title: str | None = None,
-           root_claim: str | None = None,
+           thesis_claim: str | None = None,
            client=None, commit_summary: str | None = None) -> dict:
     """Convenience entry over `run()`: ingest one document, fetching it when no
     text is given and seeding the corpus when it does not exist. Returns the same
@@ -283,11 +283,11 @@ def ingest(corpus_name: str, *, url: str | None = None,
                              (no fetch).
 
     If ``<corpus_name>.v2.yaml`` is absent it is seeded before ingesting — with
-    exactly one claim, the root, whose text IS `root_claim` (required in that
+    exactly one claim, the thesis, whose text IS `thesis_claim` (required in that
     case; title defaults to `corpus_name`). A corpus with zero claims gives
     ingestion nothing to attach to (I3's "attach to existing uuids" is vacuous),
     which in practice produced a flat, disconnected claim list rather than a
-    DAG — `root_claim` is the thesis/question the document's claims attach to
+    DAG — `thesis_claim` is the thesis/question the document's claims attach to
     instead. The seed and the ingest then land together on the ingest branch,
     leaving main untouched for review. Fetching and corpus creation are
     deterministic harness steps — only the text->graph transform is the model's.
@@ -308,13 +308,13 @@ def ingest(corpus_name: str, *, url: str | None = None,
 
     seeded = corpus_file not in store.list_corpora()
     if seeded:
-        if not root_claim:
+        if not thesis_claim:
             raise ValueError(
                 f"corpus {corpus_name!r} does not exist; seeding a new corpus "
-                f"needs root_claim — the thesis/question this corpus argues "
+                f"needs thesis_claim — the thesis/question this corpus argues "
                 f"about (e.g. 'Fares should be removed from public transit'), "
                 f"the anchor the document's claims attach to")
-        _seed_corpus(store, corpus_file, corpus_name, title or corpus_name, root_claim)
+        _seed_corpus(store, corpus_file, corpus_name, title or corpus_name, thesis_claim)
 
     if not seeded:
         return _ingest_into(store, head0, corpus_file, reference, document_text,

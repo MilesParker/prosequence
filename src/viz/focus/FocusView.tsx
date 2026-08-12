@@ -63,48 +63,48 @@ function Connector() {
   return <div style={{ width: 1, height: FOCUS.connector, background: COLORS.border, alignSelf: 'center' }} />
 }
 
-// ── Reference-root line & tear (Stage 4) ──────────────────────────────────────
+// ── Reference-thesis line & tear (Stage 4) ──────────────────────────────────────
 //
-// The reference root — the origin all stance is measured from, the same claim the
+// The reference thesis — the origin all stance is measured from, the same claim the
 // graph pins with a target — rides at the very top as "what is this ultimately
 // for", which the one-hop parent band otherwise loses. Below it an inert torn
 // sheet stands in for the chain of hops we are NOT showing (that structure lives
 // in the graph, or one refocus away), captioned with how far the centred claim
-// really sits from the root. Neither is drawn when the centred claim IS the root
+// really sits from the thesis. Neither is drawn when the centred claim IS the thesis
 // — that band carries the target itself — so the same claim never appears twice
 // with a 0-gap between (see the frame's suppression logic).
 
-// The pinned root: an ink target icon over the ALIGNED wash. The root is aligned by
+// The pinned thesis: an ink target icon over the ALIGNED wash. The thesis is aligned by
 // construction (it is on its own side), so its painted surface doubles as the legend
 // for that pole and the caption for every other fill in the frame — the honesty
 // constraint made visible. Truncated to a single banner line; clicking it recentres
-// the stack on the root — the always-available "take me back to the top".
-function RootLine({ gd, rootId, onFocus }: { gd: GraphData; rootId: string; onFocus: (id: string, source?: DOMRect) => void }) {
-  const claim = getClaim(gd, rootId)
-  const stance = stanceStyle(useStance(rootId), { neutralBg: COLORS.surface, neutralBorder: COLORS.border })
+// the stack on the thesis — the always-available "take me back to the top".
+function ThesisLine({ gd, thesisId, onFocus }: { gd: GraphData; thesisId: string; onFocus: (id: string, source?: DOMRect) => void }) {
+  const claim = getClaim(gd, thesisId)
+  const stance = stanceStyle(useStance(thesisId), { neutralBg: COLORS.surface, neutralBorder: COLORS.border })
   return (
     <div
       className="pz-row"
-      onClick={e => onFocus(rootId, e.currentTarget.getBoundingClientRect())}
-      title={claim?.text ?? rootId}
+      onClick={e => onFocus(thesisId, e.currentTarget.getBoundingClientRect())}
+      title={claim?.text ?? thesisId}
       style={{
         display: 'flex', gap: 10, alignItems: 'center', cursor: 'pointer',
         padding: '8px 12px', borderRadius: 8,
         border: `1px solid ${COLORS.border}`,
-        ...stance,   // aligned wash + border (root is aligned); ink target icon stays
+        ...stance,   // aligned wash + border (thesis is aligned); ink target icon stays
       }}
     >
       <TargetIcon />
       <span style={{ flex: 1, minWidth: 0 }}>
-        <TagHeader gd={gd} id={rootId} />
+        <TagHeader gd={gd} id={thesisId} />
         {SHOW_FOCUS_TEXT && (
           <span style={{ display: 'block', ...DETAIL_TEXT, fontSize: FOCUS.detailFont, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-            {claim?.text ?? rootId}
+            {claim?.text ?? thesisId}
           </span>
         )}
       </span>
       <span style={{ flexShrink: 0, fontSize: FOCUS.labelFont, textTransform: 'uppercase', letterSpacing: '0.08em', color: COLORS.textDim }}>
-        reference root
+        reference thesis
       </span>
     </div>
   )
@@ -128,13 +128,13 @@ function TornEdge() {
 }
 
 // Torn edge + the hop count beside it. Inert: the tear only says "there's more
-// between here and the root, and it's this many inference hops away".
+// between here and the thesis, and it's this many inference hops away".
 function TearLine({ hops }: { hops: number }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 12, pointerEvents: 'none', margin: `${FOCUS.rootLineGap}px 0` }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: 12, pointerEvents: 'none', margin: `${FOCUS.thesisLineGap}px 0` }}>
       <div style={{ flex: 1, minWidth: 0 }}><TornEdge /></div>
       <span style={{ flexShrink: 0, fontSize: FOCUS.labelFont, color: COLORS.textDim, whiteSpace: 'nowrap' }}>
-        <span style={{ fontWeight: 700, color: COLORS.textMuted }}>{hops}</span> hop{hops === 1 ? '' : 's'} to root
+        <span style={{ fontWeight: 700, color: COLORS.textMuted }}>{hops}</span> hop{hops === 1 ? '' : 's'} to thesis
       </span>
     </div>
   )
@@ -244,12 +244,12 @@ function CameFromIcon() {
   )
 }
 
-function FocusBand({ gd, focusId, fromId, showFromIcon, isReferenceRoot, onFromHover, onFocus, onLocate, bandRef }: {
+function FocusBand({ gd, focusId, fromId, showFromIcon, isReferenceThesis, onFromHover, onFocus, onLocate, bandRef }: {
   gd: GraphData
   focusId: string
   fromId: string | null
   showFromIcon: boolean
-  isReferenceRoot: boolean
+  isReferenceThesis: boolean
   onFromHover: (on: boolean) => void
   onFocus: (id: string) => void
   onLocate: (id: string) => void
@@ -257,8 +257,8 @@ function FocusBand({ gd, focusId, fromId, showFromIcon, isReferenceRoot, onFromH
 }) {
   const claim = getClaim(gd, focusId)
   // The centred claim is the "you are here" surface — painted by its own stance at
-  // the denser selected opacity, mirroring the graph's selected node. At the root it
-  // reads aligned (root is aligned by construction), matching the pinned root line.
+  // the denser selected opacity, mirroring the graph's selected node. At the thesis it
+  // reads aligned (thesis is aligned by construction), matching the pinned thesis line.
   const stance = stanceStyle(useStance(focusId), { selected: true, neutralBg: COLORS.surface, neutralBorder: COLORS.border })
   return (
     <div
@@ -279,12 +279,12 @@ function FocusBand({ gd, focusId, fromId, showFromIcon, isReferenceRoot, onFromH
         ...stance,
       }}
     >
-      {/* At the root, the band carries the target itself (no separate root line). */}
-      {isReferenceRoot && (
+      {/* At the thesis, the band carries the target itself (no separate thesis line). */}
+      {isReferenceThesis && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 10 }}>
           <TargetIcon size={15} />
           <span style={{ fontSize: FOCUS.labelFont, textTransform: 'uppercase', letterSpacing: '0.08em', color: COLORS.textDim }}>
-            reference root
+            reference thesis
           </span>
         </div>
       )}
@@ -388,7 +388,7 @@ type Flight = { id: string; source: DOMRect; target: DOMRect | null; phase: Flig
 // in the final leg it fades so the redrawn band shows through beneath it.
 function Ghost({ gd, flight, sm }: { gd: GraphData; flight: Flight; sm: StanceMap | null }) {
   const FL = FOCUS.flight
-  const st = sm ? (flight.id === sm.refRootId ? 'aligned' : sm.node.get(flight.id)) : undefined
+  const st = sm ? (flight.id === sm.refThesisId ? 'aligned' : sm.node.get(flight.id)) : undefined
   const stance = stanceStyle(st, { selected: true, neutralBg: COLORS.surface, neutralBorder: COLORS.border })
   const box = flight.target ?? flight.source
   const tag = getClaim(gd, flight.id)?.tag ?? flight.id
@@ -424,37 +424,37 @@ function Ghost({ gd, flight, sm }: { gd: GraphData; flight: Flight; sm: StanceMa
 // ── Frame ─────────────────────────────────────────────────────────────────────
 
 export function FocusView({
-  gd, focusId, fromId = null, referenceRootId = null, onFocus, onLocate,
-}: { gd: GraphData; focusId: string; fromId?: string | null; referenceRootId?: string | null; onFocus: (id: string) => void; onLocate: (id: string) => void }) {
+  gd, focusId, fromId = null, referenceThesisId = null, onFocus, onLocate,
+}: { gd: GraphData; focusId: string; fromId?: string | null; referenceThesisId?: string | null; onFocus: (id: string) => void; onLocate: (id: string) => void }) {
   const claim = getClaim(gd, focusId)
   const hasParents = consumersOf(gd, focusId).length > 0
   const terminal = !!claim?.terminal
 
-  // Stance relative to the reference root (the graph's Stage 3 origin; App has
-  // already defaulted a cleared root back to the structural root before it reaches
-  // us). Recomputed only when the root moves — navigating the stack keeps it. It
-  // feeds both the hop count up to the root and the frontier hints on continuations.
-  const sm = useMemo(() => computeStance(gd, referenceRootId), [gd, referenceRootId])
-  const rootClaim = referenceRootId ? getClaim(gd, referenceRootId) : null
-  const isAtRoot = rootClaim != null && referenceRootId === focusId
+  // Stance relative to the reference thesis (the graph's Stage 3 origin; App has
+  // already defaulted a cleared thesis back to the structural thesis before it reaches
+  // us). Recomputed only when the thesis moves — navigating the stack keeps it. It
+  // feeds both the hop count up to the thesis and the frontier hints on continuations.
+  const sm = useMemo(() => computeStance(gd, referenceThesisId), [gd, referenceThesisId])
+  const thesisClaim = referenceThesisId ? getClaim(gd, referenceThesisId) : null
+  const isAtThesis = thesisClaim != null && referenceThesisId === focusId
   // `dist` counts every claim↔inference edge — two per inference hop.
-  const hopDist = rootClaim ? sm.dist.get(focusId) : undefined
+  const hopDist = thesisClaim ? sm.dist.get(focusId) : undefined
   const hops = hopDist != null ? Math.round(hopDist / 2) : null
-  // Root line + tear only when the root is real, off-centre, and genuinely above
-  // us (a directed path exists). Centred ON the root, the focus band carries the
+  // Thesis line + tear only when the thesis is real, off-centre, and genuinely above
+  // us (a directed path exists). Centred ON the thesis, the focus band carries the
   // target instead — no line, no tear, no 0-hop restatement of the same claim.
-  const showRootLine = rootClaim != null && !isAtRoot && hops != null && hops > 0
+  const showThesisLine = thesisClaim != null && !isAtThesis && hops != null && hops > 0
 
   // The claims already on screen — the frame the frontier hints measure *past*.
   const visible = useMemo(() => {
     const s = new Set(renderedClaimIds(gd, focusId))
     s.add(focusId)
-    if (referenceRootId) s.add(referenceRootId)
+    if (referenceThesisId) s.add(referenceThesisId)
     return s
-  }, [gd, focusId, referenceRootId])
+  }, [gd, focusId, referenceThesisId])
   const frontier = useMemo(
-    () => (referenceRootId ? { sm, visible } : null),
-    [referenceRootId, sm, visible],
+    () => (referenceThesisId ? { sm, visible } : null),
+    [referenceThesisId, sm, visible],
   )
 
   // The claim you came from is only traceable when it's actually on screen — not
@@ -534,12 +534,12 @@ export function FocusView({
       <FromHighlight.Provider value={{ id: fromVisible ? fromId : null, active: showFrom }}>
        <LocateContext.Provider value={onLocate}>
         <FrontierContext.Provider value={frontier}>
-        <StanceContext.Provider value={referenceRootId ? sm : null}>
+        <StanceContext.Provider value={referenceThesisId ? sm : null}>
         <div style={{ maxWidth: FOCUS.columnMaxWidth, margin: '0 auto', padding: '28px 20px 96px', display: 'flex', flexDirection: 'column', alignItems: 'stretch', opacity: surfaceOpacity, transition: surfaceTransition }}>
           {/* What's ultimately at stake, then the inert tear for the hidden hops. */}
-          {showRootLine && (
+          {showThesisLine && (
             <>
-              <RootLine gd={gd} rootId={referenceRootId as string} onFocus={handleFocus} />
+              <ThesisLine gd={gd} thesisId={referenceThesisId as string} onFocus={handleFocus} />
               <TearLine hops={hops as number} />
             </>
           )}
@@ -554,7 +554,7 @@ export function FocusView({
           <FocusBand
             gd={gd} focusId={focusId} fromId={fromId}
             showFromIcon={fromVisible}
-            isReferenceRoot={isAtRoot}
+            isReferenceThesis={isAtThesis}
             onFromHover={setShowFrom}
             onFocus={handleFocus}
             onLocate={onLocate}
@@ -575,7 +575,7 @@ export function FocusView({
        </LocateContext.Provider>
       </FromHighlight.Provider>
       </HoverContext.Provider>
-      {flight && <Ghost gd={gd} flight={flight} sm={referenceRootId ? sm : null} />}
+      {flight && <Ghost gd={gd} flight={flight} sm={referenceThesisId ? sm : null} />}
       {hovered && hoveredNode && <Tooltip node={hoveredNode} x={hovered.x} y={hovered.y} nodeById={gd.nodeById} />}
     </div>
   )

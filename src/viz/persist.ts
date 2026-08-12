@@ -1,6 +1,6 @@
 // ── Local persistence ─────────────────────────────────────────────────────────
 // Remember where the reader left off — the graph viewport ("location") and the
-// view settings (which surface, the centred claim, the reference root) — across
+// view settings (which surface, the centred claim, the reference thesis) — across
 // reloads. Best-effort: any failure (private mode, quota, disabled storage) is
 // swallowed so the app still runs with defaults.
 //
@@ -37,13 +37,13 @@ export const loadViewport = (): Viewport | null => load<Viewport | null>('viewpo
 export const saveViewport = (v: Viewport): void => save('viewport', v)
 
 // ── View settings ──────────────────────────────────────────────────────────────
-// Presence of `refRootId` is meaningful: absent = pre-init (App defaults it to the
-// structural root), while an explicit null = deliberately unpainted. So callers
-// read the raw object and test `'refRootId' in settings` rather than coalescing.
+// Presence of `refThesisId` is meaningful: absent = pre-init (App defaults it to the
+// structural thesis), while an explicit null = deliberately unpainted. So callers
+// read the raw object and test `'refThesisId' in settings` rather than coalescing.
 export interface Settings {
   view?: 'graph' | 'focus'
   focusId?: string | null
-  refRootId?: string | null
+  refThesisId?: string | null
 }
 export const loadSettings = (): Settings => load<Settings>('settings', {})
 export const saveSettings = (s: Settings): void => save('settings', s)

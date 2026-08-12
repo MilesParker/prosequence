@@ -1,4 +1,4 @@
-import { COLORS, STANCE, STANCE_NEUTRAL_STROKE, STANCE_FILL_OPACITY, REF_ROOT } from '../../config'
+import { COLORS, STANCE, STANCE_NEUTRAL_STROKE, STANCE_FILL_OPACITY, REF_THESIS } from '../../config'
 
 /** Full-chroma stance colour → the pale fill used on nodes (matches the graph wash).
  *  Poles are `hsl(…)`; return that same hue at opacity `a`. Non-hsl (neutral) ⇒ no fill. */
@@ -20,13 +20,13 @@ function StanceSwatch({ fill, stroke }: { fill: string; stroke: string }) {
   )
 }
 
-// The reference-root marker: an aligned (blue) claim box wrapped in a single ring of
-// its own colour, matching the graph — the root is always painted its aligned valence.
+// The reference-thesis marker: an aligned (blue) claim box wrapped in a single ring of
+// its own colour, matching the graph — the thesis is always painted its aligned valence.
 function TargetSwatch() {
   return (
     <svg width={24} height={18} viewBox="-12 -9 24 18" style={{ flexShrink: 0, overflow: 'visible' }}>
       <rect x={-6.5} y={-4} width={13} height={8} rx={2} fill={tint(STANCE.aligned, STANCE_FILL_OPACITY)} stroke={STANCE.aligned} strokeWidth={1.4} />
-      <rect x={-9.5} y={-7} width={19} height={14} rx={4} fill="none" stroke={STANCE.aligned} strokeWidth={REF_ROOT.ringWidth} />
+      <rect x={-9.5} y={-7} width={19} height={14} rx={4} fill="none" stroke={STANCE.aligned} strokeWidth={REF_THESIS.ringWidth} />
     </svg>
   )
 }
@@ -66,7 +66,7 @@ function Divider() {
 export function Legend({ nominating, onToggleNominate }: { nominating: boolean; onToggleNominate: () => void }) {
   return (
     <div style={{ position: 'fixed', bottom: 20, left: 20, background: COLORS.surfaceBlur, backdropFilter: 'blur(4px)', border: `1px solid ${COLORS.border}`, borderRadius: 8, boxShadow: '0 6px 24px rgba(0,0,0,0.10)', padding: '12px 16px', fontSize: 11, zIndex: 50, userSelect: 'none', maxWidth: 230 }}>
-      <SectionTitle>Reference root</SectionTitle>
+      <SectionTitle>Reference thesis</SectionTitle>
       {/* Arming this mode makes the next graph click nominate a claim as the origin —
           a deliberate act, kept off the individual nodes so nothing clutters the map. */}
       <button
@@ -75,17 +75,17 @@ export function Legend({ nominating, onToggleNominate }: { nominating: boolean; 
         style={{
           display: 'flex', alignItems: 'center', gap: 9, width: '100%', textAlign: 'left',
           padding: '6px 8px', borderRadius: 6, cursor: 'pointer', font: 'inherit', fontSize: 11,
-          border: `1px solid ${nominating ? REF_ROOT.ringColor : COLORS.border}`,
+          border: `1px solid ${nominating ? REF_THESIS.ringColor : COLORS.border}`,
           background: nominating ? 'hsla(220, 24%, 20%, 0.06)' : COLORS.surface,
           color: nominating ? COLORS.text : COLORS.textMuted,
         }}
       >
-        <TargetSwatch /> {nominating ? 'Pick a claim to anchor…' : 'Set reference root'}
+        <TargetSwatch /> {nominating ? 'Pick a claim to anchor…' : 'Set reference thesis'}
       </button>
       <div style={{ fontSize: 10.5, color: COLORS.textFaint, marginTop: 6, lineHeight: 1.35 }}>
         {nominating
           ? 'Click a claim to measure stance from it — or click empty space to clear.'
-          : <>Everything is coloured by its stance <em>relative to the reference root</em>.</>}
+          : <>Everything is coloured by its stance <em>relative to the reference thesis</em>.</>}
       </div>
 
       <Divider />

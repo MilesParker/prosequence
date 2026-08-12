@@ -94,6 +94,30 @@ def add_inference(
     return replace(corpus, inferences=corpus.inferences + (inference,))
 
 
+def designate_thesis(corpus: Corpus, *, id: str) -> Corpus:
+    """Return a new corpus with claim `id` added to `theses`.
+
+    A thesis is a claim designated as one of the contested questions the space
+    is about. Designation is data, not topology: nothing about the graph makes a
+    claim a thesis, and a thesis is an ordinary claim in every other respect —
+    which is what lets the graph grow past one. When a later document argues
+    FROM the standing thesis to something further, the consequent is a new claim
+    like any other, and this is what marks it as the question now being argued.
+
+    Additive and idempotent: designating an already-designated claim is a no-op
+    returning an equal corpus, so a plan need not check first. Undesignating is
+    deliberately absent — retiring a thesis is a curatorial act on settled
+    structure, not something an additive role does in passing.
+
+    No validation, per this module's contract: that `id` names a claim rather
+    than an inference is I3's business at commit. The finding path cannot get
+    that wrong (see `plan.DesignateThesis`), so the check would only mask a bug.
+    """
+    if id in corpus.theses:
+        return corpus
+    return replace(corpus, theses=corpus.theses + (id,))
+
+
 def revise_claim(
     corpus: Corpus,
     id: str,

@@ -26,7 +26,7 @@ body { background: #0f1117; color: #e0e0e0; font-family: -apple-system, BlinkMac
 #tooltip .tt-chip.anti  { background: #3b1a1a; color: #ef9a9a; }
 #tooltip .tt-chip.empirical { background: #1e2738; color: #78909c; }
 #tooltip .tt-chip.analogy   { background: #2a2040; color: #ce93d8; }
-#tooltip .tt-chip.root  { background: #0d2b5e; color: #90caf9; }
+#tooltip .tt-chip.thesis  { background: #0d2b5e; color: #90caf9; }
 #tooltip .tt-chip.terminal { background: #3b2e00; color: #ffcc02; }
 #tooltip .tt-chip.attributive { background: #262a30; color: #9fb0bf; }
 #tooltip .tt-chip.inference   { background: #22263a; color: #9aa4d0; }
@@ -88,7 +88,7 @@ body { background: #0f1117; color: #e0e0e0; font-family: -apple-system, BlinkMac
 <div id="legend">
   <div class="leg-section">
     <div class="leg-title">Claims</div>
-    <div class="leg-row"><div style="width:24px;height:12px;background:hsla(212,80%,42%,0.18);border:2px solid hsl(212,75%,64%);border-radius:3px;flex-shrink:0"></div> Root</div>
+    <div class="leg-row"><div style="width:24px;height:12px;background:hsla(212,80%,42%,0.18);border:2px solid hsl(212,75%,64%);border-radius:3px;flex-shrink:0"></div> Thesis</div>
     <div class="leg-row"><div style="width:22px;height:12px;background:hsla(131,40%,34%,0.20);border:1.5px solid hsl(123,38%,57%);border-radius:3px;flex-shrink:0"></div> Pro</div>
     <div class="leg-row"><div style="width:22px;height:12px;background:hsla(0,45%,40%,0.18);border:1.5px solid hsl(0,60%,70%);border-radius:3px;flex-shrink:0"></div> Anti</div>
     <div class="leg-row"><div style="width:22px;height:12px;background:hsla(199,18%,40%,0.18);border:1.5px solid hsl(200,16%,62%);border-radius:3px;flex-shrink:0"></div> Empirical</div>
@@ -115,12 +115,12 @@ body { background: #0f1117; color: #e0e0e0; font-family: -apple-system, BlinkMac
 /* ─────────────── constants ─────────────── */
 
 const NODE_HW = 60, NODE_HH = 30;      // claim half-dims
-const ROOT_HW = 66, ROOT_HH = 38;      // root claim half-dims
+const THESIS_HW = 66, THESIS_HH = 38;      // thesis claim half-dims
 const INF_R = 7;                       // inference diamond half-diagonal
 const LINE_H = 12, WORDS_PER_LINE = 2;
 
 const NODE_COLORS = {
-  root:        { fill: 'hsla(212,80%,42%,0.18)', stroke: 'hsl(212,75%,64%)' },
+  thesis:        { fill: 'hsla(212,80%,42%,0.18)', stroke: 'hsl(212,75%,64%)' },
   terminal:    { fill: 'hsla(37,95%,56%,0.15)',  stroke: 'hsl(45,100%,76%)' },
   pro:         { fill: 'hsla(131,40%,34%,0.20)', stroke: 'hsl(123,38%,57%)' },
   anti:        { fill: 'hsla(0,45%,40%,0.18)',   stroke: 'hsl(0,60%,70%)'   },
@@ -139,11 +139,11 @@ const EDGE_COLORS = {
 /* ─────────────── helpers ─────────────── */
 
 function isInf(n) { return n._kind === 'inference'; }
-function nodeHW(n) { return isInf(n) ? INF_R : (n._isRoot ? ROOT_HW : NODE_HW); }
-function nodeHH(n) { return isInf(n) ? INF_R : (n._isRoot ? ROOT_HH : NODE_HH); }
+function nodeHW(n) { return isInf(n) ? INF_R : (n._isThesis ? THESIS_HW : NODE_HW); }
+function nodeHH(n) { return isInf(n) ? INF_R : (n._isThesis ? THESIS_HH : NODE_HH); }
 
 function claimColorKey(n) {
-  if (n._isRoot) return 'root';
+  if (n._isThesis) return 'thesis';
   if (n.terminal) return 'terminal';
   if (n.attribution) return 'attributive';
   const c = n.cluster;
@@ -183,7 +183,7 @@ function sourceLabel(src) {
 function buildGraph(data) {
   const claims = data.claims || [];
   const inferences = data.inferences || [];
-  const roots = new Set((data.roots || []).map(String));
+  const theses = new Set((data.theses || data.roots || []).map(String));
   const infIds = new Set(inferences.map(i => i.id));
 
   const links = [];
@@ -194,12 +194,12 @@ function buildGraph(data) {
     else links.push({ id: `${inf.id}:contests`, source: inf.id, target: inf.target, role: 'Contests', toInf: infIds.has(inf.target), uncertain: !!inf.uncertain });
   }
 
-  const depth = computeDepth(claims, inferences, roots, infIds);
+  const depth = computeDepth(claims, inferences, theses, infIds);
   const computedMax = Math.max(0, ...Object.values(depth));
   const terminalDepth = computedMax + 1;
 
   const nodes = [];
-  for (const c of claims) nodes.push(Object.assign({}, c, { _kind: 'claim', _isRoot: roots.has(String(c.id)), _depth: c.terminal ? terminalDepth : (depth[c.id] ?? computedMax) }));
+  for (const c of claims) nodes.push(Object.assign({}, c, { _kind: 'claim', _isThesis: theses.has(String(c.id)), _depth: c.terminal ? terminalDepth : (depth[c.id] ?? computedMax) }));
   for (const i of inferences) nodes.push(Object.assign({}, i, { _kind: 'inference', _depth: depth[i.id] ?? computedMax }));
 
   const nodeById = new Map(nodes.map(n => [n.id, n]));
@@ -211,7 +211,7 @@ function buildGraph(data) {
   return { nodes, links: clean, nodeById, incoming, outgoing, maxDepth: terminalDepth };
 }
 
-function computeDepth(claims, inferences, roots, infIds) {
+function computeDepth(claims, inferences, theses, infIds) {
   const outputsToClaim = {}, contestersOf = {}, inputsOf = {};
   const push = (m, k, v) => { (m[k] = m[k] || []).push(v); };
   for (const inf of inferences) {
@@ -223,7 +223,7 @@ function computeDepth(claims, inferences, roots, infIds) {
     }
   }
   const depth = {}, queue = [];
-  roots.forEach(r => { depth[r] = 0; queue.push(r); });
+  theses.forEach(r => { depth[r] = 0; queue.push(r); });
   const visit = (id, d) => { if (!(id in depth) || d < depth[id]) { depth[id] = d; queue.push(id); } };
   while (queue.length) {
     const n = queue.shift(), d = depth[n];
@@ -298,12 +298,12 @@ async function main() {
       .attr('x', -nodeHW(d)).attr('y', -nodeHH(d))
       .attr('width', nodeHW(d) * 2).attr('height', nodeHH(d) * 2).attr('rx', 4)
       .attr('fill', nodeFill(d)).attr('stroke', nodeStroke(d))
-      .attr('stroke-width', d._isRoot ? 2.5 : 1.5);
+      .attr('stroke-width', d._isThesis ? 2.5 : 1.5);
     const lines = wrapTag(d.tag || d.id);
     const totalH = (lines.length - 1) * LINE_H;
     sel.append('text').attr('text-anchor', 'middle').attr('fill', '#e8e8e8')
-      .attr('font-size', d._isRoot ? '10px' : '9.5px').attr('font-family', 'system-ui, sans-serif')
-      .attr('pointer-events', 'none').attr('font-weight', d._isRoot ? '600' : '400')
+      .attr('font-size', d._isThesis ? '10px' : '9.5px').attr('font-family', 'system-ui, sans-serif')
+      .attr('pointer-events', 'none').attr('font-weight', d._isThesis ? '600' : '400')
       .selectAll('tspan').data(lines).enter().append('tspan')
       .attr('x', 0).attr('dy', (_, i) => i === 0 ? (-totalH / 2 + 'px') : (LINE_H + 'px'))
       .attr('dominant-baseline', 'middle').text(t => t);
@@ -330,7 +330,7 @@ async function main() {
         if (d.attribution.quote) html += `<div class="tt-quote">“${d.attribution.quote}”</div>`;
         html += `<div class="tt-sub">${sourceLabel(d.attribution.source)}</div>`;
       }
-      const label = d._isRoot ? 'root' : d.terminal ? 'terminal' : d.attribution ? 'attributive' : d.cluster;
+      const label = d._isThesis ? 'thesis' : d.terminal ? 'terminal' : d.attribution ? 'attributive' : d.cluster;
       html += `<div class="tt-meta"><span class="tt-chip ${key}">${label}</span>`;
       if (d.uncertain) html += `<span class="tt-chip">uncertain</span>`;
       html += `</div>`;
@@ -378,7 +378,7 @@ async function main() {
         html += `<div class="p-section"><div class="p-label">Source</div><div class="p-value">${sourceLabel(d.attribution.source)}</div></div>`;
       }
       html += `<div class="p-section"><div class="p-label">Properties</div><div class="p-chips">
-        ${d._isRoot ? '<span class="p-chip" style="color:#90caf9">root</span>' : ''}
+        ${d._isThesis ? '<span class="p-chip" style="color:#90caf9">thesis</span>' : ''}
         ${d.terminal ? '<span class="p-chip" style="color:#ffcc02">terminal</span>' : ''}
         ${d.attribution ? '<span class="p-chip">attributive</span>' : ''}
         <span class="p-chip">${d.cluster}</span>

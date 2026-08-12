@@ -228,13 +228,13 @@ class Corpus:
     """`DiscourseSpace` in types.ts — see "Known divergences" for the name.
 
     Constituted by its definition layer. Propositions are not owned structure:
-    `roots` designates which claims are currently treated as contested
+    `theses` designates which claims are currently treated as contested
     questions (entry points for views and traversal).
     """
     id: str
     title: str
     definitions: Tuple[Definition, ...]
-    roots: Tuple[str, ...]
+    theses: Tuple[str, ...]
     claims: Tuple[Claim, ...]
     inferences: Tuple[Inference, ...]
 
@@ -248,9 +248,9 @@ class Corpus:
 
     def __post_init__(self) -> None:
         # Canonical order established here, once, at construction: nodes and
-        # roots ascending by uuid; definitions keep authoring order (the
+        # theses ascending by uuid; definitions keep authoring order (the
         # schema does not designate them a sortable reference list).
-        object.__setattr__(self, "roots", tuple(sorted(self.roots)))
+        object.__setattr__(self, "theses", tuple(sorted(self.theses)))
         object.__setattr__(
             self, "claims", tuple(sorted(self.claims, key=lambda c: c.id)))
         object.__setattr__(
@@ -278,7 +278,14 @@ class Corpus:
 # tuple. Keep each tuple in the order the TS interface declares.
 # --------------------------------------------------------------------------
 
-CORPUS_KEYS = ("id", "title", "definitions", "roots", "claims", "inferences")
+CORPUS_KEYS = ("id", "title", "definitions", "theses", "claims", "inferences")
+
+# `roots` is the pre-rename spelling of `theses`. Accepted on load, never
+# emitted: every corpus committed before the rename still has to parse, because
+# the store reads blobs from arbitrary commits (the viewer's dev server serves
+# the newest commit touching a file, which may be an older ingest branch). Kept
+# out of CORPUS_KEYS so it is a read-only alias rather than a second live key.
+LEGACY_CORPUS_KEYS = ("roots",)
 DEFINITION_KEYS = ("term", "text", "importedFrom")
 CLAIM_KEYS = ("id", "tag", "text", "terminal", "attribution",
               "uncertain", "submissionStatus")
@@ -316,7 +323,7 @@ SOURCE_KEYS = ("type", "reference")
 #   5. `GroundsSource.type` is a `str` for the same reason, constrained
 #      against GROUNDS_SOURCE_TYPES at the tool boundary.
 #
-#   6. types.ts declares `grounds`/`warrants`/`roots` as arrays; they are
+#   6. types.ts declares `grounds`/`warrants`/`theses` as arrays; they are
 #      tuples here, because a list field makes a frozen dataclass unhashable.
 #      Ordering is canonicalized in __post_init__ rather than by the schema.
 #

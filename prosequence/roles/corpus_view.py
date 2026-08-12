@@ -18,7 +18,7 @@ import json
 from ..core.yaml_io import Claim, Corpus, Inference
 
 
-def _claim_line(c: Claim, roots: frozenset) -> dict:
+def _claim_line(c: Claim, theses: frozenset) -> dict:
     d = {
         "kind": "claim",
         "id": c.id,
@@ -26,11 +26,13 @@ def _claim_line(c: Claim, roots: frozenset) -> dict:
         "text": c.text,
         "terminal": c.terminal,
     }
-    if c.id in roots:
+    if c.id in theses:
         # Flagged explicitly: nothing else in this rendering distinguishes a
-        # root, and it is the corpus's central thesis/question — the anchor a
-        # first ingestion into an otherwise-bare space attaches to.
-        d["root"] = True
+        # thesis — it is a contested question the corpus is organised around,
+        # and the anchor a first ingestion into an otherwise-bare space
+        # attaches to. Same key the finding uses to designate a new one, so
+        # what the model reads and what it writes are spelled alike.
+        d["thesis"] = True
     if c.attribution is not None:
         d["attribution"] = {
             "source": {
@@ -72,14 +74,14 @@ def render_corpus(corpus: Corpus) -> str:
     model submits — a corpus rendered without it asks the model to classify
     moves it has never seen classified.
 
-    One node per line so the block is a clean, cacheable prefix. A root claim
-    carries `"root": true` — the only marker distinguishing it from any other
+    One node per line so the block is a clean, cacheable prefix. A thesis claim
+    carries `"thesis": true` — the only marker distinguishing it from any other
     claim, and the anchor a first ingestion into an otherwise-bare space (one
-    root claim, no inferences yet) attaches to. Returns "" only for a truly
+    thesis claim, no inferences yet) attaches to. Returns "" only for a truly
     empty corpus, which `ingest()`'s seeding step no longer produces (a new
-    corpus is seeded with a root claim, never zero nodes)."""
-    roots = frozenset(corpus.roots)
-    lines = [json.dumps(_claim_line(c, roots), ensure_ascii=False) for c in corpus.claims]
+    corpus is seeded with a thesis claim, never zero nodes)."""
+    theses = frozenset(corpus.theses)
+    lines = [json.dumps(_claim_line(c, theses), ensure_ascii=False) for c in corpus.claims]
     lines += [json.dumps(_inference_line(i), ensure_ascii=False)
               for i in corpus.inferences]
     return "\n".join(lines)

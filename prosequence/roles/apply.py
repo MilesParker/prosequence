@@ -56,6 +56,7 @@ from .plan import (
     AddClaim,
     AddInference,
     ClaimId,
+    DesignateThesis,
     Existing,
     New,
     Op,
@@ -101,6 +102,10 @@ FINDING_TOOL_SCHEMA = {
                         },
                         "text": {"type": "string", "description": "One atomic assertion."},
                         "terminal": {"type": "boolean"},
+                        "thesis": {
+                            "type": "boolean",
+                            "description": "Set true only when this claim is a further contested question the corpus should now be organised around -- the consequent an existing thesis argues FOR, where the document treats the standing thesis as a reason for this. It must still be the target of an inference below whose grounds include the claim it follows from; designating a claim does not attach it. Omit (or false) for every ordinary claim, including every claim that merely supports or attacks something.",
+                        },
                         "attribution": {
                             "type": "object",
                             # Role is positional — it is not a property of a
@@ -356,10 +361,11 @@ def ops_from_finding(finding: dict) -> Tuple[Op, ...]:
     from a scheme that names no enum member. What is deferred is only the
     structural check over the assembled plan.
 
-    Claims come first so that every `New` is bound before an inference uses it.
-    That ordering is produced here and VERIFIED by `check_plan` rather than
-    trusted — it holds today only because claims bind without referencing and
-    inferences reference without binding, which a third op type would break.
+    Claims come first so that every `New` is bound before anything uses it, then
+    thesis designations, then inferences. That ordering is produced here and
+    VERIFIED by `check_plan` rather than trusted — every op after the claims
+    references without binding, so any order among them would do, but the check
+    is what makes that a fact rather than an assumption.
 
     A ref on the wire is a bare string carrying two different kinds of thing. It
     is a `New` iff it matches a key this finding declares, and an `Existing`
@@ -386,6 +392,14 @@ def ops_from_finding(finding: dict) -> Tuple[Op, ...]:
             attribution=_attribution(c.get("attribution")),
         )
         for c in finding["claims"]
+    ]
+    # Designations sit between the claims and the inferences: every `New` they
+    # name is bound by an AddClaim above, which is what `check_plan` requires,
+    # and the ref is a key rather than a raw uuid — so a model cannot designate
+    # an inference id as a thesis (see `plan.DesignateThesis`).
+    plan += [
+        DesignateThesis(target=New(c["key"]))
+        for c in finding["claims"] if c.get("thesis")
     ]
     plan += [
         AddInference(

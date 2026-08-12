@@ -11,16 +11,16 @@ export interface LayoutBounds {
   height: number
 }
 
-/** A packed subtree box, plus the root-edge bundles leaving it. */
+/** A packed subtree box, plus the thesis-edge bundles leaving it. */
 export interface GroupBox {
   id: string
   x: number       // top-left
   y: number
   width: number
   height: number
-  /** Root-directed edges bundled per (root, role): one drawn trunk each, fanning
+  /** Thesis-directed edges bundled per (thesis, role): one drawn trunk each, fanning
    *  back out to the member nodes inside the group. */
-  bundles: Array<{ rootId: string; role: EdgeRole; count: number; members: string[] }>
+  bundles: Array<{ thesisId: string; role: EdgeRole; count: number; members: string[] }>
 }
 
 export interface LayoutResult {
@@ -31,32 +31,32 @@ export interface LayoutResult {
 const elk = new ELK()
 
 /**
- * Grouped layout. The corpora share a shape: remove the root claim and the
+ * Grouped layout. The corpora share a shape: remove the thesis claim and the
  * graph falls apart into fully disjoint subtrees (verified: zero cross-group
  * edges). So:
  *
- *   1. **Partition** nodes into those components (union–find, roots excluded).
+ *   1. **Partition** nodes into those components (union–find, theses excluded).
  *   2. **Lay out each group independently** with ELK layered — crossing-minimised,
  *      orthogonally routed edges *within* the group, where all the structure is.
  *   3. **Rect-pack the group boxes** toward a target aspect ratio. Layers exist
  *      only within a group, so one subtree may sit entirely below another —
  *      this is what collapses the width (≈4–5:1 flat → ≈1.3:1 packed).
- *   4. **Root on top, bundled edges.** Each group's root-directed edges collapse
+ *   4. **Thesis on top, bundled edges.** Each group's thesis-directed edges collapse
  *      into one drawn bundle per role (Concludes/Contests) from the group's
- *      border to the root; individual inference→root edges are not drawn.
+ *      border to the thesis; individual inference→thesis edges are not drawn.
  *
  * Writes node centres to `x`/`y` and routed waypoints to `link.points`
- * (root-touching links get none — they're represented by bundles).
+ * (thesis-touching links get none — they're represented by bundles).
  */
 export async function layoutGraph(gd: GraphData): Promise<LayoutResult> {
   const wOf = (n: GraphNode) => (n._kind === 'claim' ? nodeHW(n) : NODE.infRadius) * 2
   const hOf = (n: GraphNode) => (n._kind === 'claim' ? nodeHH(n) : NODE.infRadius) * 2
   const idOf = (n: GraphNode) => n.id as unknown as string
 
-  const rootIds = gd.nodes.filter(n => n._kind === 'claim' && (n as { _isRoot?: boolean })._isRoot).map(idOf)
-  const roots = new Set(rootIds)
+  const thesisIds = gd.nodes.filter(n => n._kind === 'claim' && (n as { _isThesis?: boolean })._isThesis).map(idOf)
+  const theses = new Set(thesisIds)
 
-  // ── 1. Partition into components, roots excluded ────────────────────────────
+  // ── 1. Partition into components, theses excluded ────────────────────────────
   const parent = new Map<string, string>()
   const find = (x: string): string => {
     let r = x
@@ -66,16 +66,16 @@ export async function layoutGraph(gd: GraphData): Promise<LayoutResult> {
     return r
   }
   const union = (a: string, b: string) => { const ra = find(a), rb = find(b); if (ra !== rb) parent.set(ra, rb) }
-  for (const n of gd.nodes) { const id = idOf(n); if (!roots.has(id)) parent.set(id, id) }
+  for (const n of gd.nodes) { const id = idOf(n); if (!theses.has(id)) parent.set(id, id) }
   for (const l of gd.links) {
     const s = l.source as unknown as string, t = l.target as unknown as string
-    if (roots.has(s) || roots.has(t)) continue
+    if (theses.has(s) || theses.has(t)) continue
     union(s, t)
   }
   const groups = new Map<string, string[]>()
   for (const n of gd.nodes) {
     const id = idOf(n)
-    if (roots.has(id)) continue
+    if (theses.has(id)) continue
     const g = find(id)
     ;(groups.get(g) ?? groups.set(g, []).get(g)!).push(id)
   }
@@ -133,25 +133,25 @@ export async function layoutGraph(gd: GraphData): Promise<LayoutResult> {
   }
   for (const l of gd.links) l.points = edgePoints.get(l.id)
 
-  // ── 4. Root(s) centred above; bundle root-directed edges per (group, role) ──
+  // ── 4. Thesis(s) centred above; bundle thesis-directed edges per (group, role) ──
   const packW = packed.width ?? 0
-  const rootY = -LAYOUT.rootGap
-  rootIds.forEach((rid, i) => {
+  const thesisY = -LAYOUT.thesisGap
+  thesisIds.forEach((rid, i) => {
     const rn = gd.nodeById.get(rid)!
-    rn.x = packW / 2 + (i - (rootIds.length - 1) / 2) * (nodeHW(rn) * 2 + 60)
-    rn.y = rootY - nodeHH(rn)
+    rn.x = packW / 2 + (i - (thesisIds.length - 1) / 2) * (nodeHW(rn) * 2 + 60)
+    rn.y = thesisY - nodeHH(rn)
   })
 
-  const groupOf = (id: string) => (roots.has(id) ? null : find(id))
-  const bundleMembers = new Map<string, string[]>()   // "group|root|role" → member node ids
+  const groupOf = (id: string) => (theses.has(id) ? null : find(id))
+  const bundleMembers = new Map<string, string[]>()   // "group|thesis|role" → member node ids
   for (const l of gd.links) {
     const s = l.source as unknown as string, t = l.target as unknown as string
-    const rootEnd = roots.has(t) ? t : roots.has(s) ? s : null
-    if (!rootEnd) continue
-    const member = roots.has(t) ? s : t
+    const thesisEnd = theses.has(t) ? t : theses.has(s) ? s : null
+    if (!thesisEnd) continue
+    const member = theses.has(t) ? s : t
     const g = groupOf(member)
     if (!g) continue
-    const k = `${g}|${rootEnd}|${l.role}`
+    const k = `${g}|${thesisEnd}|${l.role}`
     ;(bundleMembers.get(k) ?? bundleMembers.set(k, []).get(k)!).push(member)
   }
 
@@ -159,8 +159,8 @@ export async function layoutGraph(gd: GraphData): Promise<LayoutResult> {
     const off = packPos.get(g)!
     const bundles: GroupBox['bundles'] = []
     for (const [k, members] of bundleMembers) {
-      const [gg, rootId, role] = k.split('|')
-      if (gg === g) bundles.push({ rootId, role: role as EdgeRole, count: members.length, members })
+      const [gg, thesisId, role] = k.split('|')
+      if (gg === g) bundles.push({ thesisId, role: role as EdgeRole, count: members.length, members })
     }
     return { id: g, x: off.x, y: off.y, width: res.width ?? 0, height: res.height ?? 0, bundles }
   })

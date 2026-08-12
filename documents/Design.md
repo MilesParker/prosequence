@@ -67,14 +67,21 @@ inference occupies, with two exceptions encoded as data:
 
 - `Claim.terminal: boolean` marks a bedrock commitment (may never be
   concluded), distinct from "not yet supported" (a GAP-6 gap).
-- `DiscourseSpace.roots: ClaimId[]` designates the claims currently treated
-  as contested questions.
+- `DiscourseSpace.theses: ClaimId[]` designates the claims currently treated
+  as contested questions. Designation is the only thing that makes a claim a
+  thesis — nothing structural does, and the graph is not required to terminate
+  at one. A document may argue FROM a thesis to a further claim; that
+  consequent is an ordinary claim which `DesignateThesis` then adds to the
+  list, beside the standing one rather than in place of it. (The field was
+  spelled `roots` before the rename; that word claimed a graph-theory meaning
+  the concept does not have. `roots` is still read on load and never written —
+  see the serializer below.)
 
 **Retired constructs.** `Argument` (with embedded grounds), `Proposition` and
 `TerminalValueNode` as node types, `Support`/`Attack`/`Warrants` as edge
 types, `Grounds` as a struct, and the `depth`/`isMediating` fields are all
 gone. Depth is computed from topology; a mediating claim is one with no
-inference from it concluding a root. The inference's `note` field (formerly
+inference from it concluding a thesis. The inference's `note` field (formerly
 `hint`) is a non-semantic
 authoring margin note — never rendered as argument content and never attackable.
 
@@ -140,7 +147,7 @@ Dialectical attacks are inferences in their own right — they run on grounds-cl
 
 ## 11. Depth is inferential distance, not importance
 
-A node's depth in the graph measures how many inferential steps it is from the root proposition. This is not a measure of argumentative salience, rhetorical power, or relevance to the debate. Commonly cited arguments may sit deep in the graph because they are evidential rather than directly normative. The graph reveals that what people lead with in natural argument is usually evidence — which is structurally downstream, not upstream, of the claims that evidence supports.
+A node's depth in the graph measures how many inferential steps it is from the thesis proposition. This is not a measure of argumentative salience, rhetorical power, or relevance to the debate. Commonly cited arguments may sit deep in the graph because they are evidential rather than directly normative. The graph reveals that what people lead with in natural argument is usually evidence — which is structurally downstream, not upstream, of the claims that evidence supports.
 
 ---
 
@@ -157,14 +164,15 @@ A node's depth in the graph measures how many inferential steps it is from the r
 ## YAML generation rules (v2)
 
 A discourse-space corpus is a single YAML document with `id`, `title`,
-`definitions`, `roots`, `claims`, and `inferences`. The discipline rules are
+`definitions`, `theses`, `claims`, and `inferences`. The discipline rules are
 unchanged in spirit; only the shapes changed.
 
 - **Claims list.** Every assertion — conclusions, grounds, warrants,
   terminals, and the contested questions themselves — is a `Claim`. Keep
   claims **atomic**: one proposition per claim.
-- **Roots.** List the contested question(s) in `roots`. They are ordinary
-  claims; nothing "owns" them.
+- **Theses.** List the contested question(s) in `theses`. They are ordinary
+  claims; nothing "owns" them, and a space may hold several at once over one
+  shared graph.
 - **Attribution on claims.** A claim that reports what a source says carries
   `attribution: { source: <GroundsSource>, quote: <verbatim | null> }`. Its
   text is attributive ("Source X reports Y"). These are the checkable leaves;
@@ -205,7 +213,7 @@ contested question, harvest positions, attribute grounds, interrogate for
 implicit warrants). **Step 4 — emit YAML — changes shape only:** instead of
 `arguments` (claim + embedded grounds), `terminalValueNodes`, and typed
 `edges`, emit a flat `claims` list (with `attribution` on the attributive
-ones and `terminal` on the bedrock ones), a `roots` list, and an
+ones and `terminal` on the bedrock ones), a `theses` list, and an
 `inferences` list whose `grounds`/`warrants`/`target`/`relation` fields
 encode all the connective tissue.
 
@@ -238,12 +246,21 @@ so a commit diff shows exactly the nodes that changed. (The module is named
 package directory lands on `sys.path`.)
 
 - **Object model.** All dataclasses are `frozen=True`; id collections
-  (`grounds`, `warrants`, `roots`) are tuples. `Corpus.__post_init__` sorts
-  nodes and roots ascending by uuid and builds a cached `id → node` index;
+  (`grounds`, `warrants`, `theses`) are tuples. `Corpus.__post_init__` sorts
+  nodes and theses ascending by uuid and builds a cached `id → node` index;
   `Inference.__post_init__` sorts `grounds`/`warrants` and requires `target`
   plus a `relation` that is a `Relation` enum member (never a bare string).
   Canonical order is thus fixed at construction, so `serialize` emits
   stored order without re-sorting.
+- **`roots` is a read-only legacy alias for `theses`** (`LEGACY_CORPUS_KEYS`).
+  The loader accepts either spelling and the emitter writes only `theses`, so
+  every corpus committed before the rename still parses: the store reads blobs
+  from arbitrary commits, repair re-validates predicted corpora, and the dev
+  server serves the newest commit touching a file, which may be an older ingest
+  branch. A corpus carrying BOTH keys is refused rather than reconciled.
+  `validate.theses_of` and the two viewer loaders (`src/loader.ts` for the CLI,
+  `useDiscourseData.normalize` for the browser) read the alias on the same
+  terms.
 - **`Relation` is a plain `Enum`** (`CONCLUDES`/`CONTESTS`, values the wire
   strings), deliberately not a `str`-mixin: a str-enum compares equal to its
   own wire string, so bare `"concludes"` would sail through every call site
@@ -283,8 +300,8 @@ discourse-spaces/scratch/<f>.v2.yaml` still checks one on demand.
 
 Both query params are sanitised to a bare slug (`[^a-zA-Z0-9_-]` stripped) and
 joined to a FIXED prefix chosen by which param was supplied. The prefix is never
-caller-supplied and a `/` cannot survive the slug filter, so neither root can be
-escaped. `scratch/` is gitignored inside the corpus repo.
+caller-supplied and a `/` cannot survive the slug filter, so neither directory
+root can be escaped. `scratch/` is gitignored inside the corpus repo.
 
 ## Corpus store (`prosequence/core/corpus_store.py`)
 
@@ -340,7 +357,8 @@ serializer (`yaml_io.py`), the validator (`validate.py`), and the store
 `commit()`.
 
 - **`ops.py`** — pure transforms, `(corpus, args) -> corpus`. `add_claim`,
-  `add_inference`, `revise_claim`. No io, no uuid generation, no validation. A
+  `add_inference`, `designate_thesis`, `revise_claim`. No io, no uuid
+  generation, no validation. A
   transform never mutates the corpus or a node; it builds a new `Corpus`
   (`dataclasses.replace`) that shares every unchanged frozen node. Polarity is
   the `relation` argument to `add_inference` (`Relation.CONCLUDES` /
@@ -476,9 +494,12 @@ role so far (promoted from the round-trip spike).
   view, the system prompt, the finding parser, the finding-to-plan translation
   (`build_plan`), and its `run(url, document_text)` parameter (the reference
   `url` is supplied by the harness, never inferred — no fetch tool is bound).
-  Capability is `(AddClaim, AddInference)` — `ReviseClaim` is deliberately
-  withheld: ingestion is additive, adding nodes and reusing existing uuids, and
-  never changes the text of a claim already in the corpus.
+  Capability is `(AddClaim, AddInference, DesignateThesis)` — `ReviseClaim` is
+  deliberately withheld: ingestion is additive, adding nodes and reusing
+  existing uuids, and never changes the text of a claim already in the corpus.
+  `DesignateThesis` is additive on the same terms (it appends to `theses` and
+  cannot remove), which is what lets a document argue FROM the standing thesis
+  to a further claim and record that the corpus now argues about that too.
 - **Prompts** (`prompts/`) — prose only, no logic. Every role's system prompt is
   two pieces, composed by `Role.system_prompt`: `operations.OPERATIONS` (shared
   by every role — the model and the corpus discipline) followed by that role's
@@ -490,7 +511,8 @@ role so far (promoted from the round-trip spike).
   `system_prompt` is concrete on the base class, so no role assembles its own.
 - **Ops and plans** (`plan.py`) — a session write is an object: a frozen
   dataclass generic in what applying it yields (`AddClaim(Op[ClaimId])`,
-  `AddInference(Op[InferenceId])`, `ReviseClaim(Op[None])`). A plan is a list of
+  `AddInference(Op[InferenceId])`, `DesignateThesis(Op[None])`,
+  `ReviseClaim(Op[None])`). A plan is a list of
   them. References are typed and the two kinds are distinct: `New(key)` names a
   node the plan creates, `Existing(id)` names one already in the corpus — ids are
   minted by the session at add time, so nothing carries an id before the node it
@@ -499,6 +521,13 @@ role so far (promoted from the round-trip spike).
   every binding is referenced by something. `execute` folds the plan, binding
   each minted id into an environment the later ops resolve against. Graph
   invariants remain a commit-time concern.
+- **`Op.attaches`** — a `ClassVar` splitting references that BIND a claim into
+  the argument structure from references that merely name it. Only `attaches`
+  ops feed `check_plan`'s orphan tally, so `DesignateThesis` (`attaches =
+  False`) cannot pass an unconnected claim off as attached — without it, one
+  designation in a finding of thirty unconnected claims would demote the fatal
+  "nothing is attached" case to a survivable note. Binding is unaffected: a
+  `New` must be bound by an earlier op whatever the op does with it.
 - **Capability** (`capability.py`) — a role's `capability` is a tuple of op
   **types**; `check_capability` refuses a plan containing any op outside it,
   raising `CapabilityError`. The check runs over the whole plan before the first
@@ -537,7 +566,7 @@ role so far (promoted from the round-trip spike).
   (`salvage.apply_plan`, pure), reads violations off it
   (`validate.check_violations`), drops the inferences implicated, and returns a
   plan that commits cleanly. **Only inferences are dropped** — every I1-I10
-  error names an inference or a root, claims are the extracted content, and a
+  error names an inference or a thesis, claims are the extracted content, and a
   claim left unattached is legal (an orphan is a GAP-6 warning, not an error),
   so the material survives for a later role. Observed on a real run: 3 errors
   from 3 of 36 inferences, repaired to 0 with all 45 claims kept. Most
@@ -545,7 +574,7 @@ role so far (promoted from the round-trip spike).
   is to drop the newest inference on it — the highest op index, which is stable
   across dry runs where a minted uuid is not, and which biases toward keeping
   what the corpus already had (ingestion is additive). Iterative and bounded;
-  a violation no drop can fix (an unresolvable root) raises `Unrepairable` and
+  a violation no drop can fix (an unresolvable thesis) raises `Unrepairable` and
   the run fails as before.
   - Repair operates on the **plan**, never on a built session, and runs **after
     `check_plan`**. Both orderings are load-bearing. Plan-level keeps the write
@@ -609,13 +638,13 @@ claim to the *Hamas-tactics* claim, rather than undercutting the inference.
 Factual description of what the focus-view code does and where it lives. The two
 views (graph, focus) swap and never coexist; they share the derived indices
 (`supports`/`attacks`/`consumers`, built once in `graphData.ts`), the selection,
-the reference root, `computeStance`, and the graph's `Tooltip`.
+the reference thesis, `computeStance`, and the graph's `Tooltip`.
 
 **Files** (`src/viz/focus/`):
 
-- `FocusView.tsx` — the frame. Top to bottom it stacks: a pinned reference-root
-  line and torn-sheet hop divider (`RootLine`/`TearLine`, shown only when the
-  centred claim is off-root); the **Above** region (`consumers`); the **focus
+- `FocusView.tsx` — the frame. Top to bottom it stacks: a pinned reference-thesis
+  line and torn-sheet hop divider (`ThesisLine`/`TearLine`, shown only when the
+  centred claim is off-thesis); the **Above** region (`consumers`); the **focus
   band** (the centred claim); the **Below** region (`supports`/`attacks`).
   `Connector` rules sit between bands. It holds hover state and renders the shared
   `Tooltip`, and provides the `FromHighlight`, `LocateContext`, `HoverContext`,
@@ -678,15 +707,15 @@ the reference root, `computeStance`, and the graph's `Tooltip`.
   marked as the centred claim, in its grounds/warrant position. No deduping: two
   inferences into one destination are two boxes.
 - **Focus band**: the centred claim — a prominent tag (`TAG_STYLE`) over its full
-  text as muted detail (`detailFont`); at the reference root it carries the target
+  text as muted detail (`detailFont`); at the reference thesis it carries the target
   header; attribution, bedrock badge, and the came-from / locate icons render here.
 - **Below** (`supports`/`attacks`): For (`concludes`) left, Against (`contests`)
   right. One `InferenceBox` per inference whose output tile is C (the centred
   claim, marked), with the inference's grounds and warrants bracketed beneath it.
 
 **Channels.** Stance (aligned / opposed / divided / neutral, from `computeStance`
-relative to the reference root) is carried by fill: claim-tile fill and the box
-spine + wash; neutral / no-root falls back to a plain surface card. Position
+relative to the reference thesis) is carried by fill: claim-tile fill and the box
+spine + wash; neutral / no-thesis falls back to a plain surface card. Position
 (For / Supports left, Against / Contests right) is carried by layout plus the
 region-heading hue (`COLORS.column`). Both regions are fixed-height and scroll
 (`aboveHeight`, `columnHeight`); headings carry the count.
@@ -705,13 +734,13 @@ Layout tokens live in `FOCUS` and the shared text/colour tokens in `config.ts`.
 corpus's state. All access is best-effort (wrapped in try/catch) so private mode,
 quota, or disabled storage degrades to defaults rather than failing.
 
-- **Settings** (`loadSettings`/`saveSettings`) — `{ view, focusId, refRootId }`.
-  `App.tsx` seeds its `view`, `focusId`, and `refRootId` state from this at mount
-  and writes it back whenever any of the three change. Absence of `refRootId`
-  means "first visit" (the structural-root default effect runs); an explicit
+- **Settings** (`loadSettings`/`saveSettings`) — `{ view, focusId, refThesisId }`.
+  `App.tsx` seeds its `view`, `focusId`, and `refThesisId` state from this at mount
+  and writes it back whenever any of the three change. Absence of `refThesisId`
+  means "first visit" (the structural-thesis default effect runs); an explicit
   `null` is a deliberate clear (unpainted) and is preserved. Once `data` loads, a
-  validation effect drops any restored `focusId` / `refRootId` not present in the
-  corpus (clearing `refRootId` to `undefined` re-triggers the default).
+  validation effect drops any restored `focusId` / `refThesisId` not present in the
+  corpus (clearing `refThesisId` to `undefined` re-triggers the default).
 - **Viewport** (`loadViewport`/`saveViewport`) — the graph's raw d3 zoom transform
   `{ k, x, y }`. `Graph.tsx` saves it on each zoom `end` and, on mount, restores it
   exactly except when a `neighborhood` locate-return asks for a fixed tight zoom

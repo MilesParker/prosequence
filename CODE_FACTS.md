@@ -131,7 +131,7 @@ export interface DiscourseSpace {
     id: DiscourseSpaceId;
     title: string;
     definitions: Definition[];
-    roots: ClaimId[];
+    theses: ClaimId[];
     claims: Claim[];
     inferences: Inference[];
 }
@@ -143,7 +143,7 @@ export interface DiscourseSpace {
 
 - `I1` — `validate.py:46-49`: inference has exactly one output — flags when `(concludes?1:0)+(contests?1:0) != 1`.
 - `I2` — `validate.py:63-65`: no inference concludes a claim whose `terminal` is true.
-- `I3` — `validate.py:52-61,89-92`: every referenced id resolves — grounds→claim, warrant→claim, concludes→claim, contests→claim-or-inference, and each root→claim.
+- `I3` — `validate.py:52-61,89-92`: every referenced id resolves — grounds→claim, warrant→claim, concludes→claim, contests→claim-or-inference, and each thesis→claim.
 - `I4` — `validate.py:67-69`: `grounds` is non-empty (zero grounds fails).
 - `I5` — `validate.py:71-73` (soft; warning only, does not affect exit): a concluded claim should not be attributive (`attribution` is not None).
 - `I6` — `validate.py:94-124`: the Concludes graph (grounds/warrants→inference→concludes; contests edges excluded) is acyclic, via DFS grey back-edge detection.

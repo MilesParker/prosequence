@@ -11,8 +11,11 @@
 // occupies in the graph, with two exceptions encoded as data:
 //   - Claim.terminal: a commitment that the claim is bedrock (may never
 //     be concluded), as opposed to merely not-yet-supported.
-//   - DiscourseSpace.roots: claims currently designated as contested
-//     questions (views are rooted here; their grounds are bracketed).
+//   - DiscourseSpace.theses: claims currently designated as contested
+//     questions (a view is anchored at one; its grounds are bracketed).
+//     Spelled `roots` before the rename — the word collided with its
+//     graph-theory sense, which a thesis is not: the graph may grow upward
+//     past one, when a later document argues from it to something further.
 
 // ---------- Branded IDs ----------
 
@@ -176,14 +179,14 @@ export interface Definition {
 
 /**
  * Constituted by its definition layer. Propositions are not owned
- * structure — `roots` designates which claims are currently treated as
+ * structure — `theses` designates which claims are currently treated as
  * contested questions (entry points for views and traversal).
  */
 export interface DiscourseSpace {
     id: DiscourseSpaceId;
     title: string;
     definitions: Definition[];
-    roots: ClaimId[];
+    theses: ClaimId[];
     claims: Claim[];
     inferences: Inference[];
 }

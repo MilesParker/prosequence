@@ -6,8 +6,8 @@ export function printDiscourseSpace(ds: DiscourseSpace): void {
   const claimById = new Map<string, Claim>(ds.claims.map(c => [c.id, c]))
   const tagOf = (id: string) => claimById.get(id)?.tag ?? id
 
-  console.log(`ROOTS (${ds.roots.length})`)
-  for (const r of ds.roots) {
+  console.log(`THESES (${ds.theses.length})`)
+  for (const r of ds.theses) {
     console.log(`  [${tagOf(r)}] ${claimById.get(r)?.text ?? r}`)
   }
   console.log()
