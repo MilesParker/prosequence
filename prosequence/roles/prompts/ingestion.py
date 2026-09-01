@@ -68,21 +68,25 @@ find.
 3. A warrant the document evidences is dropped.
 4. A duplicate claim lands. Accepted.
 
-## Warrants: what to surface now
+## Warrants
 
-Surface a warrant when attributing it to this source requires this document.
-Stated outright or clearly relied upon — if you would point at passages to
-justify "this argument assumes X," capture it now. That evidence leaves with
-the document.
+Expect to write one for nearly every inference. A warrant is what makes these
+grounds relevant to this claim; without it the step is asserted rather than
+shown, and an opponent has nothing to engage but the grounds.
 
-Work through the inferences you are writing one at a time and ask the warrant
-question of each. Most steps a document takes rest on something, and the
-assumption is usually visible in what the author treats as not needing
-argument.
+Work through your inferences one at a time and ask the warrant question of
+each. The assumption is usually visible in what the author treats as not
+needing argument.
 
-Leave a warrant for later when it is pure logical reconstruction: derivable
-from the inference structure alone by any careful reader. A later role exists
-for those.
+What does not belong is background nobody would deny. An inference from "crime
+fell after the program began" to "the program reduced crime" does not rest on
+"crime rates change over time" — true, and useless, because denying it defeats
+nothing. It rests on something contestable: that nothing else in that period
+accounts for the fall. Deny that and the step fails, which is why it is the
+warrant.
+
+That is the test — not whether the assumption is true or obvious, but whether
+an opponent could deny it and thereby block the step.
 
 An author's reliance on an assumption they would disown if asked is squarely
 in scope.
@@ -133,5 +137,6 @@ You cannot add definitions. Work with the corpus's stipulations as they stand.
 - Every inference has a scheme; every Unknown has a descriptor.
 - Nothing concludes a terminal or an attributive claim.
 
-Submit the finding in a single call.\
+Submit the finding in a single call.
+\
 """

@@ -32,7 +32,8 @@ from __future__ import annotations
 from langchain_core.messages import HumanMessage
 
 from . import salvage
-from .apply import FINDING_TOOL_SCHEMA, FindingShapeError, ops_from_finding
+from .apply import (FINDING_TOOL_SCHEMA, FindingShapeError, ops_from_finding,
+                    prune_bad_schemes)
 from .corpus_view import render_corpus
 from .plan import (
     AddClaim, AddInference, DesignateThesis, Op, PlanError, check_plan,
@@ -89,12 +90,24 @@ class IngestionRole(Role):
         amounts behind: a malformed FIELD (`FindingShapeError`) yields no ops at
         all, so only the raw finding can be written; a malformed PLAN
         (`PlanError`) yields a full op list, which becomes a corpus.
+
+        Reaching either is now rarer than it was. An isolated bad edge — a
+        malformed scheme, a ref that resolves to nothing — is pruned and noted
+        rather than raised, so one bad inference no longer costs the run. What
+        still fails is what should: a systemically malformed finding.
         """
         # `Existing` refs are checked against the bound version: no write has
         # happened yet at plan time, so it is also the current one.
         known = frozenset(
             n.id for n in (*self.session.bound_version.claims,
                            *self.session.bound_version.inferences))
+
+        # A malformed scheme is a broken edge, not a broken finding: drop those
+        # inferences here so the other 24 and the 51 claims survive. Systemic
+        # failure is left intact and still raises below. Mirrors the ref pruning
+        # further down, one stage earlier because a scheme is refused at the
+        # wire shape rather than at the assembled plan.
+        finding, scheme_notes = prune_bad_schemes(finding)
 
         try:
             plan = ops_from_finding(finding)
@@ -111,6 +124,7 @@ class IngestionRole(Role):
         # Before check_plan, so its guarantee that every ref resolves — the one
         # repair depends on — still holds when repair runs.
         plan, pruned = prune_unresolvable(plan, known)
+        pruned = [*scheme_notes, *pruned]
 
         try:
             plan_notes = [*pruned, *check_plan(plan, known)]

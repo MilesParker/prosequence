@@ -529,6 +529,73 @@ def check_prune_unresolvable():
     return ok, " ".join(f"{k}={v}" for k, v in results.items())
 
 
+def check_prune_bad_schemes():
+    """A malformed scheme costs that inference, not the run — unless every
+    inference is malformed.
+
+    One inference naming 'FromEvidence' (an invented enum member, on a step
+    whose descriptor was already written correctly) discarded 51 claims and 24
+    sound inferences. Pruning keeps them. The systemic case is deliberately NOT
+    pruned, so `_check_schemes` still raises naming every bad scheme — a model
+    that got it wrong everywhere has misunderstood the contract.
+
+    All three malformed conditions prune alike: an invented enum member, Unknown
+    without a descriptor, and a descriptor on a named scheme. Pruned, never
+    coerced — rewriting the scheme would launder an invented value into the
+    corpus, which is precisely what this gate exists to refuse.
+    """
+    from prosequence.roles.apply import (FindingShapeError, ops_from_finding,
+                                         prune_bad_schemes)
+
+    def _f(*schemes):
+        return {"claims": [{"key": "c1", "tag": "T", "text": "x"}],
+                "inferences": [dict(grounds=["c1"], target="real",
+                                    relation="concludes", **s)
+                               for s in schemes]}
+
+    good = {"scheme": "Deductive"}
+    invented = {"scheme": "FromEvidence",
+                "schemeDescriptor": "Capability parity undercuts threat"}
+    bare_unknown = {"scheme": "Unknown"}
+    stray_desc = {"scheme": "FromCause", "schemeDescriptor": "note"}
+    results = {}
+
+    kept, notes = prune_bad_schemes(_f(good, invented))
+    results["drops_only_the_bad_edge"] = (
+        len(kept["inferences"]) == 1
+        and kept["inferences"][0]["scheme"] == "Deductive"
+        and len(notes) == 1 and "FromEvidence" in notes[0])
+
+    # The survivor must now get through the gate, which is the point of pruning
+    # ahead of it.
+    try:
+        ops_from_finding(kept)
+        results["survivor_passes_gate"] = True
+    except FindingShapeError:
+        results["survivor_passes_gate"] = False
+
+    # Every malformed condition prunes, not just the invented enum member.
+    _, notes = prune_bad_schemes(_f(good, bare_unknown, stray_desc))
+    results["all_three_faults_prune"] = len(notes) == 2
+
+    # Every inference malformed: untouched, and the gate still raises.
+    same, notes = prune_bad_schemes(_f(invented))
+    try:
+        ops_from_finding(same)
+        raised = False
+    except FindingShapeError as exc:
+        raised = "FromEvidence" in str(exc)
+    results["systemic_left_alone"] = (
+        len(same["inferences"]) == 1 and not notes and raised)
+
+    # A clean finding is returned unchanged and allocates no notes.
+    same, notes = prune_bad_schemes(_f(good))
+    results["clean_untouched"] = (len(same["inferences"]) == 1 and not notes)
+
+    ok = all(results.values())
+    return ok, " ".join(f"{k}={v}" for k, v in results.items())
+
+
 def check_finding_split_across_both_fields():
     """A finding the model serialized into BOTH fields as separate JSON strings
     keeps all of it. Observed three times on large findings: `claims` arrives as
@@ -690,6 +757,7 @@ CHECKS = [
     ("capability rejects non-Op entries", check_capability_rejects_non_op),
     ("plan rejects unresolvable refs and orphan bindings", check_plan_rejects_bad_refs),
     ("unresolvable refs prune the edge, not the run", check_prune_unresolvable),
+    ("malformed schemes prune the edge, not the run", check_prune_bad_schemes),
     ("finding split across both fields keeps all of it", check_finding_split_across_both_fields),
     ("iteration cap forces apply", check_iteration_cap_forces_apply),
 ]

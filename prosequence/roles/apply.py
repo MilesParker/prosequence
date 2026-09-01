@@ -278,9 +278,12 @@ def _normalize_finding(finding: dict) -> dict:
     return {"claims": out["claims"], "inferences": out["inferences"]}
 
 
-def _check_schemes(inferences: list) -> None:
-    """`scheme` present and in the enum, and `schemeDescriptor` present IFF the
-    scheme is Unknown.
+def _scheme_faults(inferences: list) -> dict[int, str]:
+    """Index -> why that inference's scheme is malformed. Empty when all are
+    well-formed.
+
+    `scheme` must be present and in the enum, and `schemeDescriptor` present IFF
+    the scheme is Unknown.
 
     Enforced here rather than left to the tool's `input_schema`: `tool_choice`
     forces WHICH tool is called, but Anthropic does not validate argument values
@@ -292,25 +295,66 @@ def _check_schemes(inferences: list) -> None:
     because migration produced exactly that — but nothing NEW should arrive
     classified as Unknown without saying what the move actually was.
     """
-    bad = []
+    faults: dict[int, str] = {}
     for n, inf in enumerate(inferences):
         scheme = inf.get("scheme")
         descriptor = inf.get("schemeDescriptor")
         if scheme not in _SCHEME_VALUES:
-            bad.append(f"inference[{n}]: scheme is {scheme!r}, need one of "
-                       + "/".join(_SCHEME_VALUES))
-            continue
-        if scheme == _UNKNOWN and not descriptor:
-            bad.append(f"inference[{n}]: scheme {_UNKNOWN!r} with no "
-                       f"schemeDescriptor (name the inferential move)")
+            faults[n] = (f"scheme is {scheme!r}, need one of "
+                         + "/".join(_SCHEME_VALUES))
+        elif scheme == _UNKNOWN and not descriptor:
+            faults[n] = (f"scheme {_UNKNOWN!r} with no schemeDescriptor "
+                         f"(name the inferential move)")
         elif scheme != _UNKNOWN and descriptor:
-            bad.append(f"inference[{n}]: schemeDescriptor {descriptor!r} with "
-                       f"scheme {scheme!r} (a descriptor belongs only to "
-                       f"{_UNKNOWN!r})")
-    if bad:
+            faults[n] = (f"schemeDescriptor {descriptor!r} with scheme "
+                         f"{scheme!r} (a descriptor belongs only to "
+                         f"{_UNKNOWN!r})")
+    return faults
+
+
+def _check_schemes(inferences: list) -> None:
+    """Raise `FindingShapeError` if any scheme is malformed. The gate that runs
+    inside `ops_from_finding`, after `prune_bad_schemes` has had its chance to
+    remove the isolated cases — so what reaches here is either a clean finding
+    or the systemic failure that should stop the run."""
+    faults = _scheme_faults(inferences)
+    if faults:
         raise FindingShapeError(
-            f"{len(bad)} inference(s) with a malformed scheme:\n  "
-            + "\n  ".join(bad))
+            f"{len(faults)} inference(s) with a malformed scheme:\n  "
+            + "\n  ".join(f"inference[{n}]: {why}"
+                           for n, why in sorted(faults.items())))
+
+
+def prune_bad_schemes(finding: dict) -> tuple[dict, list[str]]:
+    """Drop inferences whose scheme is malformed. Returns (finding, notes).
+
+    Same policy as `plan.prune_unresolvable`, one stage earlier: an inference
+    the tool boundary must refuse is a broken edge and nothing more, and it
+    should not cost the rest of the finding. One inference naming 'FromEvidence'
+    — an invented enum member, on a step whose descriptor was already written
+    correctly — discarded 51 claims and 24 sound inferences, a whole document's
+    ingestion thrown away over one token.
+
+    Pruned, never coerced. Rewriting 'FromEvidence' to Unknown would launder an
+    invented scheme into the corpus, and refusing values the API does not
+    enforce is this gate's entire job. The edge is dropped and the note says
+    why; the claims it cited stay, and `check_plan` decides whether anything is
+    left orphaned by its absence.
+
+    THE SYSTEMIC CASE IS LEFT ALONE, exactly as in `prune_unresolvable`: if
+    every inference is malformed, nothing is pruned and the finding is returned
+    untouched, so `_check_schemes` raises naming all of them. A model that got
+    the scheme wrong everywhere has misunderstood the contract, and the accurate
+    error is the one that says so — not a silent run that commits only claims.
+    """
+    inferences = finding.get("inferences") or []
+    faults = _scheme_faults(inferences)
+    if not faults or len(faults) >= len(inferences):
+        return finding, []
+
+    notes = [f"inference dropped: {why}" for _, why in sorted(faults.items())]
+    kept = [inf for n, inf in enumerate(inferences) if n not in faults]
+    return {**finding, "inferences": kept}, notes
 
 
 def _check_source_types(claims: list) -> None:

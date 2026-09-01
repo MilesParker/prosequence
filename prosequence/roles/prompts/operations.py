@@ -195,8 +195,9 @@ merits; that a particular source relied on it is recorded by its membership in
 that source's inference.
 
 Several warrants on one inference are conjoint — both assumptions needed for
-the one bridge. An inference with no warrants is an enthymeme, which is a
-normal state and not an error.
+the one bridge. An inference with no warrants is an enthymeme: valid as
+structure, but with its bridging assumption left implicit and therefore
+unattackable. It is legal, not desirable.
 
 Two kinds of step almost always need one. A Deductive inference has nothing
 contestable left except its premises, so an unstated premise there is the
@@ -294,5 +295,6 @@ claims may attack each other.
 
 A thesis is a claim the corpus is organised around — the contested matter
 itself. It is an ordinary claim in every other respect. Support flows toward a
-thesis and consequence flows away from it, and both are ordinary inferences.\
+thesis and consequence flows away from it, and both are ordinary inferences.
+\
 """
