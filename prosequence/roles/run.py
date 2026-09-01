@@ -4,12 +4,17 @@
 Wires the run-time dependencies and hands (url, document_text) to the role:
 
     config -> guard + session -> IngestionRole.run(url, document_text)
-           -> land the commit on its own branch
 
 Model and iteration cap come from the guard config. The role commits, once,
-outside the graph; the injection then lands that commit on its own branch and
-rewinds main (see `_land_on_branch`) — the store only advances refs/heads/main,
-so "on a branch, not main" is honoured here, in the injection's own git.
+outside the graph, onto main — and it stays there.
+
+Ingests used to be moved onto `ingest/<sha>` with main rewound. That made every
+run fork from the same point, so no two ever composed: two documents ingested
+into one corpus produced two sibling branches, neither containing the other's
+work, and a corpus living only on such a branch was invisible to
+`list_corpora` (which reads main's tree), so the next ingest into it insisted
+the corpus did not exist. An additive role that cannot accumulate is not much of
+one. History is the record and `git revert` is the rollback.
 
 `run()` is the primitive programmatic harness API: it requires BOTH a reference
 url and a document, and the corpus must already exist. `ingest()` is a
@@ -27,11 +32,9 @@ from __future__ import annotations
 import os
 import sys
 import uuid
-from typing import cast
 from html.parser import HTMLParser
 
 import anthropic
-import pygit2
 import requests
 import trafilatura
 
@@ -67,27 +70,6 @@ def _load_env() -> None:
     load_dotenv(os.path.join(REPO_ROOT, ".env"))
 
 
-def _reset_main_to(store: CorpusStore, head0: str, corpus_file: str) -> None:
-    """Point refs/heads/main at `head0` and make the working tree + index match
-    it for `corpus_file`: restore head0's blob, or delete the file if
-    `corpus_file` did not exist at head0 (it was seeded in this run and head0
-    predates it). Shared by `_land_on_branch` (after branching off a successful
-    commit) and `ingest()`'s failure path (a seed commit that a subsequent
-    ingestion failure must not leave stranded on main — see `ingest()`)."""
-    repo = store.repo
-    repo.references["refs/heads/main"].set_target(head0)
-    head0_commit = repo[head0].peel(pygit2.Commit)
-    path = os.path.join(store.workdir, corpus_file)
-    if corpus_file in head0_commit.tree:
-        blob = head0_commit.tree[corpus_file]
-        with open(path, "wb") as fh:
-            # pygit2 types repo[oid] as the base Object; this entry is a
-            # blob, and only Blob carries `.data`.
-            fh.write(cast(pygit2.Blob, repo[blob.id]).data)
-    elif os.path.exists(path):
-        os.remove(path)
-    repo.index.read_tree(head0_commit.tree)
-    repo.index.write()
 
 
 def view_url(corpus_file: str) -> str:
@@ -102,20 +84,6 @@ def view_url(corpus_file: str) -> str:
     return f"http://localhost:5173/?model={slug}"
 
 
-def _land_on_branch(store: CorpusStore, head0: str, new_sha: str,
-                    corpus_file: str) -> str:
-    """Move the just-made commit off main onto its own branch and rewind main to
-    `head0`, leaving the working tree clean.
-
-    The store only advances refs/heads/main (hard-coded, and left untouched), so
-    landing the injection on a branch rather than main happens here, after the
-    commit. Rollback is `git -C discourse-spaces branch -D <branch>`.
-    """
-    repo = store.repo
-    branch = f"ingest/{new_sha[:8]}"
-    repo.references.create(f"refs/heads/{branch}", new_sha, force=True)
-    _reset_main_to(store, head0, corpus_file)
-    return branch
 
 
 class _TextExtractor(HTMLParser):
@@ -213,13 +181,27 @@ def _seed_corpus(store: CorpusStore, corpus_file: str, corpus_id: str,
     )
 
 
-def _ingest_into(store: CorpusStore, head0: str, corpus_file: str,
+def _ingest_into(store: CorpusStore, corpus_file: str,
                  reference: str, document_text: str, *,
                  client=None, commit_summary: str | None = None) -> dict:
-    """Bind a session on `store`'s current head, run the ingestion role, then
-    land the commit on its own branch and rewind main to `head0`. Shared core of
-    `run()` and `ingest()`. `head0` is captured by the caller BEFORE any seed
-    commit, so a seed lands on the branch alongside the ingest, not on main."""
+    """Bind a session on `store`'s current head and run the ingestion role.
+    Shared core of `run()` and `ingest()`.
+
+    The commit STAYS ON MAIN. It used to be moved onto `ingest/<sha>` with main
+    rewound, which meant every run forked from the same starting point and no
+    two ever composed: two documents ingested into gaza produced two sibling
+    branches, one holding 96 claims and the other 142, neither containing the
+    other's work. A corpus that only existed on such a branch was invisible to
+    `list_corpora` (which reads main's tree), so the next ingest into it
+    reported that it did not exist and asked to seed a new one.
+
+    Accumulation is the whole point of an additive role, so main is where the
+    work goes. History is the record — every ingest is a commit with an author,
+    a message and a diff, and `git revert` is the rollback. This also restores
+    the invariant the store already assumed: "working-tree writes are main-only"
+    (SESSION_FEED), which is exactly why the old path had to commit to main and
+    move the ref afterwards rather than committing to a branch directly.
+    """
     # The store/session key a corpus by its full blob name, not the bare slug.
     session = Session(store, corpus_file)
 
@@ -235,9 +217,6 @@ def _ingest_into(store: CorpusStore, head0: str, corpus_file: str,
         iteration_cap=config.iteration_cap,
     )
     report = role.run(reference, document_text, commit_summary=commit_summary)
-    # The role committed onto main (the store's only ref); land it on its own
-    # branch and rewind main, in the injection's own git.
-    report["branch"] = _land_on_branch(store, head0, report["sha"], corpus_file)
     report["view"] = view_url(corpus_file)
     return report
 
@@ -262,8 +241,7 @@ def run(url: str, document_text: str, *, corpus_name: str = "free-transit",
 
     corpus_file = f"{corpus_name}.v2.yaml"
     store = CorpusStore(CORPUS_DIR)
-    head0 = store.head()  # captured before the session binds, for the rewind
-    return _ingest_into(store, head0, corpus_file, url, document_text,
+    return _ingest_into(store, corpus_file, url, document_text,
                         client=client, commit_summary=commit_summary)
 
 
@@ -296,7 +274,6 @@ def ingest(corpus_name: str, *, url: str | None = None,
     init_tracing()
     corpus_file = f"{corpus_name}.v2.yaml"
     store = CorpusStore(CORPUS_DIR)
-    head0 = store.head()  # BEFORE any seed, so the seed lands on the branch
 
     # Fetch only when no text was supplied; an empty string counts as "not
     # supplied" (this is the trap the primitive run() does not catch).
@@ -316,21 +293,14 @@ def ingest(corpus_name: str, *, url: str | None = None,
                 f"the anchor the document's claims attach to")
         _seed_corpus(store, corpus_file, corpus_name, title or corpus_name, thesis_claim)
 
-    if not seeded:
-        return _ingest_into(store, head0, corpus_file, reference, document_text,
-                            client=client, commit_summary=commit_summary)
-    try:
-        return _ingest_into(store, head0, corpus_file, reference, document_text,
-                            client=client, commit_summary=commit_summary)
-    except BaseException:
-        # The seed above committed directly onto main (there is no branch to
-        # land it on yet — that only happens on a *successful* ingest, inside
-        # _ingest_into). If the ingest that was meant to follow it fails for any
-        # reason, main must not end up sitting on an orphaned seed commit: roll
-        # it back to head0, same as a successful run would have (via
-        # _land_on_branch) if the ingest itself had failed to land.
-        _reset_main_to(store, head0, corpus_file)
-        raise
+    # A failed ingest after a seed leaves the seeded corpus standing, and should:
+    # it is a complete, valid, one-claim corpus, and keeping it is what makes the
+    # obvious next move — run the same ingest again — work at all. Rolling it
+    # back was what turned every retry into "corpus does not exist; seeding needs
+    # thesis_claim". The genesis commit is its own entry in history and reverts
+    # like any other.
+    return _ingest_into(store, corpus_file, reference, document_text,
+                        client=client, commit_summary=commit_summary)
 
 
 def main(argv: list[str]) -> int:
@@ -344,7 +314,6 @@ def main(argv: list[str]) -> int:
 
     report = run(reference, document_text)
     print(f"commit:     {report['sha']}")
-    print(f"branch:     {report['branch']}")
     print(f"view:       {report['view']}")
     print(f"iterations: {report['iterations']}")
     print(f"tokens:     {report['tokens']}")

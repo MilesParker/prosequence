@@ -2,8 +2,15 @@ import { defineConfig, type Plugin } from 'vite'
 import react from '@vitejs/plugin-react'
 import { execFileSync } from 'node:child_process'
 import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
-const CORPUS_DIR = path.resolve(process.cwd(), 'discourse-spaces')
+// Resolved from THIS FILE, not from process.cwd(): the corpus repo sits beside
+// the config, and where the server happened to be launched from is not a fact
+// about where the corpora are. With cwd, starting vite from any other directory
+// silently pointed this at a path that does not exist, every git call failed,
+// and every corpus fell through to a 404 that looked like a missing model.
+const CORPUS_DIR = path.resolve(
+  path.dirname(fileURLToPath(import.meta.url)), 'discourse-spaces')
 
 // A managed corpus is served from git, not from the working tree.
 //

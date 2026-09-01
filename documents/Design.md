@@ -608,10 +608,22 @@ role so far (promoted from the round-trip spike).
 - **Harness entry** (`run.py`) — wires config → guard + session → the role and
   hands it `(url, document_text)`; `main` is a thin CLI. Model and iteration cap
   come from `guard_config.toml`. The role commits onto main (the store's only
-  ref); the harness then **lands that commit on its own branch** (`ingest/<sha>`)
-  and rewinds main (`_land_on_branch`) — the store is left hard-coded to
-  `refs/heads/main`, so "on a branch, not main" is honoured here, in the
-  injection's own git. Tracing is the observability layer (`observability.py`,
+  ref) and **the commit stays there** — ingests accumulate, so run N+1 binds
+  run N. Each commit is the record (author, message, diff) and `git revert` is
+  the rollback.
+
+  This replaced moving each commit onto `ingest/<sha>` and rewinding main. That
+  made every run bind the same starting point, so runs produced siblings rather
+  than a chain — two documents ingested into one corpus gave one branch with 96
+  claims and another with 142, neither containing the other's work — and a
+  corpus living only on such a branch was invisible to `list_corpora` (which
+  reads main's tree), so the next ingest into it reported that the corpus did
+  not exist and asked for a thesis claim to seed a new one. An additive role
+  that cannot accumulate is not one. A failed ingest after a seed now also
+  leaves the seeded corpus standing, which is what makes re-running the same
+  command work instead of failing the same way.
+
+  Tracing is the observability layer (`observability.py`,
   Phoenix/OpenTelemetry), which never gates a run.
 
 ## GAP 1 — resolved (enthymemification: surfaced warrant, contested as a rebut)

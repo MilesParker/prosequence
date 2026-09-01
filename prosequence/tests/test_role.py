@@ -256,31 +256,69 @@ def _looping_role(guard, session, iteration_cap):
                         model="stub-model", iteration_cap=iteration_cap)
 
 
-def check_lands_on_branch():
-    """After the role commits onto main, the injection lands it on its own branch
-    and rewinds main to the pre-run head, leaving the working tree clean."""
+def check_ingests_accumulate_on_main():
+    """Two ingests into one corpus COMPOSE: the second builds on the first.
+
+    Each commit used to be moved onto `ingest/<sha>` with main rewound, so every
+    run bound the same starting point and produced siblings rather than a chain
+    — two documents ingested into one corpus gave one branch with 96 claims and
+    another with 142, neither holding the other's work. Worse, a corpus that
+    existed only on such a branch was invisible to `list_corpora` (which reads
+    main's tree), so the next ingest into it reported that the corpus did not
+    exist and demanded a thesis claim to seed a new one.
+
+    What must hold: main advances, the second commit's parent IS the first, both
+    claims survive into the final corpus, and the working tree stays clean so
+    the store's dirty-tree guard does not block the run after that.
+    """
     import subprocess
-    from prosequence.core.yaml_io import ArgumentScheme, Relation
-    from prosequence.roles.run import _land_on_branch
 
+    tmp = tempfile.mkdtemp(prefix="role-accum-")
     store, dst = fresh_store()
-    head0 = store.head()
-    session = Session(store, CORPUS)
-    g = next(iter(session.bound_version.claims)).id
-    c = session.add_claim("A claim added by the injection.", "branch-demo")
-    session.add_inference([g], [], c, Relation.CONCLUDES, ArgumentScheme.DEDUCTIVE)
-    sha = session.commit("injection demo")  # lands on main via the store
-    on_main = store.head() == sha
+    before = len(Session(store, CORPUS).bound_version.claims)
 
-    branch = _land_on_branch(store, head0, sha, CORPUS)
-    branch_target = str(store.repo.references[f"refs/heads/{branch}"].target)
-    main_rewound = store.head() == head0
+    def ingest_one(key: str, tag: str) -> str:
+        session = Session(store, CORPUS)
+        target = next(c.id for c in session.bound_version.claims
+                      if not c.terminal and c.attribution is None)
+        finding = {
+            "claims": [{"key": key, "tag": tag,
+                        "text": f"An assertion introduced by {tag}.",
+                        "terminal": False,
+                        "attribution": {"source": {"type": "Citation",
+                                                   "reference": "http://x"},
+                                        "quote": None}}],
+            "inferences": [{"grounds": [key], "warrants": [], "target": target,
+                            "relation": "concludes", "scheme": "Unknown",
+                            "schemeDescriptor": "report to fact"}],
+        }
+        stub = StubClient([_Resp([_block(type="tool_use", name="submit_finding",
+                                         input=finding, id="t1")],
+                                 stop="tool_use")])
+        guard = GuardedClient(stub, _cfg(tmp), CORPUS,
+                              token_log=os.path.join(tmp, "tok.jsonl"))
+        role = IngestionRole(guard=guard, session=session, model="stub-model",
+                             iteration_cap=15)
+        return role.run("http://x", "A document.")["sha"]
+
+    first = ingest_one("c1", "First ingest claim")
+    second = ingest_one("c2", "Second ingest claim")
+
+    parent = str(store.repo[second].peel(__import__("pygit2").Commit).parents[0].id)
+    final = load(store.read(CORPUS))
+    tags = {c.tag for c in final.claims}
     clean = subprocess.run(["git", "-C", dst, "status", "--short"],
                            capture_output=True, text=True).stdout.strip() == ""
-    ok = on_main and branch_target == sha and main_rewound and clean
-    return ok, (f"committed_on_main={on_main} branch={branch} "
-                f"branch_has_commit={branch_target == sha} "
-                f"main_rewound={main_rewound} tree_clean={clean}")
+
+    results = {
+        "main_advanced": store.head() == second,
+        "second_builds_on_first": parent == first,
+        "both_claims_present": {"First ingest claim",
+                                "Second ingest claim"} <= tags,
+        "claims_grew_by_two": len(final.claims) == before + 2,
+        "tree_clean": clean,
+    }
+    return all(results.values()), " ".join(f"{k}={v}" for k, v in results.items())
 
 
 def check_capability_declared():
@@ -643,7 +681,7 @@ def check_repair_drops_only_violators():
 CHECKS = [
     ("ingestion role runs end to end (corpus in prompt -> finding -> apply -> commit)", check_end_to_end),
     ("repair drops only the violating inferences, keeps every claim", check_repair_drops_only_violators),
-    ("injection lands commit on its own branch, rewinds main", check_lands_on_branch),
+    ("successive ingests accumulate on main", check_ingests_accumulate_on_main),
     ("upward thesis: new consequent designated and committed", check_upward_thesis_commits),
     ("designating a claim does not count as attaching it", check_designation_is_not_attachment),
     ("capability + role_prompt declared (op types)", check_capability_declared),
