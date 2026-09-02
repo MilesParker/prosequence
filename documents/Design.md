@@ -647,10 +647,11 @@ claim to the *Hamas-tactics* claim, rather than undercutting the inference.
 
 ## Visualization — focus view
 
-Factual description of what the focus-view code does and where it lives. The two
-views (graph, focus) swap and never coexist; they share the derived indices
-(`supports`/`attacks`/`consumers`, built once in `graphData.ts`), the selection,
-the reference thesis, `computeStance`, and the graph's `Tooltip`.
+Factual description of what the focus-view code does and where it lives. The three
+views (graph, focus, article — see the next section) swap and never coexist; they
+share the derived indices (`supports`/`attacks`/`consumers`, built once in
+`graphData.ts`), the selection, the reference thesis, and `computeStance`; the
+graph and focus views also share the graph's `Tooltip`.
 
 **Files** (`src/viz/focus/`):
 
@@ -738,6 +739,157 @@ the graph `Tooltip`, so a tag and its detail read the same on either surface.
 
 Layout tokens live in `FOCUS` and the shared text/colour tokens in `config.ts`.
 
+## Visualization — article view
+
+Factual description of the article-view code. A third surface beside the graph
+and the focus view: the centred claim read as a prose article. It swaps with the
+other two (App's `view` is `'graph' | 'focus' | 'article'`; `ViewSwitch` in the
+title bar shows one button per surface you are not on) and shares the same
+`focusId`, reference thesis, derived indices and `computeStance`. Its props are
+the focus view's minus `fromId` (`gd, focusId, referenceThesisId, onFocus,
+onLocate`); refocus goes through App's `navigate`, so browser back walks its
+history exactly as it does the focus view's.
+
+It follows the focus view's structure rather than its own. The claim's `tag` is
+the title and its `text` is the standfirst beneath (the focus view's "tag
+primary, text as secondary detail"). Sections run in the focus view's vertical
+order — "Where this leads" (its parent band) above, "The case for" / "The case
+against" (its children band) below. The grounds/warrant distinction keeps the
+focus view's mark, solid for grounds and dashed for warrants, as a rail beside
+the paragraph instead of a bracket stub. Register is long-form web prose: ragged
+right, no hyphenation, no display headline scale.
+
+**Colour.** ONE family, `STANCE_INK`, meaning one thing everywhere on the page: blue
+stands with the reference thesis, orange against it, dusty both ways, uncoloured
+no stance. It tints each trail crumb (its own stance), the kicker's left edge (the
+centred claim's), and each argument's rail (`combinedStance` of its grounds). The
+reference thesis crumb is coloured too — `hueOf` resolves it to `aligned`, the
+convention `combinedStance` already uses. `neutral` is the string `'none'` and
+paints nothing; the warrant rail stays `COLORS.border`.
+
+`STANCE_INK` is the text-and-hairline variant of `STANCE`. The poles carry over
+unchanged — they are already ink-dark. `divided` cannot: it is generated
+low-chroma and lifted so it recedes as a FILL, which is what makes it unreadable
+as type, so `deriveDividedInk` re-derives it from that generated colour with
+chroma restored and lightness dropped into the poles' range. It is still derived,
+not hand-picked, so it continues to follow the poles if they are re-tuned.
+
+For/Against carries NO colour. It is already said in words by the section heads,
+whereas stance has no other channel on this surface; and because a supporting
+argument's grounds are usually aligned and an attacking argument's usually
+opposed, a second palette would run nearly parallel to this one — inviting the
+reader to hunt for a distinction that is usually absent, and misleading them on
+the cases where the two genuinely diverge. `COLORS.column` is unused here.
+
+**Ordering.** Arguments within a section are computed, not corpus, order.
+`restsOnBedrock` leads: an inference with a terminal claim among its grounds or
+warrants sorts first however little sits beneath it: a value commitment is
+undeveloped by definition rather than by neglect, so ordering on development alone
+buries the claims the space rests on. The rest follow by `argumentReach` (the
+greatest `reachBelow` among the inference's grounds — warrants are what an argument
+assumes, not what it builds on) descending, tie-broken by ground count then corpus
+order. The reach key is the same number printed as the `›N` cues, so that half of
+the ordering is self-evidencing.
+
+**Reach cue.** Every claim being read — a grounds or warrant link — trails `›N`
+from `reachBelow`: how many inference hops the argument runs on BENEATH it, 0
+printing nothing. It is the article's answer to the focus view's frontier chevron
+("there is more this way"), as a number because prose has no row to hang a chevron
+off.
+
+Reach is not computed depth and deliberately does not share its name. Depth runs
+the other way — hops from a thesis ABOVE a claim — and the two would have collided
+under one word. The distinction carries two rules: depth is never rendered to a
+reader, which survives only because what the article renders is reach; and ordering
+by reach is near-noise if read as depth, since an inference's grounds all sit at
+roughly the same distance from a thesis.
+
+**Files** (`src/viz/article/`):
+
+- `ArticleView.tsx` — the page. Top to bottom: `Kicker` (the reference thesis —
+  at the thesis itself the single label "Thesis"; elsewhere a line
+  the routes down from it, one compact line each, from `trailsFromThesis` and
+  elided by `elide` — every entry the claim's `tag` as a link, `•`-separated, `…`
+  for the elided middle, each tinted by its OWN stance. There is no "N steps
+  away · standing with it" line: the route's length and its colours carry both.
+  "Directly under the reference thesis" when there is no intermediate claim,
+  "Not connected to the reference thesis" when it is unreachable, "and other
+  routes" when more shortest routes exist than `MAX_TRAILS`); the title (the claim's `tag`, one size); the standfirst (the
+  claim's `text` through `sentence`); `Deck` (an attributive claim's `quote` as a
+  block quote over `sourcePhrase(source)` as a byline); a one-line bedrock note
+  for terminal claims; `WhereThisLeads` (headed "Therefore"); the case sections;
+  then a footer whose
+  one link, "Show on the map", calls `onLocate(focusId)`. The root is keyed on
+  `focusId`, so a refocus remounts the page and scroll returns to the top. There
+  is no hover tooltip, no refocus flight, and no came-from trace.
+- `Argument` — one inference. `Inference` carries no tag, so the sub-headline is
+  `argumentHeadline` over its grounds' tags (joined with "+", since grounds
+  conjoin); that handle is what maps the argument back to a tile on the map.
+  Then the grounds as `ClaimLink`s in one ragged-right paragraph, and — when
+  `warrants` is non-empty — a `.pa-warrants` group on its own dashed rail, headed
+  by a single `ASSUMES` label, one line per warrant, a terminal warrant followed
+  by "· bedrock". An inference with no warrants prints no group at all.
+- `Section` — a `SectionHead` and one `Argument` per inference, ordered as above.
+  "The case for" (`supports`) is
+  shown when there are supports, or when the claim is neither terminal nor
+  attributive; "The case against" (`attacks`) is shown for every non-terminal
+  claim; an empty section prints a quiet line, and a non-terminal claim with
+  neither prints a single "The case" section with one quiet line. Terminals have
+  no body.
+- `WhereThisLeads` — headed "Therefore". One line per DESTINATION, not per
+  inference. Consumers are
+  folded into a `routes` map keyed on `(rolePhrase, target)`, so the same target
+  reached by several inferences in the same role prints once with
+  `waysPhrase(n)` ("in two ways"), while grounds-for and assumed-in-arguing-for
+  the same target stay separate lines. Each line is
+  `rolePhrase(asWarrant, relation)` as a label, then the target's `tag` as a
+  link; the inferences' other inputs are not shown. Omitted for a thesis with no
+  consumers, a quiet line for any other claim with none.
+- `ClaimLink` — a claim as an `<a>` with no `href` (`role="link"`, `tabIndex=0`,
+  Enter/Space activate); ink at rest, underlined on hover/focus; click calls
+  `onFocus(id)`. Its `show` prop picks the face: `'text'` (through `sentence`)
+  where the claim is the prose being read — grounds and warrants — and `'tag'`
+  where it is being pointed at: a trail crumb, a `WhereThisLeads` destination.
+  `tint` colours it by stance, `cue` trails the reach mark. Both reach `PageCtx`
+  for the per-claim lookups (`reachOf` memoised once per page render, `hueOf` and
+  `groupHueOf` off the `StanceMap`) rather than threading them through every
+  component between.
+  Every claim on the page is one.
+- `trail.ts` — `trailsFromThesis(gd, focusId, thesisId)` walks UP from the claim
+  through `consumersOf`/`outputOf`, breadth-first, keeping EVERY predecessor on a
+  shortest route, then enumerates that shortest-path DAG down from the thesis.
+  Returns up to `MAX_TRAILS` routes, each thesis-first with the centred claim
+  dropped (the title below already is it), plus `more` for the shortest routes
+  beyond them; `paths` is empty when the claim is the thesis or sits directly
+  under it, and the whole result is `null` when the thesis is unreachable.
+  `elide` holds the two ends of a long route and returns `null` for the elided
+  middle. `reachBelow` walks DOWN through `supportsOf`/`attacksOf` for the reach
+  cue, memoised across a page render and cycle-guarded; `argumentReach` folds it
+  over an inference's grounds and `restsOnBedrock` reports a terminal claim among
+  its inputs, together giving the section ordering.
+- `prose.ts` — the wording, as pure functions: `sentence` (adds a full stop when
+  the text ends without one), `numberWord` / `stepsAway`, `stancePhrase`
+  (aligned → "standing with it", opposed → "standing against it", divided →
+  "cutting both ways", otherwise null), `sourcePhrase` (Citation → its
+  `reference`; each of the other four source types → a fixed phrase),
+  `rolePhrase` (grounds/warrant × concludes/contests → "grounds for", "grounds
+  against", "assumed in arguing for", "assumed in arguing against"),
+  `argumentHeadline`, `waysPhrase`, `routesPhrase` (unused by the current
+  composition, kept beside its siblings), and the `ASSUMES` constant.
+
+**Not rendered.** `id`, `scheme`, `schemeDescriptor`, `uncertain`,
+`submissionStatus`, computed depth; attribution on any claim other than the centred one;
+the co-inputs of a consuming inference; counts other than `waysPhrase`. `tag` IS
+rendered here — it is the title, the argument sub-headlines, and the face of
+every pointing link.
+
+Typography tokens live in `ARTICLE` (`config.ts`): the serif body stack and the
+sans label stack, the measure, the title/standfirst/kicker/deck/body/warrant/
+lead/label/section/subhead/trail sizes, line height, the rail gap and inset, the
+kicker rail weight, and the warrant and argument gaps. Colours come from `COLORS` (paper background, ink
+text, `textMuted` for the standfirst and warrants, `textFaint` for labels,
+`border` for hairlines and the warrant rail, `STANCE_INK` for the kicker edge, the trail crumbs and the argument rail, and
+`textDimmer` for the reach cue).
 ## Visualization — session persistence
 
 `src/viz/persist.ts` remembers where the reader left off, across reloads, in
@@ -746,7 +898,8 @@ Layout tokens live in `FOCUS` and the shared text/colour tokens in `config.ts`.
 corpus's state. All access is best-effort (wrapped in try/catch) so private mode,
 quota, or disabled storage degrades to defaults rather than failing.
 
-- **Settings** (`loadSettings`/`saveSettings`) — `{ view, focusId, refThesisId }`.
+- **Settings** (`loadSettings`/`saveSettings`) — `{ view, focusId, refThesisId }`,
+  where `view` is `'graph' | 'focus' | 'article'`.
   `App.tsx` seeds its `view`, `focusId`, and `refThesisId` state from this at mount
   and writes it back whenever any of the three change. Absence of `refThesisId`
   means "first visit" (the structural-thesis default effect runs); an explicit

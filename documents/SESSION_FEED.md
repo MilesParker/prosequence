@@ -233,27 +233,46 @@ No named philosophical frameworks. `terminal: true`. No inference may conclude a
 
 ---
 
-## Views (Settled)
+## Surfaces (Settled)
 
-Both views are built. They swap, never coexist, and share one `ClaimId` selection plus one reference thesis.
+Three surfaces are built: the graph, the focus view, and the article. They swap, never coexist, and share one `ClaimId` selection plus one reference thesis. A surface may render a field another does not; the shared commitment is the selection, the reference thesis, and the derived indices, not the treatment.
 
 **Shared.** Design tokens, the derived indices (`supports`, `attacks`, `consumers`, computed once on load), the selection, the reference thesis, and `computeStance`. Not shared: layout, composition, and node/cell rendering above the primitive level.
 
-**Stance rendering.** The graph carries stance on nodes and edges; edge geometry (a double-tick slash) carries `CONCLUDES` vs `CONTESTS` independently of hue. The focus view carries stance on frontier chevrons. Palette poles are matched on perceived loudness rather than equal lightness/chroma, since blue is gamut-limited; `divided` is set apart by low chroma and its hue must avoid both pole families.
+**Stance rendering.** The graph carries stance on nodes and edges; edge geometry (a double-tick slash) carries `CONCLUDES` vs `CONTESTS` independently of hue. The focus view carries stance on fill — tiles, bands, and the inference box's spine. Frontier chevrons carry no stance. The article carries stance as ink: each trail crumb takes its own, the kicker's edge takes the centred claim's, and an argument's rail takes the combined stance of its grounds. Ink is a second token set, `STANCE_INK`. The poles carry over unchanged; `divided` cannot, and `deriveDividedInk` re-derives it from the generated fill colour. Derived, never hand-picked.
+
+Palette poles are matched on perceived loudness rather than equal lightness/chroma, since blue is gamut-limited; `divided` is set apart by low chroma and its hue must avoid both pole families.
 
 **Focus view — locked.**
 - Stacked bands: parent band, focus band, children band (For left / Against right). Claims-only frames; inferences are never centered and never selectable.
+- The unit is the inference, not the claim. Every box shows one complete inference — its output, its inputs, and how each input enters. The centred claim renders in every box, blank. Conclusion sits above premises inside a box, the same altitude grammar the stack uses between bands.
+- Claims render as tag tiles with full text on hover, not as full-text rows.
 - Cells and parent columns are fixed-height; overflow scrolls within the frame with a scroll-edge fade. "Everything visible at rest" means no disclosure *controls* — no expand/collapse, no "+N more", no click-to-reveal. Scrolling inside a fixed frame is not disclosure.
-- The parent band pages, in two polarity columns (Supports / Contests) with role as a group header ("as grounds" / "as an assumption"). Consumers are neither AND nor OR, so paging is legitimate; the pager's `n` preserves the fan-out count that the band exists to show. Warrant-role tiles render the grounds-to-destination pair, since the destination alone cannot say which inference the claim bridges.
-- For/Against columns page OR-siblings. Page state resets on refocus. Corpus order preserved.
+- Paging is retired. Tag tiles fit every sibling in a fixed-height scroll frame, and scroll keeps OR-siblings adjacent and in corpus order rather than splitting them into a visible set and a hidden set. Corpus order is preserved; nothing is sorted by degree, stance, or status.
+- The parent band shows consumers in two polarity groups (Supports / Contests) with role as a group header ("as grounds" / "as an assumption"). Warrant-role entries render the grounds-to-destination pair, since the destination alone cannot say which inference the claim bridges.
 - Frontier chevrons replaced pips entirely. Chevrons render on every claim row wherever one appears, never on the focus band; terminals render a `bedrock` badge instead. A chevron answers "there is more this way, and here is where it leads" — a different question from the retired supported/contested pip.
-- The cell conjunction label is `assumes` / `assumes, together`. "Because" in natural language signals grounds, not warrants.
-- Column tint applies to chrome only — headings, pager, labels — never to claim-bearing surfaces. The warrant bracket is neutral.
+- The grounds/warrant distinction is carried by the stub: solid into grounds, dashed into warrants. The per-box `assumes` / `assumes, together` label is retired — conjointness is a constant of the model, not a per-box fact.
+- Column tint applies to chrome only — headings, labels — never to claim-bearing surfaces. The warrant bracket is neutral. This governs the focus view; the article carries no column tint at all.
 - A pinned reference-thesis line sits at the top of the stack with a target icon; a torn-sheet divider shows hop count when the centered claim is off-thesis.
 - Per-claim "show in graph" locate and a "came from" back-trace are kept. Neither changes selection.
 - `theses[0]` is the default centre and the default reference thesis.
 - Attribution renders in the focus band only.
-- Never rendered anywhere in the focus view: `id`, `scheme`, computed depth, `tag`, `submissionStatus`, `uncertain`. Depth especially — it is inferential distance and explicitly not importance.
+- Never rendered anywhere in the focus view: `id`, `scheme`, `schemeDescriptor`, `submissionStatus`, `uncertain`, computed depth.
+- `tag` **is** rendered and is the primary identifier — a tile carries its tag and nothing else. Depth is not rendered here or anywhere, and is never a proxy for importance: it is inferential distance, and what a reader leads with in natural argument is usually evidence, which is structurally downstream of what it supports.
+
+**Article view — settled.**
+- The centred claim read as prose. Register is long-form web writing, not a newspaper: ragged right, no hyphenation, no display headline scale.
+- `tag` is the title; the claim's `text` is the standfirst beneath it. This is the focus view's tag-primary treatment carried over, and it is why the 50-character tag ceiling matters — the tag is the only short form the model produces, and a title needs one.
+- One argument per inference, headed by its grounds' tags joined with "+". `Inference` carries no tag of its own, so what it argues from is the only handle available, and it is the same text the map labels those tiles with.
+- Grounds are roman prose against a solid rail; warrants are a group on a dashed rail under a single `assumes`. This is the focus view's stub semantics translated to a margin mark. Role is positional in the model, so presentation is the only channel the distinction has, and one label over a merged italic run is not enough to carry it.
+- Section order follows the focus view's vertical order, not article convention: "Therefore" (consumers, the parent band) above, then "The case for" / "The case against" (the children band) below.
+- **No breadcrumb of one path.** The structure is a DAG. Up to three shortest routes from the reference thesis are shown, one compact line each, with "and other routes" beyond that. Route length replaces a stated hop count; crumb colour replaces a stated stance phrase.
+- **Ordering within a section is computed, not corpus order.** Arguments resting on a bedrock commitment lead; the rest follow by the reach of their grounds, descending.
+- **Reach is surfaced as a frontier cue**, `›N` after each claim being read: how many hops of argument run on beneath it. It answers the frontier chevron's question — there is more this way — as a number, because prose has no row to hang a chevron off. Reach is not computed depth: reach counts hops beneath a claim, depth counts hops from a thesis above it. The article renders neither depth nor importance.
+- **One colour family.** Stance, and only stance, is coloured. For/Against carries no colour: it is already said in words by the section heads, whereas stance has no other channel on this surface.
+- **Absence is printed.** "Nothing yet argues for this claim." A missing warrant prints no line at all — the absent line is the enthymeme, which is the normal state and not a defect.
+- Not rendered: `id`, `scheme`, `schemeDescriptor`, `uncertain`, `submissionStatus`; attribution on any claim but the centred one; a consuming inference's co-inputs.
+- One affordance: every claim is a link that recentres the page. Plus "Show on the map", which calls the same locate the focus view uses.
 
 ---
 
@@ -291,7 +310,7 @@ Both views are built. They swap, never coexist, and share one `ClaimId` selectio
 **Direction — viz and agent surface.** Settled in principle, unbuilt. Recorded here because each one closes an option rather than opening one.
 
 - **The viz becomes a client of a local service.** Derivation lives once, in Python, beside the store and validator. This was already forced in miniature: a divergent TypeScript validator reimplemented the invariants, drifted, and was deleted. The same pressure applies to every derived value the two sides share.
-- **The fetch boundary is at version change, never at interaction.** One request per (corpus, version) returns a derived bundle — parsed graph, derived indices, stance. Layout, selection, paging, and animation then run from memory. No interaction path touches the network.
+- **The fetch boundary is at version change, never at interaction.** One request per (corpus, version) returns a derived bundle — parsed graph, derived indices, stance. Layout, selection, scroll, and animation then run from memory. No interaction path touches the network.
 - **The bundle carries stance for every candidate thesis**, so thesis nomination is a lookup rather than a fetch. Nomination stays a front-end concern without stance being computed twice. Revisit when corpus size shows up in a profile, not before.
 - **The service reads the working-tree file by default and takes an optional sha.** Hand-editing keeps edit-and-reload immediacy, and replay becomes a viewing mode rather than a checkout.
 - **Agent activity surfaces as an indicator, not a live update.** The reader binds a version as an agent does and rebinds deliberately. A graph re-laying-out under someone reading it is hostile, and arriving nodes collide with the focus view's flight animation.
@@ -395,7 +414,7 @@ The hard problems sit at the front, not the end. Three of the five govern how a 
 
 ---
 
-## Staging (revised — supersedes the stages in ARCHITECTURE_STAGE1)
+## Staging (revised)
 
 Stage 3 as originally written ("same agent, now proposing through review") does not exist — there is no gate.
 
@@ -407,6 +426,20 @@ Stage 3 as originally written ("same agent, now proposing through review") does 
 - **7 — Cohorts.** First stage whose output is a comparison rather than a graph change.
 
 Extraction is proven — three corpora built this way, all validating clean, and the YAML Generation Rules above are that role's guidance. Attachment is not: deciding where a new claim belongs, whether an inference already covers it, whether the assumption is already surfaced two nodes over.
+
+**Deferred, with trigger conditions.** Lifted from the Stage 1 architecture document, which is
+otherwise superseded by Runtime and Staging above.
+
+| Item | Add when |
+|---|---|
+| Refcounted shared versions | parse cost shows in a profile |
+| Read-set conflict detection | retry rate from the coarse check is too high |
+| Tombstone / redirect table | consolidation lands (Stage 6) |
+| Vector index (pgvector or similar) | brute-force cosine over ~50k claims gets slow |
+| Population-level rate limiting | more than one agent instance per role |
+| Rationale space (cross-space refs) | rejections need to be contested, not just recorded — needs GAP 4 |
+| Merge, multi-residence | never, for this build |
+| Pruning | GAP 5 (agent identity → usage signal) |
 
 ---
 
@@ -492,8 +525,8 @@ Visualization: a Vite/TypeScript React app (`src/viz/`), D3 v7 / js-yaml, force-
 - Navigation: no standalone module in the repo. Navigation is inline (`navigate` in `src/viz/App.tsx`). `corpus_nav.py` / `test_nav.py` are not present — they belong to the agentic toy or are gone
 - YAML corpora: all three migrated to v2 and passing — `discourse-spaces/{free-transit,freedman,gaza}.v2.yaml`
 - Tags: warrant pass complete (structural prefixes stripped, ceiling 50, casing uniform). Grounds pass complete
-- Graph view and focus view: both implemented and building
-- Colour discordance: resolved. Both views read stance from one shared `computeStance`; the graph carries it on nodes and edges, the focus view on frontier chevrons. Column tint is chrome only
+- Graph view, focus view and article view: all three implemented and building
+- Colour discordance: resolved. All three surfaces read stance from one shared `computeStance`; the graph carries it on nodes and edges, the focus view on fill, the article as ink via `STANCE_INK`. Column tint is chrome only, and is used by the focus view alone
 - Stage 1 runtime: complete. Id migration, v2.2 field change, canonical serializer, git store, genesis rebuild, typed writer, guard. See Runtime
 - Agentic Prasanga traversal (interview-prep toy): raw Python + Anthropic SDK, no framework. Model is the untrusted edge, harness is the trusted spine, model requests rather than executes. Steps 0–3 working; Step 4 — wiring navigation into the full loop with stop conditions and web search — outstanding
 

@@ -41,7 +41,7 @@ export const saveViewport = (v: Viewport): void => save('viewport', v)
 // structural thesis), while an explicit null = deliberately unpainted. So callers
 // read the raw object and test `'refThesisId' in settings` rather than coalescing.
 export interface Settings {
-  view?: 'graph' | 'focus'
+  view?: 'graph' | 'focus' | 'article'
   focusId?: string | null
   refThesisId?: string | null
 }

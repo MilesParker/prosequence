@@ -183,6 +183,38 @@ export const FOCUS = {
   },
 } as const
 
+// ── Article view ─────────────────────────────────────────────────────────────
+// A third surface beside the graph and the focus view: the centred claim read as
+// a prose article. It follows the focus view's structure rather than inventing
+// one — the tag is the title and the claim's own text is the standfirst beneath
+// it (FOCUS's "tag primary, text as secondary detail"), and the grounds/warrant
+// distinction keeps the focus view's mark: SOLID for grounds, DASHED for
+// warrants, here as the rail beside a paragraph instead of a bracket stub.
+// Register is a long-form web article, not a newspaper: ragged right, no
+// hyphenation, serif body with quiet sans labels.
+export const ARTICLE = {
+  font: "Georgia, 'Iowan Old Style', 'Times New Roman', Times, serif",
+  labelFont: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
+  measure: 680,          // max text width (px) — long-form reading measure
+  titleFont: 31,         // the tag — the article's title (tags cap at 50 chars)
+  standfirstFont: 21,    // the claim's own text, directly under the title
+  kickerFont: 15,        // the reference thesis line above the title
+  deckFont: 18,          // attribution quote
+  bodyFont: 19,          // grounds prose
+  warrantFont: 17,       // warrant lines
+  leadFont: 17,          // "where this leads" lines
+  labelSize: 12,         // sans labels (kicker, assumes, roles, byline)
+  sectionFont: 12,       // section headings
+  subheadFont: 17,       // an argument's sub-headline — its grounds' tags
+  trailFont: 13,         // the thesis → claim trail in the kicker
+  kickerRail: 2,         // the kicker's stance-hue edge
+  lineHeight: 1.7,
+  rail: 15,              // gap between the grounds/warrant rail and its text
+  railInset: 2,          // how far the rail sits in from the measure
+  warrantGap: 10,        // between an argument's grounds and its first warrant
+  argGap: 34,            // between arguments (inferences) in one section
+} as const
+
 // ── Node dimensions (half-width / half-height) ───────────────────────────────
 export const NODE = {
   halfWidth: 60,
@@ -309,6 +341,31 @@ export const STANCE = {
   opposed: STANCE_OPPOSED,
   divided: deriveDivided(STANCE_ALIGNED, STANCE_OPPOSED),
   neutral: 'none',                      // no fill — outline only (see STANCE_NEUTRAL_STROKE)
+} as const
+
+/**
+ * The stance palette for TEXT and hairline rails. The two poles are already
+ * ink-dark and carry over unchanged. `divided` cannot: it is deliberately
+ * low-chroma and lifted so it RECEDES as a fill, which is exactly what makes it
+ * unreadable as type. This re-derives it from the generated colour — RULE 2 still
+ * holds, nothing here is hand-picked and it still follows the poles if they are
+ * re-tuned — restoring chroma and dropping lightness into the poles' range, so it
+ * stays the quietest of the three without reading as background.
+ */
+function deriveDividedInk(divided: string, aligned: string, opposed: string): string {
+  const [h] = divided.match(/[\d.]+/g)!.map(Number)
+  const [, sa] = aligned.match(/[\d.]+/g)!.map(Number)
+  const [, so] = opposed.match(/[\d.]+/g)!.map(Number)
+  const s = Math.min(sa, so) * 0.55   // quieter than the poles, no longer invisible
+  const l = 44                        // between the poles' 35.5 and 45.7
+  return `hsl(${h.toFixed(1)}, ${s.toFixed(1)}%, ${l}%)`
+}
+
+export const STANCE_INK = {
+  aligned: STANCE_ALIGNED,
+  opposed: STANCE_OPPOSED,
+  divided: deriveDividedInk(STANCE.divided, STANCE_ALIGNED, STANCE_OPPOSED),
+  neutral: 'none',                      // absence of stance — paints nothing
 } as const
 
 // Neutral stance carries no hue: an outline/stroke-only treatment on a muted

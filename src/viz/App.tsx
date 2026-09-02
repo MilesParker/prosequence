@@ -6,22 +6,27 @@ import { Graph } from './components/Graph'
 import { Tooltip } from './components/Tooltip'
 import { Legend } from './components/Legend'
 import { FocusView } from './focus/FocusView'
+import { ArticleView } from './article/ArticleView'
 import { useDiscourseData } from './hooks/useDiscourseData'
 import { loadSettings, saveSettings } from './persist'
 import type { GraphNode, GraphData } from './graphData'
 
-type View = 'graph' | 'focus'
+type View = 'graph' | 'focus' | 'article'
 
-// Contextual swap between the two mutually-exclusive surfaces (§9a): an entry
-// button on the graph, a return button in the focus view.
-function ViewSwitch({ view, onGraph, onFocus }: { view: View; onGraph: () => void; onFocus: () => void }) {
+// Contextual swap between the mutually-exclusive surfaces (§9a): one button per
+// surface you are not on — a return button to the graph, entry buttons otherwise.
+function ViewSwitch({ view, onGraph, onFocus, onArticle }: { view: View; onGraph: () => void; onFocus: () => void; onArticle: () => void }) {
   const style = {
     padding: '5px 12px', fontSize: 12, borderRadius: 6, cursor: 'pointer',
     border: `1px solid ${COLORS.border}`, background: COLORS.surface, color: COLORS.textMuted,
   }
-  return view === 'graph'
-    ? <button style={style} onClick={onFocus}>Focus view →</button>
-    : <button style={style} onClick={onGraph}>← Back to graph</button>
+  return (
+    <>
+      {view !== 'graph' && <button style={style} onClick={onGraph}>← Back to graph</button>}
+      {view !== 'focus' && <button style={style} onClick={onFocus}>Focus view →</button>}
+      {view !== 'article' && <button style={style} onClick={onArticle}>Article →</button>}
+    </>
+  )
 }
 
 export function App() {
@@ -173,9 +178,9 @@ export function App() {
     }
   }, [])
 
-  // Null selection defaults to a thesis when entering the focus view (§9a-2/§10.3).
+  // Null selection defaults to a thesis when entering the focus or article view (§9a-2/§10.3).
   useEffect(() => {
-    if (view === 'focus' && !focusId && thesisId) setFocusId(thesisId)
+    if (view !== 'graph' && !focusId && thesisId) setFocusId(thesisId)
   }, [view, focusId, thesisId])
 
   if (loading) return <Loading />
@@ -192,7 +197,7 @@ export function App() {
         subtitle={data.id}
         search={view === 'graph' ? search : undefined}
         onSearch={view === 'graph' ? setSearch : undefined}
-        viewToggle={<ViewSwitch view={view} onGraph={() => { setGraphEntryMode('reveal'); setView('graph') }} onFocus={() => setView('focus')} />}
+        viewToggle={<ViewSwitch view={view} onGraph={() => { setGraphEntryMode('reveal'); setView('graph') }} onFocus={() => setView('focus')} onArticle={() => setView('article')} />}
       />
 
       {view === 'graph' ? (
@@ -213,6 +218,9 @@ export function App() {
           {hovered && <Tooltip node={hovered.node} x={hovered.x} y={hovered.y} nodeById={gd.nodeById} />}
           <Legend nominating={nominating} onToggleNominate={toggleNominate} />
         </>
+      ) : view === 'article' ? (
+        // The article view: the same centre and reference thesis, read as prose.
+        fid && <ArticleView gd={gd} focusId={fid} referenceThesisId={refThesisId ?? thesisId} onFocus={navigate} onLocate={handleLocate} />
       ) : (
         // The focus view pins the same reference thesis the graph measures from
         // (Stage 3). When the thesis has been cleared to null, fall back to the
