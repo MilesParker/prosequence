@@ -38,6 +38,7 @@ const elk = new ELK()
  *   1. **Partition** nodes into those components (union–find, theses excluded).
  *   2. **Lay out each group independently** with ELK layered — crossing-minimised,
  *      orthogonally routed edges *within* the group, where all the structure is.
+ *      Inference inputs are port-ordered: warrants always right of grounds.
  *   3. **Rect-pack the group boxes** toward a target aspect ratio. Layers exist
  *      only within a group, so one subtree may sit entirely below another —
  *      this is what collapses the width (≈4–5:1 flat → ≈1.3:1 packed).
@@ -81,11 +82,38 @@ export async function layoutGraph(gd: GraphData): Promise<LayoutResult> {
   }
 
   // ── 2. Lay out each group independently ─────────────────────────────────────
+  //
+  // Inference nodes carry explicit ports so the order their inputs arrive in is
+  // fixed rather than left to crossing minimisation: **warrants sit to the right
+  // of grounds**, always. ELK indexes ports clockwise from the top-left corner,
+  // so on the SOUTH side (where inputs land under `direction: UP`) a *lower*
+  // index means *further right* — hence warrants are emitted first. An inference
+  // contested by another inference takes its incoming attack on the far left.
+  const portId = (linkId: string) => `port|${linkId}`
+  const inputRank = (role: EdgeRole) => (role === 'Warrants' ? 0 : role === 'Grounds' ? 1 : 2)
+
   const groupLayouts = await Promise.all([...groups.entries()].map(async ([g, ids]) => {
     const inGroup = new Set(ids)
-    const edges = gd.links
+    const groupLinks = gd.links
       .filter(l => inGroup.has(l.source as unknown as string) && inGroup.has(l.target as unknown as string))
-      .map(l => ({ id: l.id, sources: [l.source as unknown as string], targets: [l.target as unknown as string] }))
+    const isInf = (id: string) => gd.nodeById.get(id)!._kind === 'inference'
+
+    const inLinks = new Map<string, typeof groupLinks>()   // inference id → incoming links
+    const outLink = new Map<string, string>()              // inference id → its one outgoing link
+    for (const l of groupLinks) {
+      const s = l.source as unknown as string, t = l.target as unknown as string
+      if (isInf(t)) (inLinks.get(t) ?? inLinks.set(t, []).get(t)!).push(l)
+      if (isInf(s)) outLink.set(s, l.id)
+    }
+
+    const edges = groupLinks.map(l => {
+      const s = l.source as unknown as string, t = l.target as unknown as string
+      return {
+        id: l.id,
+        sources: [isInf(s) ? portId(l.id) : s],
+        targets: [isInf(t) ? portId(l.id) : t],
+      }
+    })
     const graph: ElkNode = {
       id: g,
       layoutOptions: {
@@ -96,7 +124,24 @@ export async function layoutGraph(gd: GraphData): Promise<LayoutResult> {
         'elk.layered.spacing.nodeNodeBetweenLayers': String(LAYOUT.layerSpacing),
         'elk.spacing.edgeNode': '16',
       },
-      children: ids.map(id => ({ id, width: wOf(gd.nodeById.get(id)!), height: hOf(gd.nodeById.get(id)!) })),
+      children: ids.map(id => {
+        const n = gd.nodeById.get(id)!
+        const box = { id, width: wOf(n), height: hOf(n) }
+        if (n._kind !== 'inference') return box
+        // Clockwise from the top-left: the output port (NORTH) first, then the
+        // inputs down the SOUTH side right-to-left — warrants, grounds, attacks.
+        const ports: Array<{ id: string; layoutOptions: Record<string, string> }> = []
+        const port = (linkId: string, side: string) => ports.push({
+          id: portId(linkId),
+          layoutOptions: { 'elk.port.side': side, 'elk.port.index': String(ports.length) },
+        })
+        const out = outLink.get(id)
+        if (out) port(out, 'NORTH')
+        for (const l of [...(inLinks.get(id) ?? [])].sort((a, b) => inputRank(a.role) - inputRank(b.role))) {
+          port(l.id, 'SOUTH')
+        }
+        return { ...box, layoutOptions: { 'elk.portConstraints': 'FIXED_ORDER' }, ports }
+      }),
       edges,
     }
     const res = await elk.layout(graph)
