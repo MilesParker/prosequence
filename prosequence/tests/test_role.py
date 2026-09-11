@@ -22,6 +22,7 @@ from prosequence.core.session import Session, ValidationFailed
 from prosequence.core.yaml_io import load
 from prosequence.core.guarded_client import GuardConfig, GuardedClient
 from prosequence.roles.ingestion import IngestionRole
+from prosequence.roles.apply import FindingShapeError
 from prosequence.roles.capability import CapabilityError, check_capability
 from prosequence.roles.plan import (
     AddClaim, AddInference, ClaimId, DesignateThesis, Existing, New, PlanError,
@@ -78,9 +79,14 @@ class StubClient:
     def __init__(self, script):
         self._script = list(script)
         self.calls = 0
+        # Every kwargs dict handed to stream(), in order. This IS the wire, and
+        # a check that asserts something never reached the model has to read it
+        # rather than trust the code that built it.
+        self.sent: list[dict] = []
         self.messages = self  # so `client.messages.stream(...)` resolves here
 
     def stream(self, **kwargs):
+        self.sent.append(kwargs)
         r = self._script[self.calls]
         self.calls += 1
         return _StreamCtx(r)
@@ -158,17 +164,19 @@ def check_end_to_end():
                 f"tokens={report['tokens']}")
 
 
-def check_upward_thesis_commits():
-    """A document that argues FROM the standing thesis to a further claim lands
-    that claim as a NEW thesis, and the corpus commits.
+def check_ingestion_cannot_designate_a_thesis():
+    """Ingestion cannot write `theses`, by two independent stops.
 
-    This is the whole upward path in one check, because every stage of it used
-    to refuse: the finding had no way to spell the designation, ingestion held
-    no op that could write `theses`, and a claim above the standing thesis
-    validated only as a GAP-6 warning about an unconcluded orphan. What must
-    hold now is that the new claim is IN `theses`, that the old one is still
-    there beside it (designation appends, never replaces), and that the
-    inference binding them survives to the commit."""
+    It held `DesignateThesis` once, granted so a document arguing FROM the
+    standing thesis could land the consequent as a further question. What it
+    produced instead was each document's own headline claim designated a corpus
+    question — a curatorial judgement no single document supports, and one that
+    silences the GAP-6 warning the loose claim would otherwise raise.
+
+    Both halves of the withdrawal are checked, because either alone would leave
+    the path open: the `thesis` flag is off the wire, so a finding that sets it
+    yields no designation op; and the capability is gone, so a plan carrying one
+    from anywhere else is refused with nothing written."""
     tmp = tempfile.mkdtemp(prefix="role-thesis-")
     store, dst = fresh_store()
     session = Session(store, CORPUS)
@@ -181,11 +189,15 @@ def check_upward_thesis_commits():
             "terminal": False, "thesis": True,
         }],
         "inferences": [{
-            # The standing thesis as GROUNDS — the direction that was missing.
             "grounds": [standing], "warrants": [], "target": "t2",
             "relation": "concludes", "scheme": "FromConsequence",
         }],
     }
+    # The flag is ignored: the plan is the claim and the inference, nothing more.
+    from prosequence.roles.apply import ops_from_finding
+    plan = ops_from_finding(finding)
+    no_designation = not any(isinstance(o, DesignateThesis) for o in plan)
+
     script = [_Resp([_block(type="tool_use", name="submit_finding",
                             input=finding, id="t1")], stop="tool_use")]
     stub = StubClient(script)
@@ -196,17 +208,26 @@ def check_upward_thesis_commits():
     report = role.run("http://x", "A document arguing past the thesis.")
 
     committed = load(store.read(CORPUS, report["sha"]))
+    # The claim still lands and still attaches — only the designation is gone.
     new_id = next(c.id for c in committed.claims if c.tag.startswith("Further"))
-    designated = new_id in committed.theses
-    kept_standing = standing in committed.theses
     bound = any(i.target == new_id and standing in i.grounds
                 for i in committed.inferences)
-    # The designation is an op in its own right, and the commit message says so.
-    logged = any(l.startswith("designate_thesis") for l in report["op_lines"])
+    unchanged = tuple(committed.theses) == (standing,)
 
-    ok = designated and kept_standing and bound and logged
-    return ok, (f"designated={designated} kept_standing={kept_standing} "
-                f"bound_by_inference={bound} in_op_lines={logged} "
+    # And the capability itself refuses a plan carrying the op.
+    try:
+        execute(Session(store, CORPUS),
+                (AddClaim(key="a", tag="A", text="a."),
+                 DesignateThesis(target=New("a"))),
+                IngestionRole.capability)
+    except CapabilityError:
+        refused = True
+    else:
+        refused = False
+
+    ok = no_designation and bound and unchanged and refused
+    return ok, (f"flag_ignored={no_designation} claim_still_attached={bound} "
+                f"theses_unchanged={unchanged} op_refused={refused} "
                 f"theses={len(committed.theses)}")
 
 
@@ -232,6 +253,65 @@ def check_designation_is_not_attachment():
     return refused, f"designation_alone_refused={refused}"
 
 
+def check_malformed_entry_prunes_not_crashes():
+    """A non-object entry in `claims` costs that entry, not the finding.
+
+    The API enforces WHICH tool is called, never the shape of its arguments, so
+    an array declared as objects can arrive holding a bare string. It used to
+    escape as `AttributeError: 'str' object has no attribute 'get'` out of
+    `_check_source_types` — past every salvage call site, so the whole finding
+    was lost with no error corpus written. Three of nine sources in one live
+    collection run died that way, all on the same line.
+
+    Partial: pruned and noted, the rest commits. Systemic (nothing survives):
+    a `FindingShapeError`, which IS salvageable, naming the field.
+    """
+    tmp = tempfile.mkdtemp(prefix="role-shape-")
+    store, dst = fresh_store()
+    session = Session(store, CORPUS)
+    target = next(c.id for c in session.bound_version.claims
+                  if not c.terminal and c.attribution is None)
+
+    finding = {
+        "claims": [
+            {"key": "c1", "tag": "Survivor", "text": "A real claim.",
+             "terminal": False,
+             "attribution": {"source": {"type": "Citation",
+                                        "reference": "http://x"}, "quote": None}},
+            "Data centres raise retail electricity rates.",   # bare string
+        ],
+        "inferences": [{
+            "grounds": ["c1"], "warrants": [], "target": target,
+            "relation": "concludes", "scheme": "FromCause"}],
+    }
+    stub = StubClient([_Resp([_block(type="tool_use", name="submit_finding",
+                                     input=finding, id="t1")], stop="tool_use")])
+    guard = GuardedClient(stub, _cfg(tmp), CORPUS,
+                          token_log=os.path.join(tmp, "tok.jsonl"))
+    role = IngestionRole(guard=guard, session=session, model="stub-model",
+                         iteration_cap=15)
+    report = role.run("http://x", "A document.")
+
+    committed = load(store.read(CORPUS, report["sha"]))
+    survived = any(c.tag == "Survivor" for c in committed.claims)
+    noted = any("not an object" in n for n in report["notes"])
+
+    # Systemic: every entry malformed, and it must be the salvageable error.
+    from prosequence.roles.apply import ops_from_finding, prune_malformed_entries
+    bad, _ = prune_malformed_entries({"claims": ["a", "b"], "inferences": []})
+    try:
+        ops_from_finding(bad)
+        systemic = "no error"
+    except FindingShapeError:
+        systemic = "FindingShapeError"
+    except AttributeError:
+        systemic = "AttributeError"
+
+    ok = survived and noted and systemic == "FindingShapeError"
+    return ok, (f"good_claim_committed={survived} drop_noted={noted} "
+                f"systemic_raises={systemic}")
+
+
 def _looping_role(guard, session, iteration_cap):
     """A minimal role that binds one trivial tool and keeps calling it — the
     vehicle for exercising the harness iteration cap now that ingestion is
@@ -239,7 +319,7 @@ def _looping_role(guard, session, iteration_cap):
     from langchain_core.tools import tool as _lc_tool
 
     class _LoopingRole(IngestionRole):
-        def build_tools(self, _session):
+        def build_tools(self):
             @_lc_tool
             def ping() -> str:
                 """A no-op tool the model can call to keep the loop going."""
@@ -322,15 +402,17 @@ def check_ingests_accumulate_on_main():
 
 
 def check_capability_declared():
-    """Ingestion declares exactly its three additive ops as op TYPES (not
+    """Ingestion declares exactly its two additive ops as op TYPES (not
     method-name strings), and a non-empty role_prompt.
 
-    All three only ever append — claims, inferences, thesis designations.
-    `ReviseClaim` stays out, which is the grant's actual content: ingestion may
-    extend the corpus in any direction, including upward past a standing thesis,
-    and may not rewrite what is already there."""
-    ok = (IngestionRole.capability == (AddClaim, AddInference, DesignateThesis)
+    Both only ever append, and both only ever add nodes. `ReviseClaim` stays
+    out: ingestion may not rewrite what is already there. `DesignateThesis`
+    stays out too: ingestion may not restate what the corpus is ABOUT. Together
+    those are the grant's actual content — a document may extend the argument
+    and may not redefine the frame it extends."""
+    ok = (IngestionRole.capability == (AddClaim, AddInference)
           and ReviseClaim not in IngestionRole.capability
+          and DesignateThesis not in IngestionRole.capability
           and isinstance(IngestionRole.role_prompt, str)
           and IngestionRole.role_prompt.strip() != "")
     return ok, (f"capability={[c.__name__ for c in IngestionRole.capability]} "
@@ -748,8 +830,11 @@ def check_repair_drops_only_violators():
 CHECKS = [
     ("ingestion role runs end to end (corpus in prompt -> finding -> apply -> commit)", check_end_to_end),
     ("repair drops only the violating inferences, keeps every claim", check_repair_drops_only_violators),
+    ("a malformed finding entry prunes, it does not crash the run",
+     check_malformed_entry_prunes_not_crashes),
     ("successive ingests accumulate on main", check_ingests_accumulate_on_main),
-    ("upward thesis: new consequent designated and committed", check_upward_thesis_commits),
+    ("ingestion cannot designate a thesis (flag off the wire, op out of grant)",
+     check_ingestion_cannot_designate_a_thesis),
     ("designating a claim does not count as attaching it", check_designation_is_not_attachment),
     ("capability + role_prompt declared (op types)", check_capability_declared),
     ("system prompt composes operations + role halves", check_system_prompt_composed),

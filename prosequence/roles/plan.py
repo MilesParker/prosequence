@@ -187,13 +187,16 @@ class DesignateThesis(Op[None]):
     """Add a claim to `theses` — the claims designated as the contested
     questions the space is about.
 
-    Held by ingestion. Before it existed, `theses` was writable only by the
-    genesis seed, so the set of questions a corpus could argue about was fixed
-    the moment it was created. A document that argues FROM the standing thesis
-    to a further claim — the consequent that the thesis is a reason for — had
-    nowhere to record that the further claim is now what is being argued: the
-    claim landed as an ordinary unconcluded node, warned as a GAP-6 gap, and
-    fell to the bottom of the graph view because depth is a BFS from `theses`.
+    Held by NO role. It was granted to ingestion, on the argument that a
+    document arguing FROM the standing thesis to a further claim had nowhere to
+    record the consequent — it landed as an unconcluded node, warned as a GAP-6
+    gap, and sank in the graph view because depth is a BFS from `theses`. The
+    grant outlived the prompt paragraph that governed it, and what it actually
+    produced was each source document's own headline claim promoted to a corpus
+    question. Designation is curatorial: it says what the corpus is about, which
+    is not a judgement a single document supports. The op stays declared, like
+    `ReviseClaim`, so the op universe is the session's whole write surface —
+    ready for a role that promotes an existing claim on purpose.
 
     `attaches = False`: designating a claim says something about it, it does not
     bind it into any inference. A claim that is only designated is still an
@@ -201,9 +204,9 @@ class DesignateThesis(Op[None]):
     no argument reaching it has extracted nothing.
 
     `target` is a `Ref[ClaimId]`, so a later role can promote an existing claim.
-    The finding path only ever produces a `New` here (the wire carries a
-    per-claim `thesis` flag, so the ref is always a key `AddClaim` binds), which
-    is why an inference uuid cannot arrive in this slot from a model.
+    No finding path produces this op any more — the per-claim `thesis` flag is
+    off the wire (see `apply.ops_from_finding`), so no model-authored plan can
+    contain one at all.
     """
     attaches = False
 

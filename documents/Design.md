@@ -465,28 +465,37 @@ touch neither the session, ops, serializer, store, nor the invariants.
 - Reporting helpers (`read_log`, `cumulative_tokens`) live apart from the
   pre-flight path — cost/reporting is deliberately kept out of the gate.
 
-## Roles (`prosequence/roles/`)
+## Agents and roles (`prosequence/roles/`)
 
-A role drives one model loop over the writer session and commits the result.
-`role.Role` is the base class; `ingestion.IngestionRole` is the only concrete
-role so far (promoted from the round-trip spike).
+Two concrete agents. `ingestion.IngestionRole` reads one document into one
+corpus and commits. `collection.CollectionAgent` searches for the documents a
+new corpus needs and drives ingestion runs over them; it holds no capability
+and never commits. The class hierarchy follows that split: `agent.Agent` is the
+model loop, `role.Role(Agent)` adds the corpus half.
 
-- **`Role` base** (`role.py`) — everything not specific to one role: the graph
-  (`START → call → (tools → call)* → apply → END`, no checkpointer), the
-  conditional edge (enforces `iteration_cap`, then routes on whether the model
-  asked for tools), message accumulation, tool binding, capability enforcement,
-  and the apply/commit boundary (`_execute` invokes the graph, then calls
-  `session.commit()` **outside** the graph — the graph has no path to a store
-  write). A role that binds no tools takes `call → apply` directly, in one turn.
-  The `cached_context` hook lets a role place bulk stable data (a corpus
-  snapshot) in front of the model as its own cached system block. Two class
-  attributes **declare** a role: `capability` (the write ops it holds) and
-  `role_prompt` (its half of the system prompt; `system_prompt()` is concrete
-  and prepends the shared `OPERATIONS` half). **Truncation is terminal**:
-  `call` inspects the raw response and raises `TruncatedResponseError` on
-  `stop_reason == "max_tokens"`. A finding cut off mid-emission is a partial
-  finding that cannot be told from a complete one by inspection, so the run
-  fails there and commits nothing. There is no retry.
+- **`Agent` base** (`agent.py`) — the model loop, and nothing about the corpus:
+  the graph (`START → call → (tools → call)* → apply → END`, no checkpointer),
+  the conditional edge (enforces `iteration_cap`, then routes on whether the
+  model asked for tools), message accumulation, tool binding, and the forced
+  finding call. An agent that binds no tools takes `call → apply` directly, in
+  one turn, with `tool_choice` pinned to its finding tool; one that binds tools
+  loops. The `cached_context` hook lets an agent place bulk stable data (a
+  corpus snapshot) in front of the model as its own cached system block.
+  `role_prompt` is its half of the system prompt; `system_prompt()` is concrete
+  and prepends the shared `OPERATIONS` half. `apply_node` records the raw
+  finding into `state.finding` and then calls `apply_finding`, the one hook
+  where a subclass turns it into an effect — a plan of session writes for
+  `Role`, nothing at all for an agent whose effects happened in its tools.
+  **Truncation is terminal**: `call` inspects the raw response and raises
+  `TruncatedResponseError` on `stop_reason == "max_tokens"`. A finding cut off
+  mid-emission is a partial finding that cannot be told from a complete one by
+  inspection, so the run fails there and commits nothing. There is no retry.
+- **`Role`** (`role.py`) — the corpus half of an agent: the writer session, the
+  `capability` declaration, `build_plan`, and the apply/commit boundary
+  (`_execute` invokes the graph, then calls `session.commit()` **outside** the
+  graph — the graph has no path to a store write). Its report carries `notes`,
+  the lines repair decided not to write, so a caller that dispatched the run can
+  see that three inferences were dropped from a clean commit.
 - **`IngestionRole`** (`ingestion.py`) — single-shot: it binds **no** read
   tools and instead renders the whole corpus into a cached system block
   (`cached_context` → `corpus_view.render_corpus`), so the model attaches in one
@@ -500,15 +509,18 @@ role so far (promoted from the round-trip spike).
   `DesignateThesis` is additive on the same terms (it appends to `theses` and
   cannot remove), which is what lets a document argue FROM the standing thesis
   to a further claim and record that the corpus now argues about that too.
-- **Prompts** (`prompts/`) — prose only, no logic. Every role's system prompt is
-  two pieces, composed by `Role.system_prompt`: `operations.OPERATIONS` (shared
-  by every role — the model and the corpus discipline) followed by that role's
+- **Prompts** (`prompts/`) — prose only, no logic. Every agent's system prompt is
+  two pieces, composed by `Agent.system_prompt`: `operations.OPERATIONS` (shared
+  by every agent — the model and the corpus discipline) followed by that agent's
   own `role_prompt` (its job, its input, its finding contract). The split is the
   editing boundary: a rule that holds for contest and revise as much as for
   ingestion is written once in `operations.py`; anything naming a specific
-  role's tool, capability, or input lives in that role's module. Adding a role
-  means adding one module here and setting `role_prompt` on the subclass —
-  `system_prompt` is concrete on the base class, so no role assembles its own.
+  agent's tool, capability, or input lives in that agent's module. Adding an
+  agent means adding one module here and setting `role_prompt` on the subclass —
+  `system_prompt` is concrete on the base class, so no agent assembles its own.
+  `OPERATIONS` goes to the collection agent too, which never writes: it is
+  judging whether a corpus is well covered, which is a judgment about claims,
+  inferences and warrants.
 - **Ops and plans** (`plan.py`) — a session write is an object: a frozen
   dataclass generic in what applying it yields (`AddClaim(Op[ClaimId])`,
   `AddInference(Op[InferenceId])`, `DesignateThesis(Op[None])`,
@@ -535,8 +547,9 @@ role so far (promoted from the round-trip spike).
   declaration whose entries are not `Op` subclasses, at role construction. Reads
   are never gated. Enforcement is at apply, never by prompt instruction.
 - **Supporting modules** — `state.py` (the graph state: a frozen dataclass with
-  an `add_messages` reducer), `bridge.py` (LangChain ↔ Anthropic message
-  translation, since the guard wraps the raw SDK), `corpus_view.py`
+  an `add_messages` reducer, shared by both agents — `plan` is empty for the one
+  that writes no ops), `bridge.py` (LangChain ↔ Anthropic message translation,
+  since the guard wraps the raw SDK's `messages.stream`), `corpus_view.py`
   (`render_corpus` — the whole corpus as JSON Lines for ingestion's cached
   context block), `read_tools.py` (the read-only tool surface over session
   queries — unused by ingestion now, retained for interaction-shaped roles),
@@ -626,6 +639,230 @@ role so far (promoted from the round-trip spike).
   Tracing is the observability layer (`observability.py`,
   Phoenix/OpenTelemetry), which never gates a run.
 
+## The collection agent (`prosequence/roles/collection.py`, `collect.py`)
+
+Run shape: `collect(corpus_name, thesis, scope=None)`. The corpus is seeded from
+`(name, thesis)` if absent — deterministic, no model, the same `seed_corpus`
+`ingest()` uses — and the agent then searches, selects sources, and dispatches
+ingestion runs into it until it reports. Goal is an initial corpus arguing the
+thesis from a range of positions, not a large one.
+
+- **It is an agent, not a role.** No session, no capability, no commit. Every
+  corpus write it causes is an ingestion run with its own session and its own
+  single commit. This is forced: a session binds head at construction and dies on
+  its one commit, so nothing spanning many commits can hold one, and `capability`
+  is defined over session write ops this agent never produces.
+- **Four tools, all harness callbacks.** `search(phrases, purpose)` runs each
+  phrase through the provider and records the hits in the ledger;
+  `corpus_state()` returns the coverage read; `ingest_sources(ids, reason)`
+  fetches and ingests; `submit_collection(...)` is the finding, and stopping.
+  This is the first agent to bind interaction tools, so the `tools` edge in
+  `Agent`'s graph runs for the first time here.
+- **The agent never sees a url or a line of document text.** It selects by
+  ledger id (`s1`, `s2`, …) and the harness resolves the id to the url it
+  recorded from the provider. What returns from an ingestion is the corpus delta
+  — claims added, inferences added, tags, sha — never the text. Search results
+  (title, host, and the provider's snippet where it has one) are the only
+  page-derived prose that reaches it. The reason is the same one that keeps a
+  fetch tool out of the ingestion loop: this agent has an egress channel, since
+  its search phrases go to a third-party provider.
+- **Fetching is as parallel as the transport allows; ingesting is never**
+  (`sources.py`). Fetch is deterministic harness I/O with no store contact, so
+  it runs in a thread pool of `min(FETCH_WORKERS, fetcher.max_concurrency)` — 6
+  for plain HTTP, 1 for Safari, which is one browser. Ingestion cannot overlap at
+  any width: `Session` binds head and passes it as `parent_sha`, so a second run
+  from the same head is refused with `HeadMoved` — terminal, no retry — and even
+  if it committed, its model reasoned over a corpus missing the first run's
+  claims, so every overlap between the two documents lands twice.
+- **How pages are fetched** (`fetch.py`) — one `Fetcher` protocol, two
+  transports, shared extraction. `RequestsFetcher` is plain HTTP: fast, parallel,
+  and refused by roughly half of what a collection run names. `SafariFetcher`
+  drives the operator's running Safari through AppleScript and reads
+  `source of tab` — a real browser, a real session, so it gets pages a plain
+  client cannot (mta.info: 403 vs 5,472 chars of article). `default_fetcher()`
+  picks Safari where it can be driven and plain HTTP otherwise, resolved once at
+  the entry point.
+  - Safari is the **default, not the fallback**. Trying HTTP first and escalating
+    on failure sounds cheaper and is wrong: a paywalled article answers a plain
+    client with a preview stub, which is a *success* as far as the transport is
+    concerned, so the run would ingest the stub and never try the browser that
+    could read the piece. Failure is not the only thing the cheap path gets
+    wrong.
+  - The url is passed to `osascript` as **`argv`, never interpolated** into the
+    AppleScript source. Search results are attacker-influenceable, and a url
+    containing a quote would otherwise close the string literal and run whatever
+    followed — `do shell script` is one `&` away.
+  - `safaridriver` was rejected: it needs `sudo safaridriver --enable`, runs one
+    session per host (so no parallelism either), and isolates its sessions from
+    the operator's browsing data, which is the one thing worth having here.
+    AppleScript needs no privilege escalation and no Safari setting —
+    `source of tab` is a plain scripting-dictionary property, where
+    `do JavaScript` would require "Allow JavaScript from Apple Events".
+- **A run does not lean on one host.** `sources.MAX_PER_HOST` (3) caps the pages
+  a collection run takes from one site, checked *before* the fetch so a capped
+  source costs no request; `fetch.HostThrottle` enforces `MIN_HOST_INTERVAL` (3s)
+  between hits on one host, with a lock per host so different hosts still
+  overlap. Politeness and breadth want the same thing here — a burst off one site
+  looks like scraping, and on the Safari path it is the operator's own browser
+  and IP making it, while a corpus drawing repeatedly on one outlet is the
+  concentration the run exists to avoid. The cap counts hosts *requested*, not
+  ingested: a failed fetch still hit the server.
+- **An ingestion failure ends that ingestion run, not the collection run.**
+  Failure-is-terminal is a property of a run: nothing committed, error corpus
+  salvaged, session dead. The next source is a different run with a different
+  session, not a retry. Guard refusals (`Refused` — kill file, token caps) are
+  re-raised and kill the collection run, because they are governance rather than
+  a fact about one source.
+- **Bounding is harness-enforced, stopping is the agent's.** `max_searches` and
+  `max_ingests` are checked in the tool dispatch and refuse as **tool results**,
+  not exceptions — hitting the ingest budget is a normal end to a run and the
+  agent should say so in its report, where a raise would lose it. Only a
+  successful ingestion spends ingest budget; a failed fetch costs nothing.
+- **Fetching and ingesting are capped separately** — `MAX_FETCH_PER_CALL` (8)
+  and `MAX_INGESTS_PER_CALL` (3), both in `sources.py`, both enforced in
+  `ingest_batch`. This is what makes over-naming safe. The prompt tells the
+  agent to name several candidates per position because about half will be
+  unreadable; under a single cap that instruction was a footgun, since every
+  named source that happened to fetch *was* ingested and "name five to survive
+  the failure rate" and "spend five ingestions" were the same act. Now naming
+  five costs at most three ingestions whatever happens.
+  - A candidate that fetched cleanly but did not fit the cap stays **`found`
+    with its text cached on the `Source`**, and comes back as
+    `fetched-not-ingested`. Naming it again skips the network entirely, so it
+    is neither re-requested nor double-counted against the per-host cap.
+  - The response says **which** cap held it back (`bound_by`:
+    `per-call-cap` vs `run-budget`), because the two imply different actions —
+    come back for it next turn, or the run is over.
+  - The tool passes the whole id list to `ingest_batch` rather than slicing it
+    to the remaining budget first. Slicing spent a *fetch* slot on a source it
+    then refused to ingest, which is the opposite of what over-naming is for.
+- **A deterministic gate drops unusable pages** before any model sees them:
+  extraction under `MIN_DOCUMENT_CHARS` (1200) is a paywall stub, cookie wall or
+  nav shell. It is a length fact, not a reading judgment, which is what removes
+  the motive for ever putting page text in the agent's context.
+- **The ledger dedups by url** (`sources.dedup_key`: scheme dropped, host
+  lowercased and de-`www.`-ed, fragment and tracking params removed, trailing
+  slash removed), so one article found by two phrases costs one id and one
+  ingestion.
+- **Search providers** (`search.py`) — one `SearchProvider` protocol, three
+  implementations: `GoogleCSE` (needs `GOOGLE_API_KEY` + `GOOGLE_CSE_ID`;
+  returns title, url, snippet, and a date off `pagemap` metatags when the page
+  declares one; costs no tokens), `AnthropicWebSearch` (one guarded model call
+  with the server-side `web_search` tool; needs only `ANTHROPIC_API_KEY`;
+  returns title, url and `page_age`, no snippet), and `StubProvider`. Dates are
+  carried verbatim and unparsed as `SearchResult.published` — the prompt asks
+  the agent to check a source's period, and asking for a check while withholding
+  the evidence turns an instruction into a guess.
+  `default_provider` picks Google when its keys are set, Anthropic otherwise.
+  Search runs in the harness in every case — no web tool is bound into the
+  agent's own loop, which is what keeps `max_searches` countable and the ledger
+  authoritative about where a url came from.
+- **The coverage read** (`coverage.py`) — what the agent reasons from. It used
+  to be a flat list of every claim tag and nothing with structure in it, which is
+  the wrong shape twice over: the corpus IS a graph of arguments, and a bag of
+  claim tags is its nodes with every edge deleted, so the agent could see that a
+  corpus contained "Death toll inconsistent with genocidal intent" but not that
+  this was an *attack* on the thesis nor that nothing answered it. It was also
+  85% of the payload, a third of that spent on claim uuids the collection agent
+  has no tool that accepts.
+  - `claim_tags` — **without uuids**. What the corpus contains, and most of what
+    the agent needs. Tags cannot carry which *side* anything is on, which is what
+    the next two are for.
+  - `arguments_on_thesis` — every inference targeting a thesis, rendered by tag
+    (`from` / `rel` / `to`, plus `assuming` and `disputed_premises`). The run's
+    scoreboard.
+  - `arguments_unanswered` — every inference concluding a claim nothing
+    contests. **The frontier, and what the read is organised around.** Each entry
+    shows what is asserted, on what grounds, under which assumptions — three
+    attack surfaces, which is what a search for the opposing view is built from.
+    A bare tag ("Public genocidal statements by leaders") does not say what to
+    search against; "Bartov: Officials called for annihilation, assuming public
+    statements evidence specific intent" does. Attributive claims cannot appear
+    as targets here at all, and not because this filters them — **I5** forbids
+    concluding one, so a source-report never enters the concluded set.
+  - **What is disputed is a count, not a rendering.** `claims_in_dispute` and
+    nothing more. Arguments already in dispute are ones where both sides are
+    *already present*; rendering them richly while leaving the unanswered ones as
+    bare tags would put the detail — and so the agent's attention — on explored
+    ground, which is backwards for a run that exists to find what is missing.
+    `unopposed` as a separate tag list is gone with this: every unopposed claim
+    is by definition concluded by something, so it appears as the `to` of an
+    unanswered argument with its reasoning attached rather than naked.
+  - `open_ends` (GAP-6 warnings by tag) and `citation_sources` (host where the
+    reference is a url, the reference itself where it is not).
+  - `claims_connected_to_thesis` — how many claims are reachable from a thesis
+    by any chain of inference, in the always-sent scoreboard. The health check,
+    and not a nicety: measured across the corpora on disk, `china-ai-2` has **1
+    of 52** claims connected to its thesis — 23 inferences arguing the right
+    topic and nothing about the question. Every other number in the read looked
+    healthy on it, and `concluded_by: 0` reads like an early run rather than a
+    broken one.
+  - A tag is reported **once**. An `ingest_sources` result lists the tags each
+    source contributed (attribution the corpus read cannot give); advancing the
+    `CoverageMark` there stops the next `corpus_state` repeating them as new.
+  - **Everything deltas.** A read takes the previous `CoverageMark` and returns
+    only movement plus the scoreboard — counts and the per-thesis
+    concludes/contests split, a few hundred bytes and the balance picture the run
+    turns on. The delta carries `answered_since`: claims that *left* the
+    unopposed set because a source answered them, which a purely additive delta
+    would hide and which is the run's own progress. Measured across four reads on
+    an 81-claim corpus: 38.3k chars for the original flat-tag shape, **14.0k
+    now** — a first read of 11.4k and steady-state reads of ~0.9k, carrying 30
+    unanswered arguments and 7 on the thesis where the original carried none.
+  - GAP-6 detection has one implementation: `check_violations` returns
+    `Violation` records for warnings as well as errors, so the claim id is read
+    off `target` rather than parsed back out of prose, and `check` still formats
+    them into the identical strings.
+  - **Stance is not here**: `computeStance` exists only in `src/viz/`, there is
+    no Python stance query, and `read_tools.py` already declines to fabricate
+    one. The host histogram is a proxy for breadth of sourcing and not the same
+    fact as breadth of view; the prompt says so rather than handing the agent a
+    number to optimise.
+- **The cascade has its own token budget** (`collect.py`,
+  `run_token_budget`, default 750k). The bound `guard_config.toml` cannot
+  express: `per_run_token_cap` bounds a *guard*, and a cascade holds up to ten
+  of them, so the unbounded ceiling was 2,000,000 tokens against a measured run
+  of ~337,000. Every guard is registered in one list; `ingest_sources` refuses
+  past the budget and `ingest_batch` re-checks before each individual run —
+  before, because the ingestion is the expensive call. It refuses as a **tool
+  result** carrying `bound_by: "token-budget"`, so the agent still writes its
+  report, and a source not taken stays `found` with its text cached. The run
+  report carries `cascade_tokens` against `token_budget`.
+- **A guard per run, not one per cascade** (`collect.py`) — the collection
+  agent, the search provider, and each ingestion run each get their own
+  `GuardedClient` over one shared `GuardConfig` and token log. `per_run_token_cap`
+  is 200k; charging a cascade to one guard would redefine "per run" as "per
+  cascade". Measured: one Anthropic web search is ~14k tokens (the server runs
+  the search loop and bills page results as input), which is why the search
+  default is 10 phrases. The cascade is bounded structurally by `max_ingests`,
+  and the rolling `cumulative_token_cap` still covers every call in it; the token
+  log's `run_id` stitches a cascade back together for reporting.
+- **The report is written to `logs/collection/<run_id>.json`**, beside the error
+  corpora salvage writes. A collection run makes no commit, so without this its
+  reasoning — which positions it looked for, which it failed to find, why it
+  stopped — dies with the process. A run that fails terminally gets one too,
+  marked `partial: true`, carrying the ledger, the tool trace and the exception:
+  both bounds that can stop the agent mid-conversation lose the model's report
+  (the token cap raises; the iteration cap routes to apply with a tool call as
+  the last message, so `FindingCallError`), and by then several ingestions have
+  committed real work.
+
+**Observed on a live run** (5 searches, 6 ingests, congestion pricing): 108
+claims, 79 inferences, 64 concludes, 15 contests, 6 distinct hosts. About 45% of
+named sources failed to fetch — 403s, bot walls returning a blank 200, sub-floor
+stubs. That rate was the binding constraint on breadth, not search or selection:
+an earlier run with the same budget shape produced **zero** contesting inferences
+because every opposition source it picked failed to fetch and it moved on rather
+than naming another. Two things address it: the prompt now says a fetch failure
+is evidence about the server and not about the position and that failed fetches
+are free, and the Safari transport gets most of those pages.
+
+**Not verified.** No live collection run has yet gone through the Safari
+transport end to end — the fetcher is verified per-URL against the pages that
+beat plain HTTP, and the cascade is verified against a scripted fetcher, but the
+two have not been exercised together. Nor has a subscription login been shown to
+carry; that needs a real paywalled article.
+
 ## GAP 1 — resolved (enthymemification: surfaced warrant, contested as a rebut)
 
 GAP 1 was: a warrant-applicability attack (e.g. free-transit's *user-pays
@@ -645,13 +882,106 @@ claim to the *Hamas-tactics* claim, rather than undercutting the inference.
 
 ---
 
+## Visualization — the workspace
+
+Factual description of the single page the surfaces live on.
+
+`src/viz/workspace/Workspace.tsx` lays out two columns below the `TitleBar`: the
+**map**, and the **reader** beside it. The reader shows one surface at a time — the
+article or the focus view, never both — chosen by a switch in its own header
+(`ReaderSwitch` in `App.tsx`); the article is the default. Each pane is
+independently minimizable.
+
+- **Panes.** A `PaneSpec` is `{ id, title, titleNode?, minWidth, controls?, render }`.
+  `PANE_ORDER` is `graph | reader` and fixes the left-to-right order. Each open pane
+  renders a header (`titleNode` or the plain `title`, then `controls`, then a
+  minimize button) over a `position: relative` client area; every surface fills that
+  area with `position: absolute; inset: 0`.
+- **Minimize.** A closed pane renders a `Rail` — a full-height button carrying its
+  name vertically — and its body is UNMOUNTED, not hidden. Restoring remounts it.
+  The reader's rail carries the name of the surface it will come back in. The rail
+  and the pane's minimize button are the ONLY show/hide controls; the title bar
+  carries none.
+- **Widths.** Open panes flex by a `sizes` fraction and each carries its own
+  `minWidth` floor, passed in by `App` because the reader's depends on which surface
+  it is showing. A `Splitter` between the two drags the boundary: it measures both
+  panes at pointer-down and redistributes only that pair's share, clamped by the
+  floors. When the window cannot fit both open panes at their floors the row scrolls
+  horizontally rather than reflowing a surface.
+- **Floors** (`WORKSPACE.minWidth`): `graph` 320; `focus` 470, because For/Against is
+  carried by position and the surface has no one-column form; `article`
+  `articleMeasure(ARTICLE.bodyFont) + 2 × ARTICLE.paneMargin`, the width its measure
+  needs at the smallest body size it will set. `WORKSPACE` is declared after `ARTICLE`
+  in `config.ts` so the floor can be derived rather than restated.
+- **Other tokens.** `headerHeight`, `railWidth`, `splitter`, `articleGutter`, default
+  `sizes`, and the `followPad` / `followMs` used by the map's follow-pan.
+
+**What `App.tsx` holds.** The shared state no surface owns: `focusId` (the one
+`ClaimId` selection), `refThesisId`, `fromId`, `nominating`, `search`, the pending
+`locate`, and the page layout (`open`, `sizes`, `reader`). Both open surfaces centre
+on the same `focusId`, so a click in either moves the other.
+
+- `handleSelect` — a map click. Selects a claim (or, while `nominating`, anchors the
+  reference thesis and ends the mode). Clears `fromId`: a map selection is a fresh
+  entry, not a step in a trail.
+- `navigate` — a refocus from inside the reader. Sets `fromId` to the claim being
+  left, which is what the focus view's came-from trace draws.
+- `handleActivate` — a map double-click: centre, and raise the reader if minimized,
+  in whichever register it is already set to.
+- `handleLocate` — "show on the map", from the focus band icon, a tile's locate
+  button, or the article's footer. Centres, raises the map pane, and hands the graph
+  a `locate` prop; the graph consumes it and calls `onLocated` to clear it, so a
+  later pane restore does not replay it.
+- `goToThesis` — the title bar's **Thesis** button. Recentres on `theses[0]`, the
+  STRUCTURAL thesis, not the reference thesis: the reference thesis moves, and this
+  is the one claim always where the reader left it. Disabled when already there.
+- **Layout migration.** `PaneId` has changed shape once (three panes became two).
+  `isLayout` checks a restored `open` / `sizes` for the current keys and falls back
+  to the defaults otherwise, so a settings object written by the three-pane version
+  cannot start the reader minimized or hand the row a `NaN` flex-grow.
+
+**Title bar.** Corpus title and id, then the two page-level acts: the Thesis button
+and `Search`. It carries no show/hide controls — each pane has a minimize button and
+a rail to return from, and a second set of toggles was the same act spelled twice.
+Search highlights on the map and lives here rather than in the map pane because it
+is a question about the corpus, and it works while the map is minimized.
+
+**History.** One effect pushes a `{ pzNav: { focusId, refThesisId } }` entry whenever
+either value changes, and `replaceState`s the first one; `popstate` applies the entry
+and sets a flag so the resulting state change is not pushed back. Pushing from one
+place rather than from each call site means either pane's navigation is walkable, and
+it made moving the reference thesis a navigation — before, it recoloured every
+surface and back could not undo it. Nothing about the page's arrangement is in the
+entry: not pane open/closed, not the split, not which surface the reader shows.
+
+**How the map answers the reader.** `Graph.tsx` measures its container with a
+`ResizeObserver` rather than reading `window.innerWidth/innerHeight`, and its zoom
+transform no longer offsets by `TITLE_BAR_HEIGHT` (the pane is already below the
+bar). `ready` (the first non-zero size) gates the scene build; a later resize only
+restretches the canvas, so the reader's location survives a splitter drag or a window
+resize. `frameRef` exposes two ways in:
+
+- `follow` — a `centerOn` change coming from the reader pans to the claim at the
+  reader's own zoom, and ONLY if it sits outside `WORKSPACE.followPad` of the visible
+  rect. A selection the graph made itself is skipped (`selfSelectRef`).
+- `neighborhood` — the `locate` prop always re-frames, at `VIEW.neighborhoodZoom`.
+
+**Map key.** `Legend` is positioned inside the map pane rather than fixed to the
+window, and collapses to a labelled "Key" pill. It starts OPEN and the choice is
+remembered (`loadKeyOpen`/`saveKeyOpen`).
+---
+
 ## Visualization — focus view
 
 Factual description of what the focus-view code does and where it lives. The three
-views (graph, focus, article — see the next section) swap and never coexist; they
-share the derived indices (`supports`/`attacks`/`consumers`, built once in
-`graphData.ts`), the selection, the reference thesis, and `computeStance`; the
-graph and focus views also share the graph's `Tooltip`.
+views share the derived indices (`supports`/`attacks`/`consumers`, built once in
+`graphData.ts`), the selection, the reference thesis, and `computeStance`; the graph
+and focus views also share the graph's `Tooltip`. The map and the focus view coexist
+as the two panes of the workspace (see the previous section); the focus view and the
+ARTICLE do not — they are alternatives in the reader pane. The focus view's root
+fills its pane (`position: absolute; inset: 0`, scrolling internally); its `Ghost`
+stays `position: fixed`, since the refocus flight measures and flies in viewport
+coordinates.
 
 **Files** (`src/viz/focus/`):
 
@@ -742,13 +1072,14 @@ Layout tokens live in `FOCUS` and the shared text/colour tokens in `config.ts`.
 ## Visualization — article view
 
 Factual description of the article-view code. A third surface beside the graph
-and the focus view: the centred claim read as a prose article. It swaps with the
-other two (App's `view` is `'graph' | 'focus' | 'article'`; `ViewSwitch` in the
-title bar shows one button per surface you are not on) and shares the same
-`focusId`, reference thesis, derived indices and `computeStance`. Its props are
-the focus view's minus `fromId` (`gd, focusId, referenceThesisId, onFocus,
-onLocate`); refocus goes through App's `navigate`, so browser back walks its
-history exactly as it does the focus view's.
+and the focus view: the centred claim read as a prose article. It is the default
+surface of the workspace's reader pane, alternating there with the focus view — the
+two answer the same question about the same claim in two registers, so they are
+never open at once — and it coexists with the map. It shares the same `focusId`,
+reference thesis, derived indices and `computeStance`. Its root fills its pane
+(`position: absolute; inset: 0`). Its props are the focus view's minus `fromId` (`gd, focusId, referenceThesisId,
+onFocus, onLocate`); refocus goes through App's `navigate`, so browser back walks
+its history exactly as it does the focus view's.
 
 It follows the focus view's structure rather than its own. The claim's `tag` is
 the title and its `text` is the standfirst beneath (the focus view's "tag
@@ -795,7 +1126,10 @@ the ordering is self-evidencing.
 from `reachBelow`: how many inference hops the argument runs on BENEATH it, 0
 printing nothing. It is the article's answer to the focus view's frontier chevron
 ("there is more this way"), as a number because prose has no row to hang a chevron
-off.
+off. It is a NUMBER rather than repeated marks: reach reaches 9 in gaza, and any
+glyph a reader has to count caps out long before that. Position within a section
+already carries rank, since reach is the sort key — so the cue's job is magnitude,
+which is what a number does and a length duplicate would not.
 
 Reach is not computed depth and deliberately does not share its name. Depth runs
 the other way — hops from a thesis ABOVE a claim — and the two would have collided
@@ -803,6 +1137,30 @@ under one word. The distinction carries two rules: depth is never rendered to a
 reader, which survives only because what the article renders is reach; and ordering
 by reach is near-noise if read as depth, since an inference's grounds all sit at
 roughly the same distance from a thesis.
+
+**Source mark.** Beside the reach cue, a claim being read that carries an
+`attribution` trails `· <source>` in the same small sans. Reach and source are the
+two ways a line of reading ends, and they are opposite: reach says the argument runs
+on beneath this claim, a source says it stops here and is checked instead. Without
+the mark an attributive leaf and an undeveloped claim are indistinguishable on the
+page — both simply stop, and only one of them is a gap.
+
+The mark is short-form. `shortSource` takes a `Citation`'s leading comma-separated
+segment (the byline or the outlet — "Omer Bartov, New York Times, 2025, citing
+Haaretz investigation" → "Omer Bartov"), capped at 28 characters with an ellipsis.
+A segment that is a bare URL reduces to its host instead, `www.` stripped
+("https://www.csis.org/analysis/…" → "csis.org"): about a quarter of the corpora's
+citations are raw links, and a link truncated to fit prose is all scheme and no
+source, where the host names the outlet a byline would have named. The other four
+source types are already short phrases and pass through whole. The
+full reference, with the verbatim `quote` when there is one, is the `title`
+(`citeTitle`). Only the centred claim's `Deck` prints a quote as type, and only it
+prints the whole reference: a quote set inline would stop the prose dead.
+
+It is not de-duplicated. A single-document corpus repeats one source across most of
+its leaves, and suppressing the repeats would make a re-sourced claim look exactly
+like an unsourced one — which is the distinction the mark exists to draw. The mark's
+first job is "this bottoms out in a source"; naming which is second.
 
 **Files** (`src/viz/article/`):
 
@@ -815,8 +1173,17 @@ roughly the same distance from a thesis.
   "Directly under the reference thesis" when there is no intermediate claim,
   "Not connected to the reference thesis" when it is unreachable, "and other
   routes" when more shortest routes exist than `MAX_TRAILS`); the title (the claim's `tag`, one size); the standfirst (the
-  claim's `text` through `sentence`); `Deck` (an attributive claim's `quote` as a
-  block quote over `sourcePhrase(source)` as a byline); a one-line bedrock note
+  claim's `text` through `sentence`); `Deck` (an attributive claim's provenance IN
+  FULL — the verbatim `quote`, italic and quoted, then the whole
+  `sourcePhrase(source)` after an em dash, run as ONE sentence at `deckFont` rather
+  than a block quote over a caption. The quote keeps its italic and its quotation
+  marks because they are someone else's words; the source is set in the sans label
+  face at `deckBylineFont`, so the words said and the hand that said them part
+  without a caption to separate them. Quote-less attributions print the source
+  alone, no dash. This is the only place on the page that prints either in full —
+  see **Source mark** — and the reason is that the centred claim has no competition
+  for the reader's attention, where a claim inside an argument has three siblings in
+  the same paragraph); a one-line bedrock note
   for terminal claims; `WhereThisLeads` (headed "Therefore"); the case sections;
   then a footer whose
   one link, "Show on the map", calls `onLocate(focusId)`. The root is keyed on
@@ -828,7 +1195,9 @@ roughly the same distance from a thesis.
   Then the grounds as `ClaimLink`s in one ragged-right paragraph, and — when
   `warrants` is non-empty — a `.pa-warrants` group on its own dashed rail, headed
   by a single `ASSUMES` label, one line per warrant, a terminal warrant followed
-  by "· bedrock". An inference with no warrants prints no group at all.
+  by "· bedrock". An inference with no warrants prints no group at all. Grounds and
+  warrants alike pass `cue`, so each carries its reach mark and, when attributive,
+  its source mark.
 - `Section` — a `SectionHead` and one `Argument` per inference, ordered as above.
   "The case for" (`supports`) is
   shown when there are supports, or when the claim is neither terminal nor
@@ -850,7 +1219,9 @@ roughly the same distance from a thesis.
   `onFocus(id)`. Its `show` prop picks the face: `'text'` (through `sentence`)
   where the claim is the prose being read — grounds and warrants — and `'tag'`
   where it is being pointed at: a trail crumb, a `WhereThisLeads` destination.
-  `tint` colours it by stance, `cue` trails the reach mark. Both reach `PageCtx`
+  `tint` colours it by stance, `cue` trails the reach mark and, on an attributive
+  claim, the source mark — so the two end-of-reading cues are switched on together,
+  wherever a claim is prose rather than a pointer. Both reach `PageCtx`
   for the per-claim lookups (`reachOf` memoised once per page render, `hueOf` and
   `groupHueOf` off the `StanceMap`) rather than threading them through every
   component between.
@@ -871,21 +1242,53 @@ roughly the same distance from a thesis.
   the text ends without one), `numberWord` / `stepsAway`, `stancePhrase`
   (aligned → "standing with it", opposed → "standing against it", divided →
   "cutting both ways", otherwise null), `sourcePhrase` (Citation → its
-  `reference`; each of the other four source types → a fixed phrase),
+  `reference`; each of the other four source types → a fixed phrase), `shortSource`
+  (the inline face of the same, see above) and `citeTitle` (its hover text — the
+  quote and the full source),
   `rolePhrase` (grounds/warrant × concludes/contests → "grounds for", "grounds
   against", "assumed in arguing for", "assumed in arguing against"),
   `argumentHeadline`, `waysPhrase`, `routesPhrase` (unused by the current
   composition, kept beside its siblings), and the `ASSUMES` constant.
 
 **Not rendered.** `id`, `scheme`, `schemeDescriptor`, `uncertain`,
-`submissionStatus`, computed depth; attribution on any claim other than the centred one;
+`submissionStatus`, computed depth; an attribution's `quote`, and any reference at
+full length, anywhere but the centred claim's `Deck`; attribution of any kind on a
+claim shown as a pointer (a trail crumb, a "Therefore" destination) rather than as
+prose;
 the co-inputs of a consuming inference; counts other than `waysPhrase`. `tag` IS
 rendered here — it is the title, the argument sub-headlines, and the face of
 every pointing link.
 
+**The measure is a line length, and the type is what grows.** The reading measure is
+`ARTICLE.charsPerLine` (72) characters, not a fixed pixel width. `useTypeScale` puts a
+`ResizeObserver` on the scroller, holds back `ARTICLE.paneMargin` on each side, and
+solves for the largest body size in `[ARTICLE.bodyFont, ARTICLE.bodyFontMax]` — 19 to
+21px — whose measure fits, rounding DOWN to a quarter-pixel so the solved size never
+eats the reserved margin and a splitter drag settles instead of reflowing per pointer
+sample. The band is narrow deliberately: `bodyFontMax` sits at the size real
+long-form holds FIXED, so the page takes itself off its floor and then stops.
+Setting `bodyFontMax` equal to `bodyFont` turns scaling off and gives a fixed
+measure. `articleMeasure(bodyPx)` (exported from `config.ts`) returns the outer width
+that size needs: `charsPerLine × charWidthRatio × bodyPx + chrome`, where
+`charWidthRatio` (0.4403) is Georgia's advance width per px of font-size, measured
+against this corpus's prose, and `chrome` is everything between the article's outer
+width and the prose column (its own 24px padding each side, plus an argument's rail).
+
+The page is scaled from one CSS variable, `--pa-s` (= body ÷ `ARTICLE.bodyFont`), set
+on `.pa-root`; every `font-size` in the stylesheet is `calc(<token>px * var(--pa-s))`
+via the `em()` helper. So the title, standfirst, body, warrants and labels keep their
+ratios and the page scales as a type scale rather than a widening box.
+
+Measured behaviour across the range: 706px pane (the floor) → 19px body, 666px outer,
+20px margins; 766px → 20.75px, 722px outer; 826px → 21px body, 730px outer, 48px
+margins; 1186px → still 21px, 228px margins. Characters per line stays 72 at every
+width.
+
 Typography tokens live in `ARTICLE` (`config.ts`): the serif body stack and the
-sans label stack, the measure, the title/standfirst/kicker/deck/body/warrant/
-lead/label/section/subhead/trail sizes, line height, the rail gap and inset, the
+sans label stack, the measure tokens
+(`charsPerLine`, `charWidthRatio`, `bodyFontMax`, `chrome`, `paneMargin`, and the
+base `measure`), the title/standfirst/kicker/deck/deck-byline/body/warrant/
+lead/label/section/subhead/trail/reach/cite sizes, line height, the rail gap and inset, the
 kicker rail weight, and the warrant and argument gaps. Colours come from `COLORS` (paper background, ink
 text, `textMuted` for the standfirst and warrants, `textFaint` for labels,
 `border` for hairlines and the warrant rail, `STANCE_INK` for the kicker edge, the trail crumbs and the argument rail, and
@@ -898,16 +1301,24 @@ text, `textMuted` for the standfirst and warrants, `textFaint` for labels,
 corpus's state. All access is best-effort (wrapped in try/catch) so private mode,
 quota, or disabled storage degrades to defaults rather than failing.
 
-- **Settings** (`loadSettings`/`saveSettings`) — `{ view, focusId, refThesisId }`,
-  where `view` is `'graph' | 'focus' | 'article'`.
-  `App.tsx` seeds its `view`, `focusId`, and `refThesisId` state from this at mount
-  and writes it back whenever any of the three change. Absence of `refThesisId`
-  means "first visit" (the structural-thesis default effect runs); an explicit
-  `null` is a deliberate clear (unpainted) and is preserved. Once `data` loads, a
-  validation effect drops any restored `focusId` / `refThesisId` not present in the
-  corpus (clearing `refThesisId` to `undefined` re-triggers the default).
+- **Settings** (`loadSettings`/`saveSettings`) — `{ focusId, refThesisId, open,
+  sizes, reader }`, where `open` and `sizes` are the page layout keyed by `PaneId`
+  (`graph | reader`) and `reader` is which surface the reader pane shows
+  (`article | focus`).
+  `App.tsx` seeds all five from this at mount and writes them back whenever any
+  change; `open` / `sizes` are validated for the current `PaneId` shape first. Absence of `refThesisId` means "first visit" (the structural-thesis
+  default effect runs); an explicit `null` is a deliberate clear (unpainted) and is
+  preserved. Once `data` loads, a validation effect drops any restored `focusId` /
+  `refThesisId` not present in the corpus (clearing `refThesisId` to `undefined`
+  re-triggers the default). A settings object written before the workspace existed
+  simply lacks `open` / `sizes` and falls through to the defaults. Layout is
+  remembered here but is NOT part of browser history — see the workspace section.
 - **Viewport** (`loadViewport`/`saveViewport`) — the graph's raw d3 zoom transform
-  `{ k, x, y }`. `Graph.tsx` saves it on each zoom `end` and, on mount, restores it
-  exactly except when a `neighborhood` locate-return asks for a fixed tight zoom
-  (which wins), falling through to centre-on-selection then fit when nothing is
-  stored.
+  `{ k, x, y }`. `Graph.tsx` saves it on each zoom `end` and restores it exactly on
+  mount, falling through to centre-on-selection then fit when nothing is stored.
+  A locate is no longer part of that priority: it arrives as a prop and re-frames
+  after mount, so it works the same on a live pane and on one just restored.
+- **Map key** (`loadKeyOpen`/`saveKeyOpen`) — whether the graph's `Legend` is
+  expanded, default true. Its own entry rather than a field on Settings, since the
+  key writes it from inside the map pane and a second writer on the settings object
+  would race `App`'s saves.

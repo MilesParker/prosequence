@@ -1,12 +1,13 @@
 // FocusView.tsx — the band-stack surface. Centres one claim; derives the rest.
 //
 // Vertical zones (§2): parent band → focus band → For/Against columns.
-// Two gestures only (§7): refocus (click a claim / parent entry) and page
-// (chevrons, For/Against columns only). No expand/collapse; everything visible
-// at rest. Page state resets on refocus via a `key` keyed to the focus id.
+// One gesture (§7): refocus — click a claim or a parent entry. Paging is retired;
+// siblings sit together in a fixed-height scroll frame, in corpus order. No
+// expand/collapse; everything visible at rest, since scrolling inside a fixed
+// frame is not disclosure.
 
 import { useState, useEffect, useMemo, useRef, useCallback, type ReactNode, type RefObject } from 'react'
-import { COLORS, FOCUS, SHOW_FOCUS_TEXT, TITLE_BAR_HEIGHT, DETAIL_TEXT } from '../../config'
+import { COLORS, FOCUS, SHOW_FOCUS_TEXT, DETAIL_TEXT } from '../../config'
 import type { GraphData, StanceMap } from '../graphData'
 import type { Inference, Attribution as AttributionT } from '../../types'
 import { sourceLabel, computeStance } from '../graphData'
@@ -352,7 +353,7 @@ function BelowRegion({ gd, focusId, onFocus }: { gd: GraphData; focusId: string;
         <RegionHeading text="For" count={supports.length} color={COLORS.column.for.label} />
         <RegionHeading text="Against" count={attacks.length} color={COLORS.column.against.label} />
       </div>
-      {/* One scroll frame per column, so For and Against page independently. */}
+      {/* One scroll frame per column, so For and Against scroll independently. */}
       <div style={{ display: 'flex', gap: FOCUS.parentColGap, alignItems: 'flex-start' }}>
         <div style={{ flex: 1, minWidth: 0 }}>
           <ScrollFrame height={FOCUS.columnHeight}>
@@ -528,7 +529,9 @@ export function FocusView({
     : 'none'
 
   return (
-    <div style={{ position: 'fixed', top: TITLE_BAR_HEIGHT, left: 0, right: 0, bottom: 0, overflowY: 'auto', background: COLORS.background }}>
+    // Fills its workspace pane. (The `Ghost` below stays position:fixed — it flies
+    // in viewport coordinates, which is what getBoundingClientRect hands us.)
+    <div style={{ position: 'absolute', inset: 0, overflowY: 'auto', background: COLORS.background }}>
       <style>{focusCss}</style>
       <HoverContext.Provider value={(id, x, y) => setHovered(id != null && x != null && y != null ? { id, x, y } : null)}>
       <FromHighlight.Provider value={{ id: fromVisible ? fromId : null, active: showFrom }}>

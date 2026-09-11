@@ -3,7 +3,7 @@
 
 DRAFT, but note this whole module is friction, not design: it exists only
 because the guard (guarded_client.GuardedClient) wraps the *raw* Anthropic SDK
-(`client.messages.create`), while LangGraph's ToolNode and the add_messages
+(`client.messages.stream`), while LangGraph's ToolNode and the add_messages
 reducer speak LangChain `BaseMessage` objects. There is no LangChain chat-model
 adapter in the loop, so the `call` node has to translate both directions by
 hand. If the role protocol keeps LangGraph, this is the seam to revisit: either

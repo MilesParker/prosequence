@@ -4,13 +4,20 @@ import { COLORS, TITLE_BAR_HEIGHT } from '../../config'
 interface Props {
   title: string
   subtitle?: string
-  search?: string
-  onSearch?: (value: string) => void
-  /** Right-aligned control (the graph⇄focus view toggle). */
-  viewToggle?: ReactNode
+  /** Right-aligned page-level actions: recentre on the thesis, and search. */
+  actions?: ReactNode
 }
 
-export function TitleBar({ title, subtitle, search, onSearch, viewToggle }: Props) {
+/**
+ * The one piece of chrome above the workspace. It carries what corpus you are
+ * reading and the two acts that belong to the page rather than to one surface:
+ * recentring on the thesis, and search.
+ *
+ * It carries no show/hide controls. Each pane has a minimize button and a rail to
+ * come back from, which is the whole mechanism; a second set of toggles up here was
+ * the same act spelled twice.
+ */
+export function TitleBar({ title, subtitle, actions }: Props) {
   return (
     <div style={{
       position: 'fixed',
@@ -32,26 +39,7 @@ export function TitleBar({ title, subtitle, search, onSearch, viewToggle }: Prop
         <span style={{ fontSize: 11, color: COLORS.textDimmer }}>{subtitle}</span>
       )}
       <div style={{ marginLeft: 'auto', display: 'flex', alignItems: 'center', gap: 10 }}>
-        {viewToggle}
-        {onSearch && (
-          <input
-            value={search ?? ''}
-            onChange={e => onSearch(e.target.value)}
-            placeholder="Search claims…  (Esc to reset)"
-            spellCheck={false}
-            style={{
-              width: 260,
-              height: 26,
-              padding: '0 10px',
-              fontSize: 12,
-              color: COLORS.text,
-              background: COLORS.surface,
-              border: `1px solid ${COLORS.border}`,
-              borderRadius: 6,
-              outline: 'none',
-            }}
-          />
-        )}
+        {actions}
       </div>
     </div>
   )

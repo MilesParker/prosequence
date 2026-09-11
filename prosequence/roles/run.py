@@ -32,17 +32,15 @@ from __future__ import annotations
 import os
 import sys
 import uuid
-from html.parser import HTMLParser
 
 import anthropic
-import requests
-import trafilatura
 
 from ..core.corpus_store import CorpusStore
 from ..core.guarded_client import GuardConfig, GuardedClient
 from ..core.session import Session
 from ..core.yaml_io import Claim, Corpus, serialize
 
+from .fetch import fetch_text
 from .ingestion import IngestionRole
 from .observability import init_tracing
 
@@ -51,12 +49,8 @@ REPO_ROOT = os.path.dirname(PKG_DIR)                                   # outer r
 CORPUS_DIR = os.path.join(REPO_ROOT, "discourse-spaces")
 GUARD_CONFIG = os.path.join(PKG_DIR, "guard_config.toml")
 
-# A plausible browser UA; many sites reject the default python-requests agent.
-_FETCH_UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) "
-             "AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0 Safari/537.36")
 
-
-def _load_env() -> None:
+def load_env() -> None:
     """Load REPO_ROOT/.env into the environment before the client is built, so
     ANTHROPIC_API_KEY (and any ANTHROPIC_BASE_URL) can live in a gitignored .env
     that a shell export or an IDE run-config need not supply. Soft: a no-op when
@@ -68,8 +62,6 @@ def _load_env() -> None:
     except ImportError:
         return
     load_dotenv(os.path.join(REPO_ROOT, ".env"))
-
-
 
 
 def view_url(corpus_file: str) -> str:
@@ -84,79 +76,17 @@ def view_url(corpus_file: str) -> str:
     return f"http://localhost:5173/?model={slug}"
 
 
-
-
-class _TextExtractor(HTMLParser):
-    """Naive HTML -> text fallback for when trafilatura's boilerplate-removal
-    heuristics find nothing extractable (e.g. a non-article page): drop
-    script/style/head, break on block tags, keep the data. No boilerplate
-    stripping of its own — nav/ads/footers survive — so this stays honest about
-    being crude rather than pretending to be article extraction."""
-
-    _SKIP = {"script", "style", "head", "noscript", "template"}
-    _BLOCK = {"p", "br", "div", "li", "h1", "h2", "h3", "h4", "h5", "h6",
-              "tr", "section", "article", "header", "footer", "blockquote"}
-
-    def __init__(self):
-        super().__init__()
-        self._parts: list[str] = []
-        self._skip_depth = 0
-
-    def handle_starttag(self, tag, attrs):
-        if tag in self._SKIP:
-            self._skip_depth += 1
-        elif tag in self._BLOCK:
-            self._parts.append("\n")
-
-    def handle_endtag(self, tag):
-        if tag in self._SKIP and self._skip_depth:
-            self._skip_depth -= 1
-        elif tag in self._BLOCK:
-            self._parts.append("\n")
-
-    def handle_data(self, data):
-        if self._skip_depth == 0:
-            self._parts.append(data)
-
-    def text(self) -> str:
-        lines = ("".join(self._parts)).splitlines()
-        out: list[str] = []
-        for ln in (ln.strip() for ln in lines):
-            if ln or (out and out[-1]):  # collapse runs of blank lines
-                out.append(ln)
-        return "\n".join(out).strip()
-
-
-def _fetch_text(url: str) -> str:
-    """Fetch `url` and reduce it to plain article text. Deterministic harness
-    I/O — the model never fetches. trafilatura does the boilerplate removal
-    (nav/ads/footers/comments stripped, main content kept); when its heuristics
-    find no extractable article (e.g. a listing or non-article page) this falls
-    back to the naive block-tag splitter, which keeps everything rather than
-    nothing. Raises on an HTTP error or an empty extraction from both."""
-    resp = requests.get(url, headers={"User-Agent": _FETCH_UA}, timeout=30)
-    resp.raise_for_status()
-    text = trafilatura.extract(resp.text, include_comments=False, include_tables=False)
-    if not text:
-        parser = _TextExtractor()
-        parser.feed(resp.text)
-        text = parser.text()
-    if not text:
-        raise ValueError(f"fetched {url!r} but extracted no text from the page")
-    return text
-
-
 def _tag_from(text: str, limit: int = 50) -> str:
     """Derive a claim tag from its text: truncate at `limit` chars on a word
     boundary (never mid-word), capitalized initial — matching the "TAGS NAME
-    CONTENT" rule in prompt.py. Used only for the seed thesis claim; a model
+    CONTENT" rule in prompts/operations.py. Used only for the seed thesis claim; a model
     finding supplies its own tags."""
     text = text.strip()
     tag = text if len(text) <= limit else text[:limit].rsplit(" ", 1)[0]
     return tag[:1].upper() + tag[1:] if tag else tag
 
 
-def _seed_corpus(store: CorpusStore, corpus_file: str, corpus_id: str,
+def seed_corpus(store: CorpusStore, corpus_file: str, corpus_id: str,
                  title: str, thesis_claim: str) -> str:
     """Commit a corpus seeded with exactly one claim — the thesis, `thesis_claim`'s
     text — onto main, and return the new sha. Deterministic — no model.
@@ -236,7 +166,7 @@ def run(url: str, document_text: str, *, corpus_name: str = "free-transit",
     # the Anthropic client and the graph are constructed. Idempotent; a no-op
     # when Phoenix/openinference are absent or PROSEQUENCE_TRACE=0. Orthogonal to
     # the commit path — never gates a run.
-    _load_env()
+    load_env()
     init_tracing()
 
     corpus_file = f"{corpus_name}.v2.yaml"
@@ -270,7 +200,7 @@ def ingest(corpus_name: str, *, url: str | None = None,
     leaving main untouched for review. Fetching and corpus creation are
     deterministic harness steps — only the text->graph transform is the model's.
     """
-    _load_env()
+    load_env()
     init_tracing()
     corpus_file = f"{corpus_name}.v2.yaml"
     store = CorpusStore(CORPUS_DIR)
@@ -280,7 +210,7 @@ def ingest(corpus_name: str, *, url: str | None = None,
     if not document_text:
         if not url:
             raise ValueError("supply document_text, url, or both")
-        document_text = _fetch_text(url)
+        document_text = fetch_text(url)
     reference = url if url else "(inline document)"
 
     seeded = corpus_file not in store.list_corpora()
@@ -291,7 +221,7 @@ def ingest(corpus_name: str, *, url: str | None = None,
                 f"needs thesis_claim — the thesis/question this corpus argues "
                 f"about (e.g. 'Fares should be removed from public transit'), "
                 f"the anchor the document's claims attach to")
-        _seed_corpus(store, corpus_file, corpus_name, title or corpus_name, thesis_claim)
+        seed_corpus(store, corpus_file, corpus_name, title or corpus_name, thesis_claim)
 
     # A failed ingest after a seed leaves the seeded corpus standing, and should:
     # it is a complete, valid, one-claim corpus, and keeping it is what makes the

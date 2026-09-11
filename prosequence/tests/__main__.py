@@ -8,12 +8,13 @@ from __future__ import annotations
 
 import sys
 
-from prosequence.tests import test_1d, test_1e, test_role
+from prosequence.tests import test_1d, test_1e, test_collection, test_role
 
 SUITES = [
     ("1d — writer session & store", test_1d),
     ("1e — stop controls", test_1e),
     ("role — ingestion role & capability", test_role),
+    ("collection — search/select/ingest cascade", test_collection),
 ]
 
 

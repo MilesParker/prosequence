@@ -14,8 +14,8 @@ array. `_coerce_list` below recovers that one known shape; anything else
 malformed raises `FindingShapeError` rather than a confusing TypeError three
 frames into plan_from_finding. The shape (a `claims` array and an `inferences`
 array, where a new claim carries a local `key` an inference can cite alongside
-real corpus uuids) is a contract this module chose (see prompt.py's prose
-description of the same contract, which must stay in sync).
+real corpus uuids) is a contract this module chose (see prompts/ingestion.py's
+prose description of the same contract, which must stay in sync).
 
 GRAPH validation is NOT done here — the session validates the whole graph once
 at commit() (I1-I10). apply deliberately does no invariant checking; a bad
@@ -56,7 +56,6 @@ from .plan import (
     AddClaim,
     AddInference,
     ClaimId,
-    DesignateThesis,
     Existing,
     New,
     Op,
@@ -75,7 +74,7 @@ class FindingShapeError(Exception):
 
 FINDING_TOOL_NAME = "submit_finding"
 
-# Mirrors the JSON contract described in prompt.py's finding-shape prose.
+# Mirrors the JSON contract described in prompts/ingestion.py's prose.
 FINDING_TOOL_SCHEMA = {
     "name": FINDING_TOOL_NAME,
     "description": (
@@ -102,10 +101,6 @@ FINDING_TOOL_SCHEMA = {
                         },
                         "text": {"type": "string", "description": "One atomic assertion."},
                         "terminal": {"type": "boolean"},
-                        "thesis": {
-                            "type": "boolean",
-                            "description": "Set true only when this claim is a further contested question the corpus should now be organised around -- the consequent an existing thesis argues FOR, where the document treats the standing thesis as a reason for this. It must still be the target of an inference below whose grounds include the claim it follows from; designating a claim does not attach it. Omit (or false) for every ordinary claim, including every claim that merely supports or attacks something.",
-                        },
                         "attribution": {
                             "type": "object",
                             # Role is positional — it is not a property of a
@@ -357,6 +352,50 @@ def prune_bad_schemes(finding: dict) -> tuple[dict, list[str]]:
     return {**finding, "inferences": kept}, notes
 
 
+def prune_malformed_entries(finding: dict) -> Tuple[dict, list]:
+    """Drop entries in `claims`/`inferences` that are not objects. Returns
+    (finding, notes).
+
+    The API enforces WHICH tool is called, never the shape of its arguments, so
+    an array declared as objects can come back holding a bare string — a model
+    emitting a claim's text where the claim should be. Observed live: three of
+    nine sources in one collection run died on the same
+    `AttributeError: 'str' object has no attribute 'get'` out of
+    `_check_source_types`, which reads `c.get("attribution")` of every entry.
+
+    That was the wrong failure twice over. It escaped as an AttributeError
+    rather than a `FindingShapeError`, so no salvage call site caught it and the
+    whole finding — every other claim in it — was lost with no error corpus
+    written. And it was fatal where it did not need to be: one malformed entry
+    among fifty is a broken entry, not a broken finding.
+
+    So this prunes and notes, on exactly the precedent of `prune_bad_schemes`
+    and `plan.prune_unresolvable`. An inference left citing a dropped claim's
+    key is picked up downstream by `prune_unresolvable`. THE SYSTEMIC CASE IS
+    LEFT ALONE: if nothing in `claims` survives, the finding is malformed rather
+    than dented, and `ops_from_finding` raises `FindingShapeError` naming it.
+    """
+    notes: list[str] = []
+    out = dict(finding)
+    for field in ("claims", "inferences"):
+        entries = out.get(field) or []
+        if not isinstance(entries, list):
+            continue
+        kept = [e for e in entries if isinstance(e, dict)]
+        dropped = len(entries) - len(kept)
+        if dropped and kept:
+            out[field] = kept
+            notes.append(
+                f"{dropped} {field[:-1]} entr{'y' if dropped == 1 else 'ies'} "
+                f"dropped: not an object (the model emitted a bare value where "
+                f"the schema declares one)")
+        elif dropped and not kept:
+            # Everything malformed: leave it, so the shape gate below raises
+            # naming the field rather than reporting an empty finding.
+            pass
+    return out, notes
+
+
 def _check_source_types(claims: list) -> None:
     """`attribution.source.type` names one of the five GroundsSource
     discriminants. Same reason as `_check_schemes`: the schema's `enum` does not
@@ -364,6 +403,12 @@ def _check_source_types(claims: list) -> None:
     source type would otherwise reach the corpus unchallenged."""
     bad = []
     for n, c in enumerate(claims):
+        if not isinstance(c, dict):
+            # Reached only when EVERY entry is malformed (`prune_malformed_
+            # entries` keeps the partial case). A FindingShapeError here is
+            # salvageable; the AttributeError this replaces was not.
+            raise FindingShapeError(
+                f"claim[{n}] is {type(c).__name__}, not an object: {c!r:.80}")
         attr = c.get("attribution")
         if not attr:
             continue
@@ -406,10 +451,15 @@ def ops_from_finding(finding: dict) -> Tuple[Op, ...]:
     structural check over the assembled plan.
 
     Claims come first so that every `New` is bound before anything uses it, then
-    thesis designations, then inferences. That ordering is produced here and
-    VERIFIED by `check_plan` rather than trusted — every op after the claims
-    references without binding, so any order among them would do, but the check
-    is what makes that a fact rather than an assumption.
+    inferences. That ordering is produced here and VERIFIED by `check_plan`
+    rather than trusted — every op after the claims references without binding,
+    so any order among them would do, but the check is what makes that a fact
+    rather than an assumption.
+
+    There is no `thesis` flag on the wire. The schema carried one and turned
+    every claim a document led with into a candidate corpus question; what a
+    corpus argues about is not a per-document decision, so the field is gone and
+    ingestion no longer holds `DesignateThesis` (see `IngestionRole`).
 
     A ref on the wire is a bare string carrying two different kinds of thing. It
     is a `New` iff it matches a key this finding declares, and an `Existing`
@@ -436,14 +486,6 @@ def ops_from_finding(finding: dict) -> Tuple[Op, ...]:
             attribution=_attribution(c.get("attribution")),
         )
         for c in finding["claims"]
-    ]
-    # Designations sit between the claims and the inferences: every `New` they
-    # name is bound by an AddClaim above, which is what `check_plan` requires,
-    # and the ref is a key rather than a raw uuid — so a model cannot designate
-    # an inference id as a thesis (see `plan.DesignateThesis`).
-    plan += [
-        DesignateThesis(target=New(c["key"]))
-        for c in finding["claims"] if c.get("thesis")
     ]
     plan += [
         AddInference(

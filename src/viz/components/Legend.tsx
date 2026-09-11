@@ -1,4 +1,6 @@
+import { useState } from 'react'
 import { COLORS, STANCE, STANCE_NEUTRAL_STROKE, STANCE_FILL_OPACITY, REF_THESIS } from '../../config'
+import { loadKeyOpen, saveKeyOpen } from '../persist'
 
 /** Full-chroma stance colour → the pale fill used on nodes (matches the graph wash).
  *  Poles are `hsl(…)`; return that same hue at opacity `a`. Non-hsl (neutral) ⇒ no fill. */
@@ -63,9 +65,49 @@ function Divider() {
   return <div style={{ marginTop: 10, borderTop: `1px solid ${COLORS.border}`, paddingTop: 10 }} />
 }
 
-export function Legend({ nominating, onToggleNominate }: { nominating: boolean; onToggleNominate: () => void }) {
+// A chevron that points down when the key is open, right when it is shut.
+function Caret({ open }: { open: boolean }) {
   return (
-    <div style={{ position: 'fixed', bottom: 20, left: 20, background: COLORS.surfaceBlur, backdropFilter: 'blur(4px)', border: `1px solid ${COLORS.border}`, borderRadius: 8, boxShadow: '0 6px 24px rgba(0,0,0,0.10)', padding: '12px 16px', fontSize: 11, zIndex: 50, userSelect: 'none', maxWidth: 230 }}>
+    <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"
+         style={{ transform: open ? 'rotate(0deg)' : 'rotate(-90deg)', transition: 'transform .12s ease' }} aria-hidden>
+      <path d="M6 9l6 6 6-6" />
+    </svg>
+  )
+}
+
+/**
+ * The map's key, sitting inside the map pane (not fixed to the window — the map is
+ * one column of the workspace now). It starts OPEN and collapses to a labelled pill;
+ * the choice is remembered.
+ *
+ * It defaulted collapsed for one round and that was wrong: nobody found it. A key
+ * that has to be discovered before it can be read is not doing the job, and the cost
+ * of it being open — covering the map's bottom-left corner — is one the reader can
+ * pay off permanently with a single click, in the direction they choose.
+ *
+ * "Set reference thesis" collapses with it rather than being kept out — nominating
+ * is a rare deliberate act, and an always-visible control for it would defeat the
+ * point of collapsing.
+ */
+export function Legend({ nominating, onToggleNominate }: { nominating: boolean; onToggleNominate: () => void }) {
+  const [open, setOpen] = useState(loadKeyOpen)
+  return (
+    <div style={{ position: 'absolute', bottom: 16, left: 16, background: open ? COLORS.surfaceBlur : COLORS.surface, backdropFilter: 'blur(4px)', border: `1px solid ${COLORS.border}`, borderRadius: 8, boxShadow: '0 6px 24px rgba(0,0,0,0.10)', padding: open ? '10px 16px 12px' : '7px 12px', fontSize: 11, zIndex: 20, userSelect: 'none', maxWidth: 230 }}>
+      <button
+        type="button"
+        onClick={() => setOpen(v => { saveKeyOpen(!v); return !v })}
+        title={open ? 'Hide the key' : 'Show the key'}
+        aria-expanded={open}
+        style={{
+          display: 'flex', alignItems: 'center', gap: 6, width: '100%', textAlign: 'left',
+          padding: 0, border: 'none', background: 'none', cursor: 'pointer', font: 'inherit',
+          color: open ? COLORS.textFaint : COLORS.textMuted, marginBottom: open ? 8 : 0,
+        }}
+      >
+        <Caret open={open} />
+        <span style={{ fontSize: open ? 9.5 : 10.5, fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.1em' }}>Key</span>
+      </button>
+      {open && <>
       <SectionTitle>Reference thesis</SectionTitle>
       {/* Arming this mode makes the next graph click nominate a claim as the origin —
           a deliberate act, kept off the individual nodes so nothing clutters the map. */}
@@ -107,6 +149,7 @@ export function Legend({ nominating, onToggleNominate }: { nominating: boolean; 
       <Divider />
       <SectionTitle>Inference</SectionTitle>
       <Row><InfSwatch /> Junction</Row>
+      </>}
     </div>
   )
 }

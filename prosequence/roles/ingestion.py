@@ -33,11 +33,10 @@ from langchain_core.messages import HumanMessage
 
 from . import salvage
 from .apply import (FINDING_TOOL_SCHEMA, FindingShapeError, ops_from_finding,
-                    prune_bad_schemes)
+                    prune_bad_schemes, prune_malformed_entries)
 from .corpus_view import render_corpus
 from .plan import (
-    AddClaim, AddInference, DesignateThesis, Op, PlanError, check_plan,
-    prune_unresolvable,
+    AddClaim, AddInference, Op, PlanError, check_plan, prune_unresolvable,
 )
 from .prompts import INGESTION
 from .repair import Unrepairable, repair_plan
@@ -52,17 +51,26 @@ class IngestionRole(Role):
     # different role's business, and a plan containing that op is refused here
     # before any of it runs.
     #
-    # `DesignateThesis` IS held, and is additive on the same terms: it appends
-    # to `theses` and can never remove. A document that argues from the standing
-    # thesis to a further claim is extending the argument upward, which is
-    # ordinary ingestion; refusing it would have made the questions a corpus can
-    # argue about permanent at genesis.
-    capability: tuple[type[Op], ...] = (AddClaim, AddInference, DesignateThesis)
+    # `DesignateThesis` is absent too, and was not always. It was granted here
+    # on the argument that a document arguing FROM the standing thesis to a
+    # further claim needed somewhere to record the consequent; the prompt
+    # paragraph instructing that was withdrawn hours later and the grant was
+    # not, leaving the capability standing with nothing governing its use. What
+    # it then bought was not the upward case — in the ai-buildout collection run
+    # the standing thesis is grounds for nothing at all — but source documents
+    # whose own headline claims were promoted to corpus questions, which has the
+    # side effect of silencing the GAP-6 warning each would otherwise raise.
+    #
+    # What a corpus is ABOUT is not a document's to decide. Designating a thesis
+    # is a curatorial act over the corpus, not an extraction from a text, and
+    # ingestion sees one document at a time. The op survives in `plan` for a
+    # role that performs it deliberately on an existing claim.
+    capability: tuple[type[Op], ...] = (AddClaim, AddInference)
     role_prompt: str = INGESTION
 
     # -- subclass hooks ----------------------------------------------------
 
-    def build_tools(self, session):
+    def build_tools(self):
         # Single-shot: no read tools. The whole corpus is placed in front of the
         # model via `cached_context`, so there is nothing to traverse.
         return [], []
@@ -107,6 +115,11 @@ class IngestionRole(Role):
         # failure is left intact and still raises below. Mirrors the ref pruning
         # further down, one stage earlier because a scheme is refused at the
         # wire shape rather than at the assembled plan.
+        # An entry that is not an object at all is dropped before anything
+        # reads its fields. Ordered first because every later gate assumes it
+        # can call `.get` on each entry — the assumption that cost three of nine
+        # sources in one collection run.
+        finding, shape_notes = prune_malformed_entries(finding)
         finding, scheme_notes = prune_bad_schemes(finding)
 
         try:
@@ -124,7 +137,7 @@ class IngestionRole(Role):
         # Before check_plan, so its guarantee that every ref resolves — the one
         # repair depends on — still holds when repair runs.
         plan, pruned = prune_unresolvable(plan, known)
-        pruned = [*scheme_notes, *pruned]
+        pruned = [*shape_notes, *scheme_notes, *pruned]
 
         try:
             plan_notes = [*pruned, *check_plan(plan, known)]

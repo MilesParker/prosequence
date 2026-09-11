@@ -94,22 +94,23 @@ def check(d, path=""):
     strings, for callers that must act on a failure rather than print it.
     """
     viols, warns = check_violations(d, path)
-    return [v.format(path) for v in viols], warns
+    return [v.format(path) for v in viols], [w.format(path) for w in warns]
 
 
 def check_violations(d, path=""):
-    """The invariant pass, structured: returns (violations, warns).
+    """The invariant pass, structured: returns (errors, warnings).
 
-    Identical analysis to `check` — which is a formatter over this — so there is
-    exactly one implementation of every invariant.
+    BOTH lists are `Violation` records. Identical analysis to `check` — which is
+    a formatter over this — so there is exactly one implementation of every
+    invariant, and one implementation of GAP-6 detection.
     """
     # `or []`: an empty `claims:`/`inferences:` block serializes to None, not [].
     claims = {c['id']: c for c in d.get('claims') or []}
     infs   = {i['id']: i for i in d.get('inferences') or []}
     theses = theses_of(d)
 
-    errs  = []   # errors -> non-zero exit
-    warns = []   # warnings (GAP-6 gaps) -> reported only
+    errs  = []   # errors (Violation) -> non-zero exit
+    warns = []   # warnings (Violation, GAP-6 gaps) -> reported only
 
     def fail(inv, iid, target, msg, nodes=()):
         errs.append(Violation(inv, iid, target, msg, tuple(nodes)))
@@ -241,7 +242,16 @@ def check_violations(d, path=""):
         if cid in theses:
             continue
         if cid not in concluded:
-            warns.append(f"{path}: GAP6 - {cid}  non-terminal, non-attributive, not a thesis, and concluded by nothing (GAP-6 gap, or it should be a thesis)")
+            # A record, not a string, for the same reason the errors are: a
+            # caller that wants to ACT on a gap (the collection agent's coverage
+            # read, which lists open ends by tag) needs the claim id, and
+            # recovering it by re-parsing prose would make the wording
+            # load-bearing. `check` formats these back into the identical
+            # string, so the CLI output is unchanged.
+            warns.append(Violation(
+                "GAP6", "-", cid,
+                "non-terminal, non-attributive, not a thesis, and concluded by "
+                "nothing (GAP-6 gap, or it should be a thesis)"))
 
     return errs, warns
 

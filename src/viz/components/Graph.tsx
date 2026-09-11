@@ -1,8 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import * as d3 from 'd3'
 import type { DiscourseSpace } from '../../types'
 import {
-  COLORS, EDGE, NODE, DISCLOSURE, TITLE_BAR_HEIGHT, VIEW, STANCE_FILL_OPACITY,
+  COLORS, EDGE, NODE, DISCLOSURE, VIEW, WORKSPACE, STANCE_FILL_OPACITY,
   STANCE_SELECTED_FILL_OPACITY, STANCE_SELECTED_STROKE_BUMP, REF_THESIS,
 } from '../../config'
 import { fitTransform, type LayoutBounds, type GroupBox } from '../layout'
@@ -21,11 +21,15 @@ interface Props {
   bounds: LayoutBounds
   groups: GroupBox[]
   highlight: Set<string>
-  /** Claim to reveal on mount — the shared selection, centred when swapping in. */
+  /** Claim to reveal on mount — the shared selection, centred when swapping in.
+   *  While mounted a change to it repaints the selection and FOLLOWS: the map pans
+   *  to the claim only when it has fallen outside the visible rect. */
   centerOn?: string | null
-  /** How to frame `centerOn` on mount: 'reveal' pans it in at a moderate zoom;
-   *  'neighborhood' zooms tight on its immediate surroundings (return icon). */
-  centerMode?: 'reveal' | 'neighborhood'
+  /** An explicit "show me this on the map" from another pane. Unlike `centerOn` it
+   *  always re-frames, at a fixed tight zoom, wherever the claim already sits. The
+   *  graph calls `onLocated` once it has consumed it. */
+  locate?: { id: string } | null
+  onLocated?: () => void
   /** The claim everything is coloured relative to (the movable reference thesis).
    *  null ⇒ no origin set, so the whole graph is unpainted (all neutral). Updates
    *  recolour the scene in place — they never rebuild it. */
@@ -61,8 +65,9 @@ type NodeSel = d3.Selection<SVGGElement, GraphNode, SVGGElement, unknown>
  * aligned / opposed / divided / neutral. Moving the reference thesis recolours the
  * whole scene in place via `applyStance`, without a rebuild.
  */
-export function Graph({ data, graphData, bounds, groups, highlight, centerOn, centerMode, referenceThesisId, onHover, onSelect, onActivate }: Props) {
+export function Graph({ data, graphData, bounds, groups, highlight, centerOn, locate, onLocated, referenceThesisId, onHover, onSelect, onActivate }: Props) {
   const svgRef = useRef<SVGSVGElement>(null)
+  const wrapRef = useRef<HTMLDivElement>(null)
   const onHoverRef = useRef(onHover)
   const onSelectRef = useRef(onSelect)
   const onActivateRef = useRef(onActivate)
@@ -73,8 +78,10 @@ export function Graph({ data, graphData, bounds, groups, highlight, centerOn, ce
   // yank the viewport / rebuild the scene, so these stay out of that effect's deps.
   const centerOnRef = useRef(centerOn)
   useEffect(() => { centerOnRef.current = centerOn }, [centerOn])
-  const centerModeRef = useRef(centerMode)
-  useEffect(() => { centerModeRef.current = centerMode }, [centerMode])
+  // The claim this graph itself last selected. Following a selection back to the
+  // node you just clicked would make the map lurch under your own pointer, so the
+  // follow-pan skips it; every other pane's selection is followed.
+  const selfSelectRef = useRef<string | null>(null)
   const referenceThesisIdRef = useRef(referenceThesisId)
   useEffect(() => { referenceThesisIdRef.current = referenceThesisId }, [referenceThesisId])
   // The selected/centred claim (same id the viewport frames), used to emphasise it.
@@ -85,12 +92,36 @@ export function Graph({ data, graphData, bounds, groups, highlight, centerOn, ce
   // Repaints the whole scene by stance for a given reference thesis. Rebuilt on each
   // scene mount (closes over that mount's selections); called by the recolour effect.
   const recolorRef = useRef<((refId: string | null) => void) | null>(null)
+  // Re-frames the scene on one claim: 'follow' pans only when it is off-view,
+  // 'neighborhood' always zooms tight. Rebuilt with the scene, called by the
+  // selection and locate effects below.
+  const frameRef = useRef<((id: string, mode: 'follow' | 'neighborhood') => void) | null>(null)
+
+  // ── Container size ─────────────────────────────────────────────────────────
+  // The graph is one pane of the workspace, not the window: it measures the box it
+  // was given. `ready` gates the scene build (a fit against a zero-size box is not
+  // a fit), and a later resize only restretches the canvas — it never rebuilds the
+  // scene or re-fits, so the reader's location survives a splitter drag.
+  const sizeRef = useRef<{ w: number; h: number }>({ w: 0, h: 0 })
+  const [ready, setReady] = useState(false)
+  useEffect(() => {
+    const box = wrapRef.current
+    if (!box) return
+    const ro = new ResizeObserver(entries => {
+      const r = entries[0].contentRect
+      if (r.width < 1 || r.height < 1) return
+      sizeRef.current = { w: r.width, h: r.height }
+      if (svgRef.current) d3.select(svgRef.current).attr('width', r.width).attr('height', r.height)
+      setReady(true)
+    })
+    ro.observe(box)
+    return () => ro.disconnect()
+  }, [])
 
   useEffect(() => {
     const el = svgRef.current
-    if (!el) return
-    const W = window.innerWidth
-    const H = window.innerHeight
+    if (!el || !ready) return
+    const { w: W, h: H } = sizeRef.current
     const gd = graphData
     const { nodes, links } = gd
 
@@ -109,7 +140,7 @@ export function Graph({ data, graphData, bounds, groups, highlight, centerOn, ce
     const zoom = d3.zoom<SVGSVGElement, unknown>()
       .scaleExtent([VIEW.zoomMin, VIEW.zoomMax])
       .on('zoom', e => g.attr('transform',
-        `translate(${e.transform.x},${e.transform.y + TITLE_BAR_HEIGHT}) scale(${e.transform.k})`))
+        `translate(${e.transform.x},${e.transform.y}) scale(${e.transform.k})`))
       // Persist the reader's "location" after each pan/zoom gesture settles so a
       // reload (or a return from the focus view) restores it exactly.
       .on('end', e => saveViewport({ k: e.transform.k, x: e.transform.x, y: e.transform.y }))
@@ -357,9 +388,9 @@ export function Graph({ data, graphData, bounds, groups, highlight, centerOn, ce
       .on('mouseover', (e: MouseEvent, d) => onHoverRef.current(d, e.clientX, e.clientY))
       .on('mousemove', (e: MouseEvent, d) => onHoverRef.current(d, e.clientX, e.clientY))
       .on('mouseout', () => onHoverRef.current(null))
-      .on('click', (e: MouseEvent, d) => { e.stopPropagation(); onSelectRef.current(d) })
+      .on('click', (e: MouseEvent, d) => { e.stopPropagation(); selfSelectRef.current = d._kind === 'claim' ? (d.id as unknown as string) : null; onSelectRef.current(d) })
       .on('dblclick', (e: MouseEvent, d) => { e.stopPropagation(); if (d._kind === 'claim') onActivateRef.current?.(d) })
-    svg.on('click', () => onSelectRef.current(null))
+    svg.on('click', () => { selfSelectRef.current = null; onSelectRef.current(null) })
 
     // Drag to nudge a node; re-clip only its incident edges (and re-place their ticks).
     nodeSel.call(d3.drag<SVGGElement, GraphNode>()
@@ -384,35 +415,57 @@ export function Graph({ data, graphData, bounds, groups, highlight, centerOn, ce
         })
       }))
 
+    // ── Framing ───────────────────────────────────────────────────────────────
+    // Centre one claim at zoom k. Sizes are read live from `sizeRef`, so a frame
+    // requested after a splitter drag lands on the pane's current box.
+    const centerAt = (node: GraphNode, k: number, ms = 0) => {
+      const { w, h } = sizeRef.current
+      const t = d3.zoomIdentity.translate(w / 2 - k * node.x!, h / 2 - k * node.y!).scale(k)
+      if (ms > 0) svg.transition().duration(ms).call(zoom.transform, t)
+      else svg.call(zoom.transform, t)
+    }
+
+    // The two ways another pane can move the map. `follow` is the passive one: a
+    // claim selected elsewhere is panned to ONLY if it has fallen outside the
+    // visible rect, at the reader's own zoom — panning on every selection would
+    // make the map lurch while they work in another pane, and never panning would
+    // leave the shared selection off-screen, which is the point of linking them.
+    // `neighborhood` is the explicit "show on the map": always re-frame, tight.
+    frameRef.current = (id, mode) => {
+      const node = gd.nodeById.get(id)
+      if (!node || node.x == null || node.y == null) return
+      const t = d3.zoomTransform(el)
+      if (mode === 'neighborhood') {
+        centerAt(node, Math.min(VIEW.zoomMax, Math.max(VIEW.zoomMin, VIEW.neighborhoodZoom)), WORKSPACE.followMs)
+        return
+      }
+      const { w, h } = sizeRef.current
+      const pad = WORKSPACE.followPad
+      const sx = t.x + t.k * node.x, sy = t.y + t.k * node.y
+      if (sx >= pad && sx <= w - pad && sy >= pad && sy <= h - pad) return   // already in view
+      centerAt(node, t.k, WORKSPACE.followMs)
+    }
+
     // Frame the scene on mount. Priority:
-    //   1. neighborhood — an explicit "locate" return wants a fixed tight zoom on
-    //      the claim, so it overrides any stored viewport.
-    //   2. stored viewport — restore the reader's last "location" exactly (reload,
-    //      or a generic return from the focus view).
-    //   3. centerOn reveal — first-ever visit swapping in a selection: reveal it.
-    //   4. fit — nothing to restore or reveal, so fit the whole map.
-    const fit = fitTransform(bounds, W, H - TITLE_BAR_HEIGHT, VIEW.zoomMin, VIEW.zoomMax)
+    //   1. stored viewport — restore the reader's last "location" exactly (reload,
+    //      or a pane restored after being minimized).
+    //   2. centerOn reveal — first-ever visit with a selection: reveal it.
+    //   3. fit — nothing to restore or reveal, so fit the whole map.
+    // An explicit locate is NOT handled here: it arrives as a prop and is applied
+    // by the effect below, so it re-frames on a live pane and on a fresh one alike.
+    const fit = fitTransform(bounds, W, H, VIEW.zoomMin, VIEW.zoomMax)
     const stored = loadViewport()
     const target = centerOnRef.current ? gd.nodeById.get(centerOnRef.current) : null
-    const centerAt = (k: number) => {
-      const tx = W / 2 - k * target!.x!
-      const ty = (H - TITLE_BAR_HEIGHT) / 2 - k * target!.y!
-      svg.call(zoom.transform, d3.zoomIdentity.translate(tx, ty).scale(k))
-    }
-    if (centerModeRef.current === 'neighborhood' && target && target.x != null && target.y != null) {
-      // Centre the claim at a fixed tight zoom so only its one or two immediate
-      // neighbours frame it.
-      centerAt(Math.min(VIEW.zoomMax, Math.max(VIEW.zoomMin, VIEW.neighborhoodZoom)))
-    } else if (stored) {
+    if (stored) {
       svg.call(zoom.transform, d3.zoomIdentity.translate(stored.x, stored.y).scale(stored.k))
     } else if (target && target.x != null && target.y != null) {
-      centerAt(Math.max(fit.k, Math.min(VIEW.zoomMax, 0.55)))
+      centerAt(target, Math.max(fit.k, Math.min(VIEW.zoomMax, 0.55)))
     } else {
       svg.call(zoom.transform, d3.zoomIdentity.translate(fit.x, fit.y).scale(fit.k))
     }
 
     return () => { svg.on('.zoom', null) }
-  }, [data, graphData, bounds])
+  }, [data, graphData, bounds, ready])
 
   // Update the search-highlight rings without rebuilding the scene.
   useEffect(() => {
@@ -428,12 +481,27 @@ export function Graph({ data, graphData, bounds, groups, highlight, centerOn, ce
     recolorRef.current?.(referenceThesisId ?? null)
   }, [referenceThesisId])
 
-  // Move the selection emphasis when the centred claim changes — repaint in place,
-  // never reframe (viewport framing stays mount-only).
+  // Move the selection emphasis when the centred claim changes — always repaint in
+  // place, and follow it (pan only if it is off-view) when the change came from
+  // another pane. A selection the graph made itself is already under the pointer.
   useEffect(() => {
     selectedIdRef.current = centerOn
     recolorRef.current?.(referenceThesisIdRef.current ?? null)
-  }, [centerOn])
+    if (centerOn && centerOn !== selfSelectRef.current) frameRef.current?.(centerOn, 'follow')
+  }, [centerOn, ready])
 
-  return <svg ref={svgRef} style={{ display: 'block' }} />
+  // An explicit locate from another pane ("Show on the map"). Consumed once and
+  // handed back, so a later pane restore does not replay it.
+  useEffect(() => {
+    if (!locate || !ready) return
+    frameRef.current?.(locate.id, 'neighborhood')
+    onLocated?.()
+  }, [locate, ready, onLocated])
+
+  // The pane's client area. The svg is stretched to it by the ResizeObserver above.
+  return (
+    <div ref={wrapRef} style={{ position: 'absolute', inset: 0, overflow: 'hidden' }}>
+      <svg ref={svgRef} style={{ display: 'block' }} />
+    </div>
+  )
 }

@@ -79,6 +79,7 @@ export const DISCLOSURE = {
 export const TITLE_BAR_HEIGHT = 44
 export const PANEL_WIDTH = 380
 
+
 // ── Detail-panel typography (px) ──────────────────────────────────────────────
 // Font sizes for the right-hand inset panel, bumped up from the original
 // cramped 10–14px scale. Tune here rather than in the component.
@@ -195,11 +196,51 @@ export const FOCUS = {
 export const ARTICLE = {
   font: "Georgia, 'Iowan Old Style', 'Times New Roman', Times, serif",
   labelFont: "-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif",
-  measure: 680,          // max text width (px) — long-form reading measure
+
+  // ── The measure is in CHARACTERS, and it is the type that grows ─────────────
+  // The reading measure is a line LENGTH IN CHARACTERS, not a width in pixels:
+  // 45–75 characters is the classic range for a single column, and this page was
+  // already at 74 when the measure was a fixed 680px at 19px — i.e. at the ceiling,
+  // not short of it. So a wider pane cannot buy a longer line; that would take the
+  // column to 81 characters at 680px and 91 at 760px, past the point where the eye
+  // stops finding the next line reliably.
+  //
+  // What a wider pane buys instead is slightly bigger type at the same line length,
+  // and not much of it. Reading distance does not change with the window, so the
+  // gain is small and quickly spent: past `bodyFontMax` the type stops and the rest
+  // of the pane becomes margin, which is what every publication does at every width.
+  // `ArticleView` solves for the largest body size that fits and scales the whole
+  // page from it, so every size on the surface keeps its ratio to the body.
+  charsPerLine: 72,      // the target line length; 74 was the old fixed measure
+  // Ceiling on the body size. Deliberately near the FIXED size real long-form sets
+  // (NYT ~20px, Medium 21) rather than at the top of what a wide pane could carry:
+  // those publications do not scale type with the window at all, they hold one size
+  // and let the margins grow, and a page that visibly inflates when you drag a
+  // splitter reads as a zoom control rather than as a better-set page. The band
+  // 19→21 is narrow on purpose — it takes the article off its floor and stops.
+  // Setting this equal to `bodyFont` turns scaling off entirely and gives the fixed
+  // measure exactly; there is no other switch to find.
+  bodyFontMax: 21,
+  // Advance width per px of font-size, MEASURED for Georgia rendering this corpus's
+  // prose (8.366px at 19px). Linear in font size, as advance widths are. The
+  // fallbacks (Iowan Old Style, Times) are narrower, so they land inside the target
+  // rather than past it — the failure direction is short lines, which is the safe one.
+  charWidthRatio: 0.4403,
+  // Everything between the article's outer width and the prose column: its own
+  // horizontal padding (24 each side) plus an argument's rail (`rail` + 1px border).
+  chrome: 24 * 2 + 15 + 1,
+  // Margin held back from the pane on each side before the measure is solved for.
+  // Without it the solver spends every pixel on type and the article fills its pane
+  // exactly at every width below the cap, so the column sits against the pane edge
+  // with only its own padding — the page never reads as a sheet on a ground.
+  paneMargin: 20,
+
+  measure: 680,          // outer width at the base body size (see `articleMeasure`)
   titleFont: 31,         // the tag — the article's title (tags cap at 50 chars)
   standfirstFont: 21,    // the claim's own text, directly under the title
   kickerFont: 15,        // the reference thesis line above the title
-  deckFont: 18,          // attribution quote
+  deckFont: 18,          // the centred claim's attribution, run inline under the standfirst
+  deckBylineFont: 15,    // the source within it — sans, so the words said and the hand that said them part
   bodyFont: 19,          // grounds prose
   warrantFont: 17,       // warrant lines
   leadFont: 17,          // "where this leads" lines
@@ -207,12 +248,59 @@ export const ARTICLE = {
   sectionFont: 12,       // section headings
   subheadFont: 17,       // an argument's sub-headline — its grounds' tags
   trailFont: 13,         // the thesis → claim trail in the kicker
+  reachFont: 13,         // the `›N` reach cue — a number, since reach runs to 9
+  citeFont: 13,          // the inline source mark on an attributive claim in the body
   kickerRail: 2,         // the kicker's stance-hue edge
   lineHeight: 1.7,
   rail: 15,              // gap between the grounds/warrant rail and its text
   railInset: 2,          // how far the rail sits in from the measure
   warrantGap: 10,        // between an argument's grounds and its first warrant
   argGap: 34,            // between arguments (inferences) in one section
+} as const
+
+/**
+ * The article's outer width for a given body size — the width at which the prose
+ * column holds `charsPerLine` characters. Inverted by `ArticleView` to pick the
+ * largest body size a pane can carry, and used here to set that pane's floor.
+ */
+export const articleMeasure = (bodyPx: number): number =>
+  Math.round(ARTICLE.charsPerLine * ARTICLE.charWidthRatio * bodyPx) + ARTICLE.chrome
+
+// ── Workspace (the single page) ───────────────────────────────────────────────
+// Two columns: the map, and the READER beside it. The reader is one surface at a
+// time — the article or the focus view, never both. They answer the same question
+// about the same claim in two registers, so side by side they compete rather than
+// compose; the map is the only surface saying something neither of them can.
+//
+// A pane minimizes to a rail on its own side; the two open panes share the width
+// by `sizes` fractions, dragged at the splitter between them.
+//
+// `minWidth` is load-bearing, not cosmetic, and the reader's floor depends on which
+// surface it is showing — App passes the right one per render:
+//   graph    a map you can still orient in
+//   focus    For/Against is carried by POSITION (left/right), so the surface has
+//            no one-column form to reflow into
+//   article  the width its measure needs at the SMALLEST body size it will set
+//            (`articleMeasure(ARTICLE.bodyFont)`). Above that the article grows by
+//            enlarging its type at a constant line length, up to `bodyFontMax`, and
+//            past that the surplus is margin. Below it the line would be short of
+//            the measure, which is the safe direction but not one to design into.
+// A splitter cannot drag below a floor, and a window too narrow for both open panes
+// scrolls the row horizontally rather than crushing them.
+export const WORKSPACE = {
+  headerHeight: 30,      // per-pane header (name / reader switch, minimize)
+  railWidth: 30,         // a minimized pane's vertical rail
+  splitter: 7,           // draggable divider between the two open panes
+  articleGutter: 24,     // the article's own horizontal padding, each side
+  minWidth: { graph: 320, focus: 470, article: articleMeasure(ARTICLE.bodyFont) + ARTICLE.paneMargin * 2 },
+  // Default split. The reader lands at roughly its measure and the map takes the
+  // rest — the map is the only surface whose content grows with the corpus rather
+  // than with the claim, so slack is worth more to it.
+  sizes: { graph: 0.52, reader: 0.48 },
+  // Follow-the-selection pan (map pane): a claim selected in the reader is panned
+  // to only when it sits outside this inset of the visible rect.
+  followPad: 48,
+  followMs: 400,
 } as const
 
 // ── Node dimensions (half-width / half-height) ───────────────────────────────

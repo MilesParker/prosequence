@@ -3,7 +3,7 @@
 // that is not a claim's own text comes from here, so the vocabulary is in one
 // place and can be tuned without touching the composition.
 
-import type { GroundsSource, Relation } from '../../types'
+import type { Attribution, GroundsSource, Relation } from '../../types'
 import type { Stance } from '../graphData'
 
 /**
@@ -53,6 +53,54 @@ export function sourcePhrase(src: GroundsSource): string {
     case 'LogicalNecessity': return 'a logical necessity'
     case 'None': return 'no source given'
   }
+}
+
+/**
+ * The domain a reference names, when the reference is bare URL — "csis.org" out of
+ * "https://www.csis.org/analysis/…". Roughly a quarter of the corpora's citations
+ * are raw links, and a link truncated to fit prose is all scheme and no source:
+ * `https://www.csis.org/analys…` names nothing a reader recognises, while the host
+ * names the outlet, which is exactly what a byline would have said. Returns null
+ * for anything that is not a URL, so the caller falls back to the text itself.
+ */
+function hostOf(text: string): string | null {
+  if (!/^https?:\/\//i.test(text)) return null
+  try {
+    return new URL(text).hostname.replace(/^www\./i, '') || null
+  } catch {
+    return null
+  }
+}
+
+/**
+ * The short face of a source, for the inline mark inside an argument. A reference
+ * is a full citation — "Omer Bartov, New York Times, 2025, citing Haaretz
+ * investigation" — and set after every sourced sentence that would swamp the prose
+ * it annotates. The leading comma-separated segment is the byline or the outlet,
+ * which is what a reader recognises; a bare URL reduces to its host instead. The
+ * whole reference stays available on hover (`citeTitle`).
+ *
+ * Non-Citation sources are already short phrases and pass through whole.
+ */
+export function shortSource(src: GroundsSource, max = 28): string {
+  const full = sourcePhrase(src)
+  if (src.type !== 'Citation') return full
+  const head = full.split(',')[0].trim() || full.trim()
+  const host = hostOf(head)
+  if (host) return host
+  return head.length > max ? `${head.slice(0, max - 1).trimEnd()}…` : head
+}
+
+/**
+ * The tooltip on an inline source mark: the verbatim quote the claim was drawn
+ * from, when there is one. The mark itself carries only the source — a quote set
+ * inline would stop the prose dead, and the deck at the top of the page is where a
+ * quote gets room to be read.
+ */
+export function citeTitle(attribution: Attribution): string {
+  const q = attribution.quote?.trim()
+  const src = sourcePhrase(attribution.source)
+  return q ? `“${q}” — ${src}` : src
 }
 
 /**

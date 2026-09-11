@@ -22,15 +22,22 @@ Design seams that matter:
   backoff, no retry, no loop that responds to a refusal. Because a run commits
   once at the very end, a refusal at any point leaves the corpus repo untouched
   — there is no partial-run state.
+* **Server-tool requests are counted as well as tokens.** A web search is billed
+  per request ON TOP of the tokens its results add to the context, so a log that
+  records only tokens under-reports the bill by a term it cannot even see. The
+  COUNT goes in the log, beside the token counts, and the price is applied
+  retrospectively like every other price here. It is not in the pre-flight
+  projection: the caps are token caps, and the structural bound on searches is
+  the calling agent's own budget (`collect.DEFAULT_MAX_SEARCHES`).
 
 The API key is never handled here: the caller constructs the real client
 (`anthropic.Anthropic()` reads `ANTHROPIC_API_KEY` from the environment) and
 passes it in. No key sits in this module, in the config, or in the log.
 
-Cost in dollars appears nowhere: the log records model + token counts, and a
-price table is applied retroactively when a dollar figure is wanted. A stale
-table must never be able to make a cap silently wrong, so it stays out of the
-pre-flight path entirely.
+Cost in dollars appears nowhere: the log records model, token counts and
+server-tool request counts, and a price table is applied retroactively when a
+dollar figure is wanted. A stale table must never be able to make a cap silently
+wrong, so it stays out of the pre-flight path entirely.
 """
 from __future__ import annotations
 
@@ -132,6 +139,23 @@ def _default_estimate_input(messages: Sequence[dict]) -> int:
                 else:
                     chars += len(str(block))
     return max(1, math.ceil(chars / 4))
+
+
+def _server_tool_counts(usage: Any) -> dict:
+    """Per-request server-tool counts off a response's `usage`, as a plain dict.
+
+    `usage.server_tool_use` is None on every call that used no server tool,
+    and the zero counts on a call that declared one but did not use it are
+    dropped, so the log line only grows when something was actually billed."""
+    stu = getattr(usage, "server_tool_use", None)
+    if stu is None:
+        return {}
+    counts = {}
+    for field in ("web_search_requests", "web_fetch_requests"):
+        n = int(getattr(stu, field, 0) or 0)
+        if n:
+            counts[field] = n
+    return counts
 
 
 # --------------------------------------------------------------------------
@@ -266,17 +290,24 @@ class GuardedClient:
         in_tok = int(usage.input_tokens)
         out_tok = int(usage.output_tokens)
         self._run_tokens += in_tok + out_tok
-        self._append_log(model, in_tok, out_tok, committed)
+        self._append_log(model, in_tok, out_tok, committed,
+                         _server_tool_counts(usage))
         return resp
 
     # -- token log ---------------------------------------------------------
 
-    def _append_log(self, model: str, input_tokens: int, output_tokens: int, committed: bool) -> None:
+    def _append_log(self, model: str, input_tokens: int, output_tokens: int,
+                    committed: bool, server_tools: Optional[dict] = None) -> None:
         """One JSONL line per API call, written after the call returns.
 
         Append mode, the whole line in a single write, flush + fsync — so an
         append survives a crash mid-write and the cumulative gate can trust what
-        it reads. No cost figure: model + counts only, priced retroactively."""
+        it reads. No cost figure: model + counts only, priced retroactively.
+
+        `server_tools` carries the per-request counts a server tool reports
+        (`web_search_requests`, `web_fetch_requests`). Omitted from the line
+        entirely when the call used none, so the log's shape is unchanged for
+        every call that is just a model call."""
         rec = {
             "timestamp": self._now(),
             "run_id": self._run_id,
@@ -286,6 +317,8 @@ class GuardedClient:
             "output_tokens": output_tokens,
             "committed": committed,
         }
+        if server_tools:
+            rec["server_tool_use"] = server_tools
         line = json.dumps(rec, separators=(",", ":")) + "\n"
         os.makedirs(os.path.dirname(self._log_path) or ".", exist_ok=True)
         with open(self._log_path, "a", encoding="utf-8") as fh:
@@ -320,3 +353,16 @@ def cumulative_tokens(path: str) -> int:
     and for cross-checking the guard against a hand-summed total."""
     return sum(int(r.get("input_tokens", 0)) + int(r.get("output_tokens", 0))
                for r in read_log(path))
+
+
+def server_tool_requests(path: str) -> dict:
+    """Total server-tool requests across the whole log, by kind.
+
+    These are billed PER REQUEST, separately from the tokens their results add
+    to the context, so a spend figure computed from tokens alone is short by
+    this term. Reporting only — nothing in the pre-flight path reads it."""
+    totals: dict = {}
+    for rec in read_log(path):
+        for kind, n in (rec.get("server_tool_use") or {}).items():
+            totals[kind] = totals.get(kind, 0) + int(n)
+    return totals

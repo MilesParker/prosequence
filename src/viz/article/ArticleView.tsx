@@ -7,7 +7,9 @@
 //   kicker      the reference thesis, how far it is, and which side C stands on
 //   title       C's TAG — the short handle, primary, exactly as on a focus tile
 //   standfirst  C's own text, the secondary detail beneath the tag
-//   deck        C's attribution (quote + source) or its bedrock note
+//   deck        C's attribution IN FULL — the verbatim quote and the whole
+//               reference, run into the reading as one sentence rather than
+//               captioned beneath it — or its bedrock note
 //   sections    "Where this leads", then "The case for" / "The case against" —
 //               the focus view's vertical order (parent band above, children
 //               band below), not an article's conclusion-last convention.
@@ -18,6 +20,11 @@
 //               warrant group — the focus view's only grounds/warrant mark
 //               (FOCUS.bracket*), carried over intact. One `assumes` heads the
 //               group; the warrants conjoin by sitting under it together.
+//   sourcing    a claim in the body that is attributive carries its source inline,
+//               short-form beside its text (full reference on hover). These are the
+//               graph's empirical leaves: nothing argues for them because they are
+//               checked, not derived, and without the mark a sourced leaf and an
+//               undeveloped claim read identically — both just stop.
 //
 // Colour: ONE family, STANCE, meaning one thing everywhere on the page — blue
 // stands with the reference thesis, orange against it, dusty both ways, uncoloured
@@ -32,22 +39,29 @@
 // article on it — plus the "show on the map" line at the foot. Stance is spoken
 // in the kicker, never painted.
 
-import { createContext, Fragment, useContext, useMemo, type KeyboardEvent, type ReactNode } from 'react'
-import { ARTICLE, COLORS, STANCE_INK, TITLE_BAR_HEIGHT } from '../../config'
+import { createContext, Fragment, useContext, useEffect, useMemo, useRef, useState, type KeyboardEvent, type ReactNode, type RefObject } from 'react'
+import { ARTICLE, COLORS, STANCE_INK, articleMeasure } from '../../config'
 import type { GraphData } from '../graphData'
 import { computeStance } from '../graphData'
 import type { Attribution as AttributionT, Inference } from '../../types'
 import { getClaim, supportsOf, attacksOf, consumersOf, outputOf, combinedStance } from '../focus/focusData'
-import { sentence, sourcePhrase, rolePhrase, argumentHeadline, waysPhrase, ASSUMES } from './prose'
+import { sentence, sourcePhrase, shortSource, citeTitle, rolePhrase, argumentHeadline, waysPhrase, ASSUMES } from './prose'
 import { trailsFromThesis, elide, reachBelow, argumentReach, restsOnBedrock } from './trail'
 
 // All the page's styling. Body is the serif; labels are a quiet sans — the two
 // jobs are reading and pointing, and they are not the same job.
+//
+// Every font-size is a multiple of `--pa-s`, the page's type scale, which the frame
+// solves for from the pane's width (see `useTypeScale`). One variable rather than a
+// per-size rule because the page is a type SCALE: the ratios between the title, the
+// standfirst, the body and the labels are the design, and a body that grew while the
+// labels stayed put would just look broken.
+const em = (px: number) => `calc(${px}px * var(--pa-s))`
 const css = `
   .pa-root { font-family: ${ARTICLE.font}; color: ${COLORS.text}; -webkit-font-smoothing: antialiased; }
   .pa-root a.pa-link { color: inherit; text-decoration: none; cursor: pointer; text-decoration-color: ${COLORS.textDim}; text-decoration-thickness: 1px; text-underline-offset: 0.18em; }
   .pa-root a.pa-link:hover, .pa-root a.pa-link:focus-visible { text-decoration: underline; outline: none; }
-  .pa-label { font-family: ${ARTICLE.labelFont}; font-size: ${ARTICLE.labelSize}px; font-style: normal; font-weight: 500; letter-spacing: 0.02em; color: ${COLORS.textFaint}; }
+  .pa-label { font-family: ${ARTICLE.labelFont}; font-size: ${em(ARTICLE.labelSize)}; font-style: normal; font-weight: 500; letter-spacing: 0.02em; color: ${COLORS.textFaint}; }
 
   /* The kicker is the reference-thesis axis: the trail down from the thesis, how
      far, and which side this claim stands on. Its edge and its stance phrase take
@@ -55,35 +69,50 @@ const css = `
      none) — a different axis from the green/red For-Against of the sections
      below, kept in a different place and a different colour family. Chrome only. */
   .pa-kicker { margin-bottom: 20px; padding-left: 12px; border-left: ${ARTICLE.kickerRail}px solid ${COLORS.border}; }
-  .pa-trail { margin-top: 4px; font-family: ${ARTICLE.labelFont}; font-size: ${ARTICLE.trailFont}px; line-height: 1.5; color: ${COLORS.textMuted}; }
+  .pa-trail { margin-top: 4px; font-family: ${ARTICLE.labelFont}; font-size: ${em(ARTICLE.trailFont)}; line-height: 1.5; color: ${COLORS.textMuted}; }
   .pa-trail + .pa-trail { margin-top: 2px; }
   .pa-trail .pa-sep { color: ${COLORS.textDimmer}; margin: 0 0.45em; }
-  .pa-reach { font-family: ${ARTICLE.labelFont}; font-size: 11px; color: ${COLORS.textDimmer}; margin-left: 0.3em; white-space: nowrap; vertical-align: 0.08em; }
-  .pa-title { font-size: ${ARTICLE.titleFont}px; font-weight: 700; line-height: 1.24; letter-spacing: -0.011em; margin: 0; text-wrap: balance; }
-  .pa-standfirst { margin: 12px 0 0; font-size: ${ARTICLE.standfirstFont}px; line-height: 1.5; color: ${COLORS.textMuted}; }
-  .pa-deck { margin: 20px 0 0; }
-  .pa-deck blockquote { margin: 0 0 6px; font-style: italic; font-size: ${ARTICLE.deckFont}px; line-height: 1.5; color: ${COLORS.textMuted}; }
-  .pa-note { margin: 18px 0 0; font-size: ${ARTICLE.warrantFont}px; line-height: 1.55; color: ${COLORS.textMuted}; }
+  /* The reach cue rides beside 19px serif prose, so it needs weight to register at
+     all — but it is an aside, not a second voice, hence sans, small and unsaturated
+     rather than loud. A NUMBER and not repeated marks: reach runs to 9 in gaza, and
+     any glyph the reader has to count caps out long before that. */
+  .pa-reach { font-family: ${ARTICLE.labelFont}; font-size: ${em(ARTICLE.reachFont)}; font-weight: 600; color: ${COLORS.textMuted}; margin-left: 0.45em; white-space: nowrap; vertical-align: 0.09em; letter-spacing: 0.01em; }
+  .pa-reach .pa-reach-mark { font-weight: 400; color: ${COLORS.textDim}; margin-right: 0.08em; }
+  /* The inline source mark on an attributive claim in the body. Same sans register
+     as the reach cue beside it, one step quieter: reach says how much argument is
+     still to read, a source says the reading STOPS here and is checked instead. */
+  .pa-cite { font-family: ${ARTICLE.labelFont}; font-size: ${em(ARTICLE.citeFont)}; color: ${COLORS.textFaint}; margin-left: 0.4em; vertical-align: 0.09em; letter-spacing: 0.01em; }
+  .pa-cite .pa-cite-mark { color: ${COLORS.textDimmer}; margin-right: 0.3em; }
+  .pa-title { font-size: ${em(ARTICLE.titleFont)}; font-weight: 700; line-height: 1.24; letter-spacing: -0.011em; margin: 0; text-wrap: balance; }
+  .pa-standfirst { margin: 12px 0 0; font-size: ${em(ARTICLE.standfirstFont)}; line-height: 1.5; color: ${COLORS.textMuted}; }
+  /* The centred claim's provenance, run as a sentence at body size. The quote stays
+     italic and quoted — it is someone else's words, not the page's — and the source
+     follows it inline, in the sans label register so the eye can tell the words that
+     were said from the hand that said them without a caption to separate them. */
+  .pa-deck { margin: 18px 0 0; font-size: ${em(ARTICLE.deckFont)}; line-height: 1.55; color: ${COLORS.textMuted}; }
+  .pa-deck .pa-quote { font-style: italic; }
+  .pa-deck .pa-byline { font-family: ${ARTICLE.labelFont}; font-size: ${em(ARTICLE.deckBylineFont)}; color: ${COLORS.textFaint}; }
+  .pa-note { margin: 18px 0 0; font-size: ${em(ARTICLE.warrantFont)}; line-height: 1.55; color: ${COLORS.textMuted}; }
   .pa-head { padding-bottom: 26px; border-bottom: 1px solid ${COLORS.border}; }
 
-  .pa-section { font-family: ${ARTICLE.labelFont}; font-size: ${ARTICLE.sectionFont}px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; color: ${COLORS.textFaint}; margin: 40px 0 18px; }
-  .pa-subhead { font-size: ${ARTICLE.subheadFont}px; font-weight: 700; line-height: 1.35; margin: 0 0 7px; color: ${COLORS.text}; }
+  .pa-section { font-family: ${ARTICLE.labelFont}; font-size: ${em(ARTICLE.sectionFont)}; font-weight: 600; text-transform: uppercase; letter-spacing: 0.09em; color: ${COLORS.textFaint}; margin: 40px 0 18px; }
+  .pa-subhead { font-size: ${em(ARTICLE.subheadFont)}; font-weight: 700; line-height: 1.35; margin: 0 0 7px; color: ${COLORS.text}; }
 
   /* The rail. Solid alongside grounds, dashed alongside a warrant — the focus
      view's bracket stubs (solid into grounds, dashed into warrants) as a margin
      mark. Same inset for both, so one argument reads as one continuous edge. */
   .pa-arg { margin: 0 0 ${ARTICLE.argGap}px; padding-left: ${ARTICLE.rail}px; border-left: 1px solid ${COLORS.border}; }
-  .pa-grounds { margin: 0; font-size: ${ARTICLE.bodyFont}px; line-height: ${ARTICLE.lineHeight}; }
+  .pa-grounds { margin: 0; font-size: ${em(ARTICLE.bodyFont)}; line-height: ${ARTICLE.lineHeight}; }
   /* The warrant group hangs off the argument on its own dashed rail, headed by a
      single "assumes". Neutral, per the settled rule that the warrant bracket
      carries no column tint. */
   .pa-warrants { margin: ${ARTICLE.warrantGap}px 0 0; padding-left: ${ARTICLE.rail}px; border-left: 1px dashed ${COLORS.border}; }
   .pa-assumes { display: block; margin-bottom: 3px; }
-  .pa-warrant { margin: 0; font-size: ${ARTICLE.warrantFont}px; line-height: ${ARTICLE.lineHeight}; color: ${COLORS.textMuted}; }
+  .pa-warrant { margin: 0; font-size: ${em(ARTICLE.warrantFont)}; line-height: ${ARTICLE.lineHeight}; color: ${COLORS.textMuted}; }
   .pa-warrant + .pa-warrant { margin-top: 5px; }
 
-  .pa-quiet { margin: 0; font-size: ${ARTICLE.warrantFont}px; line-height: ${ARTICLE.lineHeight}; color: ${COLORS.textFaint}; }
-  .pa-lead { margin: 0 0 12px; font-size: ${ARTICLE.leadFont}px; line-height: 1.55; }
+  .pa-quiet { margin: 0; font-size: ${em(ARTICLE.warrantFont)}; line-height: ${ARTICLE.lineHeight}; color: ${COLORS.textFaint}; }
+  .pa-lead { margin: 0 0 12px; font-size: ${em(ARTICLE.leadFont)}; line-height: 1.55; }
   .pa-lead .pa-label { margin-right: 0.4em; }
   .pa-foot { margin-top: 44px; padding-top: 16px; border-top: 1px solid ${COLORS.border}; }
 `
@@ -109,8 +138,9 @@ const PageCtx = createContext<{
  * being read (grounds, warrants), 'tag' where it is being pointed at (a trail
  * crumb, a destination) — the focus view's split between primary handle and
  * secondary detail. `tint` colours it by its stance toward the reference thesis;
- * `cue` trails a reach mark saying how much argument lies beneath it. No href —
- * nothing to show in a status bar — so keyboard activation is wired by hand.
+ * `cue` trails a reach mark saying how much argument lies beneath it, and, on an
+ * attributive claim, the source it bottoms out in. No href — nothing to show in a
+ * status bar — so keyboard activation is wired by hand.
  */
 function ClaimLink({ gd, id, onFocus, show = 'text', tint = false, cue = false }: {
   gd: GraphData; id: string; onFocus: (id: string) => void
@@ -129,8 +159,11 @@ function ClaimLink({ gd, id, onFocus, show = 'text', tint = false, cue = false }
     <>
       <a className="pa-link" role="link" tabIndex={0} onClick={go} onKeyDown={onKey}
          style={hue ? { color: hue, textDecorationColor: hue } : undefined}>{label}</a>
+      {cue && claim?.attribution && (
+        <span className="pa-cite" title={citeTitle(claim.attribution)}><span className="pa-cite-mark">·</span>{shortSource(claim.attribution.source)}</span>
+      )}
       {reach > 0 && (
-        <span className="pa-reach" title={`${reach} more ${reach === 1 ? 'step' : 'steps'} of argument beneath this claim`}>›{reach}</span>
+        <span className="pa-reach" title={`${reach} more ${reach === 1 ? 'step' : 'steps'} of argument beneath this claim`}><span className="pa-reach-mark">›</span>{reach}</span>
       )}
     </>
   )
@@ -183,13 +216,28 @@ function Kicker({ gd, thesisId, focusId, hue, onFocus }: {
   )
 }
 
-// An attributive claim's provenance: the quote, then its source as a byline.
+// The centred claim's provenance, run into the reading rather than captioned under
+// it. The quote keeps its quotation marks and its italic — they are someone else's
+// words and must not read as the page's — but it sits at body size on the same
+// line as the source, as one sentence saying what this claim rests on.
+//
+// It is set in FULL here, both the verbatim quote and the whole reference, and this
+// is the only place on the page that is true. A claim inside an argument gets the
+// short mark and puts the rest on hover (`shortSource` / `citeTitle`), because four
+// full references in a paragraph swamp the prose they annotate. The centred claim
+// has no such competition: it is the one thing the page is about, so the reader is
+// owed its sourcing without a hover and without an abbreviation.
+//
+// Attributive claims are the graph's empirical leaves — they bottom out by being
+// checkable against a source rather than by a terminal flag — so this line is the
+// whole case for the claim, standing where "The case for" stands on any other page.
 function Deck({ attribution }: { attribution: AttributionT }) {
+  const quote = attribution.quote?.trim()
   return (
-    <figure className="pa-deck">
-      {attribution.quote && <blockquote>“{attribution.quote.trim()}”</blockquote>}
-      <figcaption className="pa-label">{sourcePhrase(attribution.source)}</figcaption>
-    </figure>
+    <p className="pa-deck">
+      {quote && <><span className="pa-quote">“{quote}”</span>{' '}</>}
+      <span className="pa-byline">{quote ? '— ' : ''}{sourcePhrase(attribution.source)}</span>
+    </p>
   )
 }
 
@@ -312,6 +360,41 @@ function WhereThisLeads({ gd, focusId, consumers, isThesis, onFocus }: {
   )
 }
 
+// ── The type scale ─────────────────────────────────────────────────────────────
+
+/**
+ * Solve for the body size this pane can carry, and the outer width that gives it
+ * `ARTICLE.charsPerLine`. The line LENGTH is the invariant; the type size is what
+ * moves. A wider pane is spent on larger type at the same measure until the type
+ * reaches `bodyFontMax`, after which the surplus becomes margin — reading distance
+ * does not grow with the window, so the gain from more width is real but finite.
+ *
+ * `paneMargin` is held back on each side first, so the article never fills its pane
+ * exactly — it stays a sheet on a ground at every width, not only above the cap.
+ *
+ * Rounded DOWN to a quarter-pixel: down, so the solved size never exceeds what the
+ * pane can actually hold and eats into the reserved margin; quarter-pixel, so a
+ * splitter drag settles instead of reflowing the page on every pointer sample.
+ */
+function useTypeScale(ref: RefObject<HTMLElement>): { scale: number; measure: number } {
+  const [body, setBody] = useState<number>(ARTICLE.bodyFont)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const ro = new ResizeObserver(entries => {
+      const w = entries[0].contentRect.width
+      if (w < 1) return
+      const usable = w - ARTICLE.paneMargin * 2
+      const fits = (usable - ARTICLE.chrome) / (ARTICLE.charsPerLine * ARTICLE.charWidthRatio)
+      const clamped = Math.min(ARTICLE.bodyFontMax, Math.max(ARTICLE.bodyFont, fits))
+      setBody(Math.floor(clamped * 4) / 4)   // never round UP past what fits
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
+  }, [ref])
+  return { scale: body / ARTICLE.bodyFont, measure: articleMeasure(body) }
+}
+
 // ── Page ───────────────────────────────────────────────────────────────────────
 
 export function ArticleView({ gd, focusId, referenceThesisId = null, onFocus, onLocate }: {
@@ -344,6 +427,11 @@ export function ArticleView({ gd, focusId, referenceThesisId = null, onFocus, on
     return (id: string) => reachBelow(gd, id, memo)
   }, [gd])
 
+  // The pane is measured on the scroller, not the article, so the article's own
+  // width can follow it without the two chasing each other.
+  const paneRef = useRef<HTMLDivElement>(null)
+  const { scale, measure } = useTypeScale(paneRef)
+
   const supports = supportsOf(gd, focusId)
   const attacks = attacksOf(gd, focusId)
   const consumers = consumersOf(gd, focusId)
@@ -361,9 +449,12 @@ export function ArticleView({ gd, focusId, referenceThesisId = null, onFocus, on
     // Keyed on the centred claim so a refocus remounts the page — scroll returns to
     // the top, as following a link does.
     <PageCtx.Provider value={{ reachOf, hueOf, groupHueOf }}>
-    <div key={focusId} lang="en" className="pa-root" style={{ position: 'fixed', top: TITLE_BAR_HEIGHT, left: 0, right: 0, bottom: 0, overflowY: 'auto', background: COLORS.background }}>
+    {/* Fills its workspace pane. `--pa-s` scales every size on the page; `measure`
+        is the width that scale needs to hold the line length. */}
+    <div ref={paneRef} key={focusId} lang="en" className="pa-root"
+         style={{ position: 'absolute', inset: 0, overflowY: 'auto', background: COLORS.background, ['--pa-s' as string]: scale }}>
       <style>{css}</style>
-      <article style={{ maxWidth: ARTICLE.measure, margin: '0 auto', padding: '48px 24px 72px' }}>
+      <article style={{ maxWidth: measure, margin: '0 auto', padding: '48px 24px 72px' }}>
         <header className="pa-head">
           {thesisId && <Kicker gd={gd} thesisId={thesisId} focusId={focusId} hue={hue} onFocus={onFocus} />}
           <h1 className="pa-title">{title}</h1>
