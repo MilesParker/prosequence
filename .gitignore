@@ -12,10 +12,12 @@ __pycache__/
 # tree so git never records a gitlink / phantom submodule for it.
 /discourse-spaces/
 
-# Stop controls (Directive 1e). The token log is runtime spend data, and the
-# kill file is a runtime signal — neither is committed, and neither belongs in
-# the corpus repo. The guard config (prosequence/guard_config.toml) IS committed.
-/logs/
+# Stop controls (Directive 1e). The kill file is a runtime signal — not
+# committed, and not part of the corpus repo. The guard config
+# (prosequence/guard_config.toml) IS committed. Runtime output (token log,
+# failed-run corpora, collection reports) lives under prosequence/logs/ and is
+# ignored by that directory's own .gitignore, which stays tracked so the path
+# exists in a fresh clone — an entry here would hide it.
 /STOP
 
 /node_modules

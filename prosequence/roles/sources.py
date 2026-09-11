@@ -30,7 +30,7 @@ Two properties this module exists to hold:
 
 * **An ingestion failure ends that ingestion run, not the collection run.**
   Failure-is-terminal is a property of a run: nothing is committed, the error
-  corpus is salvaged under `logs/failed/`, and the session is dead. The next
+  corpus is salvaged under `prosequence/logs/failed/`, and the session is dead. The next
   source is a DIFFERENT run with a different session — not a retry, not a
   recovery. Guard refusals are the exception and are re-raised: a kill file or
   a breached cap is not a fact about one source.

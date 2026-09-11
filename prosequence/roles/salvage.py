@@ -13,7 +13,7 @@ and re-spending.
 This module writes the work out instead. On failure the plan is applied
 BEST-EFFORT to the bound version and the result is serialized to an ERROR FILE:
 
-    logs/failed/<slug>.<utc>.<run>.error.v2.yaml
+    prosequence/logs/failed/<slug>.<utc>.<run>.error.v2.yaml
 
 Three properties, each load-bearing:
 
@@ -21,7 +21,7 @@ Three properties, each load-bearing:
     it, and the viz app opens it. That is the whole point of salvaging the graph
     rather than the raw finding: the failure is a graph-shaped problem (41
     unattached claims), and a graph is what you need in front of you to see it.
-  * It is named an error and it lives in `logs/`, which is gitignored in the
+  * It is named an error and it lives in `prosequence/logs/`, gitignored in the
     outer repo and is not the corpus store. `discourse-spaces/` is its own git
     repo; nothing here ever writes there. An error file cannot be mistaken for a
     corpus, and cannot be picked up by `validate.py`'s three-corpus sweep.
@@ -61,18 +61,19 @@ from typing import Optional, Sequence
 
 from ..core import ops as _ops
 from ..core.types import Corpus
+from ..paths import LOG_DIR, REPO_ROOT
 from ..core.yaml_io import serialize
 from .plan import AddClaim, AddInference, DesignateThesis, Existing, Op, Ref
 
-# logs/failed, beside the token log. Not a config key (see guarded_client's
-# DEFAULT_TOKEN_LOG for the same reasoning); the directory is created on demand.
-_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-FAILED_DIR = os.path.join(_REPO_ROOT, "logs", "failed")
+# `prosequence/logs/failed`, beside the token log. Not a config key (see
+# guarded_client's DEFAULT_TOKEN_LOG for the same reasoning); the directory is
+# created on demand.
+FAILED_DIR = os.path.join(LOG_DIR, "failed")
 
 # The viewer's unmanaged root (see src/config.ts). Gitignored and invisible to
 # the store and the validator, so writing here can never dirty the corpus repo
 # or affect a later commit.
-SCRATCH_DIR = os.path.join(_REPO_ROOT, "discourse-spaces", "scratch")
+SCRATCH_DIR = os.path.join(REPO_ROOT, "discourse-spaces", "scratch")
 
 _BANNER = "FAILED RUN — NOT A CORPUS. Do not copy this into discourse-spaces/."
 

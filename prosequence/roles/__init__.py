@@ -23,7 +23,7 @@ Ingestion-specific:
   apply       — the finding tool schema, and a finding -> a list of plan ops.
                 It does not write; `plan.execute` does.
   repair      — drops the inferences that would fail I1-I10, keeping the rest.
-  salvage     — writes a failed run's graph and finding under logs/failed/.
+  salvage     — writes a failed run's graph and finding under prosequence/logs/failed/.
   read_tools  — the read-only tool surface, for a traversal-shaped role. Not
                 bound by ingestion (single-shot) and not yet by anything else.
 

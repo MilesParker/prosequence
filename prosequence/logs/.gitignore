@@ -1,0 +1,6 @@
+# Runtime output: the token log (spend history, read back by the cumulative
+# cap), failed-run error corpora, and collection run reports. All generated,
+# none of it committed — but the directory itself is tracked so the path exists
+# in a fresh clone.
+*
+!.gitignore

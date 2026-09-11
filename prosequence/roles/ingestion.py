@@ -90,7 +90,7 @@ class IngestionRole(Role):
         Both failures here are terminal and stay terminal: nothing is committed,
         and the exception propagates unchanged. What changes is that the run's
         output no longer evaporates with it — the plan the model asked for is
-        written out as an error corpus under `logs/failed/` first (see
+        written out as an error corpus under `prosequence/logs/failed/` first (see
         `salvage`). That is the difference between diagnosing a bad finding by
         reading a graph and diagnosing it by re-running the ingestion.
 

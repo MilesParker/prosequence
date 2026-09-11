@@ -285,7 +285,7 @@ package directory lands on `sys.path`.)
 Two roots, one viewer. `discourse-spaces/*.v2.yaml` is the **managed** store —
 its own git repo, written only by a role's commit, and the only thing the
 harness knows about. `discourse-spaces/scratch/` is **unmanaged**: hand-copied
-corpora, snapshots, an error corpus lifted out of `logs/failed/`. The viewer
+corpora, snapshots, an error corpus lifted out of `prosequence/logs/failed/`. The viewer
 loads either (`?model=<name>` and `?scratch=<name>`); nothing else sees the
 second.
 
@@ -451,7 +451,7 @@ touch neither the session, ops, serializer, store, nor the invariants.
   table is applied retroactively; a price never sits in the pre-flight path. The
   cumulative counters derive from this file (no separate counter to reconcile).
   Append mode, one `write` per line, `flush` + `fsync`, so an append survives a
-  crash mid-write. Default path `logs/token_log.jsonl` at the repo root
+  crash mid-write. Default path `prosequence/logs/token_log.jsonl`
   (dir auto-created), **gitignored and outside the corpus repo** (every
   corpus-repo commit is a graph change, nothing else); the path is a constructor
   argument, not a config key.
@@ -605,10 +605,11 @@ model loop, `role.Role(Agent)` adds the corpus half.
 - **Salvage** (`salvage.py`) — every terminal failure is still terminal and
   still commits nothing, but the run's output is written out first instead of
   being lost with the exception. The plan is applied best-effort to the bound
-  version and serialized to `logs/failed/<slug>.<utc>.<run>.error.v2.yaml`: a
+  version and serialized to
+  `prosequence/logs/failed/<slug>.<utc>.<run>.error.v2.yaml`: a
   real v2 corpus (`load` reads it, `validate.check` runs over it, the viz opens
   it) whose YAML-comment header names the failure and lists every op that could
-  not be applied. It is written to `logs/`, which is gitignored and is **not**
+  not be applied. It is written to `prosequence/logs/`, which is gitignored and is **not**
   the corpus store — `discourse-spaces/` is a separate git repo and nothing here
   writes there. Three call sites: `IngestionRole.build_plan` catches
   `FindingShapeError` (no ops exist yet, so only the raw finding is written) and
@@ -837,7 +838,7 @@ thesis from a range of positions, not a large one.
   default is 10 phrases. The cascade is bounded structurally by `max_ingests`,
   and the rolling `cumulative_token_cap` still covers every call in it; the token
   log's `run_id` stitches a cascade back together for reporting.
-- **The report is written to `logs/collection/<run_id>.json`**, beside the error
+- **The report is written to `prosequence/logs/collection/<run_id>.json`**, beside the error
   corpora salvage writes. A collection run makes no commit, so without this its
   reasoning — which positions it looked for, which it failed to find, why it
   stopped — dies with the process. A run that fails terminally gets one too,

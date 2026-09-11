@@ -50,13 +50,14 @@ import uuid
 from dataclasses import dataclass
 from typing import Any, Callable, Optional, Sequence
 
+from ..paths import LOG_DIR
 
-# Default token-log path: the repo-root `logs/` dir, gitignored, outside the
-# corpus repo. Not a config key (the config enumerates caps/window/kill-file/
-# model only); it is a constructor parameter so a test can point it at a temp
-# file. The dir is created on demand at write time (see _append_log).
-_REPO_ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-DEFAULT_TOKEN_LOG = os.path.join(_REPO_ROOT, "logs", "token_log.jsonl")
+
+# Default token-log path: `prosequence/logs/`, gitignored, outside the corpus
+# repo (see `..paths`). Not a config key (the config enumerates caps/window/
+# kill-file/model only); it is a constructor parameter so a test can point it at
+# a temp file. The dir is created on demand at write time (see _append_log).
+DEFAULT_TOKEN_LOG = os.path.join(LOG_DIR, "token_log.jsonl")
 
 
 # --------------------------------------------------------------------------

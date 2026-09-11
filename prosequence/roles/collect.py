@@ -46,7 +46,8 @@ cap before the agent had reasoned about anything.
 
 A collection run produces no commit, so without this its reasoning — which
 positions it went looking for, which it failed to find, why it stopped —
-evaporates with the process. It is written to `logs/collection/<run_id>.json`,
+evaporates with the process. It is written to
+`prosequence/logs/collection/<run_id>.json`,
 beside the error corpora salvage writes. Gitignored, outside the corpus repo,
 same as every other run artifact.
 
@@ -82,11 +83,12 @@ from ..core.yaml_io import load
 from .collection import CollectionAgent, CollectionContext
 from .ingestion import IngestionRole
 from .observability import init_tracing
-from .run import CORPUS_DIR, GUARD_CONFIG, REPO_ROOT, load_env, seed_corpus, view_url
+from ..paths import LOG_DIR
+from .run import CORPUS_DIR, GUARD_CONFIG, load_env, seed_corpus, view_url
 from .fetch import Fetcher, default_fetcher
 from .search import SearchProvider, default_provider
 
-COLLECTION_LOG_DIR = os.path.join(REPO_ROOT, "logs", "collection")
+COLLECTION_LOG_DIR = os.path.join(LOG_DIR, "collection")
 
 # Run bounds. Not in guard_config.toml: that file holds GOVERNANCE (token caps,
 # kill file, iteration cap) — the bounds that apply to every run of everything.
@@ -121,7 +123,7 @@ DEFAULT_RUN_TOKEN_BUDGET = 750_000
 
 
 def _write_report(report: dict, run_id: str) -> Optional[str]:
-    """Write the run report under `logs/collection/`. Best-effort: a failure to
+    """Write the run report under `prosequence/logs/collection/`. Best-effort: a failure to
     write it must not fail a run whose corpus work already committed."""
     try:
         os.makedirs(COLLECTION_LOG_DIR, exist_ok=True)
@@ -144,7 +146,8 @@ def collect(corpus_name: str, thesis: str, scope: Optional[str] = None, *,
             fetcher: Optional[Fetcher] = None,
             store: Optional[CorpusStore] = None) -> dict:
     """Populate `corpus_name` with sources arguing `thesis` from a range of
-    positions. Returns the run report (also written under `logs/collection/`).
+    positions. Returns the run report (also written under
+    `prosequence/logs/collection/`).
 
     `scope` is optional prose narrowing what the thesis is about — the same
     role a scope note plays in a brief. It is passed to the agent and to nothing

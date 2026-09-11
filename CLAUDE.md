@@ -36,7 +36,9 @@ discourse-spaces/   <slug>.v2.yaml corpora (change only on instruction)
 prosequence/           all Python: core/ (model, session, store, validate, guard), roles/ (role protocol), scripts/
 prosequence/core/types.py      Python mirror of src/types.ts (declarations only)
 prosequence/core/validate.py   invariants
-logs/               runtime token log (gitignored, auto-created)
+prosequence/logs/   runtime output: token log, failed-run corpora,
+                    collection reports (contents gitignored by the
+                    directory's own .gitignore; paths from prosequence/paths.py)
 
 ## Documentation
 

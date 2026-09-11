@@ -313,7 +313,7 @@ def check_plan(plan: Sequence[Op], known_ids: frozenset) -> list[str]:
         at 22 attributive out of 30.
 
     Failing the second case is cheap now in a way it was not before: salvage
-    writes the graph AND the finding to logs/failed/ ahead of the raise, so the
+    writes the graph AND the finding to prosequence/logs/failed/ ahead of the raise, so the
     run's output survives for inspection and nothing is lost by refusing to
     commit it. The loud failure is what keeps a prompt defect visible instead of
     letting it accumulate as corpus sediment — which matters because the corpus
@@ -367,7 +367,7 @@ def check_plan(plan: Sequence[Op], known_ids: frozenset) -> list[str]:
     # are attributive by the attributive discipline, and an attributive claim
     # with no inference to ground is an orphan quote. In one such run 22 of 30
     # were attributive. Failing costs nothing now that salvage writes the graph
-    # and the finding to logs/failed/ first, and the loud failure is what makes
+    # and the finding to prosequence/logs/failed/ first, and the loud failure is what makes
     # the prompt defect visible instead of accumulating as corpus sediment.
     if seen and len(orphans) == len(seen):
         raise PlanError(

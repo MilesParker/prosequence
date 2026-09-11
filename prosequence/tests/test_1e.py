@@ -15,6 +15,7 @@ import tempfile
 import time
 
 from prosequence.core.guarded_client import (
+    DEFAULT_TOKEN_LOG,
     GuardedClient,
     GuardConfig,
     Refused,
@@ -279,15 +280,33 @@ def check_config_rejects_prices_and_keys():
 
 
 def check_log_gitignored_and_outside_corpus():
-    """The token log is gitignored and absent from the corpus repo."""
-    ignored = subprocess.run(["git", "-C", REPO_ROOT, "check-ignore", "logs/token_log.jsonl"],
+    """The token log is gitignored, outside the corpus repo, and its directory
+    still exists in a fresh clone.
+
+    The path comes from `DEFAULT_TOKEN_LOG`, never spelled here: this check used
+    to hardcode `logs/token_log.jsonl`, which kept passing against a path the
+    guard had stopped writing to. A check on where output goes has to ask the
+    code where it goes.
+
+    The third clause is the one the nesting introduced. `prosequence/logs/`
+    ignores its own contents and keeps `.gitignore` tracked, so the directory
+    survives a clone; an ignore rule covering the directory itself would erase
+    that file and the path with it."""
+    rel = os.path.relpath(DEFAULT_TOKEN_LOG, REPO_ROOT)
+    ignored = subprocess.run(["git", "-C", REPO_ROOT, "check-ignore", rel],
                              capture_output=True, text=True).returncode == 0
-    # Not present in the corpus repo tree at head.
+    keeper = os.path.join(os.path.dirname(rel), ".gitignore")
+    keeper_kept = subprocess.run(["git", "-C", REPO_ROOT, "check-ignore", keeper],
+                                 capture_output=True, text=True).returncode != 0
+    # Not in the corpus repo: not under its tree, and not tracked by it.
+    corpus_dir = os.path.join(REPO_ROOT, "discourse-spaces")
+    under_corpus = os.path.commonpath([DEFAULT_TOKEN_LOG, corpus_dir]) == corpus_dir
     in_corpus = subprocess.run(
-        ["git", "-C", os.path.join(REPO_ROOT, "discourse-spaces"), "ls-files", "logs/token_log.jsonl"],
+        ["git", "-C", corpus_dir, "ls-files", os.path.basename(DEFAULT_TOKEN_LOG)],
         capture_output=True, text=True).stdout.strip()
-    ok = ignored and in_corpus == ""
-    return ok, f"gitignored={ignored} in_corpus_repo={bool(in_corpus)}"
+    ok = ignored and keeper_kept and not under_corpus and in_corpus == ""
+    return ok, (f"path={rel} gitignored={ignored} dir_kept={keeper_kept} "
+                f"in_corpus_repo={bool(in_corpus) or under_corpus}")
 
 
 CHECKS = [

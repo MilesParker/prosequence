@@ -85,7 +85,7 @@ class Role(Agent):
         checked out, every op ran, and the completed graph is discarded on
         I1-I10. That graph is exactly what someone needs to read to understand
         which invariant it broke and why, so it is written out under
-        `logs/failed/` before the exception propagates. This is generic — every
+        `prosequence/logs/failed/` before the exception propagates. This is generic — every
         role commits — which is why it lives here rather than in a subclass.
         """
         final_state = self._invoke(init_state)
